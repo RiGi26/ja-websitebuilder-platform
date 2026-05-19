@@ -39,24 +39,24 @@ const INIT: FormData = {
 }
 
 const ADDONS = [
-  { id: 'blog', name: 'Blog / Artikel', price: 150000, yearlyMaint: 10000 },
-  { id: 'shop', name: 'Online Shop', price: 250000, yearlyMaint: 10000 },
-  { id: 'admin', name: 'Dashboard Admin', price: 200000, yearlyMaint: 10000 },
-  { id: 'member', name: 'Login Member', price: 250000, yearlyMaint: 10000 },
-  { id: 'lms', name: 'LMS / E-learning', price: 350000, yearlyMaint: 10000 },
-  { id: 'quiz', name: 'Quiz Online', price: 250000, yearlyMaint: 10000 },
-  { id: 'portal', name: 'Portal Siswa', price: 300000, yearlyMaint: 10000 },
-  { id: 'gsheets', name: 'Google Sheets Integration', price: 220000, yearlyMaint: 10000 },
-  { id: 'midtrans', name: 'Midtrans Payment', price: 250000, yearlyMaint: 10000 },
-  { id: 'wa', name: 'WhatsApp Automation', price: 200000, yearlyMaint: 10000 },
-  { id: 'invoice', name: 'Invoice Automation', price: 180000, yearlyMaint: 10000 },
-  { id: 'seo', name: 'SEO Optimization', price: 150000, yearlyMaint: 10000 },
-  { id: 'booking', name: 'Booking System', price: 180000, yearlyMaint: 10000 },
-  { id: 'chat', name: 'Live Chat', price: 120000, yearlyMaint: 10000 },
+  { id: 'blog', name: 'Blog / Artikel', price: 99000, yearlyMaint: 15000 },
+  { id: 'shop', name: 'Online Shop', price: 299000, yearlyMaint: 50000 },
+  { id: 'admin', name: 'Dashboard Admin', price: 199000, yearlyMaint: 30000 },
+  { id: 'member', name: 'Login Member', price: 199000, yearlyMaint: 30000 },
+  { id: 'lms', name: 'LMS / E-learning', price: 399000, yearlyMaint: 50000 },
+  { id: 'quiz', name: 'Quiz Online', price: 249000, yearlyMaint: 40000 },
+  { id: 'portal', name: 'Portal Siswa', price: 299000, yearlyMaint: 40000 },
+  { id: 'gsheets', name: 'Google Sheets Integration', price: 149000, yearlyMaint: 20000 },
+  { id: 'midtrans', name: 'Midtrans Payment', price: 299000, yearlyMaint: 40000 },
+  { id: 'wa', name: 'WhatsApp Automation', price: 199000, yearlyMaint: 30000 },
+  { id: 'invoice', name: 'Invoice Automation', price: 199000, yearlyMaint: 30000 },
+  { id: 'seo', name: 'SEO Optimization', price: 149000, yearlyMaint: 20000 },
+  { id: 'booking', name: 'Booking System', price: 249000, yearlyMaint: 40000 },
+  { id: 'chat', name: 'Live Chat', price: 99000, yearlyMaint: 15000 },
 ]
 
-const BASE_PRICE = 600000
-const BASE_YEARLY = 600000
+const BASE_PRICE = 499000
+const BASE_YEARLY = 299000
 
 // ── Reusable components ────────────────────────────────────────────────────────
 function StepHeader({ title, desc }: { title: string; desc: string }) {
