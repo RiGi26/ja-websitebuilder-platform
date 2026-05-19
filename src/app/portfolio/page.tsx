@@ -34,10 +34,10 @@ export default function PortfolioPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-light mb-4" style={{ fontFamily: "'Fraunces', serif" }}>
-            Portofolio Kami
+            Karya Desain & Sistem Kami
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Website profesional yang telah kami bangun untuk berbagai bisnis di Indonesia
+            Eksplorasi berbagai konsep antarmuka dan sistem website modern yang siap kami implementasikan untuk bisnis Anda.
           </p>
         </div>
 
