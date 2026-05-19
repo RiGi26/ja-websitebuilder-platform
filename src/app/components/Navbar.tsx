@@ -42,16 +42,14 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-2xl font-semibold">
-          WebStudio
+          JA Studio
         </Link>
 
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" className="text-sm hover:text-gray-600 transition-colors">Layanan</Link>
           <Link href="/template" className="text-sm hover:text-gray-600 transition-colors">Template</Link>
           <Link href="/portfolio" className="text-sm hover:text-gray-600 transition-colors">Portofolio</Link>
           <Link href="/pricing" className="text-sm hover:text-gray-600 transition-colors">Harga</Link>
-          <Link href="/" className="text-sm hover:text-gray-600 transition-colors">Blog</Link>
         </div>
 
         {/* CTA Button */}

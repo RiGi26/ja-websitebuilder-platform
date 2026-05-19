@@ -24,7 +24,7 @@ export default function Home() {
                 variant="secondary"
                 className="px-4 py-2 bg-purple-50 text-purple-700 border-purple-200 text-xs font-medium"
               >
-                ✦ Terpercaya oleh 500+ bisnis
+                ✦ Desain Premium, Harga UMKM
               </Badge>
             </motion.div>
 
@@ -62,10 +62,10 @@ export default function Home() {
               className="flex items-center justify-center gap-3 mb-6"
             >
               <Button asChild size="lg" className="bg-black hover:bg-gray-800">
-                <Link href="/portfolio">Lihat Template</Link>
+                <Link href="/template">Lihat Template</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/order">Hubungi Kami</Link>
+                <Link href="/order">Ajukan Proyek</Link>
               </Button>
             </motion.div>
 
@@ -81,7 +81,7 @@ export default function Home() {
                   <Star key={i} className="w-4 h-4 fill-current" />
                 ))}
               </span>
-              Rated 4.9 dari 120+ ulasan
+              Harga mulai Rp 499.000 / tahun pertama
             </motion.p>
           </div>
 
@@ -103,7 +103,7 @@ export default function Home() {
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="bg-white rounded px-3 py-1 text-xs text-gray-500">
-                    example-website.com
+                    studio.japanarenacorp.com
                   </div>
                 </div>
               </div>

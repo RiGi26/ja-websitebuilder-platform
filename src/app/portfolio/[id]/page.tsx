@@ -44,7 +44,7 @@ export default function CaseStudyPage() {
             <span className="flex items-center gap-2"><Clock className="w-4 h-4" />{project.year}</span>
             <span className="flex items-center gap-2"><Users className="w-4 h-4" />{project.duration}</span>
             <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-purple-600 hover:underline">
-              <ExternalLink className="w-4 h-4" />Lihat Website Live
+              <ExternalLink className="w-4 h-4" />Lihat Demo Konsep
             </a>
           </div>
         </div>
@@ -145,11 +145,13 @@ export default function CaseStudyPage() {
             <Button asChild variant="outline">
               <Link href="/portfolio"><ArrowLeft className="w-4 h-4 mr-2" />Semua Proyek</Link>
             </Button>
-            <Button asChild>
-              <Link href={`/portfolio/${parseInt(id) + 1}`}>
-                Proyek Berikutnya<ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
+            {parseInt(id) < Object.keys(projectsData).length && (
+              <Button asChild>
+                <Link href={`/portfolio/${parseInt(id) + 1}`}>
+                  Proyek Berikutnya<ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

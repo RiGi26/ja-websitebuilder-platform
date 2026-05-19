@@ -11,7 +11,7 @@ import { Monitor, Tablet, Smartphone, Star, Check, FileText, Headphones, Palette
 import { templatesData } from '@/data/templates'
 import { notFound, useParams } from 'next/navigation'
 
-const features = ['5 halaman termasuk', 'Form kontak', 'SEO setup', 'Hosting gratis 1 tahun']
+const features = ['Desain sesuai template pilihan', 'Domain + Hosting 1 tahun', 'Mobile Friendly & Responsive', 'Garansi Revisi Minor']
 const included = [
   { icon: FileText, label: '5 Halaman' },
   { icon: Palette, label: 'Desain Custom' },
@@ -78,35 +78,6 @@ export default function TemplateDetailPage() {
               </div>
             </div>
 
-            {/* Reviews */}
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4">Ulasan</h3>
-              <div className="space-y-4">
-                {reviews.map((review, i) => (
-                  <div key={i} className="bg-white border rounded-lg p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center font-semibold text-purple-600">
-                        {review.avatar}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="font-semibold">{review.name}</p>
-                            <p className="text-sm text-gray-500">{review.role}</p>
-                          </div>
-                          <div className="flex text-yellow-400">
-                            {[...Array(review.rating)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-current" />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-gray-700">{review.comment}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Sticky Sidebar */}
