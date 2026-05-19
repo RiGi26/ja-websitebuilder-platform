@@ -7,8 +7,9 @@ import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Textarea } from '@/app/components/ui/textarea'
 import { Separator } from '@/app/components/ui/separator'
-import { Check, Building2, User, ChevronRight, ChevronLeft, Send, X, LayoutTemplate } from 'lucide-react'
+import { Check, Building2, User, ChevronRight, ChevronLeft, Send, X, LayoutTemplate, Loader2 } from 'lucide-react'
 import { templatesData } from '@/data/templates'
+import { supabase } from '@/lib/supabase'
 
 // ── Types & Constants ─────────────────────────────────────────────────────────
 type ClientType = 'individu' | 'perusahaan' | null
@@ -95,6 +96,8 @@ function OrderFormInner() {
     templateId: initialTemplateId
   })
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Force sync URL params with state in case of client-side caching
   useEffect(() => {
@@ -127,6 +130,43 @@ function OrderFormInner() {
   }, BASE_YEARLY)
 
   const finalPrice = BASE_PRICE + totalAddons
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            client_type: form.clientType,
+            nama_usaha: form.clientType === 'individu' ? form.namaUsaha : null,
+            nama_perusahaan: form.clientType === 'perusahaan' ? form.namaPerusahaan : null,
+            nama_pic: form.clientType === 'perusahaan' ? form.namapic : null,
+            jabatan: form.clientType === 'perusahaan' ? form.jabatan : null,
+            nomor_wa: form.nomorWa,
+            email: form.email,
+            industri: form.industri,
+            template_id: form.templateId,
+            referensi_manual: form.referensiManual,
+            selected_addons: form.selectedAddons,
+            total_estimasi: finalPrice,
+            total_maintenance: totalYearlyMaint,
+            status: 'pending' // Default status untuk dashboard
+          }
+        ])
+
+      if (error) throw error
+
+      setSubmitted(true)
+    } catch (err: any) {
+      console.error('Submission error:', err)
+      setSubmitError('Terjadi kesalahan koneksi. Pastikan Supabase sudah di-setup dengan benar.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const totalSteps = 4
   const progress = step === 0 ? 0 : Math.round((step / totalSteps) * 100)
@@ -446,7 +486,7 @@ function OrderFormInner() {
 
             {/* Terms */}
             <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
-              className="flex items-start gap-3 w-full text-left bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors">
+              className="flex items-start gap-3 w-full text-left bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors mb-4">
               <span className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all ${
                 form.agreedToTerms ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
               }`}>
@@ -456,6 +496,12 @@ function OrderFormInner() {
                 Saya mengerti bahwa ini adalah <strong className="text-blue-800">Estimasi Awal untuk website berbasis Template</strong>. Jika saya mengajukan referensi dengan fitur/desain <strong className="text-blue-800">Custom</strong>, harga final dapat menyesuaikan tingkat kerumitan pengerjaan. Saya menyetujui untuk dihubungi via WhatsApp.
               </span>
             </button>
+
+            {submitError && (
+              <div className="bg-red-50 text-red-600 text-sm p-4 rounded-xl border border-red-200">
+                {submitError}
+              </div>
+            )}
           </div>
         )}
 
@@ -475,12 +521,21 @@ function OrderFormInner() {
           )}
           {step === totalSteps && (
             <Button
-              disabled={!form.agreedToTerms}
-              onClick={() => setSubmitted(true)}
-              className="bg-blue-600 hover:bg-blue-700 gap-2 px-8 shadow-lg shadow-blue-600/30"
+              disabled={!form.agreedToTerms || isSubmitting}
+              onClick={handleSubmit}
+              className="bg-blue-600 hover:bg-blue-700 gap-2 px-8 shadow-lg shadow-blue-600/30 min-w-[200px]"
             >
-              <Send className="w-4 h-4" />
-              Kirim Pendaftaran
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Mengirim...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Kirim Pendaftaran
+                </>
+              )}
             </Button>
           )}
         </div>
