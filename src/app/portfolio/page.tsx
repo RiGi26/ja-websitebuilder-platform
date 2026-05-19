@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic'
 const MasonryGrid = dynamic(() => import('react-responsive-masonry'), { ssr: false })
 
 import { projectsList as projects } from '@/data/portfolio'
-const filters = ['Semua', 'Restoran', 'Klinik', 'Properti', 'Jasa']
+const filters = ['Semua', 'F&B', 'Retail', 'Korporat', 'Kesehatan', 'Edukasi']
 
 const getHeight = (size: string) => {
   switch (size) {
@@ -72,10 +72,13 @@ export default function PortfolioPage() {
                   <div className={`w-full h-full bg-gradient-to-br ${project.color} flex items-center justify-center`}>
                     <span className="text-7xl">{project.image}</span>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      <p className="text-sm text-white/80 mb-1">{project.category}</p>
+                      <p className="text-xs text-white/70 mb-1">{project.category}</p>
                       <h3 className="text-2xl font-semibold text-white">{project.title}</h3>
+                      {project.badge && (
+                        <span className="text-[10px] text-purple-200 mt-1 block">{project.badge}</span>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -22,7 +22,7 @@ export default function CaseStudyPage() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/portfolio">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Portofolio
+              Kembali ke Karya Kami
             </Link>
           </Button>
         </div>
@@ -36,6 +36,9 @@ export default function CaseStudyPage() {
               <Badge key={tag} variant="secondary">{tag}</Badge>
             ))}
           </div>
+          {project.badge && (
+            <p className="text-xs font-semibold uppercase tracking-widest text-purple-500 mb-3">{project.badge}</p>
+          )}
           <h1 className="text-5xl font-light mb-6" style={{ fontFamily: "'Fraunces', serif" }}>
             {project.title}
           </h1>

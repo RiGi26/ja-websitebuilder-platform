@@ -41,8 +41,8 @@ export function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-semibold">
-          JA Studio
+        <Link href="/" className="text-2xl font-semibold tracking-tight">
+          Japan Arena <span className="text-purple-600">Studio</span>
         </Link>
 
         {/* Nav Links */}
@@ -54,7 +54,7 @@ export function Navbar() {
 
         {/* CTA Button */}
         <Button asChild>
-          <Link href="/order">Mulai Gratis</Link>
+          <Link href="/order">Konsultasi Gratis</Link>
         </Button>
       </div>
     </nav>
