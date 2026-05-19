@@ -6,27 +6,27 @@ import { Check } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 
 const addons = [
-  { id: 'blog', name: 'Blog / Artikel', price: 99000, yearlyMaint: 15000 },
-  { id: 'shop', name: 'Online Shop', price: 299000, yearlyMaint: 50000 },
-  { id: 'admin', name: 'Dashboard Admin', price: 199000, yearlyMaint: 30000 },
-  { id: 'member', name: 'Login Member', price: 199000, yearlyMaint: 30000 },
-  { id: 'lms', name: 'LMS / E-learning', price: 399000, yearlyMaint: 50000 },
-  { id: 'quiz', name: 'Quiz Online', price: 249000, yearlyMaint: 40000 },
-  { id: 'portal', name: 'Portal Siswa', price: 299000, yearlyMaint: 40000 },
-  { id: 'gsheets', name: 'Google Sheets Integration', price: 149000, yearlyMaint: 20000 },
-  { id: 'midtrans', name: 'Midtrans Payment', price: 299000, yearlyMaint: 40000 },
-  { id: 'wa', name: 'WhatsApp Automation', price: 199000, yearlyMaint: 30000 },
-  { id: 'invoice', name: 'Invoice Automation', price: 199000, yearlyMaint: 30000 },
-  { id: 'seo', name: 'SEO Optimization', price: 149000, yearlyMaint: 20000 },
-  { id: 'booking', name: 'Booking System', price: 249000, yearlyMaint: 40000 },
-  { id: 'chat', name: 'Live Chat', price: 99000, yearlyMaint: 15000 },
+  { id: 'blog', name: 'Blog / Artikel', price: 99000, yearlyMaint: 50000 },
+  { id: 'shop', name: 'Online Shop', price: 299000, yearlyMaint: 199000 },
+  { id: 'admin', name: 'Dashboard Admin', price: 199000, yearlyMaint: 99000 },
+  { id: 'member', name: 'Login Member', price: 199000, yearlyMaint: 99000 },
+  { id: 'lms', name: 'LMS / E-learning', price: 399000, yearlyMaint: 299000 },
+  { id: 'quiz', name: 'Quiz Online', price: 249000, yearlyMaint: 99000 },
+  { id: 'portal', name: 'Portal Siswa', price: 299000, yearlyMaint: 149000 },
+  { id: 'gsheets', name: 'Google Sheets Integration', price: 149000, yearlyMaint: 49000 },
+  { id: 'midtrans', name: 'Midtrans Payment', price: 299000, yearlyMaint: 99000 },
+  { id: 'wa', name: 'WhatsApp Automation', price: 199000, yearlyMaint: 99000 },
+  { id: 'invoice', name: 'Invoice Automation', price: 199000, yearlyMaint: 99000 },
+  { id: 'seo', name: 'SEO Optimization', price: 149000, yearlyMaint: 49000 },
+  { id: 'booking', name: 'Booking System', price: 249000, yearlyMaint: 99000 },
+  { id: 'chat', name: 'Live Chat', price: 99000, yearlyMaint: 49000 },
 ]
 
 export default function PricingCalculatorPage() {
   const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set())
 
   const basePrice = 499000
-  const baseYearly = 299000
+  const baseYearly = 499000
 
   const handleToggle = (id: string) => {
     const newSelected = new Set(selectedAddons)
@@ -171,7 +171,7 @@ export default function PricingCalculatorPage() {
                 <ul className="space-y-3 pl-4 list-disc marker:text-blue-400">
                   <li><strong>Tahun pertama mencakup:</strong> Setup website, Development, Domain, Hosting, Maintenance basic.</li>
                   <li><strong>Tahun kedua dan seterusnya hanya dikenakan biaya:</strong> Hosting, Domain, Maintenance fitur aktif.</li>
-                  <li>Maintenance fitur dikenakan bervariasi antara {formatPrice(15000)} hingga {formatPrice(50000)} / tahun tergantung fitur.</li>
+                  <li>Maintenance fitur dikenakan bervariasi antara {formatPrice(49000)} hingga {formatPrice(299000)} / tahun tergantung fitur dan penggunaan kapasitas penyimpanan (storage).</li>
                   <li>Harga di atas merupakan estimasi awal dan berlaku khusus untuk pengerjaan <strong>Berbasis Template</strong>.</li>
                   <li>Jika Anda mengajukan referensi website manual dengan <strong>Desain/Fitur Custom yang kompleks</strong>, harga final akan dihitung ulang dan disesuaikan saat konsultasi via WhatsApp.</li>
                 </ul>
