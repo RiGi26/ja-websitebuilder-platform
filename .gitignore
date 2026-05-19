@@ -2,10 +2,9 @@
 node_modules/
 .pnpm-store/
 
-# Build output
-dist/
-dist-ssr/
-build/
+# Next.js build output
+.next/
+out/
 
 # Environment variables (jangan commit nilai sensitif)
 .env.local
