@@ -86,17 +86,15 @@ function formatPrice(price: number) {
 // ── Internal Form Component (Wrapped in Suspense) ──────────────────────────────
 function OrderFormInner() {
   const searchParams = useSearchParams()
-  const [step, setStep] = useState(0) // 0=Tipe, 1=Info, 2=Referensi, 3=Addons, 4=Review
-  const [form, setForm] = useState<FormData>(INIT)
-  const [submitted, setSubmitted] = useState(false)
+  const templateParam = searchParams.get('template')
+  const initialTemplateId = templateParam && templatesData[templateParam] ? templateParam : null
 
-  // Initialize templateId from URL if present
-  useEffect(() => {
-    const templateParam = searchParams.get('template')
-    if (templateParam && templatesData[templateParam]) {
-      setForm(prev => ({ ...prev, templateId: templateParam }))
-    }
-  }, [searchParams])
+  const [step, setStep] = useState(0) // 0=Tipe, 1=Info, 2=Referensi, 3=Addons, 4=Review
+  const [form, setForm] = useState<FormData>({
+    ...INIT,
+    templateId: initialTemplateId
+  })
+  const [submitted, setSubmitted] = useState(false)
 
   const set = (key: keyof FormData, value: unknown) => setForm(f => ({ ...f, [key]: value }))
 
