@@ -55,27 +55,17 @@ export default function TemplateDetailPage() {
                 device === 'desktop' ? 'w-full aspect-[16/10]' :
                 device === 'tablet' ? 'w-2/3 aspect-[4/3]' : 'w-1/3 aspect-[9/16]'
               }`}>
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                  <div className="text-center p-8">
-                    <div className="text-5xl mb-4">{template.image}</div>
-                    <h3 className="text-2xl font-semibold mb-2">{template.title}</h3>
-                    <p className="text-gray-600">Template Website {template.category}</p>
-                  </div>
-                </div>
+                <iframe 
+                  src={template.demoUrl} 
+                  className="w-full h-full rounded-lg border-none bg-white"
+                  title={`Preview ${template.title}`}
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
+                />
               </div>
             </div>
 
-            {/* Screenshots */}
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4">Screenshots Lainnya</h3>
-              <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Halaman {i}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             {/* Specs */}
             <div className="mt-8 bg-gray-50 rounded-lg p-6">
