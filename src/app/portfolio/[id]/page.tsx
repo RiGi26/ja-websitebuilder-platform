@@ -7,37 +7,7 @@ import { Separator } from '@/app/components/ui/separator'
 import { ArrowLeft, ArrowRight, ExternalLink, TrendingUp, Users, Clock } from 'lucide-react'
 import { useParams } from 'next/navigation'
 
-const projectsData: Record<string, {
-  id: number; title: string; category: string; year: string; duration: string
-  liveUrl: string; image: string; color: string; tags: string[]
-  challenge: string; solution: string
-  results: { metric: string; description: string }[]
-  screenshots: { title: string; description: string }[]
-  testimonial: { quote: string; author: string; role: string; company: string; avatar: string }
-}> = {
-  '1': {
-    id: 1, title: 'Kafe Nusantara', category: 'Restoran', year: '2025', duration: '14 hari',
-    liveUrl: 'https://kafenusantara.com', image: '🍽️', color: 'from-orange-100 to-red-100',
-    tags: ['React', 'Tailwind CSS', 'SEO', 'Responsive'],
-    challenge: 'Kafe Nusantara membutuhkan website yang modern dan mudah digunakan untuk menampilkan menu, lokasi, dan reservasi online. Website lama mereka tidak mobile-friendly dan sulit diupdate.',
-    solution: 'Kami membangun website baru dengan fokus pada user experience dan mobile-first design. Integrasi dengan sistem reservasi memudahkan pelanggan untuk booking meja secara online.',
-    results: [
-      { metric: 'Traffic +300%', description: 'Peningkatan pengunjung website dalam 3 bulan' },
-      { metric: 'Konversi +40%', description: 'Lebih banyak reservasi online' },
-      { metric: 'Loading 2.1s', description: 'Waktu loading yang sangat cepat' },
-    ],
-    screenshots: [
-      { title: 'Homepage', description: 'Landing page dengan menu unggulan' },
-      { title: 'Menu', description: 'Katalog menu lengkap dengan foto' },
-      { title: 'Reservasi', description: 'Form booking yang mudah digunakan' },
-      { title: 'Kontak', description: 'Lokasi dan informasi kontak' },
-    ],
-    testimonial: {
-      quote: 'Website baru kami benar-benar mengubah cara kami berinteraksi dengan pelanggan. Reservasi online meningkat drastis dan pelanggan sering memuji tampilan website yang profesional.',
-      author: 'Budi Santoso', role: 'Pemilik', company: 'Kafe Nusantara', avatar: 'BS',
-    },
-  },
-}
+import { projectsData } from '@/data/portfolio'
 
 export default function CaseStudyPage() {
   const params = useParams()

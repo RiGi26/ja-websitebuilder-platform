@@ -8,17 +8,7 @@ import dynamic from 'next/dynamic'
 // Dynamic import karena react-responsive-masonry menggunakan browser API
 const MasonryGrid = dynamic(() => import('react-responsive-masonry'), { ssr: false })
 
-const projects = [
-  { id: 1, title: 'Kafe Nusantara', category: 'Restoran', image: '🍽️', color: 'from-orange-100 to-red-100', size: 'large' },
-  { id: 2, title: 'Klinik Sehat Bersama', category: 'Klinik', image: '🏥', color: 'from-blue-100 to-cyan-100', size: 'small' },
-  { id: 3, title: 'Properti Prima', category: 'Properti', image: '🏠', color: 'from-green-100 to-emerald-100', size: 'medium' },
-  { id: 4, title: 'Toko Buku Pintar', category: 'Jasa', image: '📚', color: 'from-purple-100 to-pink-100', size: 'small' },
-  { id: 5, title: 'Restoran Padang Sederhana', category: 'Restoran', image: '🍛', color: 'from-yellow-100 to-orange-100', size: 'medium' },
-  { id: 6, title: 'Spa & Wellness', category: 'Jasa', image: '💆', color: 'from-pink-100 to-purple-100', size: 'large' },
-  { id: 7, title: 'Rumah Sakit Harapan', category: 'Klinik', image: '🏥', color: 'from-teal-100 to-blue-100', size: 'small' },
-  { id: 8, title: 'Apartemen Modern', category: 'Properti', image: '🏢', color: 'from-gray-100 to-slate-100', size: 'medium' },
-]
-
+import { projectsList as projects } from '@/data/portfolio'
 const filters = ['Semua', 'Restoran', 'Klinik', 'Properti', 'Jasa']
 
 const getHeight = (size: string) => {
