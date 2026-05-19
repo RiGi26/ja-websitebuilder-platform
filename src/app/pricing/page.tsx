@@ -172,7 +172,8 @@ export default function PricingCalculatorPage() {
                   <li><strong>Tahun pertama mencakup:</strong> Setup website, Development, Domain, Hosting, Maintenance basic.</li>
                   <li><strong>Tahun kedua dan seterusnya hanya dikenakan biaya:</strong> Hosting, Domain, Maintenance fitur aktif.</li>
                   <li>Maintenance fitur dikenakan bervariasi antara {formatPrice(15000)} hingga {formatPrice(50000)} / tahun tergantung fitur.</li>
-                  <li>Harga di atas merupakan estimasi awal dan dapat berubah untuk request custom yang kompleks.</li>
+                  <li>Harga di atas merupakan estimasi awal dan berlaku khusus untuk pengerjaan <strong>Berbasis Template</strong>.</li>
+                  <li>Jika Anda mengajukan referensi website manual dengan <strong>Desain/Fitur Custom yang kompleks</strong>, harga final akan dihitung ulang dan disesuaikan saat konsultasi via WhatsApp.</li>
                 </ul>
               </div>
 

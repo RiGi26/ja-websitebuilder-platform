@@ -453,7 +453,7 @@ function OrderFormInner() {
                 {form.agreedToTerms && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </span>
               <span className="text-sm text-gray-700 leading-relaxed">
-                Saya mengerti bahwa ini adalah <strong className="text-blue-800">Estimasi Awal</strong>. Harga final dapat menyesuaikan tingkat kesulitan. Saya menyetujui untuk dihubungi via WhatsApp.
+                Saya mengerti bahwa ini adalah <strong className="text-blue-800">Estimasi Awal untuk website berbasis Template</strong>. Jika saya mengajukan referensi dengan fitur/desain <strong className="text-blue-800">Custom</strong>, harga final dapat menyesuaikan tingkat kerumitan pengerjaan. Saya menyetujui untuk dihubungi via WhatsApp.
               </span>
             </button>
           </div>
