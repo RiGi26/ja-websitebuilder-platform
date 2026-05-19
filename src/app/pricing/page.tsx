@@ -2,212 +2,187 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Check } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
-import { Badge } from '@/app/components/ui/badge'
-import { Switch } from '@/app/components/ui/switch'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/app/components/ui/accordion'
-import { Check, X } from 'lucide-react'
 
-export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(false)
+const addons = [
+  { id: 'blog', name: 'Blog / Artikel', price: 150000, yearlyMaint: 10000 },
+  { id: 'shop', name: 'Online Shop', price: 250000, yearlyMaint: 10000 },
+  { id: 'admin', name: 'Dashboard Admin', price: 200000, yearlyMaint: 10000 },
+  { id: 'member', name: 'Login Member', price: 250000, yearlyMaint: 10000 },
+  { id: 'lms', name: 'LMS / E-learning', price: 350000, yearlyMaint: 10000 },
+  { id: 'quiz', name: 'Quiz Online', price: 250000, yearlyMaint: 10000 },
+  { id: 'portal', name: 'Portal Siswa', price: 300000, yearlyMaint: 10000 },
+  { id: 'gsheets', name: 'Google Sheets Integration', price: 220000, yearlyMaint: 10000 },
+  { id: 'midtrans', name: 'Midtrans Payment', price: 250000, yearlyMaint: 10000 },
+  { id: 'wa', name: 'WhatsApp Automation', price: 200000, yearlyMaint: 10000 },
+  { id: 'invoice', name: 'Invoice Automation', price: 180000, yearlyMaint: 10000 },
+  { id: 'seo', name: 'SEO Optimization', price: 150000, yearlyMaint: 10000 },
+  { id: 'booking', name: 'Booking System', price: 180000, yearlyMaint: 10000 },
+  { id: 'chat', name: 'Live Chat', price: 120000, yearlyMaint: 10000 },
+]
 
-  const plans = [
-    {
-      name: 'STARTER',
-      title: 'Paket Starter',
-      description: 'Untuk bisnis yang baru mulai',
-      priceMonthly: 1500000,
-      priceYearly: 14400000,
-      featured: false,
-      features: [
-        { name: '3 halaman website', included: true },
-        { name: 'Desain responsif', included: true },
-        { name: 'Form kontak', included: true },
-        { name: 'SEO basic', included: true },
-        { name: 'Hosting 6 bulan', included: true },
-        { name: 'Domain gratis', included: false },
-        { name: 'E-commerce', included: false },
-        { name: 'Custom backend', included: false },
-      ],
-    },
-    {
-      name: 'BISNIS',
-      title: 'Paket Bisnis',
-      description: 'Paling populer untuk bisnis berkembang',
-      priceMonthly: 2500000,
-      priceYearly: 24000000,
-      featured: true,
-      features: [
-        { name: '5 halaman website', included: true },
-        { name: 'Desain responsif', included: true },
-        { name: 'Form kontak', included: true },
-        { name: 'SEO advanced', included: true },
-        { name: 'Hosting 1 tahun', included: true },
-        { name: 'Domain gratis', included: true },
-        { name: 'E-commerce basic', included: true },
-        { name: 'Custom backend', included: false },
-      ],
-    },
-    {
-      name: 'KUSTOM',
-      title: 'Paket Kustom',
-      description: 'Solusi enterprise untuk bisnis besar',
-      priceMonthly: null,
-      priceYearly: null,
-      featured: false,
-      features: [
-        { name: 'Unlimited halaman', included: true },
-        { name: 'Desain responsif', included: true },
-        { name: 'Form kontak', included: true },
-        { name: 'SEO advanced', included: true },
-        { name: 'Hosting unlimited', included: true },
-        { name: 'Domain gratis', included: true },
-        { name: 'E-commerce advanced', included: true },
-        { name: 'Custom backend', included: true },
-      ],
-    },
-  ]
+export default function PricingCalculatorPage() {
+  const [selectedAddons, setSelectedAddons] = useState<Set<string>>(new Set())
 
-  const faqs = [
-    {
-      question: 'Berapa lama proses pembuatan website?',
-      answer: 'Rata-rata 5-7 hari kerja untuk paket Starter dan Bisnis. Untuk paket Kustom, timeline disesuaikan dengan kompleksitas proyek.',
-    },
-    {
-      question: 'Apakah saya bisa mengubah paket di kemudian hari?',
-      answer: 'Ya, Anda bisa upgrade atau downgrade paket kapan saja. Tim kami akan membantu proses migrasi.',
-    },
-    {
-      question: 'Apa yang terjadi setelah masa hosting habis?',
-      answer: 'Anda akan menerima notifikasi sebelum masa hosting habis dan bisa melakukan perpanjangan dengan harga spesial untuk klien existing.',
-    },
-    {
-      question: 'Apakah ada biaya tersembunyi?',
-      answer: 'Tidak ada biaya tersembunyi. Semua yang tertera di paket sudah termasuk dalam harga. Biaya tambahan hanya untuk add-on yang Anda minta.',
-    },
-  ]
+  const basePrice = 600000
+  const baseYearly = 600000
+
+  const handleToggle = (id: string) => {
+    const newSelected = new Set(selectedAddons)
+    if (newSelected.has(id)) {
+      newSelected.delete(id)
+    } else {
+      newSelected.add(id)
+    }
+    setSelectedAddons(newSelected)
+  }
+
+  // Calculate totals
+  let totalFirstYear = basePrice
+  let totalYearlyMaint = baseYearly
+
+  selectedAddons.forEach((id) => {
+    const addon = addons.find((a) => a.id === id)
+    if (addon) {
+      totalFirstYear += addon.price
+      totalYearlyMaint += addon.yearlyMaint
+    }
+  })
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
 
   return (
-    <div className="pt-24 pb-16 px-6">
+    <div className="pt-24 pb-16 px-6 bg-[#f4f7fb] min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4 bg-purple-50 text-purple-700">
-            Transparan, tanpa biaya tersembunyi
-          </Badge>
-          <h1 className="text-5xl font-light mb-4" style={{ fontFamily: "'Fraunces', serif" }}>
-            Pilih Paket yang Tepat
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Investasi terbaik untuk bisnis Anda. Semua paket sudah termasuk maintenance dan support.
-          </p>
+        {/* Hero Section */}
+        <div className="bg-gradient-to-br from-slate-900 to-blue-900 p-10 md:p-14 rounded-[34px] text-white mb-8 relative overflow-hidden shadow-2xl">
+          <div className="absolute -top-32 -right-32 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="relative z-10">
+            <span className="inline-block px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-sm font-medium mb-6">
+              JapanArena Digital Studio
+            </span>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+              Smart Website Pricing Calculator
+            </h1>
+            <p className="text-lg text-blue-100 max-w-2xl leading-relaxed">
+              Hitung estimasi biaya website sesuai kebutuhan Anda. 
+              Harga tahun pertama sudah termasuk setup, development website, domain, hosting, dan maintenance basic.
+            </p>
+          </div>
         </div>
 
-        {/* Billing Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span className={!isYearly ? 'font-semibold' : 'text-gray-500'}>Bayar Bulanan</span>
-          <Switch checked={isYearly} onCheckedChange={setIsYearly} />
-          <span className={isYearly ? 'font-semibold' : 'text-gray-500'}>Bayar Tahunan</span>
-          {isYearly && (
-            <Badge className="bg-green-100 text-green-700 border-green-200">Hemat 20%</Badge>
-          )}
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Column (Options) */}
+          <div className="lg:col-span-8 bg-white p-8 md:p-10 rounded-[30px] shadow-sm">
+            
+            {/* Base Package Info */}
+            <div className="bg-slate-50 border border-blue-100 p-8 rounded-3xl mb-10">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Paket Hemat — {formatPrice(basePrice)} / Tahun Pertama</h3>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-600">
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Setup website</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Pembuatan website modern basic</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Domain</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Hosting</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> SSL / HTTPS</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Mobile friendly</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Maintenance basic</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-blue-600" /> Support revisi minor</li>
+              </ul>
+            </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan, i) => (
-            <div
-              key={i}
-              className={`relative rounded-xl p-8 ${
-                plan.featured
-                  ? 'bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-300 shadow-xl'
-                  : 'bg-white border border-gray-200 shadow-sm'
-              }`}
-            >
-              {plan.featured && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white">
-                  Paling Populer
-                </Badge>
-              )}
-              <div className="mb-6">
-                <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">{plan.name}</p>
-                <h3 className="text-2xl font-semibold mb-2">{plan.title}</h3>
-                <p className="text-sm text-gray-600">{plan.description}</p>
-              </div>
-              <div className="mb-6">
-                {plan.priceMonthly ? (
-                  <>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">
-                        {formatPrice(isYearly ? plan.priceYearly! / 12 : plan.priceMonthly)}
-                      </span>
-                      <span className="text-gray-500">/bulan</span>
+            <h2 className="text-2xl font-extrabold mb-6 text-slate-900">Pilih Fitur Tambahan (Add-on)</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {addons.map((addon) => {
+                const isSelected = selectedAddons.has(addon.id)
+                return (
+                  <label
+                    key={addon.id}
+                    className={`cursor-pointer border-2 rounded-2xl p-5 transition-all duration-200 ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-slate-200 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1">
+                        <input
+                          type="checkbox"
+                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          checked={isSelected}
+                          onChange={() => handleToggle(addon.id)}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-slate-900 mb-1">{addon.name}</h4>
+                        <div className="text-blue-600 font-bold mb-1">+ {formatPrice(addon.price)}</div>
+                        <div className="text-sm text-slate-500">+ {formatPrice(addon.yearlyMaint)}/tahun maintenance</div>
+                      </div>
                     </div>
-                    {isYearly && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        Dibayar {formatPrice(plan.priceYearly!)} per tahun
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-2xl font-semibold">Hubungi Sales</div>
-                )}
-              </div>
-              <div className="border-t border-gray-200 pt-6 mb-6">
-                <div className="space-y-3">
-                  {plan.features.map((feature, j) => (
-                    <div key={j} className="flex items-start gap-3">
-                      {feature.included ? (
-                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      ) : (
-                        <X className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
-                      )}
-                      <span className={feature.included ? 'text-gray-900' : 'text-gray-400'}>
-                        {feature.name}
-                      </span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Right Column (Summary Sticky) */}
+          <div className="lg:col-span-4 relative">
+            <div className="sticky top-28">
+              
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 rounded-[30px] shadow-xl shadow-blue-900/20 mb-6">
+                <p className="text-blue-100 text-sm font-medium mb-1">Total Tahun Pertama</p>
+                <div className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight">
+                  {formatPrice(totalFirstYear)}
+                </div>
+                <p className="text-sm text-blue-200 mb-8 border-b border-white/20 pb-6">
+                  Sudah termasuk setup + website + domain + hosting + maintenance
+                </p>
+
+                <p className="text-blue-100 text-sm font-medium mb-1">Estimasi Tahun Kedua & Seterusnya</p>
+                <div className="text-2xl font-bold mb-2">
+                  {formatPrice(totalYearlyMaint)} <span className="text-lg font-normal">/ tahun</span>
+                </div>
+                <p className="text-sm text-blue-200 mb-6 border-b border-white/20 pb-6">
+                  Hosting + domain + maintenance fitur
+                </p>
+
+                <div className="space-y-3 mb-8">
+                  <div className="flex justify-between text-sm items-center py-2 border-b border-white/10 border-dashed">
+                    <span className="flex items-center gap-2"><Check className="w-4 h-4" /> Paket Website Hemat</span>
+                    <span className="font-semibold">{formatPrice(basePrice)}</span>
+                  </div>
+                  {addons.filter(a => selectedAddons.has(a.id)).map(addon => (
+                    <div key={addon.id} className="flex justify-between text-sm items-center py-2 border-b border-white/10 border-dashed">
+                      <span className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-300" /> {addon.name}</span>
+                      <span className="font-semibold">+ {formatPrice(addon.price)}</span>
                     </div>
                   ))}
                 </div>
-              </div>
-              <Button
-                asChild
-                className={`w-full ${
-                  plan.featured
-                    ? 'bg-black hover:bg-gray-800'
-                    : 'bg-white text-black border-2 border-black hover:bg-gray-50'
-                }`}
-              >
-                <Link href="/order">
-                  {plan.priceMonthly ? 'Pilih Paket' : 'Hubungi Sales'}
-                </Link>
-              </Button>
-            </div>
-          ))}
-        </div>
 
-        {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-semibold text-center mb-8" style={{ fontFamily: "'Fraunces', serif" }}>
-            Pertanyaan Umum
-          </h2>
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border rounded-lg px-6">
-                <AccordionTrigger className="text-left font-semibold">{faq.question}</AccordionTrigger>
-                <AccordionContent className="text-gray-600">{faq.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-          <div className="text-center mt-8">
-            <p className="text-gray-600 mb-4">Masih ada pertanyaan?</p>
-            <Button asChild variant="outline">
-              <Link href="/order">Hubungi Kami</Link>
-            </Button>
+                <Button asChild size="lg" className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-14 text-base font-bold">
+                  <Link href="/order">Ajukan Konsultasi Sekarang</Link>
+                </Button>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-sm text-blue-900 leading-relaxed">
+                <strong className="block mb-3 text-base">Informasi Penting:</strong>
+                <ul className="space-y-3 pl-4 list-disc marker:text-blue-400">
+                  <li><strong>Tahun pertama mencakup:</strong> Setup website, Development, Domain, Hosting, Maintenance basic.</li>
+                  <li><strong>Tahun kedua dan seterusnya hanya dikenakan biaya:</strong> Hosting, Domain, Maintenance fitur aktif.</li>
+                  <li>Maintenance fitur dikenakan {formatPrice(10000)} / fitur / tahun.</li>
+                  <li>Harga di atas merupakan estimasi awal dan dapat berubah untuk request custom yang kompleks.</li>
+                </ul>
+              </div>
+
+            </div>
           </div>
         </div>
+
+        <footer className="text-center mt-16 text-slate-500 text-sm">
+          &copy; {new Date().getFullYear()} JapanArena Digital Studio. Hak Cipta Dilindungi.
+        </footer>
       </div>
     </div>
   )
