@@ -137,7 +137,7 @@ export default function TemplateDetailPage() {
               </div>
               <div className="space-y-3 mb-6">
                 <Button asChild className="w-full bg-black hover:bg-gray-800">
-                  <Link href="/order">Pilih Template Ini</Link>
+                  <Link href={`/order?template=${template.id}`}>Pilih Template Ini</Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full gap-2">
                   <a href={template.demoUrl} target="_blank" rel="noopener noreferrer">
