@@ -6,7 +6,10 @@ import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Separator } from '@/app/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/tabs'
-import { Monitor, Tablet, Smartphone, Star, Check, FileText, Headphones, Palette, Zap } from 'lucide-react'
+import { Monitor, Tablet, Smartphone, Star, Check, FileText, Headphones, Palette, Zap, ExternalLink } from 'lucide-react'
+
+import { templatesData } from '@/data/templates'
+import { notFound, useParams } from 'next/navigation'
 
 const features = ['5 halaman termasuk', 'Form kontak', 'SEO setup', 'Hosting gratis 1 tahun']
 const included = [
@@ -21,7 +24,13 @@ const reviews = [
 ]
 
 export default function TemplateDetailPage() {
+  const params = useParams()
+  const id = params.id as string
+  const template = templatesData[id]
+
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+
+  if (!template) return notFound()
 
   return (
     <div className="pt-24 pb-16 px-6">
@@ -48,9 +57,9 @@ export default function TemplateDetailPage() {
               }`}>
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
                   <div className="text-center p-8">
-                    <div className="text-5xl mb-4">🍽️</div>
-                    <h3 className="text-2xl font-semibold mb-2">Restoran Nusantara</h3>
-                    <p className="text-gray-600">Template Website Restoran</p>
+                    <div className="text-5xl mb-4">{template.image}</div>
+                    <h3 className="text-2xl font-semibold mb-2">{template.title}</h3>
+                    <p className="text-gray-600">Template Website {template.category}</p>
                   </div>
                 </div>
               </div>
@@ -72,9 +81,9 @@ export default function TemplateDetailPage() {
             <div className="mt-8 bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold mb-4">Spesifikasi Teknis</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="text-gray-500">Platform:</span><span className="ml-2 font-medium">React + Tailwind</span></div>
-                <div><span className="text-gray-500">Halaman:</span><span className="ml-2 font-medium">5 halaman</span></div>
-                <div><span className="text-gray-500">Update:</span><span className="ml-2 font-medium">Gratis 6 bulan</span></div>
+                <div><span className="text-gray-500">Platform:</span><span className="ml-2 font-medium">{template.platform}</span></div>
+                <div><span className="text-gray-500">Halaman:</span><span className="ml-2 font-medium">{template.pages}</span></div>
+                <div><span className="text-gray-500">Kategori:</span><span className="ml-2 font-medium">{template.category}</span></div>
                 <div><span className="text-gray-500">Support:</span><span className="ml-2 font-medium">24/7</span></div>
               </div>
             </div>
@@ -114,18 +123,18 @@ export default function TemplateDetailPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-white border rounded-lg p-6 shadow-sm">
               <h2 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Fraunces', serif" }}>
-                Template Restoran Modern
+                {template.title}
               </h2>
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (<Star key={i} className="w-4 h-4 fill-current" />))}
+                  {[...Array(Math.floor(template.rating))].map((_, i) => (<Star key={i} className="w-4 h-4 fill-current" />))}
                 </div>
-                <span className="text-sm text-gray-500">(42 ulasan)</span>
+                <span className="text-sm text-gray-500">({template.reviewCount} ulasan)</span>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">Rp 2.500.000</span>
-                  <span className="text-gray-500 line-through">Rp 3.000.000</span>
+                  <span className="text-3xl font-bold">{template.price}</span>
+                  <span className="text-gray-500 line-through">{template.originalPrice}</span>
                 </div>
               </div>
               <div className="mb-6 space-y-2">
@@ -140,8 +149,10 @@ export default function TemplateDetailPage() {
                 <Button asChild className="w-full bg-black hover:bg-gray-800">
                   <Link href="/order">Pilih Template Ini</Link>
                 </Button>
-                <Button asChild variant="outline" className="w-full">
-                  <a href="#" target="_blank">Lihat Demo Live</a>
+                <Button asChild variant="outline" className="w-full gap-2">
+                  <a href={template.demoUrl} target="_blank" rel="noopener noreferrer">
+                    Lihat Demo Live <ExternalLink className="w-4 h-4" />
+                  </a>
                 </Button>
               </div>
               <Separator className="my-6" />
