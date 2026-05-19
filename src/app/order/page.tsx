@@ -96,6 +96,14 @@ function OrderFormInner() {
   })
   const [submitted, setSubmitted] = useState(false)
 
+  // Force sync URL params with state in case of client-side caching
+  useEffect(() => {
+    const param = searchParams.get('template')
+    if (param && templatesData[param]) {
+      setForm(prev => prev.templateId !== param ? { ...prev, templateId: param } : prev)
+    }
+  }, [searchParams])
+
   const set = (key: keyof FormData, value: unknown) => setForm(f => ({ ...f, [key]: value }))
 
   const toggleAddon = (id: string) => {
