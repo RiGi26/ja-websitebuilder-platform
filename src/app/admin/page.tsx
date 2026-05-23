@@ -3,6 +3,7 @@ import {
   Briefcase, 
   Calendar, 
   ChevronRight, 
+  ChevronLeft,
   MessageCircle, 
   Package, 
   CheckCircle2, 
