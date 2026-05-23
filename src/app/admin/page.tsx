@@ -70,9 +70,14 @@ export default async function StudioAdminPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-12 animate-fade-in">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-2 px-3 py-1 bg-blue-50 rounded-lg inline-block">
-                Studio Management
-              </p>
+              <div className="flex items-center gap-3 mb-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue px-3 py-1 bg-blue-50 rounded-lg inline-block">
+                    Studio Management
+                </p>
+                <Link href="/" className="text-[10px] font-bold text-gray-400 hover:text-apple-blue transition-colors flex items-center gap-1 uppercase tracking-widest">
+                    <ChevronLeft size={12} /> Kembali ke Beranda
+                </Link>
+              </div>
               <h1 className="text-4xl md:text-5xl sf-display-heavy text-[#1D1D1F] tracking-tight">
                 Brief Website Masuk
               </h1>
@@ -84,7 +89,7 @@ export default async function StudioAdminPage() {
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Leads</p>
                     <p className="text-3xl sf-display-heavy text-apple-blue">{orders.length}</p>
                </div>
-               <a href="/auth/logout" className="p-4 bg-white rounded-2xl apple-shadow border border-black/5 text-red-500 hover:bg-red-50 transition-colors">
+               <a href="/api/admin/logout" className="p-4 bg-white rounded-2xl apple-shadow border border-black/5 text-red-500 hover:bg-red-50 transition-colors" title="Logout">
                   <LogOut size={20} />
                </a>
             </div>
