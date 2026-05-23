@@ -33,110 +33,157 @@ export default function TemplateDetailPage() {
   if (!template) return notFound()
 
   return (
-    <div className="pt-24 pb-16 px-6">
+    <div className="pt-32 pb-24 px-4 sm:px-6 bg-[#F5F5F7] min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Preview Area */}
-          <div className="lg:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <Button variant={device === 'desktop' ? 'default' : 'outline'} size="sm" onClick={() => setDevice('desktop')}>
-                <Monitor className="w-4 h-4 mr-2" />Desktop
-              </Button>
-              <Button variant={device === 'tablet' ? 'default' : 'outline'} size="sm" onClick={() => setDevice('tablet')}>
-                <Tablet className="w-4 h-4 mr-2" />Tablet
-              </Button>
-              <Button variant={device === 'mobile' ? 'default' : 'outline'} size="sm" onClick={() => setDevice('mobile')}>
-                <Smartphone className="w-4 h-4 mr-2" />Mobile
-              </Button>
+        
+        {/* Navigation Breadcrumb (Apple Style) */}
+        <div className="flex items-center gap-2 mb-10 animate-fade-in px-1">
+            <Link href="/template" className="text-xs font-bold text-gray-400 hover:text-apple-blue transition-colors uppercase tracking-widest flex items-center gap-1">
+                <ChevronLeft size={14} /> Kembali ke Katalog
+            </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Left Area: Device Preview Lab */}
+          <div className="lg:col-span-8 space-y-6 animate-fade-up">
+            
+            {/* Device Toggles (Floating Control) */}
+            <div className="flex items-center justify-between bg-white rounded-2xl p-2 apple-shadow border border-black/5">
+                <div className="flex gap-1">
+                    {[
+                        { id: 'desktop', icon: Monitor, label: 'Desktop' },
+                        { id: 'tablet',  icon: Tablet,  label: 'Tablet'  },
+                        { id: 'mobile',  icon: Smartphone, label: 'Mobile' },
+                    ].map((d) => (
+                        <button
+                            key={d.id}
+                            onClick={() => setDevice(d.id as any)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                device === d.id 
+                                ? 'bg-apple-blue text-white shadow-md' 
+                                : 'text-gray-400 hover:bg-gray-50'
+                            }`}
+                        >
+                            <d.icon size={16} />
+                            <span className="hidden sm:inline">{d.label}</span>
+                        </button>
+                    ))}
+                </div>
+                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Responsive Engine</span>
+                </div>
             </div>
 
-            <div className="bg-gray-100 rounded-lg p-8 flex items-center justify-center min-h-[600px]">
-              <div className={`bg-white rounded-lg shadow-xl transition-all duration-300 ${
-                device === 'desktop' ? 'w-full aspect-[16/10]' :
-                device === 'tablet' ? 'w-2/3 aspect-[4/3]' : 'w-1/3 aspect-[9/16]'
-              }`}>
+            {/* Preview Frame Container */}
+            <div className="bg-white rounded-[40px] apple-shadow border border-black/5 overflow-hidden flex items-center justify-center min-h-[500px] sm:min-h-[700px] p-4 sm:p-12 relative">
+              {/* Device Frame Simulation */}
+              <motion.div 
+                key={device}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`bg-white rounded-[24px] shadow-2xl border-[8px] border-black transition-all duration-500 relative ${
+                    device === 'desktop' ? 'w-full aspect-[16/10]' :
+                    device === 'tablet'  ? 'w-[450px] aspect-[3/4]' : 
+                                           'w-[300px] aspect-[9/19.5]'
+                }`}
+              >
+                {/* Dynamic notch for mobile */}
+                {device === 'mobile' && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20" />
+                )}
+
                 <iframe 
                   src={template.demoUrl} 
-                  className="w-full h-full rounded-lg border-none bg-white"
+                  className="w-full h-full rounded-[16px] border-none bg-white"
                   title={`Preview ${template.title}`}
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                 />
-              </div>
+              </motion.div>
+              
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent pointer-events-none" />
             </div>
 
-
-
-            {/* Specs */}
-            <div className="mt-8 bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Spesifikasi Teknis</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="text-gray-500">Platform:</span><span className="ml-2 font-medium">{template.platform}</span></div>
-                <div><span className="text-gray-500">Halaman:</span><span className="ml-2 font-medium">{template.pages}</span></div>
-                <div><span className="text-gray-500">Kategori:</span><span className="ml-2 font-medium">{template.category}</span></div>
-                <div><span className="text-gray-500">Support:</span><span className="ml-2 font-medium">24/7</span></div>
-              </div>
+            {/* Technical Specs Card */}
+            <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/5 grid grid-cols-2 sm:grid-cols-4 gap-8">
+                {[
+                    { l: 'Platform', v: template.platform, i: Zap },
+                    { l: 'Structure', v: template.pages, i: FileText },
+                    { l: 'UX Score', v: '9.8/10', i: Star },
+                    { l: 'Support', v: 'Priority', i: Headphones },
+                ].map((s, i) => (
+                    <div key={i} className="space-y-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <s.i size={12} className="text-apple-blue" /> {s.l}
+                        </p>
+                        <p className="text-sm font-bold text-[#1D1D1F]">{s.v}</p>
+                    </div>
+                ))}
             </div>
-
           </div>
 
-          {/* Sticky Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white border rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Fraunces', serif" }}>
-                {template.title}
-              </h2>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex text-yellow-400">
-                  {[...Array(Math.floor(template.rating))].map((_, i) => (<Star key={i} className="w-4 h-4 fill-current" />))}
+          {/* Right Area: Sticky Action Sidebar */}
+          <div className="lg:col-span-4 animate-fade-up" style={{animationDelay: '100ms'}}>
+            <div className="sticky top-24 bg-white rounded-[40px] p-8 md:p-10 apple-shadow border border-black/[0.03] space-y-8">
+              
+              <div>
+                <h2 className="text-3xl md:text-4xl sf-display-heavy text-[#1D1D1F] tracking-tight mb-2" style={{ fontFamily: "'Fraunces', serif" }}>
+                    {template.title}
+                </h2>
+                <div className="flex items-center gap-2">
+                    <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (<Star key={i} size={14} className="fill-current" />))}
+                    </div>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">({template.reviewCount} Reviews)</span>
                 </div>
-                <span className="text-sm text-gray-500">({template.reviewCount} ulasan)</span>
               </div>
-              <div className="mb-6">
+
+              <div className="bg-[#F9F9FB] rounded-3xl p-6 border border-black/[0.02]">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Paket Launching Dasar</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">{template.price}</span>
-                  <span className="text-gray-500 line-through">{template.originalPrice}</span>
+                  <span className="text-4xl sf-display-heavy text-apple-blue tabular-nums">{template.price}</span>
+                  <span className="text-sm text-gray-400 line-through font-medium">{template.originalPrice}</span>
+                </div>
+                <p className="text-[10px] text-green-600 font-bold mt-3 bg-green-50 px-2 py-1 rounded-md inline-block uppercase tracking-wider">Mulai Launching Dalam 7 Hari</p>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest pl-1">Keunggulan Blueprint Ini</p>
+                <div className="grid grid-cols-1 gap-3">
+                    {features.map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-gray-50/50 p-3 rounded-2xl border border-black/[0.01]">
+                        <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center shrink-0">
+                            <Check size={14} className="text-green-600" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 leading-tight">{feature}</span>
+                    </div>
+                    ))}
                 </div>
               </div>
-              <div className="mb-6 space-y-2">
-                {features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-3 mb-6">
-                <Button asChild className="w-full bg-black hover:bg-gray-800">
-                  <Link href={`/order?template=${template.id}`}>Pilih Template Ini</Link>
+
+              <div className="pt-4 space-y-3">
+                <Button asChild size="lg" className="w-full bg-[#1D1D1F] hover:bg-black h-16 rounded-2xl text-base sf-display-heavy shadow-xl glow-button">
+                  <Link href={`/order?template=${template.id}`}>Pilih Template & Mulai Proyek</Link>
                 </Button>
-                <Button asChild variant="outline" className="w-full gap-2">
-                  <a href={template.demoUrl} target="_blank" rel="noopener noreferrer">
-                    Lihat Demo Live <ExternalLink className="w-4 h-4" />
+                <Button asChild variant="outline" className="w-full h-14 rounded-2xl border-black/5 hover:bg-gray-50 text-sm font-bold text-gray-500">
+                  <a href={template.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    Buka Preview Full-Screen <ExternalLink size={16} />
                   </a>
                 </Button>
               </div>
-              <Separator className="my-6" />
-              <div>
-                <h4 className="font-semibold mb-4">Termasuk:</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {included.map((item, i) => (
-                    <div key={i} className="flex flex-col items-center text-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                        <item.icon className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <span className="text-xs text-gray-600">{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <Separator className="my-6" />
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Butuh custom?</p>
-                <Link href="/order" className="text-sm text-purple-600 hover:underline font-medium">
-                  Hubungi untuk layanan custom →
+
+              <div className="pt-6 border-t border-black/5 text-center">
+                <p className="text-xs text-gray-400 font-medium mb-3 leading-relaxed">
+                    Butuh fitur tambahan atau kustomisasi penuh sesuai keinginan Anda?
+                </p>
+                <Link href="/order" className="inline-flex items-center gap-1.5 text-xs font-bold text-apple-blue uppercase tracking-widest hover:underline">
+                  Konsultasi Layanan Custom <ArrowRight size={12} />
                 </Link>
               </div>
+
             </div>
           </div>
         </div>
