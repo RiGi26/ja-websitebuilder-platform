@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Navbar } from '@/app/components/Navbar'
+import Navbar from '@/app/components/Navbar'
 
 export const metadata: Metadata = {
-  title: 'WebStudio — Website Profesional untuk Bisnis Anda',
-  description:
-    'Dari desain hingga launch dalam hitungan hari. Website custom yang benar-benar sesuai dengan bisnis Anda.',
+  title: 'Japan Arena Studio — Solusi Website Bisnis Profesional',
+  description: 'Bangun infrastruktur digital bisnismu mulai dari desain, hosting, hingga integrasi pembayaran otomatis. Terima beres, live dalam 7 hari.',
 }
 
 export default function RootLayout({
@@ -15,8 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="min-h-screen bg-white">
-        <Navbar />
+      <body className="antialiased">
         {children}
       </body>
     </html>

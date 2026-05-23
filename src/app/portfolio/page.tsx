@@ -21,7 +21,7 @@ export default function PortfolioPage() {
       {/* Hero Header */}
       <div className="bg-white border-b border-gray-100 pt-28 pb-14 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-purple-600 mb-4">
+          <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-apple-blue mb-4">
             Karya & Demo Sistem
           </span>
           <h1
@@ -30,7 +30,7 @@ export default function PortfolioPage() {
           >
             Apa yang Bisa Kami
             <br />
-            <span className="text-purple-600">Bangun untuk Anda</span>
+            <span className="text-apple-blue">Bangun untuk Anda</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
             Kumpulan konsep desain dan sistem yang mendemonstrasikan kemampuan tim kami di berbagai industri.
@@ -74,7 +74,7 @@ export default function PortfolioPage() {
                 transition={{ duration: 0.35, delay: index * 0.06 }}
               >
                 <Link href={`/portfolio/${project.id}`} className="group block">
-                  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-purple-200 transition-all duration-300">
+                  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-apple-blue/30 transition-all duration-300">
 
                     {/* Visual Preview */}
                     <div className={`relative h-52 bg-gradient-to-br ${project.color} flex items-center justify-center overflow-hidden`}>
@@ -98,17 +98,17 @@ export default function PortfolioPage() {
                     {/* Card Body */}
                     <div className="p-5">
                       {project.badge && (
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-1.5">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-apple-blue mb-1.5">
                           {project.badge}
                         </p>
                       )}
-                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors mb-3 leading-snug">
+                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-apple-blue transition-colors mb-3 leading-snug">
                         {project.title}
                       </h3>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-400 font-medium">Klik untuk lihat studi kasus →</span>
-                        <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                          <ArrowUpRight className="w-4 h-4 text-gray-500 group-hover:text-purple-600" />
+                        <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-50 flex items-center justify-center transition-colors">
+                          <ArrowUpRight className="w-4 h-4 text-gray-500 group-hover:text-apple-blue" />
                         </div>
                       </div>
                     </div>
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
                 </Link>
               </motion.div>
             ))}
-          </AnimatePresence>
+          </motion.div>
         </AnimatePresence>
 
         {filteredProjects.length === 0 && (
@@ -129,25 +129,20 @@ export default function PortfolioPage() {
         )}
 
         {/* CTA Banner */}
-        <div className="mt-16 bg-gradient-to-br from-slate-900 to-purple-900 rounded-3xl p-8 sm:p-12 text-center text-white">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3">
+        <div className="mt-16 bg-gradient-to-br from-slate-900 to-blue-900 rounded-[32px] p-8 sm:p-12 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-apple-blue opacity-20 rounded-full blur-3xl"></div>
+          <h2 className="text-2xl sm:text-3xl sf-display-heavy mb-3 relative z-10">
             Siap bangun website impian Anda?
           </h2>
-          <p className="text-slate-300 mb-8 max-w-lg mx-auto text-sm sm:text-base">
+          <p className="text-slate-300 mb-8 max-w-lg mx-auto text-sm sm:text-base relative z-10">
             Tim kami siap mengimplementasikan sistem serupa untuk bisnis Anda. Konsultasi gratis, tanpa komitmen.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center relative z-10">
             <Link
-              href="/order"
-              className="bg-white text-black font-bold px-8 py-3 rounded-xl hover:bg-gray-100 transition-colors text-sm"
+              href="https://wa.me/6281296917963?text=Halo%20Japan%20Arena%20Studio%2C%20saya%20tertarik%20dengan%20layanan%20pembuatan%20website."
+              className="bg-white text-black font-bold px-8 py-3 rounded-full hover:bg-gray-100 transition-colors text-sm"
             >
-              Konsultasi Gratis →
-            </Link>
-            <Link
-              href="/template"
-              className="border border-white/30 text-white font-semibold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm"
-            >
-              Lihat Katalog Template
+              Konsultasi Gratis Sekarang →
             </Link>
           </div>
         </div>

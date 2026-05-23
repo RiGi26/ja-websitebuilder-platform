@@ -8,9 +8,14 @@ import { motion } from 'motion/react'
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-bg">
+      <Navbar />
+      
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-32 pb-24 px-6 relative overflow-hidden">
+        {/* Background Decor */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl -mr-64 -mt-64 opacity-60 pointer-events-none" />
+        
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
             {/* Eyebrow Badge */}
@@ -20,12 +25,10 @@ export default function Home() {
               transition={{ duration: 0.5 }}
               className="inline-block mb-6"
             >
-              <Badge
-                variant="secondary"
-                className="px-4 py-2 bg-purple-50 text-purple-700 border-purple-200 text-xs font-medium"
-              >
-                ✦ Desain Premium, Harga UMKM
-              </Badge>
+              <div className="inline-flex items-center gap-2 bg-white border border-black/5 text-[#0071E3] text-[11px] font-bold px-4 py-1.5 rounded-full apple-shadow">
+                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                Done-for-You: Kami Buatkan, Anda Terima Beres
+              </div>
             </motion.div>
 
             {/* Headline */}
@@ -33,15 +36,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-7xl font-light mb-6"
-              style={{ fontFamily: "'Fraunces', serif" }}
+              className="text-5xl md:text-7xl sf-display-heavy tracking-tight text-gray-900 leading-[1.05] mb-8"
             >
-              Website profesional,{' '}
-              <span className="relative inline-block">
-                <span className="relative z-10">tanpa ribet</span>
-                <span className="absolute bottom-2 left-0 w-full h-3 bg-purple-200 -rotate-1 -z-10"></span>
-              </span>
-              .
+              Website Bisnis Profesional <br />
+              <span className="text-apple-blue italic">Tanpa Ribet.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -49,9 +47,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg text-gray-600 mb-8 max-w-lg mx-auto"
+              className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Dari desain hingga launch dalam hitungan hari. Website custom yang benar-benar sesuai dengan bisnis Anda.
+              Kami bantu bangun infrastruktur digital bisnismu mulai dari desain, hosting, hingga integrasi pembayaran otomatis. Cukup kirim materi, website Anda live dalam 7 hari.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -59,30 +57,34 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex items-center justify-center gap-3 mb-6"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
             >
-              <Button asChild size="lg" className="bg-black hover:bg-gray-800">
-                <Link href="/template">Lihat Template</Link>
+              <Button asChild size="lg" className="bg-[#1D1D1F] hover:bg-black text-white px-8 py-7 rounded-full text-lg sf-display-heavy shadow-xl glow-button w-full sm:w-auto">
+                <Link href="https://wa.me/6281296917963?text=Halo%20Japan%20Arena%20Corp%2C%20saya%20ingin%20konsultasi%20pembuatan%20website%20bisnis.">
+                  Konsultasi Gratis Sekarang
+                </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/order">Ajukan Proyek</Link>
+              <Button asChild size="lg" variant="outline" className="px-8 py-7 rounded-full text-lg sf-display border-black/5 bg-white apple-shadow hover:bg-gray-50 w-full sm:w-auto">
+                <Link href="/template">Lihat Katalog Template</Link>
               </Button>
             </motion.div>
 
             {/* Social Proof */}
-            <motion.p
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-sm text-gray-500 flex items-center justify-center gap-2"
+              className="flex flex-col items-center gap-2"
             >
-              <span className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </span>
-              Harga mulai Rp 499.000 / tahun pertama
-            </motion.p>
+                <div className="flex text-yellow-400 gap-1">
+                    {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                    ))}
+                </div>
+                <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                    Sudah Termasuk Hosting & Support WA 24/7
+                </p>
+            </motion.div>
           </div>
 
           {/* Device Mockup with Floating Cards */}
@@ -90,47 +92,47 @@ export default function Home() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="mt-16 relative max-w-5xl mx-auto"
+            className="mt-20 relative max-w-5xl mx-auto"
           >
             {/* Browser Mockup */}
-            <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="relative bg-white rounded-[40px] shadow-2xl border-[10px] border-black overflow-hidden aspect-[16/10]">
               {/* Browser Chrome */}
-              <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
+              <div className="bg-gray-100 px-6 py-4 flex items-center gap-3 border-b border-gray-200">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 <div className="flex-1 mx-4">
-                  <div className="bg-white rounded px-3 py-1 text-xs text-gray-500">
+                  <div className="bg-white rounded-lg px-4 py-1.5 text-xs text-gray-400 font-mono border border-black/5">
                     studio.japanarenacorp.com
                   </div>
                 </div>
               </div>
 
               {/* Website Screenshot Placeholder */}
-              <div className="bg-gradient-to-br from-purple-50 to-blue-50 aspect-[16/10] flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="text-6xl mb-4">🏪</div>
-                  <h3 className="text-2xl font-semibold mb-2">Toko Kopi Nusantara</h3>
-                  <p className="text-gray-600">Website bisnis lokal yang profesional</p>
+              <div className="bg-[#F5F5F7] h-full flex items-center justify-center p-12">
+                <div className="text-center">
+                  <div className="text-7xl mb-6">🏪</div>
+                  <h3 className="text-3xl sf-display-heavy mb-3">Toko Kopi Nusantara</h3>
+                  <p className="text-gray-500 text-lg">Website bisnis lokal yang profesional & modern</p>
                 </div>
               </div>
             </div>
 
-            {/* Floating Feature Cards */}
+            {/* Floating Feature Cards (Strategy specific) */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
-              className="absolute -left-8 top-1/4 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
+              className="absolute -left-12 top-1/4 bg-white/80 backdrop-blur-xl rounded-3xl apple-shadow p-5 flex items-center gap-4 border border-white/50"
             >
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Check className="w-5 h-5 text-green-600" />
+              <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
+                <div className="text-xl font-bold">Rp</div>
               </div>
               <div>
-                <p className="font-semibold text-sm">SEO Ready</p>
-                <p className="text-xs text-gray-500">Siap ranking di Google</p>
+                <p className="sf-display text-base">Payment Gateway</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Terima QRIS & Bank Transfer</p>
               </div>
             </motion.div>
 
@@ -138,29 +140,14 @@ export default function Home() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
-              className="absolute -right-8 top-1/3 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
+              className="absolute -right-12 top-1/3 bg-white/80 backdrop-blur-xl rounded-3xl apple-shadow p-5 flex items-center gap-4 border border-white/50"
             >
-              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-purple-600" />
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-apple-blue flex items-center justify-center">
+                <Zap className="w-6 h-6 fill-current" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Desain Custom</p>
-                <p className="text-xs text-gray-500">Sesuai brand Anda</p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1.0 }}
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 border border-gray-100"
-            >
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm">Live in 7 days</p>
-                <p className="text-xs text-gray-500">Cepat & tepat waktu</p>
+                <p className="sf-display text-base">WA Automation</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Notifikasi Invoice Otomatis</p>
               </div>
             </motion.div>
           </motion.div>
@@ -169,3 +156,5 @@ export default function Home() {
     </div>
   )
 }
+
+import Navbar from '@/app/components/Navbar'
