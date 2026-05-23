@@ -2,14 +2,20 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Check, Building2, User, ChevronRight, ChevronLeft, 
+  Send, X, LayoutTemplate, Loader2, Sparkles, AlertCircle, 
+  Rocket, ShieldCheck, ArrowRight, Star, Info
+} from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Textarea } from '@/app/components/ui/textarea'
-import { Separator } from '@/app/components/ui/separator'
-import { Check, Building2, User, ChevronRight, ChevronLeft, Send, X, LayoutTemplate, Loader2 } from 'lucide-react'
 import { templatesData } from '@/data/templates'
 import { supabase } from '@/lib/supabase'
+import Navbar from '@/app/components/Navbar'
 
 // ── Types & Constants ─────────────────────────────────────────────────────────
 type ClientType = 'individu' | 'perusahaan' | null
@@ -64,7 +70,7 @@ function StepHeader({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-1">{title}</h2>
-      <p className="text-gray-500 text-sm">{desc}</p>
+      <p className="text-gray-500 text-sm font-medium">{desc}</p>
     </div>
   )
 }
@@ -72,7 +78,7 @@ function StepHeader({ title, desc }: { title: string; desc: string }) {
 function FieldRow({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-semibold text-gray-700">
+      <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2 ml-1">
         {label}{required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children}
@@ -84,7 +90,21 @@ function formatPrice(price: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
 }
 
-// ── Internal Form Component (Wrapped in Suspense) ──────────────────────────────
+export default function OrderPage() {
+  return (
+    <div className="pt-32 pb-24 px-4 bg-[#F5F5F7] min-h-screen font-sans">
+      <Navbar />
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="w-10 h-10 border-4 border-apple-blue/20 border-t-apple-blue rounded-full animate-spin" />
+        </div>
+      }>
+        <OrderFormInner />
+      </Suspense>
+    </div>
+  )
+}
+
 function OrderFormInner() {
   const searchParams = useSearchParams()
   const templateParam = searchParams.get('template')
@@ -99,7 +119,6 @@ function OrderFormInner() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  // Force sync URL params with state in case of client-side caching
   useEffect(() => {
     const param = searchParams.get('template')
     if (param && templatesData[param]) {
@@ -118,7 +137,6 @@ function OrderFormInner() {
     }
   }
 
-  // Calculate totals
   const totalAddons = form.selectedAddons.reduce((acc, id) => {
     const addon = ADDONS.find(a => a.id === id)
     return acc + (addon?.price || 0)
@@ -153,16 +171,15 @@ function OrderFormInner() {
             selected_addons: form.selectedAddons,
             total_estimasi: finalPrice,
             total_maintenance: totalYearlyMaint,
-            status: 'pending' // Default status untuk dashboard
+            status: 'pending'
           }
         ])
 
       if (error) throw error
-
       setSubmitted(true)
     } catch (err: any) {
       console.error('Submission error:', err)
-      setSubmitError('Terjadi kesalahan koneksi. Pastikan Supabase sudah di-setup dengan benar.')
+      setSubmitError('Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp jika error berlanjut.')
     } finally {
       setIsSubmitting(false)
     }
@@ -173,28 +190,37 @@ function OrderFormInner() {
 
   if (submitted) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-6 pt-12 pb-16">
-        <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+      <div className="max-w-xl mx-auto text-center py-12 px-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[40px] apple-shadow p-12 border border-black/[0.03]">
+          <div className="w-24 h-24 rounded-full bg-green-50 text-green-500 flex items-center justify-center mx-auto mb-8 shadow-inner">
+            <Check size={48} strokeWidth={3} />
           </div>
-          <h1 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Fraunces', serif" }}>Brief Terkirim! 🎉</h1>
-          <p className="text-gray-600 mb-6">
-            Terima kasih! Tim kami akan menghubungi Anda melalui WhatsApp dalam <strong>1×24 jam kerja</strong> untuk konfirmasi dan diskusi lebih lanjut.
+          <h1 className="text-4xl sf-display-heavy text-gray-900 mb-4 tracking-tight leading-tight">Brief Terkirim! 🎉</h1>
+          <p className="text-gray-500 mb-10 leading-relaxed">
+            Brief Anda sudah dalam antrean kurasi kami. Konsultan Japan Arena Studio akan menghubungi Anda melalui WhatsApp dalam <strong>1x24 jam</strong>.
           </p>
-          <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5 text-left space-y-2 mb-8">
-            <p className="text-sm font-semibold text-purple-700">Langkah selanjutnya:</p>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p>✅ Brief Anda sudah kami terima</p>
-              <p>📞 Tim akan menghubungi via WhatsApp</p>
-              <p>📋 Kami siapkan proposal & estimasi biaya (Total: {formatPrice(finalPrice)})</p>
-              <p>🚀 Kick-off meeting & mulai pengerjaan</p>
+          <div className="bg-[#F5F5F7] rounded-3xl p-6 text-left space-y-4 mb-10 border border-black/[0.02]">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Alur Pengerjaan</p>
+            <div className="space-y-3">
+              {[
+                { t: 'Review Brief', c: 'Tim kami menganalisa kebutuhan teknis Anda.' },
+                { t: 'Video Call Consultation', c: 'Diskusi mendalam mengenai struktur & strategi web.' },
+                { t: 'Proses Pengerjaan', c: 'Website Anda akan live dalam estimasi 7 hari.' }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-apple-blue text-white flex items-center justify-center text-[10px] font-bold shrink-0">{i+1}</div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 leading-none mb-1">{item.t}</p>
+                    <p className="text-xs text-gray-500 leading-tight">{item.c}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <Button onClick={() => { setForm(INIT); setStep(0); setSubmitted(false) }} className="bg-black hover:bg-gray-800 w-full">
-            Isi Brief Baru
+          <Button asChild className="bg-[#1D1D1F] hover:bg-black w-full py-7 rounded-2xl text-base sf-display-heavy shadow-lg glow-button">
+            <Link href="/">Kembali ke Beranda</Link>
           </Button>
-        </div>
+        </motion.div>
       </div>
     )
   }
@@ -202,354 +228,381 @@ function OrderFormInner() {
   const selectedTemplateDetails = form.templateId ? templatesData[form.templateId] : null
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-10">
-        <p className="text-xs font-bold uppercase tracking-widest text-purple-600 mb-2">Pendaftaran & Brief</p>
-        <h1 className="text-4xl font-light mb-3" style={{ fontFamily: "'Fraunces', serif" }}>
-          Ceritakan Website Impian Anda
-        </h1>
-        <p className="text-gray-500">Ikuti langkah-langkah berikut untuk memulai pembuatan website Anda</p>
+    <div className="max-w-4xl mx-auto">
+      {/* Header (Apple Style) */}
+      <div className="text-center mb-12">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
+                Onboarding Experience
+            </span>
+            <h1 className="text-4xl md:text-6xl sf-display-heavy text-[#1D1D1F] tracking-tight leading-tight mb-4" style={{ fontFamily: "'Fraunces', serif" }}>
+                Ceritakan Website <br className="hidden md:block" /> <span className="italic text-apple-blue">Impian Anda</span>
+            </h1>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed font-medium">
+                Pendaftaran ini adalah langkah awal menuju transformasi digital bisnis Anda yang lebih profesional.
+            </p>
+        </motion.div>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress Experience */}
       {step > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-500 font-medium">Langkah {step} dari {totalSteps}</span>
-            <span className="text-xs text-purple-600 font-semibold">{progress}%</span>
+        <div className="max-w-2xl mx-auto mb-12">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Step {step} of {totalSteps}</span>
+            <span className="text-sm font-bold text-apple-blue tabular-nums">{progress}% Complete</span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-purple-600 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+          <div className="h-2.5 bg-white rounded-full overflow-hidden shadow-inner p-0.5 border border-black/[0.03]">
+            <motion.div 
+                className="h-full bg-apple-blue rounded-full" 
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+            />
           </div>
-          <div className="flex justify-between mt-3 px-1">
-            {['Info Dasar', 'Referensi', 'Fitur/Add-on', 'Review'].map((s, i) => (
-              <span key={s} className={`text-[11px] font-medium ${step === i + 1 ? 'text-purple-600' : step > i + 1 ? 'text-green-600' : 'text-gray-400'}`}>
-                {step > i + 1 ? '✓ ' : ''}{s}
+          <div className="flex justify-between mt-4 px-2">
+            {['Info Dasar', 'Referensi', 'Fitur Pro', 'Final Review'].map((s, i) => (
+              <span key={s} className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${step === i + 1 ? 'text-apple-blue' : step > i + 1 ? 'text-green-600' : 'text-gray-300'}`}>
+                {s}
               </span>
             ))}
           </div>
         </div>
       )}
 
-      {/* Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 p-6 sm:p-10">
-        
-        {/* Step 0 — Pilih Tipe Client */}
-        {step === 0 && (
-          <div>
-            <StepHeader title="Pilih Tipe Pendaftar" desc="Apakah Anda mengajukan sebagai individu/UMKM atau mewakili perusahaan?" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {([
-                { type: 'individu' as ClientType, icon: User, title: 'Individu / UMKM', desc: 'Personal, freelancer, usaha kecil, atau UMKM' },
-                { type: 'perusahaan' as ClientType, icon: Building2, title: 'Perusahaan / Korporat', desc: 'PT, CV, yayasan, atau organisasi resmi' },
-              ] as const).map(({ type, icon: Icon, title, desc }) => (
-                <button key={type} type="button"
-                  onClick={() => { set('clientType', type); setStep(1) }}
-                  className={`group flex flex-col items-start gap-4 p-6 rounded-2xl border-2 text-left transition-all hover:border-purple-400 hover:shadow-md ${
-                    form.clientType === type ? 'border-purple-600 bg-purple-50' : 'border-gray-200'
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                    <Icon className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-900 mb-1">{title}</p>
-                    <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>
-                  </div>
-                  <span className="text-xs font-semibold text-purple-600 flex items-center gap-1 mt-auto pt-2">
-                    Pilih ini <ChevronRight className="w-3 h-3" />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 1 — Info Dasar */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <StepHeader
-              title={form.clientType === 'perusahaan' ? 'Informasi Perusahaan' : 'Informasi Dasar'}
-              desc="Data kontak yang akan kami gunakan untuk menghubungi Anda"
-            />
-
-            {form.clientType === 'individu' ? (
-              <>
-                <FieldRow label="Nama / Nama Usaha" required>
-                  <Input placeholder="Contoh: Japan Arena" value={form.namaUsaha}
-                    onChange={e => set('namaUsaha', e.target.value)} />
-                </FieldRow>
-                <FieldRow label="Nomor WhatsApp" required>
-                  <Input placeholder="08xxxxxxxxxx" value={form.nomorWa}
-                    onChange={e => set('nomorWa', e.target.value)} />
-                </FieldRow>
-              </>
-            ) : (
-              <>
-                <FieldRow label="Nama Perusahaan" required>
-                  <Input placeholder="PT. Contoh Sejahtera" value={form.namaPerusahaan}
-                    onChange={e => set('namaPerusahaan', e.target.value)} />
-                </FieldRow>
-                <div className="grid grid-cols-2 gap-4">
-                  <FieldRow label="Nama PIC" required>
-                    <Input placeholder="Nama lengkap" value={form.namapic}
-                      onChange={e => set('namapic', e.target.value)} />
-                  </FieldRow>
-                  <FieldRow label="Jabatan">
-                    <Input placeholder="Contoh: Manager" value={form.jabatan}
-                      onChange={e => set('jabatan', e.target.value)} />
-                  </FieldRow>
-                </div>
-                <FieldRow label="Nomor WhatsApp PIC" required>
-                  <Input placeholder="08xxxxxxxxxx" value={form.nomorWa}
-                    onChange={e => set('nomorWa', e.target.value)} />
-                </FieldRow>
-                <FieldRow label="Email Perusahaan">
-                  <Input type="email" placeholder="email@perusahaan.com" value={form.email}
-                    onChange={e => set('email', e.target.value)} />
-                </FieldRow>
-                <FieldRow label="Industri / Bidang Usaha" required>
-                  <Input placeholder="Contoh: Pendidikan, Kesehatan, Retail" value={form.industri}
-                    onChange={e => set('industri', e.target.value)} />
-                </FieldRow>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Step 2 — Template & Referensi */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <StepHeader title="Referensi Website" desc="Dasar desain yang akan kami buatkan untuk Anda" />
-
-            {selectedTemplateDetails ? (
-              <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                  Terpilih dari Katalog
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="text-4xl bg-white w-16 h-16 rounded-xl flex items-center justify-center shadow-sm">
-                    {selectedTemplateDetails.image}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900">{selectedTemplateDetails.title}</h3>
-                    <p className="text-sm text-gray-600 mb-2">Kategori: {selectedTemplateDetails.category}</p>
-                    <p className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded inline-block font-medium">
-                      Desain ini akan dijadikan dasar website Anda
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => set('templateId', null)}
-                  className="mt-4 text-sm text-red-500 font-semibold flex items-center gap-1 hover:text-red-600"
-                >
-                  <X className="w-4 h-4" /> Batal pilih template ini (Isi manual)
-                </button>
-              </div>
-            ) : (
-              <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-4 text-gray-700 font-semibold">
-                  <LayoutTemplate className="w-5 h-5" />
-                  Anda belum memilih template dari katalog
-                </div>
-                <FieldRow label="Ceritakan website yang Anda inginkan (URL/Ide Manual)" required>
-                  <Textarea
-                    placeholder={`Tuliskan link website referensi (contoh: www.apple.com) atau ceritakan:
-- Tujuannya untuk apa?
-- Warna yang disukai?
-- Target audiensnya siapa?`}
-                    rows={5} 
-                    value={form.referensiManual}
-                    onChange={e => set('referensiManual', e.target.value)}
-                    className="resize-none bg-white"
-                  />
-                </FieldRow>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Step 3 — Add-ons (Smart Calculator) */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <StepHeader title="Fitur Tambahan (Add-on)" desc="Pilih fitur tambahan yang diperlukan. Total harga akan otomatis dihitung." />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 pb-2 custom-scrollbar">
-              {ADDONS.map((addon) => {
-                const isSelected = form.selectedAddons.includes(addon.id)
-                return (
-                  <label
-                    key={addon.id}
-                    className={`cursor-pointer border-2 rounded-xl p-4 transition-all duration-200 flex items-start gap-3 ${
-                      isSelected ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                  >
-                    <div className="mt-0.5">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        checked={isSelected}
-                        onChange={() => toggleAddon(addon.id)}
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm text-gray-900">{addon.name}</h4>
-                      <div className="text-blue-600 text-sm font-bold mt-0.5">+{formatPrice(addon.price)}</div>
-                    </div>
-                  </label>
-                )
-              })}
-            </div>
-
-            {/* Smart Calculator Summary Strip */}
-            <div className="bg-slate-900 text-white rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <p className="text-slate-400 text-xs font-medium mb-1">Paket Dasar + Addon</p>
-                <div className="text-2xl font-bold">{formatPrice(finalPrice)} <span className="text-xs font-normal text-slate-300">/ Tahun Pertama</span></div>
-              </div>
-              <div className="text-right sm:text-right w-full sm:w-auto">
-                <p className="text-slate-400 text-xs font-medium mb-1">Renewal Tahun Ke-2</p>
-                <div className="text-sm font-semibold text-blue-300">{formatPrice(totalYearlyMaint)} / thn</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4 — Review */}
-        {step === 4 && (
-          <div className="space-y-6">
-            <StepHeader title="Review & Konfirmasi" desc="Periksa kembali detail pesanan Anda sebelum mengirim brief" />
-
-            <div className="bg-gray-50 rounded-2xl p-5 sm:p-6 space-y-5 text-sm border border-gray-100">
-              {/* Kontak */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 border-b pb-2">Data Pemesan ({form.clientType})</p>
-                <div className="grid grid-cols-2 gap-y-2 text-gray-700">
-                  {form.clientType === 'perusahaan' ? (
-                    <>
-                      <div className="col-span-2 sm:col-span-1"><span className="text-gray-500">Perusahaan:</span> <br/>{form.namaPerusahaan}</div>
-                      <div className="col-span-2 sm:col-span-1"><span className="text-gray-500">Industri:</span> <br/>{form.industri}</div>
-                      <div className="col-span-2 sm:col-span-1"><span className="text-gray-500">PIC:</span> <br/>{form.namapic} ({form.jabatan})</div>
-                      <div className="col-span-2 sm:col-span-1"><span className="text-gray-500">Email:</span> <br/>{form.email || '-'}</div>
-                    </>
-                  ) : (
-                    <div className="col-span-2"><span className="text-gray-500">Nama Usaha/Personal:</span> <br/>{form.namaUsaha}</div>
-                  )}
-                  <div className="col-span-2"><span className="text-gray-500">WhatsApp:</span> <br/>{form.nomorWa}</div>
-                </div>
-              </div>
-
-              {/* Referensi */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 border-b pb-2">Referensi Desain</p>
-                {selectedTemplateDetails ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{selectedTemplateDetails.image}</span>
-                    <span className="font-semibold text-purple-700">Template Katalog: {selectedTemplateDetails.title}</span>
-                  </div>
-                ) : (
-                  <div className="text-gray-700 whitespace-pre-line bg-white p-3 rounded-lg border">
-                    {form.referensiManual || '-'}
-                  </div>
-                )}
-              </div>
-
-              {/* Kalkulasi Akhir */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 border-b pb-2">Rincian Estimasi Biaya</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>✅ Paket Website Hemat Dasar</span>
-                    <span className="font-medium">{formatPrice(BASE_PRICE)}</span>
-                  </div>
-                  {form.selectedAddons.map(id => {
-                    const addon = ADDONS.find(a => a.id === id)
-                    return addon ? (
-                      <div key={id} className="flex justify-between items-center text-blue-700">
-                        <span>+ {addon.name}</span>
-                        <span className="font-medium">{formatPrice(addon.price)}</span>
+      {/* Main Glass Container */}
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={step}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="bg-white rounded-[40px] apple-shadow border border-black/[0.03] p-8 md:p-14 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10 min-h-[300px] flex flex-col">
+              
+              {/* Step 0 — Pilih Tipe Client (Modernized) */}
+              {step === 0 && (
+              <div className="space-y-10">
+                  <StepHeader title="Siapa Anda?" desc="Pilih tipe pendaftar agar kami bisa memberikan rekomendasi strategi yang tepat." />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {([
+                      { type: 'individu' as ClientType, icon: User, title: 'Individu / UMKM', desc: 'Pemilik usaha kecil, freelancer, atau personal brand.', emoji: '🚀' },
+                      { type: 'perusahaan' as ClientType, icon: Building2, title: 'Perusahaan / Korporat', desc: 'Sistem untuk PT, CV, Yayasan, atau Bisnis Menengah.', emoji: '🏢' },
+                  ] as const).map(({ type, icon: Icon, title, desc, emoji }) => (
+                      <button key={type} type="button"
+                      onClick={() => { set('clientType', type); setStep(1) }}
+                      className={`group flex flex-col items-start gap-6 p-8 rounded-[32px] border-2 text-left transition-all duration-300 hover:scale-[1.02] ${
+                          form.clientType === type ? 'border-apple-blue bg-blue-50/30' : 'border-black/[0.03] bg-[#F9F9FB] hover:border-apple-blue/30'
+                      }`}
+                      >
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                          form.clientType === type ? 'bg-apple-blue text-white' : 'bg-white text-gray-400 group-hover:text-apple-blue apple-shadow'
+                      }`}>
+                          <Icon size={32} />
                       </div>
-                    ) : null
-                  })}
-                  <div className="border-t pt-2 mt-2 flex justify-between items-center font-bold text-lg text-slate-900">
-                    <span>Total Estimasi Awal</span>
-                    <span>{formatPrice(finalPrice)}</span>
+                      <div>
+                          <div className="flex items-center gap-2 mb-2">
+                              <h4 className="text-xl sf-display-heavy text-gray-900">{title}</h4>
+                              <span className="text-xl">{emoji}</span>
+                          </div>
+                          <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+                      </div>
+                      <span className="text-[11px] font-bold text-apple-blue flex items-center gap-2 mt-auto pt-4 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                          Pilih Kategori Ini <ArrowRight size={14} />
+                      </span>
+                      </button>
+                  ))}
                   </div>
-                  <div className="flex justify-between items-center text-xs text-gray-500 mt-1">
-                    <span>Biaya perpanjangan tahun berikutnya</span>
-                    <span>{formatPrice(totalYearlyMaint)} / thn</span>
-                  </div>
-                </div>
               </div>
-            </div>
-
-            {/* Terms */}
-            <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
-              className="flex items-start gap-3 w-full text-left bg-blue-50/50 p-4 rounded-xl border border-blue-100 hover:bg-blue-50 transition-colors mb-4">
-              <span className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all ${
-                form.agreedToTerms ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-              }`}>
-                {form.agreedToTerms && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-              </span>
-              <span className="text-sm text-gray-700 leading-relaxed">
-                Saya mengerti bahwa ini adalah <strong className="text-blue-800">Estimasi Awal untuk website berbasis Template</strong>. Jika saya mengajukan referensi dengan fitur/desain <strong className="text-blue-800">Custom</strong>, harga final dapat menyesuaikan tingkat kerumitan pengerjaan. Saya menyetujui untuk dihubungi via WhatsApp.
-              </span>
-            </button>
-
-            {submitError && (
-              <div className="bg-red-50 text-red-600 text-sm p-4 rounded-xl border border-red-200">
-                {submitError}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className={`flex mt-10 ${step > 0 ? 'justify-between' : 'justify-end'}`}>
-          {step > 0 && (
-            <Button variant="outline" onClick={() => setStep(s => s - 1)} className="gap-2">
-              <ChevronLeft className="w-4 h-4" />
-              {step === 1 ? 'Ubah Tipe' : 'Kembali'}
-            </Button>
-          )}
-          {step > 0 && step < totalSteps && (
-            <Button onClick={() => setStep(s => s + 1)} className="bg-black hover:bg-gray-800 gap-2 px-8">
-              Lanjutkan
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          )}
-          {step === totalSteps && (
-            <Button
-              disabled={!form.agreedToTerms || isSubmitting}
-              onClick={handleSubmit}
-              className="bg-blue-600 hover:bg-blue-700 gap-2 px-8 shadow-lg shadow-blue-600/30 min-w-[200px]"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Mengirim...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  Kirim Pendaftaran
-                </>
               )}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
 
-export default function OrderPage() {
-  return (
-    <div className="pt-24 pb-16 px-4 bg-[#f4f7fb] min-h-screen">
-      <Suspense fallback={<div className="text-center pt-20">Loading form...</div>}>
-        <OrderFormInner />
-      </Suspense>
+              {/* Step 1 — Info Dasar (Clean) */}
+              {step === 1 && (
+              <div className="space-y-8 max-w-2xl">
+                  <StepHeader
+                  title={form.clientType === 'perusahaan' ? 'Identitas Bisnis' : 'Informasi Kontak'}
+                  desc="Gunakan data aktif agar tim kami bisa segera menghubungi Anda untuk tahap awal."
+                  />
+
+                  <div className="space-y-6">
+                      {form.clientType === 'individu' ? (
+                      <>
+                          <FieldRow label="Nama Lengkap / Nama Brand" required>
+                              <Input placeholder="Contoh: Nara Coffee Studio" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5 text-lg" />
+                          </FieldRow>
+                          <FieldRow label="WhatsApp Utama" required>
+                              <Input placeholder="08xxxxxxxxxx" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5 text-lg font-mono" />
+                          </FieldRow>
+                      </>
+                      ) : (
+                      <>
+                          <FieldRow label="Nama Perusahaan" required>
+                              <Input placeholder="PT. Jaya Abadi Sejahtera" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5 text-lg" />
+                          </FieldRow>
+                          <div className="grid grid-cols-2 gap-6">
+                              <FieldRow label="Nama PIC" required>
+                                  <Input placeholder="Nama lengkap" value={form.namapic} onChange={e => set('namapic', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5" />
+                              </FieldRow>
+                              <FieldRow label="Jabatan PIC">
+                                  <Input placeholder="Contoh: Manager Operasional" value={form.jabatan} onChange={e => set('jabatan', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5" />
+                              </FieldRow>
+                          </div>
+                          <FieldRow label="Nomor WhatsApp PIC" required>
+                              <Input placeholder="08xxxxxxxxxx" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5 font-mono" />
+                          </FieldRow>
+                          <FieldRow label="Email Bisnis">
+                              <Input type="email" placeholder="official@company.com" value={form.email} onChange={e => set('email', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5" />
+                          </FieldRow>
+                          <FieldRow label="Industri / Bidang Usaha" required>
+                              <Input placeholder="Contoh: Healthcare, EdTech, Real Estate" value={form.industri} onChange={e => set('industri', e.target.value)} className="py-7 rounded-2xl bg-gray-50 border-black/5" />
+                          </FieldRow>
+                      </>
+                      )}
+                  </div>
+              </div>
+              )}
+
+              {/* Step 2 — Template & Referensi (Focus) */}
+              {step === 2 && (
+              <div className="space-y-8">
+                  <StepHeader title="Visual & Referensi" desc="Tentukan arah desain website Anda agar kami bisa membuatkan sketsa awal yang akurat." />
+
+                  {selectedTemplateDetails ? (
+                  <div className="bg-blue-50/50 border border-apple-blue/20 rounded-[32px] p-8 md:p-10 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 bg-apple-blue text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest">
+                      Selected Template
+                      </div>
+                      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                          <div className="text-[100px] leading-none bg-white w-32 h-32 rounded-3xl flex items-center justify-center shadow-lg border border-black/5 shrink-0 group-hover:scale-105 transition-transform duration-500">
+                              {selectedTemplateDetails.image}
+                          </div>
+                          <div className="text-center md:text-left">
+                              <h3 className="text-3xl sf-display-heavy text-gray-900 mb-2">{selectedTemplateDetails.title}</h3>
+                              <p className="text-gray-500 mb-4 font-medium italic">Kategori: {selectedTemplateDetails.category}</p>
+                              <div className="inline-flex items-center gap-2 text-xs font-bold text-apple-blue bg-white border border-apple-blue/10 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                  <Sparkles size={12} /> Desain Ini Akan Menjadi Fondasi
+                              </div>
+                          </div>
+                      </div>
+                      <button 
+                          onClick={() => set('templateId', null)}
+                          className="mt-10 mx-auto md:mx-0 text-sm text-red-500 font-bold flex items-center gap-1.5 hover:text-red-700 transition-colors uppercase tracking-widest"
+                      >
+                          <X className="w-4 h-4" /> Reset Referensi (Isi Manual)
+                      </button>
+                  </div>
+                  ) : (
+                  <div className="space-y-6">
+                      <div className="flex items-center gap-4 text-gray-400 font-bold uppercase tracking-[0.2em] text-[11px] mb-2">
+                          <LayoutTemplate className="w-5 h-5 text-gray-300" />
+                          Custom Briefing
+                      </div>
+                      <FieldRow label="Ceritakan Website Impian Anda (atau Tempel URL Referensi)" required>
+                          <Textarea
+                              placeholder={`Tuliskan link website referensi (contoh: www.apple.com) atau rincian:
+• Apa tujuan utama website Anda?
+• Apa warna brand dominan yang ingin digunakan?
+• Siapa target pembaca/pembeli utama Anda?`}
+                              rows={8} 
+                              value={form.referensiManual}
+                              onChange={e => set('referensiManual', e.target.value)}
+                              className="resize-none bg-gray-50 border-black/5 rounded-[24px] p-6 text-lg placeholder-gray-300 focus:bg-white transition-all leading-relaxed"
+                          />
+                      </FieldRow>
+                  </div>
+                  )}
+              </div>
+              )}
+
+              {/* Step 3 — Add-ons (Premium Picker) */}
+              {step === 3 && (
+              <div className="space-y-10">
+                  <StepHeader title="Otomasi & Fitur Pro" desc="Pilih komponen tambahan untuk memaksimalkan website Anda. Biaya dihitung transparan." />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2 pb-2 custom-scrollbar">
+                  {ADDONS.map((addon) => {
+                      const isSelected = form.selectedAddons.includes(addon.id)
+                      return (
+                      <label
+                          key={addon.id}
+                          className={`cursor-pointer border-2 rounded-[24px] p-6 transition-all duration-300 flex flex-col gap-4 relative group ${
+                          isSelected ? 'border-apple-blue bg-blue-50/20 shadow-md' : 'border-black/[0.03] bg-gray-50/50 hover:border-apple-blue/30'
+                          }`}
+                      >
+                          <div className="flex justify-between items-start">
+                              <div className={`w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center ${isSelected ? 'bg-apple-blue border-apple-blue' : 'border-gray-300'}`}>
+                                  {isSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                              </div>
+                              <div className={`text-xs font-black uppercase tracking-widest ${isSelected ? 'text-apple-blue' : 'text-gray-400'}`}>
+                                  {formatPrice(addon.price).replace('Rp', 'IDR ')}
+                              </div>
+                          </div>
+                          <input
+                              type="checkbox"
+                              className="absolute opacity-0"
+                              checked={isSelected}
+                              onChange={() => toggleAddon(addon.id)}
+                          />
+                          <div>
+                              <h4 className="font-bold text-gray-900 group-hover:text-apple-blue transition-colors leading-tight mb-1">{addon.name}</h4>
+                              <p className="text-[10px] text-gray-400 font-medium">Renewal: {formatPrice(addon.yearlyMaint)} / thn</p>
+                          </div>
+                      </label>
+                      )
+                  })}
+                  </div>
+
+                  {/* Floating Summary Bar */}
+                  <div className="bg-[#1D1D1F] text-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
+                      <div className="flex items-center gap-5">
+                          <div className="w-12 h-12 rounded-full bg-apple-blue flex items-center justify-center shrink-0 shadow-lg glow-button">
+                              <Rocket className="w-6 h-6" />
+                          </div>
+                          <div>
+                              <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-1 leading-none">Paket Launching + Addons</p>
+                              <div className="text-3xl sf-display-heavy leading-none">{formatPrice(finalPrice)} <span className="text-xs font-medium text-gray-500 ml-1">/ thn 1</span></div>
+                          </div>
+                      </div>
+                      <div className="text-left md:text-right border-l md:border-l-0 md:border-r border-white/10 pl-5 md:pl-0 md:pr-5">
+                          <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1 leading-none">Biaya Maintenance Tahun 2</p>
+                          <div className="text-lg font-bold text-apple-blue">{formatPrice(totalYearlyMaint)} <span className="text-[10px] font-medium text-gray-400">/ Thn</span></div>
+                      </div>
+                  </div>
+              </div>
+              )}
+
+              {/* Step 4 — Review (Official Contract feel) */}
+              {step === 4 && (
+              <div className="space-y-10">
+                  <StepHeader title="Konfirmasi Data & Brief" desc="Pastikan data di bawah sudah benar. Brief ini akan dijadikan acuan pengerjaan tim kami." />
+
+                  <div className="bg-[#F9F9FB] rounded-[32px] p-8 md:p-12 space-y-10 border border-black/[0.03] apple-shadow">
+                      
+                      {/* Header Table style */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                          <div className="space-y-1">
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kategori Client</p>
+                              <p className="text-lg font-bold text-gray-900 sf-display capitalize">{form.clientType}</p>
+                          </div>
+                          <div className="space-y-1">
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kontak WhatsApp</p>
+                              <p className="text-lg font-bold text-apple-blue font-mono">{form.nomorWa}</p>
+                          </div>
+                          <div className="col-span-full h-px bg-black/[0.03]" />
+                          <div className="col-span-full">
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Subjek Pengerjaan</p>
+                              <p className="text-xl font-bold text-gray-900 sf-display">{form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha}</p>
+                          </div>
+                      </div>
+
+                      {/* Breakdown Cost */}
+                      <div className="bg-white rounded-3xl p-8 border border-black/5 shadow-sm">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6 pb-4 border-b border-black/[0.03]">Ringkasan Investasi Digital</p>
+                          <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                  <span className="text-gray-500 font-semibold">Paket Website Studio (Foundation)</span>
+                                  <span className="font-bold text-gray-900">{formatPrice(BASE_PRICE)}</span>
+                              </div>
+                              {form.selectedAddons.map(id => {
+                                  const addon = ADDONS.find(a => a.id === id)
+                                  return addon ? (
+                                  <div key={id} className="flex justify-between items-center text-apple-blue">
+                                      <span className="font-medium text-sm">+ {addon.name}</span>
+                                      <span className="font-bold">{formatPrice(addon.price)}</span>
+                                  </div>
+                                  ) : null
+                              })}
+                              <div className="pt-6 mt-6 border-t-2 border-black/5 flex justify-between items-center">
+                                  <span className="text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter">Total Estimasi Awal</span>
+                                  <span className="text-3xl sf-display-heavy text-apple-blue">{formatPrice(finalPrice)}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Apple-style Agreement */}
+                  <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
+                      className={`flex items-start gap-5 w-full text-left p-6 rounded-[24px] border transition-all duration-300 ${
+                          form.agreedToTerms ? 'bg-blue-50/50 border-apple-blue shadow-md' : 'bg-white border-black/[0.05] hover:border-apple-blue/30'
+                      }`}>
+                      <div className={`w-7 h-7 rounded-lg flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all duration-300 ${
+                          form.agreedToTerms ? 'bg-apple-blue border-apple-blue text-white shadow-lg' : 'border-gray-200 bg-white'
+                      }`}>
+                          {form.agreedToTerms && <Check className="w-5 h-5" strokeWidth={4} />}
+                      </div>
+                      <div className="space-y-1">
+                          <p className="text-[15px] font-bold text-gray-900 leading-tight">Saya Mengonfirmasi Brief Ini</p>
+                          <p className="text-xs text-gray-400 font-medium leading-relaxed italic">
+                              Saya menyetujui bahwa harga ini bersifat <strong className="text-apple-blue">Estimasi Awal</strong>. Tim Japan Arena akan memberikan Penawaran Final setelah sesi konsultasi WhatsApp.
+                          </p>
+                      </div>
+                  </button>
+
+                  {submitError && (
+                      <div className="bg-red-50 text-red-600 text-sm p-5 rounded-2xl border border-red-200 flex items-center gap-3">
+                          <AlertCircle size={20} /> {submitError}
+                      </div>
+                  )}
+              </div>
+              )}
+
+              {/* Navigation (Floating Bottom) */}
+              <div className={`mt-14 flex items-center ${step > 0 ? 'justify-between' : 'justify-end'}`}>
+                  {step > 0 && (
+                      <Button 
+                          variant="outline" 
+                          onClick={() => setStep(s => s - 1)} 
+                          className="gap-2 border-black/5 hover:bg-gray-50 h-14 rounded-2xl px-6 sf-display text-gray-500"
+                      >
+                          <ChevronLeft size={18} />
+                          {step === 1 ? 'Ubah Tipe' : 'Kembali'}
+                      </Button>
+                  )}
+                  {step < totalSteps ? (
+                      <Button 
+                          onClick={() => {
+                              if(step === 1 && (!form.nomorWa || (form.clientType === 'individu' && !form.namaUsaha) || (form.clientType === 'perusahaan' && !form.namaPerusahaan))) {
+                                  alert('Mohon lengkapi data wajib.'); return;
+                              }
+                              setStep(s => s + 1)
+                          }} 
+                          className="bg-[#1D1D1F] hover:bg-black h-14 rounded-2xl px-10 sf-display-heavy shadow-lg transition-all active:scale-95 group"
+                      >
+                          {step === 0 ? 'Mulai Ceritakan Web Anda' : 'Lanjutkan Langkah Berikutnya'}
+                          <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                  ) : (
+                      <Button
+                          disabled={!form.agreedToTerms || isSubmitting}
+                          onClick={handleSubmit}
+                          className="bg-apple-blue hover:bg-[#005BB5] h-14 rounded-2xl px-12 sf-display-heavy text-white shadow-xl glow-button transition-all active:scale-95 min-w-[240px]"
+                      >
+                          {isSubmitting ? (
+                              <>
+                              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                              Mengirim Data...
+                              </>
+                          ) : (
+                              <>
+                              Kirim Brief Sekarang <Send size={18} className="ml-2" />
+                              </>
+                          )}
+                      </Button>
+                  )}
+              </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      
+      {/* Trust Badge Below Form */}
+      <div className="mt-12 text-center">
+         <p className="text-[11px] font-bold text-gray-300 uppercase tracking-[0.3em] flex items-center justify-center gap-3">
+             <ShieldCheck size={16} /> 256-bit Secure Briefing Session
+         </p>
+      </div>
     </div>
   )
 }
