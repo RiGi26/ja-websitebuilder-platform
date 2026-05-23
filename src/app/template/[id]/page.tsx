@@ -6,7 +6,11 @@ import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
 import { Separator } from '@/app/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/tabs'
-import { Monitor, Tablet, Smartphone, Star, Check, FileText, Headphones, Palette, Zap, ExternalLink } from 'lucide-react'
+import { 
+  Monitor, Tablet, Smartphone, Star, Check, FileText, 
+  Headphones, Palette, Zap, ExternalLink, ChevronLeft, ArrowRight, Sparkles 
+} from 'lucide-react'
+import { motion } from 'framer-motion'
 
 import { templatesData } from '@/data/templates'
 import { notFound, useParams } from 'next/navigation'
