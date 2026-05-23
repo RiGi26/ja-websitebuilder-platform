@@ -230,15 +230,15 @@ function OrderFormInner() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header (Apple Style) */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-10 px-2">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
+            <span className="inline-block text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
                 Onboarding Experience
             </span>
-            <h1 className="text-4xl md:text-6xl sf-display-heavy text-[#1D1D1F] tracking-tight leading-tight mb-4" style={{ fontFamily: "'Fraunces', serif" }}>
+            <h1 className="text-3xl md:text-6xl sf-display-heavy text-[#1D1D1F] tracking-tight leading-tight mb-4" style={{ fontFamily: "'Fraunces', serif" }}>
                 Ceritakan Website <br className="hidden md:block" /> <span className="italic text-apple-blue">Impian Anda</span>
             </h1>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed font-medium">
+            <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed font-medium">
                 Pendaftaran ini adalah langkah awal menuju transformasi digital bisnis Anda yang lebih profesional.
             </p>
         </motion.div>
@@ -246,12 +246,12 @@ function OrderFormInner() {
 
       {/* Progress Experience */}
       {step > 0 && (
-        <div className="max-w-2xl mx-auto mb-12">
+        <div className="max-w-2xl mx-auto mb-10 px-4">
           <div className="flex items-center justify-between mb-3 px-1">
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Step {step} of {totalSteps}</span>
-            <span className="text-sm font-bold text-apple-blue tabular-nums">{progress}% Complete</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Step {step} of {totalSteps}</span>
+            <span className="text-xs font-bold text-apple-blue tabular-nums">{progress}% Complete</span>
           </div>
-          <div className="h-2.5 bg-white rounded-full overflow-hidden shadow-inner p-0.5 border border-black/[0.03]">
+          <div className="h-2 bg-white rounded-full overflow-hidden shadow-inner border border-black/[0.03]">
             <motion.div 
                 className="h-full bg-apple-blue rounded-full" 
                 initial={{ width: 0 }}
@@ -259,9 +259,9 @@ function OrderFormInner() {
                 transition={{ duration: 0.6, ease: "easeOut" }}
             />
           </div>
-          <div className="flex justify-between mt-4 px-2">
-            {['Info Dasar', 'Referensi', 'Fitur Pro', 'Final Review'].map((s, i) => (
-              <span key={s} className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${step === i + 1 ? 'text-apple-blue' : step > i + 1 ? 'text-green-600' : 'text-gray-300'}`}>
+          <div className="flex justify-between mt-4">
+            {['Info', 'Ref', 'Fitur', 'Final'].map((s, i) => (
+              <span key={s} className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${step === i + 1 ? 'text-apple-blue' : step > i + 1 ? 'text-green-600' : 'text-gray-300'}`}>
                 {s}
               </span>
             ))}
@@ -277,7 +277,7 @@ function OrderFormInner() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="bg-white rounded-[40px] apple-shadow border border-black/[0.03] p-8 md:p-14 relative overflow-hidden"
+          className="bg-white rounded-[32px] md:rounded-[40px] apple-shadow border border-black/[0.03] p-6 md:p-14 relative overflow-hidden mx-2 sm:mx-0"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full blur-[100px] pointer-events-none" />
           
