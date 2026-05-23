@@ -49,6 +49,7 @@ function formatDate(date: string) {
   })
 }
 
+// Force redeploy to verify fixed helpers
 export default async function StudioAdminPage() {
   const cookieStore = await cookies()
   const isAuth = cookieStore.get('admin_auth')?.value === 'true'
