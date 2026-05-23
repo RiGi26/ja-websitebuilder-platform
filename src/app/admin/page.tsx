@@ -18,6 +18,7 @@ import Link from 'next/link'
 import Navbar from '@/app/components/Navbar'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import OrderStatusControl from './OrderStatusControl'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,6 +33,20 @@ async function getOrders() {
     return []
   }
   return data
+}
+
+function formatPrice(price: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
+}
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 export default async function StudioAdminPage() {
@@ -164,23 +179,25 @@ export default async function StudioAdminPage() {
                       </div>
                     </div>
 
-                    {/* Financial Summary */}
-                    <div className="lg:w-1/4 bg-[#1D1D1F] rounded-3xl p-8 text-white flex flex-col justify-between shadow-xl relative overflow-hidden shrink-0">
-                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-apple-blue opacity-20 rounded-full blur-2xl" />
-                      
-                      <div className="relative z-10">
-                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Estimasi Project</p>
-                        <p className="text-3xl sf-display-heavy text-white mb-6 tabular-nums">{formatPrice(order.total_estimasi)}</p>
-                        
-                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">Maintenance / Thn</p>
-                        <p className="text-lg font-bold text-apple-blue tabular-nums">{formatPrice(order.total_maintenance)}</p>
+                    {/* Financial Summary & Controls */}
+                    <div className="lg:w-1/4 space-y-6 shrink-0">
+                      <div className="bg-[#1D1D1F] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-apple-blue opacity-20 rounded-full blur-2xl" />
+                        <div className="relative z-10">
+                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Estimasi Project</p>
+                            <p className="text-3xl sf-display-heavy text-white mb-6 tabular-nums">{formatPrice(order.total_estimasi)}</p>
+                            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">Maintenance / Thn</p>
+                            <p className="text-lg font-bold text-apple-blue tabular-nums">{formatPrice(order.total_maintenance)}</p>
+                        </div>
                       </div>
 
-                      <div className="relative z-10 pt-8 mt-8 border-t border-white/5 space-y-3">
-                         <button className="w-full py-3 bg-apple-blue text-white rounded-xl text-xs font-bold hover:bg-[#005BB5] transition-all flex items-center justify-center gap-2 glow-button">
-                           <Briefcase size={14} /> Handle Project
-                         </button>
-                         <p className="text-[10px] text-gray-500 text-center">Klik untuk memindahkan ke pengerjaan aktif</p>
+                      {/* NEW: Admin Progress Control */}
+                      <div className="px-1">
+                        <OrderStatusControl 
+                            orderId={order.id} 
+                            currentStep={order.progress_step || 1} 
+                            currentStatus={order.status || 'pending'} 
+                        />
                       </div>
                     </div>
 
