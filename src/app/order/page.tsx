@@ -526,17 +526,17 @@ function OrderFormInner() {
                   {/* Apple-style Agreement */}
                   <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
                       className={`flex items-start gap-5 w-full text-left p-6 rounded-[24px] border transition-all duration-300 ${
-                          form.agreedToTerms ? 'bg-blue-50/50 border-apple-blue shadow-md' : 'bg-white border-black/[0.05] hover:border-apple-blue/30'
+                          form.agreedToTerms ? 'bg-blue-50 border-apple-blue shadow-sm' : 'bg-white border-black/[0.05] hover:border-apple-blue/30'
                       }`}>
                       <div className={`w-7 h-7 rounded-lg flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all duration-300 ${
-                          form.agreedToTerms ? 'bg-apple-blue border-apple-blue text-white shadow-lg' : 'border-gray-200 bg-white'
+                          form.agreedToTerms ? 'bg-apple-blue border-apple-blue text-white shadow-lg' : 'border-gray-300 bg-white'
                       }`}>
                           {form.agreedToTerms && <Check className="w-5 h-5" strokeWidth={4} />}
                       </div>
                       <div className="space-y-1">
-                          <p className="text-[15px] font-bold text-gray-900 leading-tight">Saya Mengonfirmasi Brief Ini</p>
-                          <p className="text-xs text-gray-400 font-medium leading-relaxed italic">
-                              Saya menyetujui bahwa harga ini bersifat <strong className="text-apple-blue">Estimasi Awal</strong>. Tim Japan Arena akan memberikan Penawaran Final setelah sesi konsultasi WhatsApp.
+                          <p className="text-[15px] font-bold text-gray-900 leading-tight">Saya Mengonfirmasi Detail Brief Ini</p>
+                          <p className="text-xs text-gray-500 font-medium leading-relaxed italic">
+                              Dengan ini saya menyatakan bahwa data yang diisi telah benar. Saya memahami bahwa rincian biaya di atas merupakan <strong className="text-apple-blue">Estimasi Awal</strong> dan Penawaran Final akan diberikan oleh tim Japan Arena Corp setelah sesi konsultasi melalui WhatsApp.
                           </p>
                       </div>
                   </button>
@@ -555,10 +555,10 @@ function OrderFormInner() {
                       <Button 
                           variant="outline" 
                           onClick={() => setStep(s => s - 1)} 
-                          className="gap-2 border-black/5 hover:bg-gray-50 h-14 rounded-2xl px-6 sf-display text-gray-500"
+                          className="gap-2 border-black/10 hover:bg-gray-100 h-14 rounded-2xl px-6 sf-display text-gray-600"
                       >
                           <ChevronLeft size={18} />
-                          {step === 1 ? 'Ubah Tipe' : 'Kembali'}
+                          {step === 1 ? 'Ubah Kategori' : 'Kembali'}
                       </Button>
                   )}
                   {step < totalSteps ? (
@@ -569,9 +569,9 @@ function OrderFormInner() {
                               }
                               setStep(s => s + 1)
                           }} 
-                          className="bg-[#1D1D1F] hover:bg-black h-14 rounded-2xl px-10 sf-display-heavy shadow-lg transition-all active:scale-95 group"
+                          className="bg-[#1D1D1F] hover:bg-black text-white h-14 rounded-2xl px-10 sf-display-heavy shadow-lg transition-all active:scale-95 group"
                       >
-                          {step === 0 ? 'Mulai Ceritakan Web Anda' : 'Lanjutkan Langkah Berikutnya'}
+                          {step === 0 ? 'Mulai Pengisian Brief' : 'Lanjutkan ke Tahap Berikutnya'}
                           <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
                       </Button>
                   ) : (
@@ -583,7 +583,7 @@ function OrderFormInner() {
                           {isSubmitting ? (
                               <>
                               <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                              Mengirim Data...
+                              Sedang Mengirim...
                               </>
                           ) : (
                               <>
