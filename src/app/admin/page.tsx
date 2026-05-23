@@ -11,10 +11,13 @@ import {
   Building2,
   ExternalLink,
   Zap,
-  DollarSign
+  DollarSign,
+  LogOut
 } from 'lucide-react'
 import Link from 'next/link'
 import Navbar from '@/app/components/Navbar'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,21 +34,14 @@ async function getOrders() {
   return data
 }
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
 export default async function StudioAdminPage() {
+  const cookieStore = await cookies()
+  const isAuth = cookieStore.get('admin_auth')?.value === 'true'
+
+  if (!isAuth) {
+    redirect('/admin/login')
+  }
+
   const orders = await getOrders()
 
   return (
@@ -67,11 +63,14 @@ export default async function StudioAdminPage() {
               <p className="text-gray-500 mt-2 font-medium">Pantau dan kelola semua calon klien yang telah mengisi brief.</p>
             </div>
             
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
                <div className="bg-white px-6 py-4 rounded-3xl apple-shadow border border-black/5 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Leads</p>
                     <p className="text-3xl sf-display-heavy text-apple-blue">{orders.length}</p>
                </div>
+               <a href="/auth/logout" className="p-4 bg-white rounded-2xl apple-shadow border border-black/5 text-red-500 hover:bg-red-50 transition-colors">
+                  <LogOut size={20} />
+               </a>
             </div>
           </div>
 
