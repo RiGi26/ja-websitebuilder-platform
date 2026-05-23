@@ -8,7 +8,7 @@ import { Separator } from '@/app/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/tabs'
 import { 
   Monitor, Tablet, Smartphone, Star, Check, FileText, 
-  Headphones, Palette, Zap, ExternalLink, ChevronLeft, ArrowRight, Sparkles 
+  Headphones, Palette, Zap, ExternalLink, ChevronLeft, ArrowRight, Sparkles, Home 
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -41,10 +41,19 @@ export default function TemplateDetailPage() {
       <div className="max-w-7xl mx-auto">
         
         {/* Navigation Breadcrumb (Apple Style) */}
-        <div className="flex items-center gap-2 mb-10 animate-fade-in px-1">
-            <Link href="/template" className="text-xs font-bold text-gray-400 hover:text-apple-blue transition-colors uppercase tracking-widest flex items-center gap-1">
-                <ChevronLeft size={14} /> Kembali ke Katalog
+        <div className="flex items-center gap-3 mb-10 animate-fade-in px-1 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            <Link href="/" className="text-gray-400 hover:text-apple-blue transition-colors flex items-center gap-1.5 group">
+                <Home size={14} className="group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Studio</span>
             </Link>
+            <ChevronLeft size={10} className="text-gray-300 rotate-180" />
+            <Link href="/template" className="text-gray-400 hover:text-apple-blue transition-colors flex items-center gap-1.5 group">
+                <span className="text-[10px] font-bold uppercase tracking-widest">Katalog Template</span>
+            </Link>
+            <ChevronLeft size={10} className="text-gray-300 rotate-180" />
+            <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black text-apple-blue uppercase tracking-widest">{template.title}</span>
+            </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
