@@ -16,6 +16,7 @@ import { Textarea } from '@/app/components/ui/textarea'
 import { templatesData } from '@/data/templates'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/app/components/Navbar'
+import Footer from '@/app/components/Footer'
 
 // ── Types & Constants ─────────────────────────────────────────────────────────
 type ClientType = 'individu' | 'perusahaan' | null
@@ -598,11 +599,12 @@ function OrderFormInner() {
       </AnimatePresence>
       
       {/* Trust Badge Below Form */}
-      <div className="mt-12 text-center">
+      <div className="mt-12 text-center mb-12">
          <p className="text-[11px] font-bold text-gray-300 uppercase tracking-[0.3em] flex items-center justify-center gap-3">
              <ShieldCheck size={16} /> 256-bit Secure Briefing Session
          </p>
       </div>
+      <Footer />
     </div>
   )
 }
