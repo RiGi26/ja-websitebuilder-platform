@@ -45,6 +45,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           <Link href="/template" className="text-sm font-semibold text-gray-500 hover:text-apple-blue transition-colors sf-display">Template</Link>
           <Link href="/pricing" className="text-sm font-semibold text-gray-500 hover:text-apple-blue transition-colors sf-display">Harga</Link>
+          <Link href="/track" className="text-sm font-semibold text-gray-500 hover:text-apple-blue transition-colors sf-display">Track Pesanan</Link>
           <a href={CORP_URL} className="text-sm font-semibold text-gray-500 hover:text-apple-blue transition-colors sf-display inline-flex items-center gap-1">
             <ChevronLeft size={14}/> Japan Arena Corp
           </a>
