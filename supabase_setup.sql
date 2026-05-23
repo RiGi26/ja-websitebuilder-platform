@@ -23,7 +23,8 @@ create table public.orders (
   total_maintenance numeric not null,
   
   -- Tracking
-  status text default 'pending'
+  status text default 'pending', -- 'pending', 'active', 'completed', 'cancelled'
+  progress_step integer default 1 -- 1: Briefing, 2: Analysis, 3: Design, 4: Dev, 5: Launch
 );
 
 -- Atur keamanan (RLS)
