@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion } from 'motion/react'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
-import { ExternalLink, Star } from 'lucide-react'
+import { ExternalLink, Star, ChevronRight } from 'lucide-react'
 import { templatesList } from '@/data/templates'
 
 const categories = ['Semua', 'F&B', 'Korporat', 'Retail', 'Kesehatan', 'Edukasi', 'Blog']
