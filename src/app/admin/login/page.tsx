@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, Loader2, AlertCircle } from 'lucide-react'
+import { Lock, Loader2, AlertCircle, Home } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
@@ -40,14 +41,27 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <Image 
-            src="/images/Icon.png" 
-            alt="Logo" 
-            width={48} height={48} 
-            className="mx-auto mb-4 drop-shadow-sm"
-          />
-          <h1 className="text-2xl sf-display-heavy text-gray-900 tracking-tight">Studio Admin</h1>
-          <p className="text-sm text-gray-500 mt-1">Khusus Tim Japan Arena Studio</p>
+          <Link 
+            href="https://ja-landingpage-platform.vercel.app" 
+            className="group flex flex-col items-center gap-4 transition-all"
+            title="Kembali ke Portal Utama"
+          >
+            <div className="relative">
+              <Image 
+                src="/images/Icon.png" 
+                alt="Logo" 
+                width={56} height={56} 
+                className="mx-auto object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white text-[8px] px-2 py-0.5 rounded-full whitespace-nowrap pointer-events-none uppercase tracking-widest font-bold">
+                Beranda
+              </div>
+            </div>
+            <div className="text-center">
+              <h1 className="text-2xl sf-display-heavy text-gray-900 tracking-tight leading-none">Studio Admin</h1>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Japan Arena Studio</p>
+            </div>
+          </Link>
         </div>
 
         <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
