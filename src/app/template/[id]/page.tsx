@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
+import { triggerHaptic } from '@/lib/ux-utils'
 import { templatesData } from '@/data/templates'
 import { notFound, useParams } from 'next/navigation'
 
@@ -61,6 +62,23 @@ export default function TemplateDetailPage() {
           {/* Left Area: Device Preview Lab */}
           <div className="lg:col-span-8 space-y-6 animate-fade-up">
             
+            {/* Visual Thumbnail Strip (New Premium Element) */}
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                <div className="min-w-[120px] aspect-[4/3] rounded-2xl overflow-hidden border border-black/5 apple-shadow shrink-0">
+                    <img src={template.image} alt="Preview 1" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 bg-white rounded-2xl p-6 apple-shadow border border-black/5 flex items-center justify-between">
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kategori Desain</p>
+                        <h4 className="text-lg font-bold text-[#1D1D1F]">{template.category}</h4>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Basis Teknologi</p>
+                        <h4 className="text-sm font-bold text-apple-blue">{template.platform}</h4>
+                    </div>
+                </div>
+            </div>
+
             {/* Device Toggles (Floating Control) */}
             <div className="flex items-center justify-between bg-white rounded-2xl p-2 apple-shadow border border-black/5">
                 <div className="flex gap-1">
@@ -71,7 +89,7 @@ export default function TemplateDetailPage() {
                     ].map((d) => (
                         <button
                             key={d.id}
-                            onClick={() => setDevice(d.id as any)}
+                            onClick={() => { triggerHaptic(5); setDevice(d.id as any); }}
                             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                                 device === d.id 
                                 ? 'bg-apple-blue text-white shadow-md' 
@@ -90,13 +108,19 @@ export default function TemplateDetailPage() {
             </div>
 
             {/* Preview Frame Container */}
-            <div className="bg-white rounded-[40px] apple-shadow border border-black/5 overflow-hidden flex items-center justify-center min-h-[500px] sm:min-h-[700px] p-4 sm:p-12 relative">
+            <div className="bg-white rounded-[40px] apple-shadow border border-black/5 overflow-hidden flex items-center justify-center min-h-[500px] sm:min-h-[700px] p-4 sm:p-12 relative group/preview">
+              {/* Dynamic Loading State */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/50 backdrop-blur-sm z-0">
+                  <div className="w-10 h-10 border-4 border-apple-blue/20 border-t-apple-blue rounded-full animate-spin mb-4" />
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Membangun Preview...</p>
+              </div>
+
               {/* Device Frame Simulation */}
               <motion.div 
                 key={device}
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`bg-white rounded-[24px] shadow-2xl border-[8px] border-black transition-all duration-500 relative ${
+                className={`bg-white rounded-[24px] shadow-2xl border-[8px] border-black transition-all duration-500 relative z-10 ${
                     device === 'desktop' ? 'w-full aspect-[16/10]' :
                     device === 'tablet'  ? 'w-[450px] aspect-[3/4]' : 
                                            'w-[300px] aspect-[9/19.5]'
@@ -104,18 +128,29 @@ export default function TemplateDetailPage() {
               >
                 {/* Dynamic notch for mobile */}
                 {device === 'mobile' && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-b-xl z-20" />
                 )}
 
                 <iframe 
                   src={template.demoUrl} 
-                  className="w-full h-full rounded-[16px] border-none bg-white"
+                  className="w-full h-full rounded-[16px] border-none bg-white relative z-10"
                   title={`Preview ${template.title}`}
                   loading="lazy"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
                 />
               </motion.div>
               
+              {/* Fallback & Safety Note */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-500 w-full max-w-xs px-6">
+                  <div className="bg-black/80 backdrop-blur-md text-white p-3 rounded-2xl text-[10px] text-center leading-relaxed border border-white/10">
+                      <p className="font-bold mb-1">Preview tidak muncul?</p>
+                      <p className="text-gray-400 mb-2">Beberapa situs membatasi tampilan di dalam frame untuk keamanan.</p>
+                      <a href={template.demoUrl} target="_blank" className="text-apple-blue-light font-black hover:underline uppercase tracking-widest">
+                          Buka Link Langsung →
+                      </a>
+                  </div>
+              </div>
+
               {/* Background Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent pointer-events-none" />
             </div>
@@ -154,13 +189,17 @@ export default function TemplateDetailPage() {
                 </div>
               </div>
 
-              <div className="bg-[#F9F9FB] rounded-3xl p-6 border border-black/[0.02]">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Paket Launching Dasar</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl sf-display-heavy text-apple-blue tabular-nums">{template.price}</span>
-                  <span className="text-sm text-gray-400 line-through font-medium">{template.originalPrice}</span>
+              <div className="bg-[#F9F9FB] rounded-3xl p-6 md:p-8 border border-black/[0.02] relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-apple-blue/5 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-apple-blue/10 transition-colors" />
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] mb-2 leading-none">Investasi Launching</p>
+                <div className="flex items-end gap-2.5">
+                  <span className="text-4xl md:text-5xl sf-display-heavy text-apple-blue tracking-tighter leading-none tabular-nums">{template.price}</span>
+                  <span className="text-sm text-gray-300 line-through font-bold mb-1 leading-none">{template.originalPrice}</span>
                 </div>
-                <p className="text-[10px] text-green-600 font-bold mt-3 bg-green-50 px-2 py-1 rounded-md inline-block uppercase tracking-wider">Mulai Launching Dalam 7 Hari</p>
+                <div className="mt-5 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider">Tersedia untuk Launching 7 Hari</p>
+                </div>
               </div>
 
               <div className="space-y-4">

@@ -65,20 +65,22 @@ export default function TemplateCatalogPage() {
                 className="group flex flex-col bg-white rounded-[32px] border border-black/[0.03] apple-shadow hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
               >
                 {/* Visual Preview */}
-                <Link href={`/template/${template.id}`} className="block relative aspect-[4/3] overflow-hidden bg-[#F9F9FB]">
-                  <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
-                      <span className="text-7xl drop-shadow-xl">{template.image}</span>
-                  </div>
+                <Link href={`/template/${template.id}`} className="block relative aspect-[4/3] overflow-hidden bg-[#F0F0F2]">
+                  <img 
+                    src={template.image} 
+                    alt={template.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
                   {/* Device Pill Overlay */}
                   <div className="absolute top-4 left-4">
-                      <span className="bg-white/80 backdrop-blur-md text-[10px] font-black text-gray-900 px-3 py-1 rounded-full border border-black/5 uppercase tracking-widest">
+                      <span className="bg-white/90 backdrop-blur-md text-[10px] font-black text-gray-900 px-3.5 py-1.5 rounded-full border border-black/5 uppercase tracking-widest shadow-sm">
                           {template.category}
                       </span>
                   </div>
                   {/* Hover Glass Overlay */}
                   <div className="absolute inset-0 apple-glass opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
                       <span className="bg-[#1D1D1F] text-white px-6 py-3 rounded-full text-xs font-bold shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        Lihat Review Perangkat
+                        Explore Blueprint →
                       </span>
                   </div>
                 </Link>
@@ -101,12 +103,12 @@ export default function TemplateCatalogPage() {
                     {template.description}
                   </p>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-black/5 mt-auto">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Investasi</span>
-                      <span className="text-xl sf-display-heavy text-[#1D1D1F] tracking-tight">{template.price}</span>
+                  <div className="flex items-end justify-between pt-6 border-t border-black/5 mt-auto">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] leading-none">Investasi</span>
+                      <span className="text-xl md:text-2xl sf-display-heavy text-[#1D1D1F] tracking-tighter group-hover:text-apple-blue transition-colors duration-300">{template.price}</span>
                     </div>
-                    <Button asChild variant="outline" className="rounded-full px-5 border-black/5 hover:bg-gray-50 transition-all sf-display text-xs">
+                    <Button asChild variant="outline" className="rounded-full px-5 h-11 border-black/5 hover:bg-gray-50 transition-all sf-display text-xs">
                       <Link href={`/template/${template.id}`}>
                         Detail <ChevronRight className="w-3 h-3 ml-1" />
                       </Link>

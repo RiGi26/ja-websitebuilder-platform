@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { triggerHaptic } from '@/lib/ux-utils'
 import { 
   Check, Building2, User, ChevronRight, ChevronLeft, 
   Send, X, LayoutTemplate, Loader2, Sparkles, AlertCircle, 
@@ -129,7 +130,23 @@ function OrderFormInner() {
 
   const set = (key: keyof FormData, value: unknown) => setForm(f => ({ ...f, [key]: value }))
 
+  const nextStep = () => {
+    if(step === 1 && (!form.nomorWa || (form.clientType === 'individu' && !form.namaUsaha) || (form.clientType === 'perusahaan' && !form.namaPerusahaan))) {
+        alert('Mohon lengkapi data wajib.'); return;
+    }
+    triggerHaptic(10)
+    setStep(s => s + 1)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const prevStep = () => {
+    triggerHaptic(5)
+    setStep(s => s - 1)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const toggleAddon = (id: string) => {
+    triggerHaptic(5)
     const isSelected = form.selectedAddons.includes(id)
     if (isSelected) {
       set('selectedAddons', form.selectedAddons.filter(a => a !== id))
@@ -172,7 +189,8 @@ function OrderFormInner() {
             selected_addons: form.selectedAddons,
             total_estimasi: finalPrice,
             total_maintenance: totalYearlyMaint,
-            status: 'pending'
+            status: 'pending',
+            type: 'new'
           }
         ])
 
@@ -294,7 +312,7 @@ function OrderFormInner() {
                       { type: 'perusahaan' as ClientType, icon: Building2, title: 'Perusahaan / Korporat', desc: 'Sistem untuk PT, CV, Yayasan, atau Bisnis Menengah.', emoji: '🏢' },
                   ] as const).map(({ type, icon: Icon, title, desc, emoji }) => (
                       <button key={type} type="button"
-                      onClick={() => { set('clientType', type); setStep(1) }}
+                      onClick={() => { triggerHaptic(10); set('clientType', type); setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                       className={`group flex flex-col items-start gap-6 p-8 rounded-[32px] border-2 text-left transition-all duration-300 hover:scale-[1.02] ${
                           form.clientType === type ? 'border-apple-blue bg-blue-50/30' : 'border-black/[0.03] bg-[#F9F9FB] hover:border-apple-blue/30'
                       }`}
@@ -555,7 +573,7 @@ function OrderFormInner() {
                   {step > 0 && (
                       <Button 
                           variant="outline" 
-                          onClick={() => setStep(s => s - 1)} 
+                          onClick={prevStep} 
                           className="gap-2 border-black/10 hover:bg-gray-100 h-14 rounded-2xl px-6 sf-display text-gray-600"
                       >
                           <ChevronLeft size={18} />
@@ -564,12 +582,7 @@ function OrderFormInner() {
                   )}
                   {step < totalSteps ? (
                       <Button 
-                          onClick={() => {
-                              if(step === 1 && (!form.nomorWa || (form.clientType === 'individu' && !form.namaUsaha) || (form.clientType === 'perusahaan' && !form.namaPerusahaan))) {
-                                  alert('Mohon lengkapi data wajib.'); return;
-                              }
-                              setStep(s => s + 1)
-                          }} 
+                          onClick={nextStep} 
                           className="bg-[#1D1D1F] hover:bg-black text-white h-14 rounded-2xl px-10 sf-display-heavy shadow-lg transition-all active:scale-95 group"
                       >
                           {step === 0 ? 'Mulai Pengisian Brief' : 'Lanjutkan ke Tahap Berikutnya'}
@@ -578,7 +591,7 @@ function OrderFormInner() {
                   ) : (
                       <Button
                           disabled={!form.agreedToTerms || isSubmitting}
-                          onClick={handleSubmit}
+                          onClick={() => { triggerHaptic(20); handleSubmit(); }}
                           className="bg-apple-blue hover:bg-[#005BB5] h-14 rounded-2xl px-12 sf-display-heavy text-white shadow-xl glow-button transition-all active:scale-95 min-w-[240px]"
                       >
                           {isSubmitting ? (

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import Navbar from '@/app/components/Navbar'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: 'Japan Arena Studio — Solusi Website Bisnis Profesional',
@@ -16,6 +16,7 @@ export default function RootLayout({
     <html lang="id">
       <body className="antialiased">
         {children}
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )
