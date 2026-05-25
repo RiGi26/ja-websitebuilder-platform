@@ -7,15 +7,3 @@ export function triggerHaptic(duration = 10) {
     window.navigator.vibrate(duration)
   }
 }
-
-/**
- * Skeleton Loader Component
- */
-export function Skeleton({ className = "", width, height }: { className?: string; width?: string | number; height?: string | number }) {
-  return (
-    <div 
-      className={`skeleton rounded-lg ${className}`} 
-      style={{ width, height }}
-    />
-  )
-}
