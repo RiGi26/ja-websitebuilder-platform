@@ -23,7 +23,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template elegan untuk restoran, kafe, atau rumah makan. Dilengkapi dengan menu digital, galeri foto, dan integrasi reservasi via WhatsApp.',
     price: 'Rp 899.000', originalPrice: 'Rp 1.500.000',
     demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
-    image: '🍽️', features: ['Menu Digital Interaktif', 'Form Reservasi Meja', 'Integrasi Google Maps', 'Mobile Responsive'],
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop', features: ['Menu Digital Interaktif', 'Form Reservasi Meja', 'Integrasi Google Maps', 'Mobile Responsive'],
     tags: ['Restaurant', 'Cafe', 'Food'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 42,
   },
   'cafe-minimalis': {
@@ -31,7 +31,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Desain estetik dan bersih khusus untuk kedai kopi kekinian. Cocok untuk menonjolkan biji kopi dan suasana kafe.',
     price: 'Rp 699.000', originalPrice: 'Rp 1.200.000',
     demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
-    image: '☕', features: ['Katalog Kopi', 'Cerita Kafe', 'Galeri Instagram', 'Lokasi Cabang'],
+    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Kopi', 'Cerita Kafe', 'Galeri Instagram', 'Lokasi Cabang'],
     tags: ['Cafe', 'Coffee', 'Minimalist'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.8, reviewCount: 89,
   },
   'fine-dining': {
@@ -39,7 +39,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Tampilan super premium dengan tema gelap (dark mode) untuk restoran bintang lima. Menambah kesan eksklusif.',
     price: 'Rp 999.000', originalPrice: 'Rp 1.800.000',
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: '🍷', features: ['Sistem Booking VVIP', 'Menu Eksklusif', 'Video Background', 'Multi-bahasa'],
+    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1200&auto=format&fit=crop', features: ['Sistem Booking VVIP', 'Menu Eksklusif', 'Video Background', 'Multi-bahasa'],
     tags: ['Luxury', 'Fine Dining', 'Premium'], platform: 'Next.js + Framer Motion', pages: '6 Halaman', rating: 4.9, reviewCount: 24,
   },
 
@@ -49,7 +49,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Desain profesional untuk perusahaan, agensi, atau konsultan. Menampilkan layanan, portofolio, dan tim Anda dengan elegan.',
     price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: '🏢', features: ['Tentang Kami & Tim', 'Layanan & Portofolio', 'Blog/Berita', 'Form Kontak & Lead Gen'],
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop', features: ['Tentang Kami & Tim', 'Layanan & Portofolio', 'Blog/Berita', 'Form Kontak & Lead Gen'],
     tags: ['Corporate', 'Agency', 'Business'], platform: 'Next.js + Tailwind', pages: '7 Halaman', rating: 4.8, reviewCount: 128,
   },
   'startup-saas': {
@@ -57,7 +57,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Landing page modern dan dinamis bergaya Silicon Valley. Sangat cocok untuk produk digital atau aplikasi.',
     price: 'Rp 849.000', originalPrice: 'Rp 1.500.000',
     demoUrl: 'https://linear.app', repoUrl: '#',
-    image: '🚀', features: ['Tabel Harga', 'Integrasi Analytics', 'Animasi Scroll', 'Testimoni Klien'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop', features: ['Tabel Harga', 'Integrasi Analytics', 'Animasi Scroll', 'Testimoni Klien'],
     tags: ['Startup', 'SaaS', 'Tech'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 310,
   },
   'creative-agency': {
@@ -65,7 +65,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template nyentrik dan kreatif untuk agensi desain atau marketing. Menampilkan portofolio dengan transisi unik.',
     price: 'Rp 799.000', originalPrice: 'Rp 1.500.000',
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: '🎨', features: ['Grid Portofolio 3D', 'Dark Mode Toggle', 'Cursor Custom', 'Form Konsultasi'],
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop', features: ['Grid Portofolio 3D', 'Dark Mode Toggle', 'Cursor Custom', 'Form Konsultasi'],
     tags: ['Creative', 'Design', 'Portfolio'], platform: 'Next.js + GSAP', pages: '6 Halaman', rating: 4.7, reviewCount: 65,
   },
 
@@ -75,7 +75,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Website toko online lengkap dengan keranjang belanja, integrasi payment gateway lokal, dan penghitungan ongkos kirim.',
     price: 'Rp 1.299.000', originalPrice: 'Rp 2.500.000',
     demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: '🛍️', features: ['Katalog Produk & Variasi', 'Shopping Cart', 'Payment Gateway (Midtrans)', 'Dashboard Admin'],
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Produk & Variasi', 'Shopping Cart', 'Payment Gateway (Midtrans)', 'Dashboard Admin'],
     tags: ['E-Commerce', 'Shop', 'Retail'], platform: 'Next.js + Supabase', pages: '10+ Halaman', rating: 4.9, reviewCount: 85,
   },
   'fashion-boutique': {
@@ -83,7 +83,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Toko online estetik dengan fokus pada foto produk besar. Sangat cocok untuk brand pakaian atau perhiasan.',
     price: 'Rp 899.000', originalPrice: 'Rp 1.800.000',
     demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: '👗', features: ['Lookbook', 'Wishlist', 'Zoom Produk', 'Filter Kategori'],
+    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1200&auto=format&fit=crop', features: ['Lookbook', 'Wishlist', 'Zoom Produk', 'Filter Kategori'],
     tags: ['Fashion', 'Apparel', 'Modern'], platform: 'Next.js + Tailwind', pages: '8 Halaman', rating: 4.6, reviewCount: 45,
   },
   'gadget-store': {
@@ -91,7 +91,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template e-commerce dengan fitur perbandingan spesifikasi produk dan review. Ideal untuk toko handphone atau komputer.',
     price: 'Rp 1.199.000', originalPrice: 'Rp 2.400.000',
     demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: '💻', features: ['Spesifikasi Teknis', 'Flash Sale Timer', 'Kalkulator Cicilan', 'Live Chat'],
+    image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1200&auto=format&fit=crop', features: ['Spesifikasi Teknis', 'Flash Sale Timer', 'Kalkulator Cicilan', 'Live Chat'],
     tags: ['Tech', 'Gadget', 'Store'], platform: 'Next.js + PostgreSQL', pages: '12 Halaman', rating: 4.8, reviewCount: 112,
   },
 
@@ -101,7 +101,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template bersih dan terpercaya untuk klinik kesehatan, dokter gigi, atau rumah sakit. Termasuk fitur booking jadwal dokter.',
     price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: '🏥', features: ['Jadwal Dokter', 'Booking Konsultasi', 'Layanan Medis', 'Testimoni Pasien'],
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop', features: ['Jadwal Dokter', 'Booking Konsultasi', 'Layanan Medis', 'Testimoni Pasien'],
     tags: ['Health', 'Clinic', 'Doctor'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.7, reviewCount: 34,
   },
   'dental-care': {
@@ -109,7 +109,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Desain ramah anak dan keluarga untuk klinik gigi. Warna cerah yang menenangkan pasien.',
     price: 'Rp 699.000', originalPrice: 'Rp 1.200.000',
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: '🦷', features: ['Galeri Before-After', 'Profil Dokter Spesialis', 'FAQ Perawatan', 'Form Pendaftaran'],
+    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Before-After', 'Profil Dokter Spesialis', 'FAQ Perawatan', 'Form Pendaftaran'],
     tags: ['Dental', 'Health', 'Family'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 4.9, reviewCount: 56,
   },
   'spa-wellness': {
@@ -117,7 +117,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template elegan dan rileks untuk salon kecantikan, spa, atau pijat refleksi.',
     price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: '💆', features: ['Katalog Treatment', 'Booking Jam Terapis', 'Harga Paket', 'Galeri Ruangan'],
+    image: 'https://images.unsplash.com/photo-1544161515-4af6b1d8d16e?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Treatment', 'Booking Jam Terapis', 'Harga Paket', 'Galeri Ruangan'],
     tags: ['Spa', 'Beauty', 'Wellness'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 4.8, reviewCount: 77,
   },
 
@@ -127,7 +127,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Platform e-learning untuk menjual video kursus online. Termasuk sistem member, progres belajar, dan sertifikat digital.',
     price: 'Rp 1.399.000', originalPrice: 'Rp 3.000.000',
     demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
-    image: '🎓', features: ['Video Player & Progress', 'Membership Area', 'Kuis & Sertifikat', 'Pembayaran Otomatis'],
+    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1200&auto=format&fit=crop', features: ['Video Player & Progress', 'Membership Area', 'Kuis & Sertifikat', 'Pembayaran Otomatis'],
     tags: ['Course', 'Education', 'LMS'], platform: 'Next.js + PostgreSQL', pages: '15+ Halaman', rating: 5, reviewCount: 215,
   },
   'school-portal': {
@@ -135,7 +135,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Website resmi untuk sekolah (SD/SMP/SMA). Menyediakan informasi akademik, berita, dan pendaftaran siswa baru (PPDB).',
     price: 'Rp 899.000', originalPrice: 'Rp 1.800.000',
     demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
-    image: '🏫', features: ['Formulir PPDB Online', 'Kalender Akademik', 'Mading Digital', 'Galeri Kegiatan'],
+    image: 'https://images.unsplash.com/photo-1523050335191-51ff1895aa73?q=80&w=1200&auto=format&fit=crop', features: ['Formulir PPDB Online', 'Kalender Akademik', 'Mading Digital', 'Galeri Kegiatan'],
     tags: ['School', 'Academy', 'Portal'], platform: 'Next.js + Tailwind', pages: '8 Halaman', rating: 4.6, reviewCount: 42,
   },
   'bootcamp-tech': {
@@ -143,7 +143,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template gelap beraksen neon untuk tempat kursus coding atau bootcamp teknologi.',
     price: 'Rp 699.000', originalPrice: 'Rp 1.400.000',
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: '👨‍💻', features: ['Silabus Kurikulum', 'Profil Mentor', 'Penyaluran Kerja', 'Testimoni Alumni'],
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop', features: ['Silabus Kurikulum', 'Profil Mentor', 'Penyaluran Kerja', 'Testimoni Alumni'],
     tags: ['Bootcamp', 'Coding', 'Tech'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.8, reviewCount: 93,
   },
 
@@ -153,7 +153,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Desain minimalis yang berfokus pada tipografi dan keterbacaan. Cocok untuk penulis, jurnalis, atau content creator.',
     price: 'Rp 599.000', originalPrice: 'Rp 1.000.000',
     demoUrl: 'https://next-blog-starter.vercel.app', repoUrl: '#',
-    image: '✍️', features: ['Artikel & Kategori', 'Komentar Pembaca', 'Newsletter Subscribe', 'Dark/Light Mode'],
+    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1200&auto=format&fit=crop', features: ['Artikel & Kategori', 'Komentar Pembaca', 'Newsletter Subscribe', 'Dark/Light Mode'],
     tags: ['Blog', 'Writer', 'Minimalist'], platform: 'Next.js + Markdown', pages: '5 Halaman', rating: 4.6, reviewCount: 56,
   },
   'news-magazine': {
@@ -161,7 +161,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Template padat informasi untuk portal berita lokal atau majalah gaya hidup. Mendukung banyak penulis.',
     price: 'Rp 799.000', originalPrice: 'Rp 1.500.000',
     demoUrl: 'https://next-blog-starter.vercel.app', repoUrl: '#',
-    image: '📰', features: ['Breaking News Ticker', 'Kolom Opini', 'Ruang Iklan/Ads', 'Integrasi Sosial Media'],
+    image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200&auto=format&fit=crop', features: ['Breaking News Ticker', 'Kolom Opini', 'Ruang Iklan/Ads', 'Integrasi Sosial Media'],
     tags: ['News', 'Magazine', 'Portal'], platform: 'Next.js + Headless CMS', pages: '10 Halaman', rating: 4.7, reviewCount: 110,
   },
   'photo-portfolio': {
@@ -169,7 +169,7 @@ export const templatesData: Record<string, TemplateDetail> = {
     description: 'Fokus 100% pada gambar. Layout masonry grid yang indah untuk memamerkan hasil jepretan fotografer atau seniman.',
     price: 'Rp 499.000', originalPrice: 'Rp 900.000',
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: '📷', features: ['Galeri Masonry', 'Zoom Image Lightbox', 'Proteksi Klik Kanan', 'Paket Pemotretan'],
+    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Masonry', 'Zoom Image Lightbox', 'Proteksi Klik Kanan', 'Paket Pemotretan'],
     tags: ['Photography', 'Art', 'Gallery'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.9, reviewCount: 184,
   }
 }

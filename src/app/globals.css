@@ -169,18 +169,26 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply text-[15px] md:text-base antialiased;
   }
 
   html {
     font-size: var(--font-size);
   }
 
-  h1 { font-size: var(--text-2xl); font-weight: var(--font-weight-medium); line-height: 1.5; }
-  h2 { font-size: var(--text-xl); font-weight: var(--font-weight-medium); line-height: 1.5; }
-  h3 { font-size: var(--text-lg); font-weight: var(--font-weight-medium); line-height: 1.5; }
-  h4 { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
+  h1 { @apply text-2xl md:text-3xl font-bold tracking-tight leading-tight; }
+  h2 { @apply text-xl md:text-2xl font-semibold tracking-tight leading-snug; }
+  h3 { @apply text-lg md:text-xl font-semibold leading-normal; }
+  h4 { @apply text-base md:text-lg font-medium; }
+  
   label { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
   button { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
   input { font-size: var(--text-base); font-weight: var(--font-weight-normal); line-height: 1.5; }
+}
+
+@layer utilities {
+  .text-mobile-balance {
+    text-wrap: balance;
+  }
 }

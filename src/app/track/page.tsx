@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 import { supabase } from '@/lib/supabase'
+import AddonMarketplace from '@/app/components/AddonMarketplace'
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
 
@@ -155,6 +156,16 @@ export default function PublicProjectTracker() {
                                     <MessageCircle size={18} /> Hubungi Project Manager
                                 </a>
                             </div>
+
+                            {/* Self-Service Upgrade Section ala Rumahweb */}
+                            {(result.progress_step >= 4 || result.status === 'completed') && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+                                    className="mt-16 pt-16 border-t-2 border-dashed border-gray-200"
+                                >
+                                    <AddonMarketplace existingOrder={result} onSuccess={() => handleSearch({ preventDefault: () => {} } as any)} />
+                                </motion.div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
