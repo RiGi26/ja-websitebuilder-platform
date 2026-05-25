@@ -2,8 +2,11 @@ export interface TemplateDetail {
   id: string
   title: string
   category: string
+  tier: 'starter' | 'business' | 'elite' // Tambahkan Tier
   description: string
   price: string
+  price_numeric: number // Untuk kalkulasi
+  renewal_price: number // Biaya perpanjangan tahun ke-2
   originalPrice: string
   demoUrl: string
   repoUrl: string
@@ -17,160 +20,66 @@ export interface TemplateDetail {
 }
 
 export const templatesData: Record<string, TemplateDetail> = {
-  // === KATEGORI F&B ===
-  'resto-modern': {
-    id: 'resto-modern', title: 'Restoran Modern', category: 'F&B',
-    description: 'Template elegan untuk restoran, kafe, atau rumah makan. Dilengkapi dengan menu digital, galeri foto, dan integrasi reservasi via WhatsApp.',
-    price: 'Rp 899.000', originalPrice: 'Rp 1.500.000',
-    demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop', features: ['Menu Digital Interaktif', 'Form Reservasi Meja', 'Integrasi Google Maps', 'Mobile Responsive'],
-    tags: ['Restaurant', 'Cafe', 'Food'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 42,
-  },
-  'cafe-minimalis': {
-    id: 'cafe-minimalis', title: 'Coffee Shop Minimalis', category: 'F&B',
-    description: 'Desain estetik dan bersih khusus untuk kedai kopi kekinian. Cocok untuk menonjolkan biji kopi dan suasana kafe.',
-    price: 'Rp 699.000', originalPrice: 'Rp 1.200.000',
-    demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Kopi', 'Cerita Kafe', 'Galeri Instagram', 'Lokasi Cabang'],
-    tags: ['Cafe', 'Coffee', 'Minimalist'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.8, reviewCount: 89,
-  },
-  'fine-dining': {
-    id: 'fine-dining', title: 'Luxury Fine Dining', category: 'F&B',
-    description: 'Tampilan super premium dengan tema gelap (dark mode) untuk restoran bintang lima. Menambah kesan eksklusif.',
-    price: 'Rp 999.000', originalPrice: 'Rp 1.800.000',
-    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1200&auto=format&fit=crop', features: ['Sistem Booking VVIP', 'Menu Eksklusif', 'Video Background', 'Multi-bahasa'],
-    tags: ['Luxury', 'Fine Dining', 'Premium'], platform: 'Next.js + Framer Motion', pages: '6 Halaman', rating: 4.9, reviewCount: 24,
-  },
-
-  // === KATEGORI KORPORAT ===
-  'company-pro': {
-    id: 'company-pro', title: 'Company Profile Pro', category: 'Korporat',
-    description: 'Desain profesional untuk perusahaan, agensi, atau konsultan. Menampilkan layanan, portofolio, dan tim Anda dengan elegan.',
-    price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
+  // === TIER STARTER (Rp 499rb - Rp 799rb) ===
+  'photo-portfolio': {
+    id: 'photo-portfolio', title: 'Fotografer Portfolio', category: 'Portfolio', tier: 'starter',
+    description: 'Fokus 100% pada gambar. Layout masonry grid yang indah untuk memamerkan hasil jepretan fotografer atau seniman.',
+    price: 'Rp 599.000', price_numeric: 599000, renewal_price: 699000, originalPrice: 'Rp 900.000',
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop', features: ['Tentang Kami & Tim', 'Layanan & Portofolio', 'Blog/Berita', 'Form Kontak & Lead Gen'],
-    tags: ['Corporate', 'Agency', 'Business'], platform: 'Next.js + Tailwind', pages: '7 Halaman', rating: 4.8, reviewCount: 128,
+    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Masonry', 'Zoom Image Lightbox', 'Proteksi Klik Kanan', 'Paket Pemotretan'],
+    tags: ['Photography', 'Art', 'Gallery'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.9, reviewCount: 184,
   },
-  'startup-saas': {
-    id: 'startup-saas', title: 'Startup & SaaS', category: 'Korporat',
-    description: 'Landing page modern dan dinamis bergaya Silicon Valley. Sangat cocok untuk produk digital atau aplikasi.',
-    price: 'Rp 849.000', originalPrice: 'Rp 1.500.000',
-    demoUrl: 'https://linear.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop', features: ['Tabel Harga', 'Integrasi Analytics', 'Animasi Scroll', 'Testimoni Klien'],
-    tags: ['Startup', 'SaaS', 'Tech'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 310,
-  },
-  'creative-agency': {
-    id: 'creative-agency', title: 'Creative Agency', category: 'Korporat',
-    description: 'Template nyentrik dan kreatif untuk agensi desain atau marketing. Menampilkan portofolio dengan transisi unik.',
-    price: 'Rp 799.000', originalPrice: 'Rp 1.500.000',
-    demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop', features: ['Grid Portofolio 3D', 'Dark Mode Toggle', 'Cursor Custom', 'Form Konsultasi'],
-    tags: ['Creative', 'Design', 'Portfolio'], platform: 'Next.js + GSAP', pages: '6 Halaman', rating: 4.7, reviewCount: 65,
-  },
-
-  // === KATEGORI RETAIL ===
-  'toko-online': {
-    id: 'toko-online', title: 'Toko Online E-Commerce', category: 'Retail',
-    description: 'Website toko online lengkap dengan keranjang belanja, integrasi payment gateway lokal, dan penghitungan ongkos kirim.',
-    price: 'Rp 1.299.000', originalPrice: 'Rp 2.500.000',
-    demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Produk & Variasi', 'Shopping Cart', 'Payment Gateway (Midtrans)', 'Dashboard Admin'],
-    tags: ['E-Commerce', 'Shop', 'Retail'], platform: 'Next.js + Supabase', pages: '10+ Halaman', rating: 4.9, reviewCount: 85,
-  },
-  'fashion-boutique': {
-    id: 'fashion-boutique', title: 'Fashion Boutique', category: 'Retail',
-    description: 'Toko online estetik dengan fokus pada foto produk besar. Sangat cocok untuk brand pakaian atau perhiasan.',
-    price: 'Rp 899.000', originalPrice: 'Rp 1.800.000',
-    demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1200&auto=format&fit=crop', features: ['Lookbook', 'Wishlist', 'Zoom Produk', 'Filter Kategori'],
-    tags: ['Fashion', 'Apparel', 'Modern'], platform: 'Next.js + Tailwind', pages: '8 Halaman', rating: 4.6, reviewCount: 45,
-  },
-  'gadget-store': {
-    id: 'gadget-store', title: 'Elektronik & Gadget', category: 'Retail',
-    description: 'Template e-commerce dengan fitur perbandingan spesifikasi produk dan review. Ideal untuk toko handphone atau komputer.',
-    price: 'Rp 1.199.000', originalPrice: 'Rp 2.400.000',
-    demoUrl: 'https://demo.vercel.store', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1200&auto=format&fit=crop', features: ['Spesifikasi Teknis', 'Flash Sale Timer', 'Kalkulator Cicilan', 'Live Chat'],
-    tags: ['Tech', 'Gadget', 'Store'], platform: 'Next.js + PostgreSQL', pages: '12 Halaman', rating: 4.8, reviewCount: 112,
-  },
-
-  // === KATEGORI KESEHATAN ===
-  'klinik-sehat': {
-    id: 'klinik-sehat', title: 'Klinik Medis & Dokter', category: 'Kesehatan',
-    description: 'Template bersih dan terpercaya untuk klinik kesehatan, dokter gigi, atau rumah sakit. Termasuk fitur booking jadwal dokter.',
-    price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
-    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop', features: ['Jadwal Dokter', 'Booking Konsultasi', 'Layanan Medis', 'Testimoni Pasien'],
-    tags: ['Health', 'Clinic', 'Doctor'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.7, reviewCount: 34,
-  },
-  'dental-care': {
-    id: 'dental-care', title: 'Dental Care Pro', category: 'Kesehatan',
-    description: 'Desain ramah anak dan keluarga untuk klinik gigi. Warna cerah yang menenangkan pasien.',
-    price: 'Rp 699.000', originalPrice: 'Rp 1.200.000',
-    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Before-After', 'Profil Dokter Spesialis', 'FAQ Perawatan', 'Form Pendaftaran'],
-    tags: ['Dental', 'Health', 'Family'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 4.9, reviewCount: 56,
-  },
-  'spa-wellness': {
-    id: 'spa-wellness', title: 'Spa & Beauty Wellness', category: 'Kesehatan',
-    description: 'Template elegan dan rileks untuk salon kecantikan, spa, atau pijat refleksi.',
-    price: 'Rp 749.000', originalPrice: 'Rp 1.400.000',
-    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1544161515-4af6b1d8d16e?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Treatment', 'Booking Jam Terapis', 'Harga Paket', 'Galeri Ruangan'],
-    tags: ['Spa', 'Beauty', 'Wellness'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 4.8, reviewCount: 77,
-  },
-
-  // === KATEGORI EDUKASI ===
-  'lms-edukasi': {
-    id: 'lms-edukasi', title: 'LMS Kursus Online', category: 'Edukasi',
-    description: 'Platform e-learning untuk menjual video kursus online. Termasuk sistem member, progres belajar, dan sertifikat digital.',
-    price: 'Rp 1.399.000', originalPrice: 'Rp 3.000.000',
-    demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1200&auto=format&fit=crop', features: ['Video Player & Progress', 'Membership Area', 'Kuis & Sertifikat', 'Pembayaran Otomatis'],
-    tags: ['Course', 'Education', 'LMS'], platform: 'Next.js + PostgreSQL', pages: '15+ Halaman', rating: 5, reviewCount: 215,
-  },
-  'school-portal': {
-    id: 'school-portal', title: 'Portal Sekolah Modern', category: 'Edukasi',
-    description: 'Website resmi untuk sekolah (SD/SMP/SMA). Menyediakan informasi akademik, berita, dan pendaftaran siswa baru (PPDB).',
-    price: 'Rp 899.000', originalPrice: 'Rp 1.800.000',
-    demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1523050335191-51ff1895aa73?q=80&w=1200&auto=format&fit=crop', features: ['Formulir PPDB Online', 'Kalender Akademik', 'Mading Digital', 'Galeri Kegiatan'],
-    tags: ['School', 'Academy', 'Portal'], platform: 'Next.js + Tailwind', pages: '8 Halaman', rating: 4.6, reviewCount: 42,
-  },
-  'bootcamp-tech': {
-    id: 'bootcamp-tech', title: 'Tech Bootcamp Academy', category: 'Edukasi',
-    description: 'Template gelap beraksen neon untuk tempat kursus coding atau bootcamp teknologi.',
-    price: 'Rp 699.000', originalPrice: 'Rp 1.400.000',
-    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop', features: ['Silabus Kurikulum', 'Profil Mentor', 'Penyaluran Kerja', 'Testimoni Alumni'],
-    tags: ['Bootcamp', 'Coding', 'Tech'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.8, reviewCount: 93,
-  },
-
-  // === KATEGORI BLOG ===
   'personal-blog': {
-    id: 'personal-blog', title: 'Personal Blog / Penulis', category: 'Blog',
+    id: 'personal-blog', title: 'Personal Blog / Penulis', category: 'Blog', tier: 'starter',
     description: 'Desain minimalis yang berfokus pada tipografi dan keterbacaan. Cocok untuk penulis, jurnalis, atau content creator.',
-    price: 'Rp 599.000', originalPrice: 'Rp 1.000.000',
+    price: 'Rp 649.000', price_numeric: 649000, renewal_price: 699000, originalPrice: 'Rp 1.000.000',
     demoUrl: 'https://next-blog-starter.vercel.app', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1200&auto=format&fit=crop', features: ['Artikel & Kategori', 'Komentar Pembaca', 'Newsletter Subscribe', 'Dark/Light Mode'],
     tags: ['Blog', 'Writer', 'Minimalist'], platform: 'Next.js + Markdown', pages: '5 Halaman', rating: 4.6, reviewCount: 56,
   },
-  'news-magazine': {
-    id: 'news-magazine', title: 'Majalah / Portal Berita', category: 'Blog',
-    description: 'Template padat informasi untuk portal berita lokal atau majalah gaya hidup. Mendukung banyak penulis.',
-    price: 'Rp 799.000', originalPrice: 'Rp 1.500.000',
-    demoUrl: 'https://next-blog-starter.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200&auto=format&fit=crop', features: ['Breaking News Ticker', 'Kolom Opini', 'Ruang Iklan/Ads', 'Integrasi Sosial Media'],
-    tags: ['News', 'Magazine', 'Portal'], platform: 'Next.js + Headless CMS', pages: '10 Halaman', rating: 4.7, reviewCount: 110,
-  },
-  'photo-portfolio': {
-    id: 'photo-portfolio', title: 'Fotografer Portfolio', category: 'Blog',
-    description: 'Fokus 100% pada gambar. Layout masonry grid yang indah untuk memamerkan hasil jepretan fotografer atau seniman.',
-    price: 'Rp 499.000', originalPrice: 'Rp 900.000',
+
+  // === TIER BUSINESS (Rp 899rb - Rp 1.2jt) ===
+  'company-pro': {
+    id: 'company-pro', title: 'Company Profile Pro', category: 'Korporat', tier: 'business',
+    description: 'Desain profesional untuk perusahaan, agensi, atau konsultan. Menampilkan layanan, portofolio, dan tim Anda dengan elegan.',
+    price: 'Rp 999.000', price_numeric: 999000, renewal_price: 899000, originalPrice: 'Rp 1.800.000',
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
-    image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Masonry', 'Zoom Image Lightbox', 'Proteksi Klik Kanan', 'Paket Pemotretan'],
-    tags: ['Photography', 'Art', 'Gallery'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.9, reviewCount: 184,
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop', features: ['Tentang Kami & Tim', 'Layanan & Portofolio', 'Blog/Berita', 'Form Kontak & Lead Gen'],
+    tags: ['Corporate', 'Agency', 'Business'], platform: 'Next.js + Tailwind', pages: '7 Halaman', rating: 4.8, reviewCount: 128,
+  },
+  'resto-modern': {
+    id: 'resto-modern', title: 'Restoran Modern', category: 'F&B', tier: 'business',
+    description: 'Template elegan untuk restoran, kafe, atau rumah makan. Dilengkapi dengan menu digital, galeri foto, dan integrasi reservasi via WhatsApp.',
+    price: 'Rp 899.000', price_numeric: 899000, renewal_price: 899000, originalPrice: 'Rp 1.500.000',
+    demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop', features: ['Menu Digital Interaktif', 'Form Reservasi Meja', 'Integrasi Google Maps', 'Mobile Responsive'],
+    tags: ['Restaurant', 'Cafe', 'Food'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 42,
+  },
+  'klinik-sehat': {
+    id: 'klinik-sehat', title: 'Klinik Medis & Dokter', category: 'Kesehatan', tier: 'business',
+    description: 'Template bersih dan terpercaya untuk klinik kesehatan, dokter gigi, atau rumah sakit. Termasuk fitur booking jadwal dokter.',
+    price: 'Rp 949.000', price_numeric: 949000, renewal_price: 899000, originalPrice: 'Rp 1.600.000',
+    demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop', features: ['Jadwal Dokter', 'Booking Konsultasi', 'Layanan Medis', 'Testimoni Pasien'],
+    tags: ['Health', 'Clinic', 'Doctor'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.7, reviewCount: 34,
+  },
+
+  // === TIER ELITE (Rp 1.5jt - Rp 2.5jt) ===
+  'toko-online': {
+    id: 'toko-online', title: 'Toko Online E-Commerce', category: 'Retail', tier: 'elite',
+    description: 'Website toko online lengkap dengan keranjang belanja, integrasi payment gateway lokal, dan penghitungan ongkos kirim.',
+    price: 'Rp 1.899.000', price_numeric: 1899000, renewal_price: 1200000, originalPrice: 'Rp 3.500.000',
+    demoUrl: 'https://demo.vercel.store', repoUrl: '#',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Produk & Variasi', 'Shopping Cart', 'Payment Gateway (Midtrans)', 'Dashboard Admin'],
+    tags: ['E-Commerce', 'Shop', 'Retail'], platform: 'Next.js + Supabase', pages: '10+ Halaman', rating: 4.9, reviewCount: 85,
+  },
+  'lms-edukasi': {
+    id: 'lms-edukasi', title: 'LMS Kursus Online', category: 'Edukasi', tier: 'elite',
+    description: 'Platform e-learning untuk menjual video kursus online. Termasuk sistem member, progres belajar, dan sertifikat digital.',
+    price: 'Rp 2.499.000', price_numeric: 2499000, renewal_price: 1499000, originalPrice: 'Rp 5.000.000',
+    demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
+    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1200&auto=format&fit=crop', features: ['Video Player & Progress', 'Membership Area', 'Kuis & Sertifikat', 'Pembayaran Otomatis'],
+    tags: ['Course', 'Education', 'LMS'], platform: 'Next.js + PostgreSQL', pages: '15+ Halaman', rating: 5, reviewCount: 215,
   }
 }
 
