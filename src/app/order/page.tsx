@@ -8,7 +8,7 @@ import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
   Send, X, LayoutTemplate, Loader2, Sparkles, AlertCircle,
-  Rocket, ShieldCheck, ArrowRight, Star, Info
+  Rocket, ShieldCheck, ArrowRight, Star, Info, Search
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -110,11 +110,20 @@ function OrderFormContent() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [orderResult, setOrderResult] = useState<any>(null)
+
+  // Pre-fill dari kalkulator ja-corp-landing
+  const kalkulatorIndustri = searchParams.get('industri') ?? ''
+  const kalkulatorEstimasi = searchParams.get('estimasi') ? Number(searchParams.get('estimasi')) : null
+  const kalkulatorPaket = searchParams.get('paket') ?? ''
+  const kalkulatorAddons = searchParams.get('addons') ?? ''
 
   useEffect(() => {
     const tid = searchParams.get('template')
     if (tid && templatesData[tid]) setForm(f => ({ ...f, templateId: tid }))
-  }, [searchParams])
+    if (kalkulatorIndustri) setForm(f => ({ ...f, industri: kalkulatorIndustri }))
+    if (kalkulatorAddons) setForm(f => ({ ...f, referensiManual: `Dari kalkulator:\nPaket: ${kalkulatorPaket}\nFitur: ${kalkulatorAddons}` }))
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (key: keyof FormData, val: any) => setForm(f => ({ ...f, [key]: val }))
 
@@ -154,7 +163,7 @@ function OrderFormContent() {
     setSubmitError(null)
 
     try {
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('orders')
         .insert([
           {
@@ -175,8 +184,11 @@ function OrderFormContent() {
             type: 'new'
           }
         ])
+        .select()
+        .single()
 
       if (error) throw error
+      setOrderResult(inserted)
       setSubmitted(true)
     } catch (err: any) {
       console.error('Submission error:', err)
@@ -189,38 +201,75 @@ function OrderFormContent() {
   const totalSteps = 4
   const progress = step === 0 ? 0 : Math.round((step / totalSteps) * 100)
 
-  if (submitted) {
+  if (submitted && orderResult) {
+    const displayId = `JA-${new Date().getFullYear()}-${orderResult.id.slice(0, 8).toUpperCase()}`
+    const clientName = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
+    const waMsg = encodeURIComponent(
+      `Halo Japan Arena Studio! 👋\n\nSaya baru mengisi form order website.\n\n` +
+      `📋 Order ID: *${displayId}*\n` +
+      `🏢 Nama: ${clientName}\n` +
+      `💰 Estimasi: Rp ${finalPrice.toLocaleString('id-ID')}\n\n` +
+      `Mohon konfirmasi penerimaan order saya ya.\nTerima kasih!`
+    )
+    const trackUrl = `/track?id=${orderResult.id}`
+
     return (
-      <div className="max-w-xl mx-auto text-center py-12 px-6">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[40px] apple-shadow p-12 border border-black/[0.03]">
-          <div className="w-24 h-24 rounded-full bg-green-50 text-green-500 flex items-center justify-center mx-auto mb-8 shadow-inner">
-            <Check size={48} strokeWidth={3} />
+      <div className="max-w-xl mx-auto py-12 px-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[40px] apple-shadow p-10 border border-black/[0.03]">
+          {/* Success Icon */}
+          <div className="w-20 h-20 rounded-full bg-green-50 text-green-500 flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <Check size={40} strokeWidth={3} />
           </div>
-          <h1 className="text-4xl sf-display-heavy text-gray-900 mb-4 tracking-tight leading-tight">Brief Terkirim! 🎉</h1>
-          <p className="text-gray-500 mb-10 leading-relaxed">
-            Brief Anda sudah dalam antrean kurasi kami. Konsultan Japan Arena Studio akan menghubungi Anda melalui WhatsApp dalam <strong>1x24 jam</strong>.
+
+          <h1 className="text-3xl sf-display-heavy text-gray-900 mb-2 tracking-tight text-center">Order Diterima! 🎉</h1>
+          <p className="text-gray-500 text-sm text-center mb-8 leading-relaxed">
+            Tim kami akan menghubungi Anda via WhatsApp dalam <strong>1×24 jam</strong>.
           </p>
-          <div className="bg-[#F5F5F7] rounded-3xl p-6 text-left space-y-4 mb-10 border border-black/[0.02]">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Alur Pengerjaan</p>
-            <div className="space-y-3">
-              {[
-                { t: 'Review Brief', c: 'Tim kami menganalisa kebutuhan teknis Anda.' },
-                { t: 'Video Call Consultation', c: 'Diskusi mendalam mengenai struktur & strategi web.' },
-                { t: 'Proses Pengerjaan', c: 'Website Anda akan live dalam estimasi 7 hari.' }
-              ].map((item, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="w-6 h-6 rounded-full bg-apple-blue text-white flex items-center justify-center text-[10px] font-bold shrink-0">{i+1}</div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 leading-none mb-1">{item.t}</p>
-                    <p className="text-xs text-gray-500 leading-tight">{item.c}</p>
-                  </div>
-                </div>
-              ))}
+
+          {/* Order ID Card */}
+          <div className="bg-gradient-to-br from-[#1D1D1F] to-gray-800 rounded-[28px] p-7 text-white mb-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-apple-blue/20 blur-3xl" />
+            <div className="relative z-10">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID Anda</p>
+              <p className="text-3xl font-black tracking-wider text-white mb-1">{displayId}</p>
+              <p className="text-gray-400 text-xs font-medium">Simpan ID ini untuk lacak progress pengerjaan</p>
             </div>
           </div>
-          <Button asChild className="bg-[#1D1D1F] hover:bg-black w-full py-7 rounded-2xl text-base sf-display-heavy shadow-lg glow-button">
-            <Link href="/">Kembali ke Beranda</Link>
-          </Button>
+
+          {/* Track & WA Buttons */}
+          <div className="space-y-3 mb-8">
+            <Button asChild className="w-full py-6 rounded-2xl bg-apple-blue hover:bg-blue-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
+              <Link href={trackUrl}>
+                <Search size={18} /> Lacak Progress Sekarang
+              </Link>
+            </Button>
+            <a
+              href={`https://wa.me/6281296917963?text=${waMsg}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm transition-all"
+            >
+              <span className="text-base">💬</span> Konfirmasi via WhatsApp
+            </a>
+          </div>
+
+          {/* Steps */}
+          <div className="bg-[#F5F5F7] rounded-3xl p-6 space-y-4 border border-black/[0.02]">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alur Selanjutnya</p>
+            {[
+              { t: 'Review Brief', c: 'Tim kami menganalisa kebutuhan teknis Anda.' },
+              { t: 'Video Call Consultation', c: 'Diskusi mendalam mengenai struktur & strategi.' },
+              { t: 'Proses Pengerjaan', c: 'Website live dalam estimasi 7 hari kerja.' },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="w-6 h-6 rounded-full bg-apple-blue text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{item.t}</p>
+                  <p className="text-xs text-gray-500">{item.c}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
     )
@@ -240,6 +289,23 @@ function OrderFormContent() {
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Project Briefing</h1>
           <p className="text-gray-500 font-medium">Bantu kami memahami visi digital bisnis Anda.</p>
       </div>
+
+      {/* Banner dari kalkulator */}
+      {kalkulatorEstimasi && (
+        <div className="bg-blue-50 border border-blue-100 rounded-[28px] p-5 mb-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-apple-blue rounded-2xl flex items-center justify-center text-white shrink-0">
+            <Sparkles size={20} />
+          </div>
+          <div>
+            <p className="text-sm font-black text-blue-900 mb-1">Dilanjutkan dari Kalkulator</p>
+            <p className="text-xs text-blue-700 font-medium leading-relaxed">
+              Industri: <strong>{kalkulatorIndustri}</strong> · Paket: <strong>{kalkulatorPaket}</strong>
+              {kalkulatorAddons && <> · Fitur: <strong>{kalkulatorAddons}</strong></>}
+            </p>
+            <p className="text-xs text-blue-600 mt-1">Estimasi: <strong>Rp {kalkulatorEstimasi.toLocaleString('id-ID')}</strong></p>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-[40px] p-8 md:p-12 apple-shadow border border-black/[0.03] relative">
         <AnimatePresence mode="wait">
