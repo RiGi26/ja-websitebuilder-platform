@@ -15,7 +15,6 @@ import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Textarea } from '@/app/components/ui/textarea'
 import { templatesData } from '@/data/templates'
-import { supabase } from '@/lib/supabase'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 
@@ -103,6 +102,10 @@ export default function OrderPage() {
   )
 }
 
+const SNAP_JS = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
+  ? 'https://app.midtrans.com/snap/snap.js'
+  : 'https://app.sandbox.midtrans.com/snap/snap.js'
+
 function OrderFormContent() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
@@ -111,6 +114,18 @@ function OrderFormContent() {
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [orderResult, setOrderResult] = useState<any>(null)
+  const [paymentPending, setPaymentPending] = useState(false)
+
+  // Load Midtrans Snap.js
+  useEffect(() => {
+    const existing = document.getElementById('midtrans-snap')
+    if (existing) return
+    const script = document.createElement('script')
+    script.id = 'midtrans-snap'
+    script.src = SNAP_JS
+    script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '')
+    document.head.appendChild(script)
+  }, [])
 
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
@@ -163,37 +178,54 @@ function OrderFormContent() {
     setSubmitError(null)
 
     try {
-      const { data: inserted, error } = await supabase
-        .from('orders')
-        .insert([
-          {
-            client_type: form.clientType,
-            nama_usaha: form.clientType === 'individu' ? form.namaUsaha : null,
-            nama_perusahaan: form.clientType === 'perusahaan' ? form.namaPerusahaan : null,
-            nama_pic: form.clientType === 'perusahaan' ? form.namapic : null,
-            jabatan: form.clientType === 'perusahaan' ? form.jabatan : null,
-            nomor_wa: form.nomorWa,
-            email: form.email,
-            industri: form.industri,
-            template_id: form.templateId,
-            referensi_manual: form.referensiManual,
-            selected_addons: form.selectedAddons,
-            total_estimasi: finalPrice,
-            total_maintenance: totalYearlyMaint,
-            status: 'pending',
-            type: 'new'
-          }
-        ])
-        .select()
-        .single()
+      // 1. Create order + get Snap token from server
+      const res = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_type: form.clientType,
+          nama_usaha: form.namaUsaha,
+          nama_perusahaan: form.namaPerusahaan,
+          nama_pic: form.namapic,
+          jabatan: form.jabatan,
+          nomor_wa: form.nomorWa,
+          email: form.email,
+          industri: form.industri,
+          template_id: form.templateId,
+          referensi_manual: form.referensiManual,
+          selected_addons: form.selectedAddons,
+          total_estimasi: finalPrice,
+          total_maintenance: totalYearlyMaint,
+        }),
+      })
 
-      if (error) throw error
-      setOrderResult(inserted)
-      setSubmitted(true)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Gagal membuat transaksi')
+
+      const { snap_token, order_id, display_id, dp_amount } = data
+
+      // 2. Open Midtrans Snap popup
+      setIsSubmitting(false)
+      ;(window as any).snap.pay(snap_token, {
+        onSuccess: () => {
+          setOrderResult({ id: order_id, display_id, dp_amount })
+          setSubmitted(true)
+        },
+        onPending: () => {
+          setPaymentPending(true)
+          setOrderResult({ id: order_id, display_id, dp_amount })
+          setSubmitted(true)
+        },
+        onError: () => {
+          setSubmitError('Pembayaran gagal. Silakan coba lagi.')
+        },
+        onClose: () => {
+          setSubmitError('Pembayaran dibatalkan. Klik "Kirim Brief Project" untuk mencoba kembali.')
+        },
+      })
     } catch (err: any) {
       console.error('Submission error:', err)
       setSubmitError('Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp jika error berlanjut.')
-    } finally {
       setIsSubmitting(false)
     }
   }
@@ -202,41 +234,62 @@ function OrderFormContent() {
   const progress = step === 0 ? 0 : Math.round((step / totalSteps) * 100)
 
   if (submitted && orderResult) {
-    const displayId = `JA-${new Date().getFullYear()}-${orderResult.id.slice(0, 8).toUpperCase()}`
+    const displayId = orderResult.display_id
+    const dpAmount = orderResult.dp_amount
+    const remaining = finalPrice - dpAmount
     const clientName = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
     const waMsg = encodeURIComponent(
-      `Halo Japan Arena Studio! 👋\n\nSaya baru mengisi form order website.\n\n` +
+      `Halo Japan Arena Studio! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
       `📋 Order ID: *${displayId}*\n` +
       `🏢 Nama: ${clientName}\n` +
-      `💰 Estimasi: Rp ${finalPrice.toLocaleString('id-ID')}\n\n` +
-      `Mohon konfirmasi penerimaan order saya ya.\nTerima kasih!`
+      `💰 DP Dibayar: Rp ${dpAmount.toLocaleString('id-ID')}\n\n` +
+      `Mohon konfirmasi penerimaan DP saya ya. Terima kasih!`
     )
     const trackUrl = `/track?id=${orderResult.id}`
 
     return (
       <div className="max-w-xl mx-auto py-12 px-6">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[40px] apple-shadow p-10 border border-black/[0.03]">
-          {/* Success Icon */}
-          <div className="w-20 h-20 rounded-full bg-green-50 text-green-500 flex items-center justify-center mx-auto mb-6 shadow-inner">
-            <Check size={40} strokeWidth={3} />
+
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ${paymentPending ? 'bg-amber-50 text-amber-500' : 'bg-green-50 text-green-500'}`}>
+            {paymentPending ? <Loader2 size={36} /> : <Check size={40} strokeWidth={3} />}
           </div>
 
-          <h1 className="text-3xl sf-display-heavy text-gray-900 mb-2 tracking-tight text-center">Order Diterima! 🎉</h1>
+          <h1 className="text-3xl sf-display-heavy text-gray-900 mb-2 tracking-tight text-center">
+            {paymentPending ? 'Menunggu Konfirmasi Pembayaran' : 'DP Berhasil! 🎉'}
+          </h1>
           <p className="text-gray-500 text-sm text-center mb-8 leading-relaxed">
-            Tim kami akan menghubungi Anda via WhatsApp dalam <strong>1×24 jam</strong>.
+            {paymentPending
+              ? 'Pembayaran Anda sedang diproses. Kami akan mulai pengerjaan setelah pembayaran terkonfirmasi.'
+              : <>Tim kami akan menghubungi Anda dalam <strong>1×24 jam</strong> untuk sesi Onboarding.</>
+            }
           </p>
 
           {/* Order ID Card */}
-          <div className="bg-gradient-to-br from-[#1D1D1F] to-gray-800 rounded-[28px] p-7 text-white mb-6 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-[#1D1D1F] to-gray-800 rounded-[28px] p-7 text-white mb-4 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#0071E3]/20 blur-3xl" />
             <div className="relative z-10">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID Anda</p>
-              <p className="text-3xl font-black tracking-wider text-white mb-1">{displayId}</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID</p>
+              <p className="text-2xl font-black tracking-wider text-white mb-1">{displayId}</p>
               <p className="text-gray-400 text-xs font-medium">Simpan ID ini untuk lacak progress pengerjaan</p>
             </div>
           </div>
 
-          {/* Track & WA Buttons */}
+          {/* Payment breakdown */}
+          <div className="bg-[#F9F9FB] rounded-[24px] p-5 mb-6 border border-black/[0.04] space-y-3">
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-gray-500 flex-1">DP 50% {paymentPending ? '(menunggu konfirmasi)' : 'Dibayar'}</p>
+              <p className={`font-black text-sm shrink-0 ${paymentPending ? 'text-amber-500' : 'text-green-600'}`}>
+                {formatPrice(dpAmount)}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-2 border-t border-black/[0.04]">
+              <p className="text-sm text-gray-400 flex-1">Pelunasan (dibayar sebelum go-live)</p>
+              <p className="font-black text-sm text-gray-500 shrink-0">{formatPrice(remaining)}</p>
+            </div>
+          </div>
+
+          {/* Buttons */}
           <div className="space-y-3 mb-8">
             <Button asChild className="w-full py-6 rounded-2xl bg-[#0071E3] hover:bg-blue-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
               <Link href={trackUrl}>
@@ -249,17 +302,17 @@ function OrderFormContent() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm transition-all"
             >
-              <span className="text-base">💬</span> Konfirmasi via WhatsApp
+              <span className="text-base">💬</span> Konfirmasi DP via WhatsApp
             </a>
           </div>
 
-          {/* Steps */}
+          {/* Next steps */}
           <div className="bg-[#F5F5F7] rounded-3xl p-6 space-y-4 border border-black/[0.02]">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alur Selanjutnya</p>
             {[
-              { t: 'Review Brief', c: 'Tim kami menganalisa kebutuhan teknis Anda.' },
-              { t: 'Video Call Consultation', c: 'Diskusi mendalam mengenai struktur & strategi.' },
-              { t: 'Proses Pengerjaan', c: 'Website live dalam estimasi 7 hari kerja.' },
+              { t: 'Konfirmasi DP', c: 'Admin verifikasi pembayaran DP dalam 1×24 jam.' },
+              { t: 'Video Call Onboarding', c: 'Brief detail & kunci scope pengerjaan bersama.' },
+              { t: 'Pengerjaan & Launch', c: 'Website live dalam 7–14 hari kerja. Pelunasan sebelum go-live.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4">
                 <div className="w-6 h-6 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
