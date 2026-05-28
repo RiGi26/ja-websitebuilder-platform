@@ -27,18 +27,25 @@ export default function PublicProjectTracker() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!query) return
-    
+
     setLoading(true)
     setError(null)
-    
+
     try {
-      const { data, error: dbErr } = await supabase
-        .from('orders')
-        .select('*')
-        .or(`nomor_wa.eq.${query},id.eq.${query}`)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+      // Normalize: strip "JA-YYYY-" prefix if user pastes display ID
+      const normalized = query.replace(/^JA-\d{4}-/i, '').toLowerCase()
+      const isDisplayId = /^[a-f0-9]{8}$/i.test(normalized)
+
+      let q = supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(1)
+
+      if (isDisplayId) {
+        // Search by first 8 chars of UUID (display ID)
+        q = q.ilike('id', `${normalized}%`)
+      } else {
+        q = q.or(`nomor_wa.eq.${query},id.eq.${query}`)
+      }
+
+      const { data, error: dbErr } = await q.single()
 
       if (dbErr) throw dbErr
       setResult(data)
@@ -62,17 +69,17 @@ export default function PublicProjectTracker() {
                 </span>
                 <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4 sf-display-heavy">Lacak Progres Website</h2>
                 <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
-                    Masukkan nomor WhatsApp yang Anda gunakan saat mendaftar untuk melihat status pengerjaan secara real-time.
+                    Masukkan <strong>Order ID</strong> (contoh: JA-2025-XXXXXXXX) atau <strong>nomor WhatsApp</strong> yang digunakan saat order untuk melihat status real-time.
                 </p>
             </div>
 
             <div className="bg-white rounded-[40px] p-8 md:p-12 apple-shadow border border-black/[0.03] animate-fade-up">
                 <form onSubmit={handleSearch} className="relative max-w-md mx-auto mb-10">
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Masukkan Nomor WhatsApp..."
+                        placeholder="Order ID (JA-2025-XXXXXXXX) atau Nomor WA..."
                         className="w-full bg-gray-50 border border-black/5 rounded-2xl px-6 py-4 text-lg font-bold placeholder-gray-300 focus:outline-none focus:ring-4 focus:ring-apple-blue/10 focus:bg-white transition-all shadow-inner"
                     />
                     <button 
