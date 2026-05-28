@@ -202,7 +202,11 @@ function OrderFormContent() {
 
       const { snap_token, order_id, display_id, dp_amount } = data
 
-      // 2. Open Midtrans Snap popup
+      // 2. Guard: pastikan Snap.js sudah load
+      if (typeof (window as any).snap === 'undefined') {
+        throw new Error('Sistem pembayaran belum siap. Mohon refresh halaman dan coba lagi dalam beberapa detik.')
+      }
+
       const midtransOrderId = `${display_id}-DP`
       setIsSubmitting(false)
       ;(window as any).snap.pay(snap_token, {
@@ -235,7 +239,7 @@ function OrderFormContent() {
       })
     } catch (err: any) {
       console.error('Submission error:', err)
-      setSubmitError('Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp jika error berlanjut.')
+      setSubmitError(err.message || 'Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp.')
       setIsSubmitting(false)
     }
   }
