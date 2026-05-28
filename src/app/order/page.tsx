@@ -205,13 +205,25 @@ function OrderFormContent() {
       const { snap_token, order_id, display_id, dp_amount } = data
 
       // 2. Open Midtrans Snap popup
+      const midtransOrderId = `${display_id}-DP`
       setIsSubmitting(false)
       ;(window as any).snap.pay(snap_token, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Verify payment server-side then show success
+          await fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id, midtrans_order_id: midtransOrderId }),
+          })
           setOrderResult({ id: order_id, display_id, dp_amount })
           setSubmitted(true)
         },
-        onPending: () => {
+        onPending: async () => {
+          await fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id, midtrans_order_id: midtransOrderId }),
+          })
           setPaymentPending(true)
           setOrderResult({ id: order_id, display_id, dp_amount })
           setSubmitted(true)
