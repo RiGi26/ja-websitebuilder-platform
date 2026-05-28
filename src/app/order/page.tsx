@@ -438,7 +438,14 @@ function OrderFormContent() {
                           {form.agreedToTerms && <Check size={16} strokeWidth={4} />}
                       </div>
                       <div className="space-y-1">
-                          <p className="text-sm font-bold text-gray-900">Saya menyetujui Ketentuan Layanan</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            Saya menyetujui{' '}
+                            <a href="/terms" target="_blank" rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
+                              className="text-[#0071E3] underline underline-offset-2 hover:text-blue-700">
+                              Syarat & Ketentuan Layanan
+                            </a>
+                          </p>
                           <p className="text-xs text-gray-500 leading-relaxed">
                               Saya mengkonfirmasi bahwa data yang dimasukkan sudah benar dan bersedia untuk dihubungi oleh tim konsultan Japan Arena Corp untuk proses briefing lebih lanjut.
                           </p>
