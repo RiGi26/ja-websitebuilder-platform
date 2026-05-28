@@ -93,7 +93,7 @@ export default function OrderPage() {
       <Navbar />
       <Suspense fallback={
         <div className="flex items-center justify-center min-h-[50vh]">
-            <Loader2 className="animate-spin text-apple-blue" size={32} />
+            <Loader2 className="animate-spin text-[#0071E3]" size={32} />
         </div>
       }>
         <OrderFormContent />
@@ -198,7 +198,7 @@ function OrderFormContent() {
     }
   }
 
-  const totalSteps = 4
+  const totalSteps = 3
   const progress = step === 0 ? 0 : Math.round((step / totalSteps) * 100)
 
   if (submitted && orderResult) {
@@ -228,7 +228,7 @@ function OrderFormContent() {
 
           {/* Order ID Card */}
           <div className="bg-gradient-to-br from-[#1D1D1F] to-gray-800 rounded-[28px] p-7 text-white mb-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-apple-blue/20 blur-3xl" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#0071E3]/20 blur-3xl" />
             <div className="relative z-10">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID Anda</p>
               <p className="text-3xl font-black tracking-wider text-white mb-1">{displayId}</p>
@@ -238,7 +238,7 @@ function OrderFormContent() {
 
           {/* Track & WA Buttons */}
           <div className="space-y-3 mb-8">
-            <Button asChild className="w-full py-6 rounded-2xl bg-apple-blue hover:bg-blue-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
+            <Button asChild className="w-full py-6 rounded-2xl bg-[#0071E3] hover:bg-blue-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
               <Link href={trackUrl}>
                 <Search size={18} /> Lacak Progress Sekarang
               </Link>
@@ -262,7 +262,7 @@ function OrderFormContent() {
               { t: 'Proses Pengerjaan', c: 'Website live dalam estimasi 7 hari kerja.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-apple-blue text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
+                <div className="w-6 h-6 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
                 <div>
                   <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{item.t}</p>
                   <p className="text-xs text-gray-500">{item.c}</p>
@@ -282,8 +282,8 @@ function OrderFormContent() {
       {/* Header (Apple Style) */}
       <div className="text-center mb-12 animate-fade-in px-4">
           <div className="flex items-center justify-center gap-3 mb-6">
-              {[1,2,3,4].map((s) => (
-                  <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${step >= s-1 ? 'w-8 bg-apple-blue' : 'w-4 bg-gray-200'}`} />
+              {[1,2,3].map((s) => (
+                  <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${step >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
               ))}
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Project Briefing</h1>
@@ -293,7 +293,7 @@ function OrderFormContent() {
       {/* Banner dari kalkulator */}
       {kalkulatorEstimasi && (
         <div className="bg-blue-50 border border-blue-100 rounded-[28px] p-5 mb-6 flex items-start gap-4">
-          <div className="w-10 h-10 bg-apple-blue rounded-2xl flex items-center justify-center text-white shrink-0">
+          <div className="w-10 h-10 bg-[#0071E3] rounded-2xl flex items-center justify-center text-white shrink-0">
             <Sparkles size={20} />
           </div>
           <div>
@@ -318,8 +318,8 @@ function OrderFormContent() {
                   { id: 'perusahaan', title: 'Perusahaan / PT / CV', desc: 'Cocok untuk branding korporat dan skala bisnis menengah.', icon: Building2 },
                 ].map(opt => (
                   <button key={opt.id} onClick={() => { set('clientType', opt.id); handleNext(); triggerHaptic(); }}
-                    className={`p-8 rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] ${form.clientType === opt.id ? 'border-apple-blue bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-apple-blue/20 bg-gray-50/50'}`}>
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${form.clientType === opt.id ? 'bg-apple-blue text-white' : 'bg-white text-gray-400'}`}>
+                    className={`p-8 rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] ${form.clientType === opt.id ? 'border-[#0071E3] bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-[#0071E3]/20 bg-gray-50/50'}`}>
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${form.clientType === opt.id ? 'bg-[#0071E3] text-white' : 'bg-white text-gray-400'}`}>
                       <opt.icon size={28} />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{opt.title}</h3>
@@ -362,64 +362,16 @@ function OrderFormContent() {
               </div>
               <div className="flex justify-between mt-12 pt-8 border-t border-gray-100">
                 <Button variant="ghost" onClick={handlePrev} className="rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="rounded-2xl px-12 h-14 bg-apple-blue hover:bg-blue-600 font-bold shadow-lg">Lanjut Ke Template <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
 
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <StepHeader title="Pilih Fitur Tambahan" desc="Pilih fungsionalitas yang ingin Anda tambahkan ke website." />
-              
-              <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl mb-8 flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-apple-blue shrink-0 shadow-sm"><Info size={20} /></div>
-                  <p className="text-sm text-blue-700 font-medium leading-relaxed">
-                      Sistem kami secara otomatis mendeteksi template <strong>{selectedTemplateDetails?.title}</strong>. 
-                      Anda bisa menambah fitur spesifik lainnya di bawah ini.
-                  </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ADDONS.map(addon => (
-                  <button key={addon.id} onClick={() => toggleAddon(addon.id)}
-                    className={`flex items-start justify-between p-5 rounded-[24px] border-2 transition-all text-left group ${form.selectedAddons.includes(addon.id) ? 'border-apple-blue bg-blue-50/50' : 'border-gray-50 bg-gray-50/30 hover:border-apple-blue/20 hover:bg-white'}`}>
-                    <div className="pr-4">
-                      <p className="font-bold text-gray-900 text-sm mb-1">{addon.name}</p>
-                      <p className="text-xs text-apple-blue font-bold">{formatPrice(addon.price)}</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border-2 transition-all ${form.selectedAddons.includes(addon.id) ? 'bg-apple-blue border-apple-blue text-white shadow-sm' : 'border-gray-200 bg-white group-hover:border-apple-blue/30'}`}>
-                      {form.selectedAddons.includes(addon.id) && <Check size={14} strokeWidth={4} />}
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-10 p-6 rounded-3xl bg-[#F9F9FB] border border-black/5 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Maintenance Tahun Ke-2</p>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-bold text-gray-900">{formatPrice(totalYearlyMaint)}</span>
-                        <span className="text-xs text-gray-400 font-medium">/ tahun</span>
-                      </div>
-                  </div>
-                  <div className="text-right">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-right">Total Investasi Awal</p>
-                      <span className="text-3xl font-black text-apple-blue sf-display-heavy">{formatPrice(finalPrice)}</span>
-                  </div>
-              </div>
-
-              <div className="flex justify-between mt-12 pt-8 border-t border-gray-100">
-                <Button variant="ghost" onClick={handlePrev} className="rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button onClick={handleNext} className="rounded-2xl px-12 h-14 bg-apple-blue hover:bg-blue-600 font-bold shadow-lg">Review Brief <ChevronRight className="ml-2" size={18} /></Button>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                   <div className="flex items-center justify-between">
                     <StepHeader title="Konfirmasi & Finalisasi" desc="Pastikan rincian brief Anda sudah sesuai sebelum dikirim ke tim konsultan kami." />
-                    <div className="hidden md:block w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-apple-blue"><ShieldCheck size={32} /></div>
+                    <div className="hidden md:block w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-[#0071E3]"><ShieldCheck size={32} /></div>
                   </div>
 
                   {submitError && (
@@ -438,7 +390,7 @@ function OrderFormContent() {
                           </div>
                           <div className="space-y-1">
                               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kontak WhatsApp</p>
-                              <p className="text-lg font-bold text-apple-blue font-mono">{form.nomorWa}</p>
+                              <p className="text-lg font-bold text-[#0071E3] font-mono">{form.nomorWa}</p>
                           </div>
                           <div className="col-span-full h-px bg-black/[0.03]" />
                           <div className="col-span-full">
@@ -458,7 +410,7 @@ function OrderFormContent() {
                               {form.selectedAddons.map(id => {
                                   const addon = ADDONS.find(a => a.id === id)
                                   return addon ? (
-                                  <div key={id} className="flex justify-between items-center text-apple-blue">
+                                  <div key={id} className="flex justify-between items-center text-[#0071E3]">
                                       <span className="font-medium text-sm">+ {addon.name}</span>
                                       <span className="font-bold">{formatPrice(addon.price)}</span>
                                   </div>
@@ -466,7 +418,7 @@ function OrderFormContent() {
                               })}
                               <div className="pt-6 mt-6 border-t-2 border-black/5 flex justify-between items-center">
                                   <span className="text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter">Total Estimasi Awal</span>
-                                  <span className="text-3xl sf-display-heavy text-apple-blue">{formatPrice(finalPrice)}</span>
+                                  <span className="text-3xl sf-display-heavy text-[#0071E3]">{formatPrice(finalPrice)}</span>
                               </div>
                           </div>
                       </div>
@@ -475,10 +427,10 @@ function OrderFormContent() {
                   {/* Apple-style Agreement */}
                   <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
                       className={`flex items-start gap-5 w-full text-left p-6 rounded-[24px] border transition-all duration-300 ${
-                          form.agreedToTerms ? 'bg-blue-50 border-apple-blue shadow-sm' : 'bg-white border-black/[0.05] hover:border-apple-blue/30'
+                          form.agreedToTerms ? 'bg-blue-50 border-[#0071E3] shadow-sm' : 'bg-white border-black/[0.05] hover:border-[#0071E3]/30'
                       }`}>
                       <div className={`w-7 h-7 rounded-lg flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all duration-300 ${
-                          form.agreedToTerms ? 'bg-apple-blue border-apple-blue text-white' : 'border-gray-200'
+                          form.agreedToTerms ? 'bg-[#0071E3] border-[#0071E3] text-white' : 'border-gray-200'
                       }`}>
                           {form.agreedToTerms && <Check size={16} strokeWidth={4} />}
                       </div>
