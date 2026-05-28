@@ -134,7 +134,7 @@ function OrderFormContent() {
 
   // DYNAMIC PRICING LOGIC
   const selectedTemplate = form.templateId ? templatesData[form.templateId] : null
-  const currentBasePrice = selectedTemplate?.price_numeric || 499000
+  const currentBasePrice = selectedTemplate?.price_numeric || kalkulatorEstimasi || 499000
   const currentBaseRenewal = selectedTemplate?.renewal_price || 699000
 
   const totalAddonYearly = form.selectedAddons.reduce((acc, id) => {
@@ -403,22 +403,25 @@ function OrderFormContent() {
                       <div className="bg-white rounded-3xl p-8 border border-black/5 shadow-sm">
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6 pb-4 border-b border-black/[0.03]">Ringkasan Investasi Digital</p>
                           <div className="space-y-4">
-                              <div className="flex justify-between items-center">
-                                  <p className="text-gray-500 font-semibold">Paket Website Studio ({selectedTemplate?.title || 'Basic'})</p>
-                                  <span className="font-bold text-gray-900">{formatPrice(currentBasePrice)}</span>
+                              <div className="flex items-center gap-4">
+                                  <p className="text-gray-500 font-semibold flex-1">
+                                    Paket {kalkulatorPaket || selectedTemplate?.title || 'Website Studio'}
+                                    {kalkulatorIndustri && <span className="text-gray-400 font-normal"> · {kalkulatorIndustri}</span>}
+                                  </p>
+                                  <span className="font-bold text-gray-900 shrink-0 text-right">{formatPrice(currentBasePrice)}</span>
                               </div>
                               {form.selectedAddons.map(id => {
                                   const addon = ADDONS.find(a => a.id === id)
                                   return addon ? (
-                                  <div key={id} className="flex justify-between items-center text-[#0071E3]">
-                                      <span className="font-medium text-sm">+ {addon.name}</span>
-                                      <span className="font-bold">{formatPrice(addon.price)}</span>
+                                  <div key={id} className="flex items-center gap-4 text-[#0071E3]">
+                                      <span className="font-medium text-sm flex-1">+ {addon.name}</span>
+                                      <span className="font-bold shrink-0 text-right">{formatPrice(addon.price)}</span>
                                   </div>
                                   ) : null
                               })}
-                              <div className="pt-6 mt-6 border-t-2 border-black/5 flex justify-between items-center">
-                                  <span className="text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter">Total Estimasi Awal</span>
-                                  <span className="text-3xl sf-display-heavy text-[#0071E3]">{formatPrice(finalPrice)}</span>
+                              <div className="pt-6 mt-6 border-t-2 border-black/5 flex items-center gap-4">
+                                  <span className="text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
+                                  <span className="text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-right">{formatPrice(finalPrice)}</span>
                               </div>
                           </div>
                       </div>
