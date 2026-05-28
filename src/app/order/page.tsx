@@ -7,13 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
-  Send, X, LayoutTemplate, Loader2, Sparkles, AlertCircle,
-  Rocket, ShieldCheck, ArrowRight, Star, Info, Search
+  Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck, Search
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
-import { Textarea } from '@/app/components/ui/textarea'
 import { templatesData } from '@/data/templates'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
