@@ -111,11 +111,60 @@ alter function public.set_updated_at() set search_path = '';
 
 
 -- ────────────────────────────────────────────────────────────
+-- GAP 4 — APPLIED 2026-05-29 — CHECK format slug landing_pages
+-- ────────────────────────────────────────────────────────────
+-- Cegah slug invalid (spasi, uppercase, leading/trailing dash).
+-- Aman diapply: tabel landing_pages masih kosong (0 row).
+alter table public.landing_pages
+  add constraint chk_slug_format check (
+    slug is null or slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+  );
+
+
+-- ════════════════════════════════════════════════════════════
+-- ADVISOR CLEANUP — APPLIED 2026-05-29
+-- (migrations: harden_remaining_advisors, harden_orders_anon_and_audit)
+-- Model auth app: TIDAK pakai Supabase Auth. Admin = cookie admin_auth +
+-- service role (bypass RLS). Read publik = server route /api/track. Maka
+-- semua policy role `authenticated` adalah dead code & di-drop.
+-- ════════════════════════════════════════════════════════════
+
+-- Advisor 0028/0029 — tutup permukaan RPC event-trigger helper.
+revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+
+-- Drop dead `authenticated` policies (orders + order_progress_logs).
+-- order_progress_logs jadi RLS-on tanpa policy = terkunci ke service role
+-- (advisor 0008 INFO — by design untuk tabel audit admin-only).
+drop policy if exists "Enable read access for authenticated users" on public.orders;
+drop policy if exists "Enable update for authenticated users" on public.orders;
+drop policy if exists "auth_select_progress_logs" on public.order_progress_logs;
+drop policy if exists "auth_insert_progress_logs" on public.order_progress_logs;
+
+-- Advisor 0024 — perketat anon INSERT (cegah order palsu "sudah dibayar").
+-- Satu-satunya anon insert sah = upgrade dari AddonMarketplace.
+drop policy if exists "Enable insert for anonymous users" on public.orders;
+create policy "anon_insert_lead" on public.orders
+  for insert to anon
+  with check (
+    coalesce(payment_status, 'unpaid') = 'unpaid'
+    and coalesce(status, 'pending') in ('pending', 'pending_payment')
+    and midtrans_order_id is null
+    and dp_amount is null
+    and delivered_url is null
+    and delivered_credentials is null
+    and coalesce(progress_step, 1) between 1 and 5
+  );
+
+-- Advisor 0014 — pindah pg_trgm keluar dari schema public (tak dipakai index).
+alter extension pg_trgm set schema extensions;
+
+
+-- ────────────────────────────────────────────────────────────
 -- GAP 2 — DEFERRED — tenant_id + landing_page_id di orders
 -- ────────────────────────────────────────────────────────────
--- Menautkan order ke tenant & landing page asal. landing_pages SUDAH ada
--- (di-deploy via schema.sql), jadi FK valid. Tetap di-comment sesuai
--- rencana: butuh backfill tenant_id 21 row existing + update insert path app.
+-- Menautkan order ke tenant & landing page asal. landing_pages SUDAH ada,
+-- jadi FK valid. Tetap deferred: butuh wiring tenant di app + backfill 21 row.
+-- Lihat blok commented di bawah saat siap mengaktifkan multi-tenant orders.
 --
 --   alter table public.orders
 --     add column if not exists tenant_id uuid,
@@ -124,15 +173,3 @@ alter function public.set_updated_at() set search_path = '';
 --   create index if not exists idx_orders_tenant_id on public.orders (tenant_id);
 --   create index if not exists idx_orders_landing_page_id on public.orders (landing_page_id);
 --   -- Setelah backfill semua row: alter column tenant_id set not null;
-
-
--- ────────────────────────────────────────────────────────────
--- GAP 4 — DEFERRED — CHECK format slug landing_pages
--- ────────────────────────────────────────────────────────────
--- Cegah slug invalid (spasi, uppercase, leading/trailing dash).
--- Comment dulu: validasi data existing sebelum enforce.
---
---   alter table public.landing_pages
---     add constraint chk_slug_format check (
---       slug is null or slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
---     );
