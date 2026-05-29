@@ -99,6 +99,18 @@ export default function Home() {
                     </button>
                 </form>
 
+                <div className="text-center mb-10">
+                    <p className="text-gray-400 text-sm font-medium">
+                        Belum punya pesanan?{' '}
+                        <a 
+                            href="https://ja-landingpage-platform.vercel.app" 
+                            className="text-apple-blue font-bold hover:underline"
+                        >
+                            Mulai Rakit Website Disini &rarr;
+                        </a>
+                    </p>
+                </div>
+
                 <AnimatePresence mode="wait">
                     {result === 'not_found' && (
                         <motion.div 
