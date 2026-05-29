@@ -43,20 +43,20 @@ const INIT: FormData = {
 }
 
 const ADDONS = [
-  { id: 'blog', name: 'Blog / Artikel', price: 99000, yearlyMaint: 50000 },
-  { id: 'shop', name: 'Online Shop', price: 299000, yearlyMaint: 199000 },
-  { id: 'admin', name: 'Dashboard Admin', price: 199000, yearlyMaint: 99000 },
-  { id: 'member', name: 'Login Member', price: 199000, yearlyMaint: 99000 },
-  { id: 'lms', name: 'LMS / E-learning', price: 399000, yearlyMaint: 299000 },
-  { id: 'quiz', name: 'Quiz Online', price: 249000, yearlyMaint: 99000 },
-  { id: 'portal', name: 'Portal Siswa', price: 299000, yearlyMaint: 149000 },
-  { id: 'gsheets', name: 'Google Sheets Integration', price: 149000, yearlyMaint: 49000 },
-  { id: 'midtrans', name: 'Midtrans Payment', price: 299000, yearlyMaint: 99000 },
-  { id: 'wa', name: 'WhatsApp Automation', price: 199000, yearlyMaint: 99000 },
-  { id: 'invoice', name: 'Invoice Automation', price: 199000, yearlyMaint: 99000 },
-  { id: 'seo', name: 'SEO Optimization', price: 149000, yearlyMaint: 49000 },
-  { id: 'booking', name: 'Booking System', price: 249000, yearlyMaint: 99000 },
-  { id: 'chat', name: 'Live Chat', price: 99000, yearlyMaint: 49000 },
+  { id: 'blog', name: 'Blog / Artikel', price: 200000, yearlyMaint: 100000 },
+  { id: 'shop', name: 'Online Shop (Basic)', price: 450000, yearlyMaint: 300000 },
+  { id: 'admin', name: 'Dashboard Admin', price: 250000, yearlyMaint: 150000 },
+  { id: 'member', name: 'Membership System', price: 500000, yearlyMaint: 200000 },
+  { id: 'lms', name: 'Sistem E-learning / LMS', price: 400000, yearlyMaint: 300000 },
+  { id: 'quiz', name: 'Sistem Kuis Online', price: 450000, yearlyMaint: 200000 },
+  { id: 'portal', name: 'Portal Siswa / Member', price: 300000, yearlyMaint: 150000 },
+  { id: 'gsheets', name: 'Integrasi Google Sheets', price: 150000, yearlyMaint: 75000 },
+  { id: 'midtrans', name: 'Midtrans Payment Gateway', price: 400000, yearlyMaint: 150000 },
+  { id: 'wa', name: 'Otomasi WhatsApp', price: 300000, yearlyMaint: 150000 },
+  { id: 'invoice', name: 'Otomasi Invoice', price: 200000, yearlyMaint: 100000 },
+  { id: 'seo', name: 'Optimasi Google (SEO)', price: 150000, yearlyMaint: 75000 },
+  { id: 'booking', name: 'Sistem Booking Online', price: 300000, yearlyMaint: 150000 },
+  { id: 'chat', name: 'Live Chat Support', price: 100000, yearlyMaint: 50000 },
 ]
 
 // ── Reusable components ────────────────────────────────────────────────────────
@@ -253,7 +253,7 @@ function OrderFormContent() {
     const remaining = finalPrice - dpAmount
     const clientName = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
     const waMsg = encodeURIComponent(
-      `Halo Japan Arena Studio! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
+      `Halo Japan Arena Corp! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
       `📋 Order ID: *${displayId}*\n` +
       `🏢 Nama: ${clientName}\n` +
       `💰 DP Dibayar: Rp ${dpAmount.toLocaleString('id-ID')}\n\n` +
@@ -353,7 +353,7 @@ function OrderFormContent() {
                   <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${step >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
               ))}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Project Briefing</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Order & Briefing</h1>
           <p className="text-gray-500 font-medium">Bantu kami memahami visi digital bisnis Anda.</p>
       </div>
 
@@ -364,12 +364,12 @@ function OrderFormContent() {
             <Sparkles size={20} />
           </div>
           <div>
-            <p className="text-sm font-black text-blue-900 mb-1">Dilanjutkan dari Kalkulator</p>
+            <p className="text-sm font-black text-blue-900 mb-1">Melanjutkan dari Kalkulator</p>
             <p className="text-xs text-blue-700 font-medium leading-relaxed">
               Industri: <strong>{kalkulatorIndustri}</strong> · Paket: <strong>{kalkulatorPaket}</strong>
               {kalkulatorAddons && <> · Fitur: <strong>{kalkulatorAddons}</strong></>}
             </p>
-            <p className="text-xs text-blue-600 mt-1">Estimasi: <strong>Rp {kalkulatorEstimasi.toLocaleString('id-ID')}</strong></p>
+            <p className="text-xs text-blue-600 mt-1">Estimasi Setup: <strong>Rp {kalkulatorEstimasi.toLocaleString('id-ID')}</strong></p>
           </div>
         </div>
       )}
