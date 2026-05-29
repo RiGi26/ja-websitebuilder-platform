@@ -27,26 +27,50 @@ export async function sendWhatsApp(target: string, message: string): Promise<Fon
     return { ok: false, error: 'invalid_phone' }
   }
 
-  const formData = new FormData()
-  formData.append('target', phone)
-  formData.append('message', message)
+  // x-www-form-urlencoded lebih reliable di Vercel/undici dibanding FormData
+  const body = new URLSearchParams({ target: phone, message })
+
+  // 15s timeout supaya tidak hang ke API function timeout limit
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 15000)
 
   try {
     const res = await fetch(FONNTE_API, {
       method: 'POST',
-      headers: { Authorization: token },
-      body: formData,
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+      signal: controller.signal,
     })
-    const data = await res.json().catch(() => ({}))
+    clearTimeout(timeoutId)
+
+    const text = await res.text()
+    let data: any = {}
+    try { data = JSON.parse(text) } catch { /* keep text */ }
 
     // Fonnte returns { status: true/false, reason: "...", id: [...] }
     if (!res.ok || data.status === false) {
-      console.error('[fonnte] gagal kirim:', data?.reason ?? res.statusText)
+      console.error('[fonnte] gagal kirim:', {
+        http: res.status,
+        reason: data?.reason ?? res.statusText,
+        body: data,
+        raw: data && Object.keys(data).length === 0 ? text.slice(0, 300) : undefined,
+      })
       return { ok: false, error: data?.reason ?? `http_${res.status}` }
     }
     return { ok: true, id: Array.isArray(data.id) ? data.id[0] : data.id }
   } catch (err: any) {
-    console.error('[fonnte] error:', err?.message ?? err)
+    clearTimeout(timeoutId)
+    // err.cause sering berisi root cause network error (ENOTFOUND/ECONNREFUSED/ETIMEDOUT)
+    console.error('[fonnte] error:', JSON.stringify({
+      name: err?.name,
+      message: err?.message,
+      cause_code: err?.cause?.code,
+      cause_msg: err?.cause?.message,
+      cause_errno: err?.cause?.errno,
+    }))
     return { ok: false, error: err?.message ?? 'network_error' }
   }
 }
