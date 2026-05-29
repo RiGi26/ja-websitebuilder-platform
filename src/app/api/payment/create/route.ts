@@ -84,6 +84,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       snap_token: snapData.token,
+      redirect_url: snapData.redirect_url,
       order_id: order.id,
       display_id: displayId,
       dp_amount: dpAmount,

@@ -100,10 +100,6 @@ export default function OrderPage() {
   )
 }
 
-const SNAP_JS = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-  ? 'https://app.midtrans.com/snap/snap.js'
-  : 'https://app.sandbox.midtrans.com/snap/snap.js'
-
 function OrderFormContent() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
@@ -113,17 +109,6 @@ function OrderFormContent() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [orderResult, setOrderResult] = useState<any>(null)
   const [paymentPending, setPaymentPending] = useState(false)
-
-  // Load Midtrans Snap.js
-  useEffect(() => {
-    const existing = document.getElementById('midtrans-snap')
-    if (existing) return
-    const script = document.createElement('script')
-    script.id = 'midtrans-snap'
-    script.src = SNAP_JS
-    script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '')
-    document.head.appendChild(script)
-  }, [])
 
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
@@ -161,16 +146,6 @@ function OrderFormContent() {
   const handleNext = () => setStep(s => s + 1)
   const handlePrev = () => setStep(s => s - 1)
 
-  const toggleAddon = (id: string) => {
-    triggerHaptic()
-    setForm(f => ({
-      ...f,
-      selectedAddons: f.selectedAddons.includes(id) 
-        ? f.selectedAddons.filter(i => i !== id)
-        : [...f.selectedAddons, id]
-    }))
-  }
-
   const handleSubmit = async () => {
     setIsSubmitting(true)
     setSubmitError(null)
@@ -200,45 +175,13 @@ function OrderFormContent() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal membuat transaksi')
 
-      const { snap_token, order_id, display_id, dp_amount } = data
+      const { redirect_url, order_id, display_id, dp_amount } = data
 
-      // 2. Guard: pastikan Snap.js sudah load
-      if (typeof (window as any).snap === 'undefined') {
-        throw new Error('Sistem pembayaran belum siap. Mohon refresh halaman dan coba lagi dalam beberapa detik.')
-      }
+      // Simpan info order ke sessionStorage supaya halaman /track bisa tampilkan success state
+      sessionStorage.setItem('ja_pending_order', JSON.stringify({ order_id, display_id, dp_amount }))
 
-      const midtransOrderId = `${display_id}-DP`
-      ;(window as any).snap.pay(snap_token, {
-        onSuccess: async () => {
-          await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_id, midtrans_order_id: midtransOrderId }),
-          })
-          setOrderResult({ id: order_id, display_id, dp_amount })
-          setSubmitted(true)
-          setIsSubmitting(false)
-        },
-        onPending: async () => {
-          await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_id, midtrans_order_id: midtransOrderId }),
-          })
-          setPaymentPending(true)
-          setOrderResult({ id: order_id, display_id, dp_amount })
-          setSubmitted(true)
-          setIsSubmitting(false)
-        },
-        onError: () => {
-          setSubmitError('Pembayaran gagal. Silakan coba lagi.')
-          setIsSubmitting(false)
-        },
-        onClose: () => {
-          setSubmitError('Pembayaran dibatalkan. Klik "Kirim Brief Project" untuk mencoba kembali.')
-          setIsSubmitting(false)
-        },
-      })
+      // Redirect ke halaman pembayaran Midtrans — tidak ada SSL popup issue
+      window.location.href = redirect_url
     } catch (err: any) {
       console.error('Submission error:', err)
       setSubmitError(err.message || 'Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp.')
