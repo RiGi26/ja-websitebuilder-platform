@@ -316,8 +316,6 @@ function OrderFormContent() {
     )
   }
 
-  const selectedTemplateDetails = form.templateId ? templatesData[form.templateId] : null
-
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header (Apple Style) */}
@@ -414,22 +412,16 @@ function OrderFormContent() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar pb-6">
                 {ADDONS.map(addon => {
-                  const isRecommended = selectedTemplate?.recommendedAddons?.includes(addon.id)
                   const isSelected = form.selectedAddons.includes(addon.id)
-                  
+
                   return (
-                    <button 
-                      key={addon.id} 
+                    <button
+                      key={addon.id}
                       onClick={() => toggleAddon(addon.id)}
                       className={`p-5 rounded-3xl border-2 text-left transition-all relative flex flex-col h-full ${
                         isSelected ? 'border-[#0071E3] bg-blue-50/30' : 'border-gray-100 bg-white hover:border-gray-200'
                       }`}
                     >
-                      {isRecommended && (
-                        <div className="absolute top-3 right-3 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full flex items-center gap-1">
-                          <Sparkles size={10} /> Direkomendasikan
-                        </div>
-                      )}
                       <h4 className={`text-sm font-bold mb-1 pr-16 ${isSelected ? 'text-[#0071E3]' : 'text-gray-900'}`}>{addon.name}</h4>
                       <p className="text-xs text-gray-500 mb-4 leading-relaxed line-clamp-2">{addon.desc}</p>
                       

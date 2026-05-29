@@ -17,7 +17,6 @@ export interface TemplateDetail {
   pages: string
   rating: number
   reviewCount: number
-  recommendedAddons?: string[] // Link ke ID Addons
 }
 
 export const templatesData: Record<string, TemplateDetail> = {
@@ -29,7 +28,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?q=80&w=1200&auto=format&fit=crop', features: ['Galeri Masonry', 'Zoom Image Lightbox', 'Proteksi Klik Kanan', 'Paket Pemotretan'],
     tags: ['Photography', 'Art', 'Gallery'], platform: 'Next.js + Tailwind', pages: '4 Halaman', rating: 4.9, reviewCount: 184,
-    recommendedAddons: ['admin', 'seo', 'protection'],
   },
   'personal-blog': {
     id: 'personal-blog', title: 'Personal Blog / Penulis', category: 'Blog', tier: 'starter',
@@ -38,7 +36,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://next-blog-starter.vercel.app', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1200&auto=format&fit=crop', features: ['Artikel & Kategori', 'Komentar Pembaca', 'Newsletter Subscribe', 'Dark/Light Mode'],
     tags: ['Blog', 'Writer', 'Minimalist'], platform: 'Next.js + Markdown', pages: '5 Halaman', rating: 4.6, reviewCount: 56,
-    recommendedAddons: ['admin', 'seo', 'newsletter'],
   },
 
   // === TIER BUSINESS (Rp 899rb - Rp 1.2jt) ===
@@ -49,7 +46,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://portfolio-template.vercel.app', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop', features: ['Tentang Kami & Tim', 'Layanan & Portofolio', 'Blog/Berita', 'Form Kontak & Lead Gen'],
     tags: ['Corporate', 'Agency', 'Business'], platform: 'Next.js + Tailwind', pages: '7 Halaman', rating: 4.8, reviewCount: 128,
-    recommendedAddons: ['admin', 'seo', 'lang-multi', 'career', 'email-biz'],
   },
   'resto-modern': {
     id: 'resto-modern', title: 'Restoran Modern', category: 'F&B', tier: 'business',
@@ -58,7 +54,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://restaurant-template.vercel.app', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop', features: ['Menu Digital Interaktif', 'Form Reservasi Meja', 'Integrasi Google Maps', 'Mobile Responsive'],
     tags: ['Restaurant', 'Cafe', 'Food'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 5, reviewCount: 42,
-    recommendedAddons: ['qr-menu', 'booking', 'wa', 'delivery'],
   },
   'klinik-sehat': {
     id: 'klinik-sehat', title: 'Klinik Medis & Dokter', category: 'Kesehatan', tier: 'business',
@@ -67,7 +62,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://ui.shadcn.com', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop', features: ['Jadwal Dokter', 'Booking Konsultasi', 'Layanan Medis', 'Testimoni Pasien'],
     tags: ['Health', 'Clinic', 'Doctor'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.7, reviewCount: 34,
-    recommendedAddons: ['booking', 'wa', 'chat', 'telemedicine'],
   },
 
   // === TIER ELITE (Rp 1.5jt - Rp 2.5jt) ===
@@ -78,7 +72,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://demo.vercel.store', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop', features: ['Katalog Produk & Variasi', 'Shopping Cart', 'Payment Gateway (Midtrans)', 'Dashboard Admin'],
     tags: ['E-Commerce', 'Shop', 'Retail'], platform: 'Next.js + Supabase', pages: '10+ Halaman', rating: 4.9, reviewCount: 85,
-    recommendedAddons: ['shop', 'midtrans', 'ongkir', 'katalog-pro', 'wa', 'variant'],
   },
   'lms-edukasi': {
     id: 'lms-edukasi', title: 'LMS Kursus Online', category: 'Edukasi', tier: 'elite',
@@ -87,7 +80,6 @@ export const templatesData: Record<string, TemplateDetail> = {
     demoUrl: 'https://nextjs.org/learn', repoUrl: '#',
     image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1200&auto=format&fit=crop', features: ['Video Player & Progress', 'Membership Area', 'Kuis & Sertifikat', 'Pembayaran Otomatis'],
     tags: ['Course', 'Education', 'LMS'], platform: 'Next.js + PostgreSQL', pages: '15+ Halaman', rating: 5, reviewCount: 215,
-    recommendedAddons: ['membership', 'lms', 'cert-auto', 'midtrans', 'live-session'],
   }
 }
 
