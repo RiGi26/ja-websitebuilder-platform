@@ -43,20 +43,41 @@ const INIT: FormData = {
 }
 
 const ADDONS = [
-  { id: 'blog', name: 'Blog / Artikel', price: 200000, yearlyMaint: 100000 },
-  { id: 'shop', name: 'Online Shop (Basic)', price: 450000, yearlyMaint: 300000 },
-  { id: 'admin', name: 'Dashboard Admin', price: 250000, yearlyMaint: 150000 },
-  { id: 'member', name: 'Membership System', price: 500000, yearlyMaint: 200000 },
-  { id: 'lms', name: 'Sistem E-learning / LMS', price: 400000, yearlyMaint: 300000 },
-  { id: 'quiz', name: 'Sistem Kuis Online', price: 450000, yearlyMaint: 200000 },
-  { id: 'portal', name: 'Portal Siswa / Member', price: 300000, yearlyMaint: 150000 },
-  { id: 'gsheets', name: 'Integrasi Google Sheets', price: 150000, yearlyMaint: 75000 },
-  { id: 'midtrans', name: 'Midtrans Payment Gateway', price: 400000, yearlyMaint: 150000 },
-  { id: 'wa', name: 'Otomasi WhatsApp', price: 300000, yearlyMaint: 150000 },
-  { id: 'invoice', name: 'Otomasi Invoice', price: 200000, yearlyMaint: 100000 },
-  { id: 'seo', name: 'Optimasi Google (SEO)', price: 150000, yearlyMaint: 75000 },
-  { id: 'booking', name: 'Sistem Booking Online', price: 300000, yearlyMaint: 150000 },
-  { id: 'chat', name: 'Live Chat Support', price: 100000, yearlyMaint: 50000 },
+  // Core & Operational
+  { id: 'admin', name: 'Dashboard Admin (CMS)', price: 250000, yearlyMaint: 150000, desc: 'Kelola konten website sendiri tanpa coding.' },
+  { id: 'client-portal', name: 'Client Portal Dashboard', price: 500000, yearlyMaint: 250000, desc: 'Area khusus klien untuk progres & invoice.' },
+  
+  // E-Commerce Specific
+  { id: 'shop', name: 'Sistem Toko Online', price: 450000, yearlyMaint: 300000, desc: 'Katalog, keranjang, dan manajemen order.' },
+  { id: 'midtrans', name: 'Payment Gateway (Midtrans)', price: 400000, yearlyMaint: 150000, desc: 'Terima bayar otomatis via QRIS & Bank.' },
+  { id: 'ongkir', name: 'Integrasi Ongkir Otomatis', price: 250000, yearlyMaint: 100000, desc: 'Cek ongkir real-time (JNE/J&T/dll).' },
+  { id: 'katalog-pro', name: 'Katalog & Stok Pro', price: 350000, yearlyMaint: 150000, desc: 'Manajemen inventori & stok otomatis.' },
+  { id: 'variant', name: 'Varian Produk (Size/Warna)', price: 150000, yearlyMaint: 50000, desc: 'Pilihan variasi untuk tiap produk.' },
+  
+  // F&B Specific
+  { id: 'qr-menu', name: 'Menu Digital QR-Code', price: 200000, yearlyMaint: 100000, desc: 'Pelanggan scan meja untuk lihat menu.' },
+  { id: 'delivery', name: 'Integrasi Delivery', price: 300000, yearlyMaint: 150000, desc: 'Tombol pesan via GrabFood/GoFood.' },
+  
+  // Medical & Service
+  { id: 'booking', name: 'Sistem Booking & Kalender', price: 300000, yearlyMaint: 150000, desc: 'Jadwal temu & janji temu real-time.' },
+  { id: 'telemedicine', name: 'Integrasi Telemedicine', price: 400000, yearlyMaint: 200000, desc: 'Konsultasi online via Zoom/Meet.' },
+  
+  // LMS & Education
+  { id: 'membership', name: 'Sistem Membership', price: 500000, yearlyMaint: 200000, desc: 'Area login khusus member/siswa.' },
+  { id: 'lms', name: 'LMS / Video Course', price: 400000, yearlyMaint: 300000, desc: 'Sistem pembelajaran & progres video.' },
+  { id: 'cert-auto', name: 'Sertifikat Otomatis', price: 350000, yearlyMaint: 150000, desc: 'Generate PDF sertifikat otomatis.' },
+  { id: 'live-session', name: 'Integrasi Live Class', price: 450000, yearlyMaint: 250000, desc: 'Penjadwalan kelas Zoom otomatis.' },
+
+  // Marketing & General
+  { id: 'email-biz', name: 'Email Bisnis (nama@brand.com)', price: 150000, yearlyMaint: 300000, desc: 'Email profesional untuk kredibilitas.' },
+  { id: 'lang-multi', name: 'Multi-Language (ID/EN/JP)', price: 400000, yearlyMaint: 200000, desc: 'Website dalam 2-3 bahasa sekaligus.' },
+  { id: 'wa', name: 'Otomasi WhatsApp', price: 300000, yearlyMaint: 150000, desc: 'Notifikasi order otomatis ke WA.' },
+  { id: 'seo', name: 'SEO Optimization', price: 200000, yearlyMaint: 100000, desc: 'Optimasi agar muncul di halaman 1 Google.' },
+  { id: 'ads-tracking', name: 'Ads Tracking (Pixel/GA)', price: 150000, yearlyMaint: 0, desc: 'Pantau efektivitas iklan FB/Google.' },
+  { id: 'protection', name: 'Proteksi Gambar (Anti-Copy)', price: 100000, yearlyMaint: 0, desc: 'Cegah download gambar ilegal.' },
+  { id: 'career', name: 'Portal Lowongan Kerja', price: 300000, yearlyMaint: 100000, desc: 'Halaman karir & lamaran online.' },
+  { id: 'newsletter', name: 'Newsletter System', price: 200000, yearlyMaint: 100000, desc: 'Kumpulkan email database pelanggan.' },
+  { id: 'chat', name: 'Live Chat Support', price: 100000, yearlyMaint: 50000, desc: 'Chat langsung di website (Tawk.to).' },
 ]
 
 // ── Reusable components ────────────────────────────────────────────────────────
@@ -146,6 +167,14 @@ function OrderFormContent() {
   const handleNext = () => setStep(s => s + 1)
   const handlePrev = () => setStep(s => s - 1)
 
+  const toggleAddon = (id: string) => {
+    if (form.selectedAddons.includes(id)) {
+      set('selectedAddons', form.selectedAddons.filter(a => a !== id))
+    } else {
+      set('selectedAddons', [...form.selectedAddons, id])
+    }
+  }
+
   const handleSubmit = async () => {
     setIsSubmitting(true)
     setSubmitError(null)
@@ -180,7 +209,7 @@ function OrderFormContent() {
       // Simpan info order ke sessionStorage supaya halaman /track bisa tampilkan success state
       sessionStorage.setItem('ja_pending_order', JSON.stringify({ order_id, display_id, dp_amount }))
 
-      // Redirect ke halaman pembayaran Midtrans — tidak ada SSL popup issue
+      // Redirect ke halaman pembayaran Midtrans
       window.location.href = redirect_url
     } catch (err: any) {
       console.error('Submission error:', err)
@@ -189,8 +218,8 @@ function OrderFormContent() {
     }
   }
 
-  const totalSteps = 3
-  const progress = step === 0 ? 0 : Math.round((step / totalSteps) * 100)
+  const totalSteps = 4
+  const progress = step === 0 ? 0 : Math.round((step / (totalSteps - 1)) * 100)
 
   if (submitted && orderResult) {
     const displayId = orderResult.display_id
@@ -198,13 +227,13 @@ function OrderFormContent() {
     const remaining = finalPrice - dpAmount
     const clientName = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
     const waMsg = encodeURIComponent(
-      `Halo Japan Arena Corp! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
+      `Halo Japan Arena Studio! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
       `📋 Order ID: *${displayId}*\n` +
       `🏢 Nama: ${clientName}\n` +
       `💰 DP Dibayar: Rp ${dpAmount.toLocaleString('id-ID')}\n\n` +
       `Mohon konfirmasi penerimaan DP saya ya. Terima kasih!`
     )
-    const trackUrl = `/track?id=${orderResult.id}`
+    const trackUrl = `/`
 
     return (
       <div className="max-w-xl mx-auto py-12 px-6">
@@ -294,7 +323,7 @@ function OrderFormContent() {
       {/* Header (Apple Style) */}
       <div className="text-center mb-12 animate-fade-in px-4">
           <div className="flex items-center justify-center gap-3 mb-6">
-              {[1,2,3].map((s) => (
+              {[1,2,3,4].map((s) => (
                   <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${step >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
               ))}
           </div>
@@ -374,13 +403,69 @@ function OrderFormContent() {
               </div>
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut Pilih Fitur <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
 
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <StepHeader title="Fitur Tambahan (Addons)" desc="Personalisasi website Anda dengan fitur pendukung bisnis." />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar pb-6">
+                {ADDONS.map(addon => {
+                  const isRecommended = selectedTemplate?.recommendedAddons?.includes(addon.id)
+                  const isSelected = form.selectedAddons.includes(addon.id)
+                  
+                  return (
+                    <button 
+                      key={addon.id} 
+                      onClick={() => toggleAddon(addon.id)}
+                      className={`p-5 rounded-3xl border-2 text-left transition-all relative flex flex-col h-full ${
+                        isSelected ? 'border-[#0071E3] bg-blue-50/30' : 'border-gray-100 bg-white hover:border-gray-200'
+                      }`}
+                    >
+                      {isRecommended && (
+                        <div className="absolute top-3 right-3 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full flex items-center gap-1">
+                          <Sparkles size={10} /> Direkomendasikan
+                        </div>
+                      )}
+                      <h4 className={`text-sm font-bold mb-1 pr-16 ${isSelected ? 'text-[#0071E3]' : 'text-gray-900'}`}>{addon.name}</h4>
+                      <p className="text-xs text-gray-500 mb-4 leading-relaxed line-clamp-2">{addon.desc}</p>
+                      
+                      <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/[0.03] w-full">
+                        <span className="text-sm font-black text-gray-900">{formatPrice(addon.price)}</span>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                          isSelected ? 'bg-[#0071E3] border-[#0071E3] text-white' : 'border-gray-200'
+                        }`}>
+                          {isSelected && <Check size={12} strokeWidth={4} />}
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="mt-8 bg-blue-50/50 rounded-2xl p-4 border border-blue-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Fitur Terpilih</p>
+                  <p className="text-lg font-black text-[#0071E3]">{formatPrice(totalAddons)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Investasi</p>
+                  <p className="text-lg font-black text-gray-900">{formatPrice(finalPrice)}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col-reverse md:flex-row justify-between mt-10 pt-8 border-t border-gray-100 gap-4">
+                <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
+                <Button onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                   <div className="flex items-center justify-between">
                     <StepHeader title="Konfirmasi & Finalisasi" desc="Pastikan rincian brief Anda sudah sesuai sebelum dikirim ke tim konsultan kami." />
                     <div className="hidden md:block w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-[#0071E3]"><ShieldCheck size={32} /></div>
