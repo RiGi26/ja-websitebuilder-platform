@@ -18,6 +18,9 @@ import {
   Package,
   XCircle,
   MessageSquareText,
+  ExternalLink,
+  KeyRound,
+  PartyPopper,
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -210,6 +213,8 @@ export default async function TrackPage({
   const statusLabel = STATUS_LABELS[order.status as string] ?? order.status
   const clientName = order.nama_perusahaan || order.nama_usaha || 'Customer'
   const progressNote: string | null = order.progress_note ?? null
+  const deliveredUrl: string | null = order.delivered_url ?? null
+  const deliveredCredentials: string | null = order.delivered_credentials ?? null
   const lastUpdatedAt: string | null = order.last_updated_at ?? order.created_at
   const relativeTime = lastUpdatedAt
     ? formatDistanceToNow(new Date(lastUpdatedAt), {
@@ -257,6 +262,54 @@ export default async function TrackPage({
               </div>
             </div>
           </div>
+
+          {/* Hero: Website Live — muncul saat admin sudah isi delivered_url */}
+          {deliveredUrl && (
+            <div className="relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 rounded-[32px] p-8 shadow-lg mb-4 text-white">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                    <PartyPopper size={20} />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+                    Website Live
+                  </p>
+                </div>
+                <h2 className="text-2xl font-black tracking-tight mb-1">
+                  Website Anda Sudah Siap! 🎉
+                </h2>
+                <p className="text-sm text-white/80 mb-5">
+                  Klik tombol di bawah untuk membuka website Anda.
+                </p>
+
+                <a
+                  href={deliveredUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-green-700 font-bold text-sm px-5 py-3 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all break-all max-w-full"
+                >
+                  <ExternalLink size={16} className="shrink-0" />
+                  <span className="truncate">{deliveredUrl}</span>
+                </a>
+
+                {deliveredCredentials && (
+                  <div className="mt-5 bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <KeyRound size={14} className="text-white/80" />
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/80">
+                        Detail Akses
+                      </p>
+                    </div>
+                    <p className="text-xs text-white whitespace-pre-wrap break-words font-mono leading-relaxed">
+                      {deliveredCredentials}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Progress timeline */}
           <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/[0.04] mb-4">
