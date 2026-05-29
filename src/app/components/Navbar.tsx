@@ -9,8 +9,6 @@ import Image from 'next/image'
 const CORP_URL = 'https://ja-landingpage-platform.vercel.app'
 
 const NAV_LINKS = [
-  { label: 'Template', href: '/template' },
-  { label: 'Harga', href: '/pricing' },
   { label: 'Track Pesanan', href: '/track' },
 ]
 
@@ -56,8 +54,14 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map(link => (
-              <Link key={link.href} href={link.href} className="text-sm font-semibold text-gray-500 hover:text-[#0071E3] transition-colors sf-display">
+              <Link key={link.href} href={link.href} className="text-sm font-semibold text-gray-500 hover:text-[#0071E3] transition-colors sf-display flex items-center gap-2">
                 {link.label}
+                {link.href === '/track' && (
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-apple-blue opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-apple-blue"></span>
+                  </span>
+                )}
               </Link>
             ))}
             <div className="w-[1px] h-4 bg-black/10 mx-2" />
@@ -70,18 +74,11 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            <Button asChild className="hidden md:inline-flex bg-[#1D1D1F] hover:bg-black text-white rounded-full px-6 shadow-md transition-all active:scale-95">
-              <Link href="https://wa.me/6281296917963?text=Halo%20Japan%20Arena%20Studio%2C%20saya%20tertarik%20dengan%20layanan%20pembuatan%20website.">
-                Mulai Proyek
-              </Link>
-            </Button>
-
-            {/* Hamburger — mobile only */}
+          {/* Right side - Mobile Toggle Only */}
+          <div className="flex md:hidden items-center">
             <button
               onClick={() => setMenuOpen(prev => !prev)}
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -128,15 +125,6 @@ export default function Navbar() {
               <LayoutGrid size={15} />
               Portal Utama
             </a>
-          </div>
-          <div className="px-4 pb-4">
-            <Link
-              href="https://wa.me/6281296917963?text=Halo%20Japan%20Arena%20Studio%2C%20saya%20tertarik%20dengan%20layanan%20pembuatan%20website."
-              onClick={() => setMenuOpen(false)}
-              className="block w-full bg-[#1D1D1F] text-white text-center py-3.5 rounded-2xl font-bold text-sm hover:bg-black transition-colors"
-            >
-              Mulai Proyek
-            </Link>
           </div>
         </div>
       </div>
