@@ -174,6 +174,13 @@ export default async function StudioAdminPage() {
                            Status: {order.status}
                         </span>
                       </div>
+
+                      {/* Builder: provision / kelola website klien (posisi menonjol) */}
+                      <BuildButton
+                        orderId={order.id}
+                        hasTenant={!!order.tenant_id}
+                        pageId={order.tenant_id ? pagesByTenant[order.tenant_id]?.id ?? null : null}
+                      />
                     </div>
 
                     {/* Brief & Requirements */}
@@ -228,15 +235,6 @@ export default async function StudioAdminPage() {
                             currentNote={order.progress_note ?? null}
                             currentDeliveredUrl={order.delivered_url ?? null}
                             currentDeliveredCredentials={order.delivered_credentials ?? null}
-                        />
-                      </div>
-
-                      {/* Builder: provision / kelola website klien */}
-                      <div className="px-1">
-                        <BuildButton
-                          orderId={order.id}
-                          hasTenant={!!order.tenant_id}
-                          pageId={order.tenant_id ? pagesByTenant[order.tenant_id]?.id ?? null : null}
                         />
                       </div>
                     </div>

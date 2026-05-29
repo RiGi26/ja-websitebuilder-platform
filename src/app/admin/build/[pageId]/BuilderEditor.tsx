@@ -39,6 +39,51 @@ const FEATURE_LABELS: Record<keyof FeatureFlags, string> = {
   hasMap: 'Peta Lokasi',
 }
 
+// Skema field untuk tipe section "flat" (key-value) → form isian, bukan JSON.
+type FieldDef = { key: string; label: string; type: 'text' | 'textarea' | 'url'; placeholder?: string }
+const FIELD_SCHEMA: Partial<Record<TipeKomponen, FieldDef[]>> = {
+  hero_banner: [
+    { key: 'eyebrow', label: 'Label kecil (eyebrow)', type: 'text', placeholder: 'TOKO ONLINE' },
+    { key: 'title', label: 'Judul utama', type: 'text', placeholder: 'Selamat Datang di Toko Kami' },
+    { key: 'subtitle', label: 'Subjudul', type: 'text', placeholder: 'Produk terbaik untukmu' },
+    { key: 'cta_text', label: 'Teks tombol', type: 'text', placeholder: 'Belanja Sekarang' },
+    { key: 'cta_link', label: 'Link tombol', type: 'url', placeholder: 'https://wa.me/62...' },
+    { key: 'image_url', label: 'URL gambar (opsional)', type: 'url' },
+  ],
+  about: [
+    { key: 'title', label: 'Judul', type: 'text', placeholder: 'Tentang Kami' },
+    { key: 'body', label: 'Isi / deskripsi', type: 'textarea' },
+  ],
+  cta: [
+    { key: 'title', label: 'Judul', type: 'text' },
+    { key: 'subtitle', label: 'Subjudul', type: 'text' },
+    { key: 'cta_text', label: 'Teks tombol', type: 'text' },
+    { key: 'cta_link', label: 'Link tombol', type: 'url' },
+  ],
+  contact_form: [
+    { key: 'title', label: 'Judul', type: 'text', placeholder: 'Hubungi Kami' },
+    { key: 'deskripsi', label: 'Deskripsi', type: 'textarea' },
+    { key: 'wa', label: 'Nomor WhatsApp (62...)', type: 'text' },
+    { key: 'email', label: 'Email', type: 'text' },
+  ],
+  product_list: [{ key: 'title', label: 'Judul section', type: 'text', placeholder: 'Produk Kami' }],
+  blog_list: [{ key: 'title', label: 'Judul section', type: 'text', placeholder: 'Artikel Terbaru' }],
+  video_embed: [{ key: 'url', label: 'URL embed video', type: 'url' }],
+  map_embed: [{ key: 'url', label: 'URL embed peta (Google Maps)', type: 'url' }],
+  custom_html: [{ key: 'html', label: 'Kode HTML', type: 'textarea' }],
+}
+
+// Template JSON untuk tipe "list" (belum berbentuk form) — memudahkan pengisian.
+const JSON_TEMPLATE: Partial<Record<TipeKomponen, unknown>> = {
+  features: { title: 'Keunggulan', items: [{ title: 'Fitur A', desc: 'Penjelasan singkat' }] },
+  stats: { items: [{ value: '100+', label: 'Pelanggan' }] },
+  gallery: { title: 'Galeri', images: ['https://contoh.com/foto1.jpg'] },
+  testimonials: { title: 'Testimoni', items: [{ quote: 'Pelayanan mantap!', name: 'Budi' }] },
+  team: { title: 'Tim Kami', items: [{ nama: 'Nama', jabatan: 'Posisi', foto_url: '' }] },
+  pricing_table: { title: 'Paket Harga', plans: [{ nama: 'Basic', harga: 'Rp 500rb', fitur: ['Fitur 1', 'Fitur 2'] }] },
+  faq: { title: 'FAQ', items: [{ q: 'Pertanyaan?', a: 'Jawaban.' }] },
+}
+
 type Props = {
   page: LandingPage
   initialSections: PageSection[]
@@ -298,13 +343,17 @@ export default function BuilderEditor({ page, initialSections }: Props) {
         </div>
 
         <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-            data_konten (JSON)
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+            Pengaturan Halaman — SEO / Meta (JSON)
+          </p>
+          <p className="text-[11px] text-gray-400 mb-2">
+            Ini untuk judul/deskripsi SEO halaman, mis. <code>{'{ "meta_title": "...", "meta_description": "..." }'}</code>.
+            <strong className="text-gray-500"> Bukan</strong> tempat isi konten — isi konten diatur di tiap <em>Section</em> di bawah.
           </p>
           <textarea
             value={dataKontenText}
             onChange={(e) => setDataKontenText(e.target.value)}
-            rows={8}
+            rows={5}
             spellCheck={false}
             className="w-full text-xs font-mono rounded-xl border border-black/10 p-3 focus:border-apple-blue focus:outline-none"
           />
@@ -316,7 +365,7 @@ export default function BuilderEditor({ page, initialSections }: Props) {
           className="flex items-center gap-2 py-2.5 px-5 bg-apple-blue text-white rounded-xl text-[11px] font-bold hover:bg-blue-600 transition-colors uppercase tracking-widest disabled:opacity-50"
         >
           {busy === 'config' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-          Simpan Konfigurasi & Konten
+          Simpan Pengaturan Halaman
         </button>
       </div>
 
@@ -395,7 +444,34 @@ function SectionRow({
   onDelete: (id: string) => void
   onSaveContent: (id: string, text: string) => void
 }) {
-  const [text, setText] = useState(JSON.stringify(section.isi_komponen ?? {}, null, 2))
+  const schema = FIELD_SCHEMA[section.tipe_komponen]
+  const isi = (section.isi_komponen ?? {}) as Record<string, any>
+
+  // Mode form (tipe ber-skema): state per field.
+  const [vals, setVals] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {}
+    if (schema) for (const f of schema) init[f.key] = isi[f.key] ?? ''
+    return init
+  })
+  // Mode JSON (tipe list / lainnya): prefilled template kalau kosong.
+  const [text, setText] = useState(() => {
+    if (Object.keys(isi).length) return JSON.stringify(isi, null, 2)
+    const tmpl = JSON_TEMPLATE[section.tipe_komponen]
+    return tmpl ? JSON.stringify(tmpl, null, 2) : '{}'
+  })
+
+  const save = () => {
+    if (schema) {
+      const obj: Record<string, string> = {}
+      for (const f of schema) {
+        const v = vals[f.key]?.trim()
+        if (v) obj[f.key] = v
+      }
+      onSaveContent(section.id, JSON.stringify(obj))
+    } else {
+      onSaveContent(section.id, text)
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-black/[0.06] bg-[#F9F9FB] p-4">
@@ -443,24 +519,67 @@ function SectionRow({
         </div>
       </div>
 
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={5}
-        spellCheck={false}
-        className="w-full text-xs font-mono rounded-xl border border-black/10 p-3 focus:border-apple-blue focus:outline-none bg-white"
-      />
+      {schema ? (
+        // ── Form isian (tipe umum) ──
+        <div className="space-y-3 bg-white rounded-xl border border-black/5 p-4">
+          {schema.map((f) => (
+            <div key={f.key}>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+                {f.label}
+              </label>
+              {f.type === 'textarea' ? (
+                <textarea
+                  value={vals[f.key] ?? ''}
+                  onChange={(e) => setVals((v) => ({ ...v, [f.key]: e.target.value }))}
+                  rows={3}
+                  placeholder={f.placeholder}
+                  className="w-full text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none"
+                />
+              ) : (
+                <input
+                  type={f.type === 'url' ? 'url' : 'text'}
+                  value={vals[f.key] ?? ''}
+                  onChange={(e) => setVals((v) => ({ ...v, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  className="w-full text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none"
+                />
+              )}
+            </div>
+          ))}
+          {(section.tipe_komponen === 'product_list' || section.tipe_komponen === 'blog_list') && (
+            <p className="text-[11px] text-gray-400">
+              Daftar {section.tipe_komponen === 'product_list' ? 'produk' : 'artikel'} diisi di panel
+              {section.tipe_komponen === 'product_list' ? ' Produk' : ' Blog'} (bawah halaman ini).
+            </p>
+          )}
+        </div>
+      ) : (
+        // ── Mode JSON (tipe list/lanjutan) ──
+        <div>
+          <p className="text-[11px] text-gray-400 mb-1">
+            Tipe ini diisi via JSON (template sudah disediakan — sesuaikan nilainya):
+          </p>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={6}
+            spellCheck={false}
+            className="w-full text-xs font-mono rounded-xl border border-black/10 p-3 focus:border-apple-blue focus:outline-none bg-white"
+          />
+        </div>
+      )}
+
       <button
         disabled={busy === `content-${section.id}`}
-        onClick={() => onSaveContent(section.id, text)}
-        className="mt-2 flex items-center gap-1.5 py-2 px-4 bg-apple-blue text-white rounded-xl text-[10px] font-bold hover:bg-blue-600 transition-colors uppercase disabled:opacity-50"
+        onClick={save}
+        className="mt-3 flex items-center gap-1.5 py-2.5 px-5 bg-apple-blue text-white rounded-xl text-xs font-bold hover:bg-blue-600 transition-colors uppercase tracking-widest disabled:opacity-50 shadow-sm"
       >
         {busy === `content-${section.id}` ? (
-          <Loader2 size={12} className="animate-spin" />
+          <Loader2 size={14} className="animate-spin" />
         ) : (
-          <Save size={12} />
+          <Save size={14} />
         )}
-        Simpan Isi
+        Simpan Isi Section
       </button>
     </div>
   )
