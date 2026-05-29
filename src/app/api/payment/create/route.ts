@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         ...(email && { email }),
       },
       callbacks: {
-        finish: `${process.env.NEXT_PUBLIC_BASE_URL}/track?id=${order.id}`,
+        finish: `${process.env.NEXT_PUBLIC_BASE_URL}/thank-you?id=${order.id}`,
       },
     }
 

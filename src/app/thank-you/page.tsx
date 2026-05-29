@@ -1,0 +1,176 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { CheckCircle2, MessageCircle, ArrowRight, Clock, Phone, Layers } from 'lucide-react'
+import Navbar from '@/app/components/Navbar'
+
+const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
+
+const NEXT_STEPS = [
+  {
+    icon: Phone,
+    time: 'Dalam 1×24 jam',
+    title: 'Tim kami menghubungi Anda',
+    desc: 'Project Manager akan konfirmasi via WhatsApp untuk jadwal sesi Onboarding.',
+  },
+  {
+    icon: Layers,
+    time: 'Sesi Onboarding',
+    title: 'Briefing & finalisasi brief',
+    desc: 'Kami review semua kebutuhan Anda — konten, referensi desain, dan akses yang diperlukan.',
+  },
+  {
+    icon: Clock,
+    time: 'Setelah onboarding',
+    title: 'Pengerjaan dimulai',
+    desc: 'Progress bisa dilacak real-time lewat halaman tracking dengan Order ID Anda.',
+  },
+]
+
+export default function ThankYouPage() {
+  const router = useRouter()
+  const [orderId, setOrderId] = useState<string | null>(null)
+  const [displayId, setDisplayId] = useState<string | null>(null)
+  const [dpAmount, setDpAmount] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+
+    setOrderId(id)
+
+    const pending = sessionStorage.getItem('ja_pending_order')
+    if (pending) {
+      try {
+        const parsed = JSON.parse(pending)
+        setDisplayId(parsed.display_id)
+        setDpAmount(parsed.dp_amount)
+
+        // Trigger payment confirm (backup to webhook)
+        if (parsed.order_id && parsed.display_id) {
+          fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              order_id: parsed.order_id,
+              midtrans_order_id: `${parsed.display_id}-DP`,
+            }),
+          }).catch(() => {})
+        }
+        sessionStorage.removeItem('ja_pending_order')
+      } catch {}
+    }
+
+    setMounted(true)
+  }, [])
+
+  const trackUrl = orderId ? `/track?id=${orderId}` : '/track'
+
+  if (!mounted) return null
+
+  return (
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Navbar />
+
+      <main className="pt-28 pb-20 px-4">
+        <div className="max-w-lg mx-auto">
+
+          {/* Status Card — benchmark: Shopee order confirmed card */}
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-black/[0.04] mb-4">
+            {/* Green header strip */}
+            <div className="bg-green-500 px-8 py-7 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <CheckCircle2 size={26} className="text-white" />
+              </div>
+              <div>
+                <p className="text-white font-black text-lg leading-tight">Pembayaran Berhasil!</p>
+                <p className="text-green-100 text-sm font-medium mt-0.5">DP project Anda telah kami terima.</p>
+              </div>
+            </div>
+
+            {/* Order detail rows — benchmark: Tokopedia detail pesanan */}
+            <div className="px-8 py-6 divide-y divide-gray-50">
+              <div className="flex justify-between items-center py-3">
+                <span className="text-sm text-gray-500">Nomor Order</span>
+                <span className="text-sm font-black text-[#1D1D1F] tracking-wide">
+                  {displayId ?? (orderId ? `JA-${new Date().getFullYear()}-${orderId.slice(0, 8).toUpperCase()}` : '—')}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-3">
+                <span className="text-sm text-gray-500">Jenis Pembayaran</span>
+                <span className="text-sm font-bold text-[#1D1D1F]">DP 50%</span>
+              </div>
+              {dpAmount && (
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-sm text-gray-500">Jumlah Dibayar</span>
+                  <span className="text-sm font-black text-green-600">
+                    Rp {dpAmount.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center py-3">
+                <span className="text-sm text-gray-500">Status</span>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
+                  Sedang Diproses
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Next Steps — benchmark: Traveloka "Yang perlu kamu lakukan" */}
+          <div className="bg-white rounded-[32px] px-8 py-7 shadow-sm border border-black/[0.04] mb-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-gray-400 mb-5">Selanjutnya</p>
+            <div className="space-y-6">
+              {NEXT_STEPS.map((step, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="shrink-0 flex flex-col items-center gap-1">
+                    <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                      <step.icon size={16} className="text-gray-500" />
+                    </div>
+                    {i < NEXT_STEPS.length - 1 && (
+                      <div className="w-px h-full min-h-[20px] bg-gray-100" />
+                    )}
+                  </div>
+                  <div className="pb-2">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">{step.time}</p>
+                    <p className="text-sm font-bold text-[#1D1D1F]">{step.title}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed mt-0.5">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Info note — benchmark: Shopee "Simpan bukti pembayaran" notice */}
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 mb-6">
+            <p className="text-xs text-blue-700 leading-relaxed">
+              <span className="font-bold">Simpan nomor order Anda.</span> Gunakan nomor ini untuk melacak progress dan mengajukan pertanyaan ke tim kami.
+            </p>
+          </div>
+
+          {/* CTAs — benchmark: Shopee "Lihat Pesanan" + "Lanjut Belanja" */}
+          <div className="flex flex-col gap-3">
+            <Link
+              href={trackUrl}
+              className="w-full bg-[#1D1D1F] text-white text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-black active:scale-95 transition-all shadow-sm"
+            >
+              Lacak Progress Project <ArrowRight size={16} />
+            </Link>
+            <a
+              href={`https://wa.me/${WA_NUMBER}?text=Halo%2C%20saya%20baru%20melakukan%20pembayaran%20DP%20dengan%20order%20${displayId ?? ''}.%20Ada%20yang%20ingin%20saya%20tanyakan.`}
+              target="_blank"
+              className="w-full bg-white border border-gray-200 text-[#1D1D1F] text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all"
+            >
+              <MessageCircle size={16} className="text-green-500" /> Hubungi Tim via WhatsApp
+            </a>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  )
+}
