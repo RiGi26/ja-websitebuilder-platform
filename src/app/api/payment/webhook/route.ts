@@ -4,6 +4,8 @@ import crypto from 'crypto'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 
+// Midtrans requires HTTP 200 always — non-200 triggers retries
+// Signature check still happens; invalid ones are logged and ignored
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -16,19 +18,23 @@ export async function POST(request: Request) {
       fraud_status,
     } = body
 
-    // Verify Midtrans signature
+    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
     const expected = crypto
       .createHash('sha512')
       .update(`${order_id}${status_code}${gross_amount}${SERVER_KEY}`)
       .digest('hex')
 
     if (signature_key !== expected) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
+      console.warn('[webhook] Invalid signature for order:', order_id)
+      return NextResponse.json({ received: true, note: 'signature_mismatch' })
     }
 
     // order_id format: JA-2025-XXXXXXXX-DP → extract 8-char hex shortId
     const shortId = order_id.replace(/-DP$/, '').split('-')[2]?.toLowerCase()
-    if (!shortId) return NextResponse.json({ error: 'Bad order_id' }, { status: 400 })
+    if (!shortId) {
+      console.warn('[webhook] Unrecognised order_id format:', order_id)
+      return NextResponse.json({ received: true, note: 'unknown_order_format' })
+    }
 
     const isPaid =
       (transaction_status === 'capture' && fraud_status === 'accept') ||
@@ -40,7 +46,7 @@ export async function POST(request: Request) {
 
     if (isPaid) {
       update.payment_status = 'dp_paid'
-      update.status = 'pending' // admin review queue
+      update.status = 'pending'
     } else if (isPending) {
       update.payment_status = 'awaiting_payment'
     } else if (isFailed) {
@@ -54,12 +60,13 @@ export async function POST(request: Request) {
         .update(update)
         .ilike('id', `${shortId}%`)
 
-      if (error) throw new Error(error.message)
+      if (error) console.error('[webhook] DB update error:', error.message)
     }
 
     return NextResponse.json({ received: true })
   } catch (err: any) {
-    console.error('[payment/webhook]', err.message)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[webhook] Unhandled error:', err.message)
+    // Still return 200 — Midtrans must not retry on our internal errors
+    return NextResponse.json({ received: true, error: err.message })
   }
 }
