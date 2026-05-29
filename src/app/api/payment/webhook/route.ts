@@ -29,13 +29,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true, note: 'signature_mismatch' })
     }
 
-    // order_id format: JA-2025-XXXXXXXX-DP → extract 8-char hex shortId
-    const shortId = order_id.replace(/-DP$/, '').split('-')[2]?.toLowerCase()
-    if (!shortId) {
-      console.warn('[webhook] Unrecognised order_id format:', order_id)
-      return NextResponse.json({ received: true, note: 'unknown_order_format' })
-    }
-
     const isPaid =
       (transaction_status === 'capture' && fraud_status === 'accept') ||
       transaction_status === 'settlement'
@@ -55,10 +48,13 @@ export async function POST(request: Request) {
     }
 
     if (Object.keys(update).length > 0) {
+      // Lookup by midtrans_order_id (exact match) — kolom ini sudah di-index dan
+      // disimpan saat order dibuat di payment/create. Jauh lebih reliable
+      // dibanding ilike pada UUID (yang silent fail karena UUID tidak punya operator ILIKE).
       const { error } = await supabaseAdmin
         .from('orders')
         .update(update)
-        .ilike('id', `${shortId}%`)
+        .eq('midtrans_order_id', order_id)
 
       if (error) console.error('[webhook] DB update error:', error.message)
     }
