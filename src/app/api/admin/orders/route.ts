@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, type NotifyEvent } from '@/lib/fonnte'
+import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
 export async function PATCH(request: Request) {
-  // 1. Security Check
+  // 1. Security Check — verifikasi token sesi signed (bukan cookie statik)
   const cookieStore = await cookies()
-  const isAuth = cookieStore.get('admin_auth')?.value === 'true'
+  const isAuth = verifyAdminSessionToken(cookieStore.get(ADMIN_COOKIE_NAME)?.value)
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -44,6 +45,30 @@ export async function PATCH(request: Request) {
       .eq('id', id)
 
     if (updateErr) throw updateErr
+
+    // 3b. Audit trail — catat perubahan ke order_progress_logs (best-effort,
+    // jangan blok / gagalkan response kalau insert log error). Ditulis via
+    // service role; tabel terkunci service-role-only (RLS on, no policy).
+    const stepChanged = current?.progress_step !== progress_step
+    const statusChanged = current?.status !== status
+    const noteAdded =
+      progress_note !== undefined && progress_note !== null && progress_note !== ''
+    const deliveredChanged =
+      delivered_url !== undefined && delivered_url !== (current?.delivered_url ?? undefined)
+
+    if (stepChanged || statusChanged || noteAdded || deliveredChanged) {
+      const { error: logErr } = await supabaseAdmin.from('order_progress_logs').insert({
+        order_id: id,
+        from_step: current?.progress_step ?? null,
+        to_step: progress_step ?? null,
+        from_status: current?.status ?? null,
+        to_status: status ?? null,
+        progress_note: noteAdded ? progress_note : null,
+        changed_by: 'admin',
+        source: 'admin',
+      })
+      if (logErr) console.error('[admin/orders] audit log insert failed:', logErr.message)
+    }
 
     // 4. Tentukan notif event yang perlu dikirim (fire-and-forget, jangan blok response)
     const notifEvent = pickNotifEvent({
