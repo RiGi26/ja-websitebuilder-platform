@@ -42,27 +42,36 @@ export default function ThankYouPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    // Support both our ?id=UUID (from callbacks.finish) and
-    // Midtrans dashboard redirect ?order_id=JA-2025-XXXXXXXX-DP
-    const id = params.get('id')
-    const midtransOrderId = params.get('order_id') // e.g. JA-2025-ABCD1234-DP
+    // 3 sumber orderId, urutan prioritas:
+    //   1. ?id=UUID            → dari callbacks.finish API (CC, VA, QRIS)
+    //   2. ?order_id=JA-...-DP → dari Midtrans dashboard default redirect
+    //   3. sessionStorage      → fallback untuk GoPay/ShopeePay mobile yang
+    //                            sering kehilangan query string saat app deep link
+    const idFromUrl = params.get('id')
+    const midtransOrderId = params.get('order_id')
 
-    if (id) {
-      setOrderId(id)
+    let resolvedOrderId: string | null = null
+    let resolvedDisplayId: string | null = null
+
+    if (idFromUrl) {
+      resolvedOrderId = idFromUrl
     } else if (midtransOrderId) {
-      // Extract 8-char shortId from JA-2025-ABCD1234-DP
       const parts = midtransOrderId.replace(/-DP$/i, '').split('-')
-      const shortId = parts[2]?.toLowerCase() ?? null
-      setOrderId(shortId)
-      setDisplayId(midtransOrderId.replace(/-DP$/i, ''))
+      resolvedOrderId = parts[2]?.toLowerCase() ?? null
+      resolvedDisplayId = midtransOrderId.replace(/-DP$/i, '')
     }
 
     const pending = sessionStorage.getItem('ja_pending_order')
     if (pending) {
       try {
         const parsed = JSON.parse(pending)
-        setDisplayId(parsed.display_id)
+        resolvedDisplayId = resolvedDisplayId || parsed.display_id
         setDpAmount(parsed.dp_amount)
+
+        // Fallback: kalau URL tidak punya id (kasus GoPay mobile), pakai sessionStorage
+        if (!resolvedOrderId && parsed.order_id) {
+          resolvedOrderId = parsed.order_id
+        }
 
         // Trigger payment confirm (backup to webhook)
         if (parsed.order_id && parsed.display_id) {
@@ -78,6 +87,9 @@ export default function ThankYouPage() {
         sessionStorage.removeItem('ja_pending_order')
       } catch {}
     }
+
+    if (resolvedOrderId) setOrderId(resolvedOrderId)
+    if (resolvedDisplayId) setDisplayId(resolvedDisplayId)
 
     setMounted(true)
   }, [])

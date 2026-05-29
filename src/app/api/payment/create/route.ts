@@ -41,8 +41,12 @@ export async function POST(request: Request) {
     const dpAmount = Math.ceil(total_estimasi * 0.5)
     const clientName = client_type === 'perusahaan' ? nama_perusahaan : nama_usaha
     const midtransOrderId = `${displayId}-DP`
+    const finishUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/thank-you?id=${order.id}`
 
     // 2. Create Midtrans Snap token
+    // gopay.callback_url & shopeepay.callback_url WAJIB di-set terpisah —
+    // untuk metode pembayaran berbasis app (deep link), callbacks.finish saja
+    // tidak cukup karena app deep link tidak forward query string `?id=`.
     const snapPayload = {
       transaction_details: {
         order_id: midtransOrderId,
@@ -60,7 +64,14 @@ export async function POST(request: Request) {
         ...(email && { email }),
       },
       callbacks: {
-        finish: `${process.env.NEXT_PUBLIC_BASE_URL}/thank-you?id=${order.id}`,
+        finish: finishUrl,
+      },
+      gopay: {
+        enable_callback: true,
+        callback_url: finishUrl,
+      },
+      shopeepay: {
+        callback_url: finishUrl,
       },
     }
 
