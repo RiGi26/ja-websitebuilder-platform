@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, MapPin, Package, Clock, CheckCircle2, Plane, Warehouse, ShieldAlert, ArrowRight, Loader2, AlertCircle, MessageCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/app/components/Navbar'
@@ -23,6 +23,55 @@ export default function PublicProjectTracker() {
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [justPaid, setJustPaid] = useState(false)
+
+  // Auto-search setelah redirect dari Midtrans payment page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const orderId = params.get('id')
+    if (!orderId) return
+
+    setJustPaid(true)
+    setQuery(orderId)
+
+    // Cek apakah payment sudah dikonfirmasi via webhook, lalu trigger confirm juga
+    const pending = sessionStorage.getItem('ja_pending_order')
+    if (pending) {
+      try {
+        const { order_id, display_id } = JSON.parse(pending)
+        fetch('/api/payment/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id, midtrans_order_id: `${display_id}-DP` }),
+        })
+        sessionStorage.removeItem('ja_pending_order')
+      } catch {}
+    }
+
+    // Auto trigger search
+    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
+    setTimeout(() => handleSearchById(orderId), 500)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearchById = async (id: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: dbErr } = await supabase
+        .from('orders')
+        .select('*')
+        .ilike('id', `${id.slice(0, 8)}%`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      if (dbErr) throw dbErr
+      setResult(data)
+    } catch {
+      setResult('not_found')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,6 +112,20 @@ export default function PublicProjectTracker() {
       
       <main className="pt-32 pb-24 px-4 relative overflow-hidden">
         <div className="max-w-4xl mx-auto relative z-10">
+            {justPaid && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="bg-green-50 border border-green-200 rounded-[24px] p-5 mb-8 flex items-center gap-4"
+              >
+                <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={22} />
+                </div>
+                <div>
+                  <p className="font-black text-green-900 text-sm">Pembayaran DP Berhasil!</p>
+                  <p className="text-green-700 text-xs font-medium mt-0.5">Tim kami akan menghubungi Anda dalam 1×24 jam untuk sesi Onboarding. Progress project Anda tampil di bawah.</p>
+                </div>
+              </motion.div>
+            )}
             <div className="text-center mb-12 animate-fade-in">
                 <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
                     Project Transparency
