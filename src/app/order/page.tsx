@@ -514,7 +514,7 @@ function OrderFormContent() {
                             </a>
                           </p>
                           <p className="text-xs text-gray-500 leading-relaxed">
-                              Saya mengkonfirmasi bahwa data yang dimasukkan sudah benar dan bersedia untuk dihubungi oleh tim konsultan Japan Arena Corp untuk proses briefing lebih lanjut.
+                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah pembayaran DP berhasil dilakukan.
                           </p>
                       </div>
                   </button>
@@ -522,14 +522,14 @@ function OrderFormContent() {
                   <div className="flex justify-between mt-12 pt-8 border-t border-gray-100 gap-4">
                     <Button variant="ghost" onClick={handlePrev} className="rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
                     <Button disabled={!form.agreedToTerms || isSubmitting} onClick={handleSubmit} 
-                        className="rounded-2xl flex-1 h-14 bg-gray-900 hover:bg-black text-white font-bold shadow-xl flex items-center justify-center gap-3">
+                        className="rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl flex items-center justify-center gap-3">
                         {isSubmitting ? (
                             <>
-                                <Loader2 className="animate-spin" size={20} /> Mengirim Brief...
+                                <Loader2 className="animate-spin" size={20} /> Memproses Pesanan...
                             </>
                         ) : (
                             <>
-                                <Rocket size={20} /> Kirim Brief Project
+                                <Rocket size={20} /> Selesaikan Pesanan & Bayar DP
                             </>
                         )}
                     </Button>
