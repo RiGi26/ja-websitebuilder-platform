@@ -208,10 +208,8 @@ function OrderFormContent() {
       }
 
       const midtransOrderId = `${display_id}-DP`
-      setIsSubmitting(false)
       ;(window as any).snap.pay(snap_token, {
         onSuccess: async () => {
-          // Verify payment server-side then show success
           await fetch('/api/payment/confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -219,6 +217,7 @@ function OrderFormContent() {
           })
           setOrderResult({ id: order_id, display_id, dp_amount })
           setSubmitted(true)
+          setIsSubmitting(false)
         },
         onPending: async () => {
           await fetch('/api/payment/confirm', {
@@ -229,12 +228,15 @@ function OrderFormContent() {
           setPaymentPending(true)
           setOrderResult({ id: order_id, display_id, dp_amount })
           setSubmitted(true)
+          setIsSubmitting(false)
         },
         onError: () => {
           setSubmitError('Pembayaran gagal. Silakan coba lagi.')
+          setIsSubmitting(false)
         },
         onClose: () => {
           setSubmitError('Pembayaran dibatalkan. Klik "Kirim Brief Project" untuk mencoba kembali.')
+          setIsSubmitting(false)
         },
       })
     } catch (err: any) {
