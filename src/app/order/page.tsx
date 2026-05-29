@@ -374,18 +374,18 @@ function OrderFormContent() {
         </div>
       )}
 
-      <div className="bg-white rounded-[40px] p-8 md:p-12 apple-shadow border border-black/[0.03] relative">
+      <div className="bg-white rounded-[32px] md:rounded-[40px] p-6 sm:p-8 md:p-12 apple-shadow border border-black/[0.03] relative">
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <StepHeader title="Kategori Client" desc="Pilih jenis identitas untuk website Anda." />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {[
                   { id: 'individu', title: 'Individu / UMKM', desc: 'Cocok untuk portfolio, blog, atau usaha mikro.', icon: User },
                   { id: 'perusahaan', title: 'Perusahaan / PT / CV', desc: 'Cocok untuk branding korporat dan skala bisnis menengah.', icon: Building2 },
                 ].map(opt => (
                   <button key={opt.id} onClick={() => { set('clientType', opt.id); handleNext(); triggerHaptic(); }}
-                    className={`p-8 rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] ${form.clientType === opt.id ? 'border-[#0071E3] bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-[#0071E3]/20 bg-gray-50/50'}`}>
+                    className={`p-6 md:p-8 rounded-[24px] md:rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] ${form.clientType === opt.id ? 'border-[#0071E3] bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-[#0071E3]/20 bg-gray-50/50'}`}>
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${form.clientType === opt.id ? 'bg-[#0071E3] text-white' : 'bg-white text-gray-400'}`}>
                       <opt.icon size={28} />
                     </div>
@@ -400,7 +400,7 @@ function OrderFormContent() {
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <StepHeader title="Informasi Identitas" desc="Lengkapi detail kontak dan nama bisnis Anda." />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {form.clientType === 'individu' ? (
                   <FieldRow label="Nama Usaha / Brand" required>
                     <Input placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="apple-input" />
@@ -427,9 +427,9 @@ function OrderFormContent() {
                   </FieldRow>
                 </div>
               </div>
-              <div className="flex justify-between mt-12 pt-8 border-t border-gray-100">
-                <Button variant="ghost" onClick={handlePrev} className="rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
+              <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
+                <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
+                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -447,10 +447,10 @@ function OrderFormContent() {
                       </div>
                   )}
 
-                  <div className="bg-[#F9F9FB] rounded-[32px] p-8 md:p-12 space-y-10 border border-black/[0.03] apple-shadow">
+                  <div className="bg-[#F9F9FB] rounded-[24px] md:rounded-[32px] p-6 md:p-12 space-y-8 md:space-y-10 border border-black/[0.03] apple-shadow">
                       
                       {/* Header Table style */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
                           <div className="space-y-1">
                               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kategori Client</p>
                               <p className="text-lg font-bold text-gray-900 sf-display capitalize">{form.clientType}</p>
@@ -467,28 +467,28 @@ function OrderFormContent() {
                       </div>
 
                       {/* Breakdown Cost */}
-                      <div className="bg-white rounded-3xl p-8 border border-black/5 shadow-sm">
+                      <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border border-black/5 shadow-sm">
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6 pb-4 border-b border-black/[0.03]">Ringkasan Investasi Digital</p>
                           <div className="space-y-4">
-                              <div className="flex items-center gap-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                   <p className="text-gray-500 font-semibold flex-1">
                                     Paket {kalkulatorPaket || selectedTemplate?.title || 'Website Studio'}
                                     {kalkulatorIndustri && <span className="text-gray-400 font-normal"> · {kalkulatorIndustri}</span>}
                                   </p>
-                                  <span className="font-bold text-gray-900 shrink-0 text-right">{formatPrice(currentBasePrice)}</span>
+                                  <span className="font-bold text-gray-900 shrink-0 text-left sm:text-right">{formatPrice(currentBasePrice)}</span>
                               </div>
                               {form.selectedAddons.map(id => {
                                   const addon = ADDONS.find(a => a.id === id)
                                   return addon ? (
-                                  <div key={id} className="flex items-center gap-4 text-[#0071E3]">
+                                  <div key={id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[#0071E3]">
                                       <span className="font-medium text-sm flex-1">+ {addon.name}</span>
-                                      <span className="font-bold shrink-0 text-right">{formatPrice(addon.price)}</span>
+                                      <span className="font-bold shrink-0 text-left sm:text-right">{formatPrice(addon.price)}</span>
                                   </div>
                                   ) : null
                               })}
-                              <div className="pt-6 mt-6 border-t-2 border-black/5 flex items-center gap-4">
-                                  <span className="text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
-                                  <span className="text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-right">{formatPrice(finalPrice)}</span>
+                              <div className="pt-6 mt-6 border-t-2 border-black/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                  <span className="text-lg sm:text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
+                                  <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">{formatPrice(finalPrice)}</span>
                               </div>
                           </div>
                       </div>
@@ -496,7 +496,7 @@ function OrderFormContent() {
 
                   {/* Apple-style Agreement */}
                   <button type="button" onClick={() => set('agreedToTerms', !form.agreedToTerms)}
-                      className={`flex items-start gap-5 w-full text-left p-6 rounded-[24px] border transition-all duration-300 ${
+                      className={`flex items-start gap-4 md:gap-5 w-full text-left p-5 md:p-6 rounded-[24px] border transition-all duration-300 ${
                           form.agreedToTerms ? 'bg-blue-50 border-[#0071E3] shadow-sm' : 'bg-white border-black/[0.05] hover:border-[#0071E3]/30'
                       }`}>
                       <div className={`w-7 h-7 rounded-lg flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all duration-300 ${
@@ -519,10 +519,10 @@ function OrderFormContent() {
                       </div>
                   </button>
 
-                  <div className="flex justify-between mt-12 pt-8 border-t border-gray-100 gap-4">
-                    <Button variant="ghost" onClick={handlePrev} className="rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
+                  <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
+                    <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
                     <Button disabled={!form.agreedToTerms || isSubmitting} onClick={handleSubmit} 
-                        className="rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl flex items-center justify-center gap-3">
+                        className="w-full md:w-auto rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl flex items-center justify-center gap-3">
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="animate-spin" size={20} /> Memproses Pesanan...
