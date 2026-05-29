@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { CheckCircle2, MessageCircle, ArrowRight, Clock, Phone, Layers } from 'lucide-react'
 import Navbar from '@/app/components/Navbar'
 
+const REDIRECT_DELAY_SECONDS = 5
+
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
 
 const NEXT_STEPS = [
@@ -35,6 +37,8 @@ export default function ThankYouPage() {
   const [displayId, setDisplayId] = useState<string | null>(null)
   const [dpAmount, setDpAmount] = useState<number | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [countdown, setCountdown] = useState(REDIRECT_DELAY_SECONDS)
+  const [autoRedirect, setAutoRedirect] = useState(true)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -77,6 +81,21 @@ export default function ThankYouPage() {
 
     setMounted(true)
   }, [])
+
+  // Auto-redirect ke /track setelah countdown — berlaku untuk SEMUA metode pembayaran
+  // (CC, VA, QRIS, E-Wallet, BNPL) karena Midtrans callbacks.finish selalu kirim ke sini.
+  // router.replace() supaya tombol back tidak balik ke thank-you yang state-nya sudah kosong.
+  useEffect(() => {
+    if (!mounted || !orderId || !autoRedirect) return
+
+    if (countdown <= 0) {
+      router.replace(`/track?id=${orderId}`)
+      return
+    }
+
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [mounted, orderId, countdown, autoRedirect, router])
 
   const trackUrl = orderId ? `/track?id=${orderId}` : '/track'
   // orderId may be a shortId (8-char) or full UUID — /track handles both via ilike
@@ -164,13 +183,28 @@ export default function ThankYouPage() {
             </p>
           </div>
 
+          {/* Auto-redirect countdown banner — muncul hanya jika orderId valid & auto-redirect aktif */}
+          {orderId && autoRedirect && (
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 mb-3 flex items-center justify-between gap-3">
+              <p className="text-xs text-blue-700 leading-relaxed">
+                Mengalihkan ke halaman pelacakan dalam <span className="font-black">{countdown}</span> detik...
+              </p>
+              <button
+                onClick={() => setAutoRedirect(false)}
+                className="text-xs text-blue-700 font-bold hover:underline shrink-0"
+              >
+                Batal
+              </button>
+            </div>
+          )}
+
           {/* CTAs — benchmark: Shopee "Lihat Pesanan" + "Lanjut Belanja" */}
           <div className="flex flex-col gap-3">
             <Link
               href={trackUrl}
               className="w-full bg-[#1D1D1F] text-white text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-black active:scale-95 transition-all shadow-sm"
             >
-              Lacak Progress Project <ArrowRight size={16} />
+              Lacak Progress Sekarang <ArrowRight size={16} />
             </Link>
             <a
               href={`https://wa.me/${WA_NUMBER}?text=Halo%2C%20saya%20baru%20melakukan%20pembayaran%20DP%20dengan%20order%20${displayId ?? ''}.%20Ada%20yang%20ingin%20saya%20tanyakan.`}
