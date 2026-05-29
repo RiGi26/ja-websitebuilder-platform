@@ -205,6 +205,8 @@ export default async function StudioAdminPage() {
                             currentStep={order.progress_step || 1}
                             currentStatus={order.status || 'pending'}
                             currentNote={order.progress_note ?? null}
+                            currentDeliveredUrl={order.delivered_url ?? null}
+                            currentDeliveredCredentials={order.delivered_credentials ?? null}
                         />
                       </div>
                     </div>
