@@ -55,7 +55,10 @@ export default function AddonMarketplace({ existingOrder, onSuccess }: Props) {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase
+      // Catatan: anon hanya punya policy INSERT (bukan SELECT) pada orders,
+      // jadi JANGAN chain .select() di sini — return=representation butuh SELECT
+      // dan akan kena RLS. Data hasil insert tidak dipakai.
+      const { error } = await supabase
         .from('orders')
         .insert([{
           type: 'upgrade',
@@ -69,8 +72,6 @@ export default function AddonMarketplace({ existingOrder, onSuccess }: Props) {
           status: 'pending',
           progress_step: 4 // Langsung ke tahap development/integrasi
         }])
-        .select()
-        .single()
 
       if (error) throw error
 
