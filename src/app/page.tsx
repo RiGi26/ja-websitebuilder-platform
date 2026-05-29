@@ -5,7 +5,6 @@ import { Search, Package, CheckCircle2, Plane, Warehouse, ShieldAlert, Loader2, 
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
-import { supabase } from '@/lib/supabase'
 import AddonMarketplace from '@/app/components/AddonMarketplace'
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
@@ -33,57 +32,35 @@ export default function Home() {
     setTimeout(() => handleSearchById(orderId), 300)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSearchById = async (id: string) => {
+  // Lookup order lewat server route (service role) — bukan anon client.
+  // Normalisasi displayId/shortId/nomor WA ditangani di /api/track.
+  const fetchOrder = async (q: string) => {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: dbErr } = await supabase
-        .from('orders')
-        .select('*')
-        .ilike('id', `${id.slice(0, 8)}%`)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-      if (dbErr) throw dbErr
-      setResult(data)
-    } catch {
+      const res = await fetch(`/api/track?q=${encodeURIComponent(q)}`)
+      if (!res.ok) {
+        setResult('not_found')
+        return
+      }
+      const { order } = await res.json()
+      setResult(order ?? 'not_found')
+    } catch (err) {
+      console.error('Tracking error:', err)
       setResult('not_found')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearchById = (id: string) => {
+    void fetchOrder(id)
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (!query) return
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      // Normalize: strip "JA-YYYY-" prefix if user pastes display ID
-      const normalized = query.replace(/^JA-\d{4}-/i, '').toLowerCase()
-      const isDisplayId = /^[a-f0-9]{8}$/i.test(normalized)
-
-      let q = supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(1)
-
-      if (isDisplayId) {
-        // Search by first 8 chars of UUID (display ID)
-        q = q.ilike('id', `${normalized}%`)
-      } else {
-        q = q.or(`nomor_wa.eq.${query},id.eq.${query}`)
-      }
-
-      const { data, error: dbErr } = await q.single()
-
-      if (dbErr) throw dbErr
-      setResult(data)
-    } catch (err: any) {
-      console.error('Tracking error:', err)
-      setResult('not_found')
-    } finally {
-      setLoading(false)
-    }
+    void fetchOrder(query)
   }
 
   return (
