@@ -19,6 +19,7 @@ import Link from 'next/link'
 import Navbar from '@/app/components/Navbar'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import OrderStatusControl from './OrderStatusControl'
 
 export const dynamic = 'force-dynamic'
@@ -53,7 +54,7 @@ function formatDate(date: string) {
 // Force redeploy to verify fixed helpers
 export default async function StudioAdminPage() {
   const cookieStore = await cookies()
-  const isAuth = cookieStore.get('admin_auth')?.value === 'true'
+  const isAuth = verifyAdminSessionToken(cookieStore.get(ADMIN_COOKIE_NAME)?.value)
 
   if (!isAuth) {
     redirect('/admin/login')
