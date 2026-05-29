@@ -1,6 +1,15 @@
--- Fix: izinkan anon read orders untuk halaman /track
--- Customer input nomor WA atau Order ID mereka sendiri — filter di query level
-create policy "Enable select for anon (track page)" on public.orders
-  for select
-  to anon
-  using (true);
+-- ⚠️ DEPRECATED / DICABUT 2026-05-29
+-- ------------------------------------------------------------
+-- Dulu file ini memberi anon `using (true)` untuk SELECT orders supaya
+-- halaman /track & landing search bisa baca order. Masalah: anon key (publik)
+-- jadi bisa men-dump SELURUH tabel orders + PII via REST API langsung.
+--
+-- Sekarang semua read publik order lewat server route service-role:
+--   - src/app/api/track/route.ts  (landing search, hanya field aman)
+--   - src/app/track/page.tsx      (halaman /track, server component)
+-- Policy anon SELECT sudah di-drop (lihat supabase/add_hardening.sql).
+--
+-- JANGAN jalankan ulang policy di bawah — biarkan sebagai catatan sejarah.
+--
+-- create policy "Enable select for anon (track page)" on public.orders
+--   for select to anon using (true);

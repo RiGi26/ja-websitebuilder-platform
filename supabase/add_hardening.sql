@@ -85,12 +85,16 @@ alter table public.orders
 create unique index if not exists orders_tracking_token_key
   on public.orders (tracking_token);
 
--- ── DEFERRED (butuh perubahan app dulu) ──────────────────────
--- Mengganti policy anon `using (true)` ke token-based AKAN memutus
--- halaman /track sampai app mengirim token (mis. ?t=<token> di URL +
--- header `x-track-token`). Jangan flip sebelum app siap.
+-- 4) APPLIED 2026-05-29 — tutup lubang anon SELECT.
+-- Read publik order dipindah ke server route service-role
+-- (src/app/api/track/route.ts + src/app/track/page.tsx), jadi anon tak perlu
+-- baca tabel langsung. Drop policy permissif (sebelumnya `using (true)`).
+drop policy if exists "Enable select for anon (track page)" on public.orders;
+
+-- ── OPSI FUTURE — deep-link /track token-based ───────────────
+-- Kalau nanti mau /track via deep-link tanpa server route, bisa pakai
+-- tracking_token (app harus kirim header `x-track-token`):
 --
---   drop policy if exists "Enable select for anon (track page)" on public.orders;
 --   create policy "anon_select_by_tracking_token" on public.orders
 --     for select to anon
 --     using (
