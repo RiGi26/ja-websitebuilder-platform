@@ -6,7 +6,8 @@ import { ChevronLeft } from 'lucide-react'
 import Navbar from '@/app/components/Navbar'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import BuilderEditor from './BuilderEditor'
-import type { LandingPage, PageSection } from '@/types/websitebuilder'
+import AddonManager from './AddonManager'
+import type { LandingPage, PageSection, Product, BlogPost } from '@/types/websitebuilder'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,6 +38,12 @@ export default async function BuildPage({
     .eq('page_id', pageId)
     .order('urutan', { ascending: true })
 
+  // Data add-on (service role → semua, termasuk non-aktif/draft)
+  const [{ data: products }, { data: posts }] = await Promise.all([
+    supabaseAdmin.from('products').select('*').eq('page_id', pageId).order('urutan', { ascending: true }),
+    supabaseAdmin.from('blog_posts').select('*').eq('page_id', pageId).order('created_at', { ascending: false }),
+  ])
+
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
       <Navbar />
@@ -53,6 +60,15 @@ export default async function BuildPage({
             page={page as LandingPage}
             initialSections={(sections ?? []) as PageSection[]}
           />
+
+          <div className="mt-8">
+            <AddonManager
+              pageId={page.id}
+              tenantId={page.tenant_id}
+              initialProducts={(products ?? []) as Product[]}
+              initialPosts={(posts ?? []) as BlogPost[]}
+            />
+          </div>
         </div>
       </main>
     </div>
