@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
-import { Badge } from '@/app/components/ui/badge'
-import { Star, Check, Zap, Rocket, BarChart2, ArrowRight } from 'lucide-react'
+import { Star, Zap, ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
+import FloatingTrackButton from '@/app/components/FloatingTrackButton'
 
 // ─── Sections ───────────────────────────────────────────────────────────────
 
@@ -156,22 +156,20 @@ function HeroSection() {
   )
 }
 
-// ─── Main Page ───────────────────────────────────────────────────────────────
-
 function TrackCallout() {
   return (
     <section className="px-6 pb-16">
       <div className="max-w-7xl mx-auto">
         <div className="bg-[#1D1D1F] rounded-[28px] px-8 py-7 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div>
-            <p className="text-white font-black text-base leading-tight">Sudah pernah order?</p>
-            <p className="text-gray-400 text-sm mt-0.5">Pantau progress website Anda secara real-time dengan Order ID.</p>
+            <p className="text-white font-black text-base leading-tight">Sudah mulai proyek?</p>
+            <p className="text-gray-400 text-sm mt-0.5">Pantau progress pengerjaan website Anda secara real-time hari ini.</p>
           </div>
           <Link
             href="/track"
             className="shrink-0 inline-flex items-center gap-2 bg-white text-[#1D1D1F] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 active:scale-95 transition-all whitespace-nowrap"
           >
-            Lacak Progress <ArrowRight size={15} />
+            Pantau Progress Websitemu <ArrowRight size={15} />
           </Link>
         </div>
       </div>
@@ -189,6 +187,7 @@ export default function Home() {
         <TrackCallout />
       </main>
 
+      <FloatingTrackButton />
       <Footer />
     </div>
   )
