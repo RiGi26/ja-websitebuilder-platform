@@ -20,9 +20,7 @@ export default function Footer() {
         </div>
         
         <div className="flex flex-wrap justify-center gap-8 text-sm font-medium text-gray-500">
-          <Link href="/template" className="hover:text-apple-blue transition-colors">Katalog Template</Link>
-          <Link href="/pricing" className="hover:text-apple-blue transition-colors">Daftar Harga</Link>
-          <Link href="/track" className="hover:text-apple-blue transition-colors">Track Pesanan</Link>
+          <Link href="/" className="hover:text-apple-blue transition-colors">Track Pesanan</Link>
           <Link href="https://wa.me/6281296917963" className="hover:text-apple-blue transition-colors">Hubungi Kami</Link>
           
           {/* Admin Entry Point (Subtle) */}

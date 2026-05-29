@@ -1,193 +1,215 @@
 'use client'
 
-import Link from 'next/link'
-import { Button } from '@/app/components/ui/button'
-import { Star, Zap, ArrowRight } from 'lucide-react'
-import { motion } from 'motion/react'
+import { useState, useEffect } from 'react'
+import { Search, Package, CheckCircle2, Plane, Warehouse, ShieldAlert, Loader2, AlertCircle, MessageCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
-import FloatingTrackButton from '@/app/components/FloatingTrackButton'
+import { supabase } from '@/lib/supabase'
+import AddonMarketplace from '@/app/components/AddonMarketplace'
 
-// ─── Sections ───────────────────────────────────────────────────────────────
+const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
 
-function HeroSection() {
-  return (
-    <section className="pt-32 pb-24 px-6 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl -mr-64 -mt-64 opacity-60 pointer-events-none" />
-      
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Eyebrow Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block mb-6"
-          >
-            <div className="inline-flex items-center gap-2 bg-white border border-black/5 text-[#0071E3] text-[11px] font-bold px-4 py-1.5 rounded-full apple-shadow">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-              Done-for-You: Kami Buatkan, Anda Terima Beres
-            </div>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl sf-display-heavy tracking-tight text-gray-900 leading-[1.05] mb-8"
-          >
-            Website Bisnis Profesional <br />
-            <span className="text-apple-blue italic">Tanpa Ribet.</span>
-          </motion.h1>
-
-          {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
-          >
-            Kami bantu bangun infrastruktur digital bisnismu mulai dari desain, hosting, hingga integrasi pembayaran otomatis. Cukup kirim materi, website Anda live dalam 7 hari.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
-          >
-            <Button asChild size="lg" className="bg-[#1D1D1F] hover:bg-black text-white px-8 py-7 rounded-full text-lg sf-display-heavy shadow-xl glow-button w-full sm:w-auto">
-              <Link href="https://wa.me/6281296917963?text=Halo%20Japan%20Arena%20Studio%2C%20saya%20ingin%20konsultasi%20pembuatan%20website%20bisnis.">
-                Konsultasi Gratis Sekarang
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="px-8 py-7 rounded-full text-lg sf-display border-black/5 bg-white apple-shadow hover:bg-gray-50 w-full sm:w-auto">
-              <Link href="/template">Lihat Katalog Template</Link>
-            </Button>
-          </motion.div>
-
-          {/* Social Proof */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col items-center gap-2"
-          >
-              <div className="flex text-yellow-400 gap-1">
-                  {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                  ))}
-              </div>
-              <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                  Sudah Termasuk Hosting & Support WA 24/7
-              </p>
-          </motion.div>
-        </div>
-
-        {/* Device Mockup with Floating Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="mt-20 relative max-w-5xl mx-auto"
-        >
-          {/* Browser Mockup */}
-          <div className="relative bg-white rounded-[40px] shadow-2xl border-[10px] border-black overflow-hidden aspect-[16/10]">
-            {/* Browser Chrome */}
-            <div className="bg-gray-100 px-6 py-4 flex items-center gap-3 border-b border-gray-200">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              </div>
-              <div className="flex-1 mx-4">
-                <div className="bg-white rounded-lg px-4 py-1.5 text-xs text-gray-400 font-mono border border-black/5">
-                  studio.japanarenacorp.com
-                </div>
-              </div>
-            </div>
-
-            {/* Website Screenshot Placeholder */}
-            <div className="bg-[#F5F5F7] h-full flex items-center justify-center p-12">
-              <div className="text-center">
-                <div className="text-7xl mb-6">🏪</div>
-                <h3 className="text-3xl sf-display-heavy mb-3">Toko Kopi Nusantara</h3>
-                <p className="text-gray-500 text-lg">Website bisnis lokal yang profesional & modern</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Floating Feature Cards */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="absolute -left-12 top-1/4 bg-white/80 backdrop-blur-xl rounded-3xl apple-shadow p-5 flex items-center gap-4 border border-white/50"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-              <div className="text-xl font-bold">Rp</div>
-            </div>
-            <div>
-              <p className="sf-display text-base">Payment Gateway</p>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Terima QRIS & Bank Transfer</p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.9 }}
-            className="absolute -right-12 top-1/3 bg-white/80 backdrop-blur-xl rounded-3xl apple-shadow p-5 flex items-center gap-4 border border-white/50"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-apple-blue flex items-center justify-center">
-              <Zap className="w-6 h-6 fill-current" />
-            </div>
-            <div>
-              <p className="sf-display text-base">WA Automation</p>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Notifikasi Invoice Otomatis</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-function TrackCallout() {
-  return (
-    <section className="px-6 pb-16">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-[#1D1D1F] rounded-[28px] px-8 py-7 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div>
-            <p className="text-white font-black text-base leading-tight">Sudah mulai proyek?</p>
-            <p className="text-gray-400 text-sm mt-0.5">Pantau progress pengerjaan website Anda secara real-time hari ini.</p>
-          </div>
-          <Link
-            href="/track"
-            className="shrink-0 inline-flex items-center gap-2 bg-white text-[#1D1D1F] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 active:scale-95 transition-all whitespace-nowrap"
-          >
-            Pantau Progress Websitemu <ArrowRight size={15} />
-          </Link>
-        </div>
-      </div>
-    </section>
-  )
-}
+const STEPS = [
+  { title: 'Briefing & Onboarding', icon: Package },
+  { title: 'Analisis & Strategi', icon: Warehouse },
+  { title: 'Desain Visual (Mockup)', icon: ShieldAlert },
+  { title: 'Development & Integrasi', icon: Plane },
+  { title: 'Final Launch', icon: CheckCircle2 },
+]
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-bg flex flex-col">
-      <Navbar />
+  const [query, setQuery] = useState('')
+  const [result, setResult] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-      <main className="flex-1">
-        <HeroSection />
-        <TrackCallout />
+  // Auto-search jika ada ?id= di URL (dari link di thank-you page)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const orderId = params.get('id')
+    if (!orderId) return
+    setQuery(orderId)
+    setTimeout(() => handleSearchById(orderId), 300)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearchById = async (id: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: dbErr } = await supabase
+        .from('orders')
+        .select('*')
+        .ilike('id', `${id.slice(0, 8)}%`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      if (dbErr) throw dbErr
+      setResult(data)
+    } catch {
+      setResult('not_found')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!query) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Normalize: strip "JA-YYYY-" prefix if user pastes display ID
+      const normalized = query.replace(/^JA-\d{4}-/i, '').toLowerCase()
+      const isDisplayId = /^[a-f0-9]{8}$/i.test(normalized)
+
+      let q = supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(1)
+
+      if (isDisplayId) {
+        // Search by first 8 chars of UUID (display ID)
+        q = q.ilike('id', `${normalized}%`)
+      } else {
+        q = q.or(`nomor_wa.eq.${query},id.eq.${query}`)
+      }
+
+      const { data, error: dbErr } = await q.single()
+
+      if (dbErr) throw dbErr
+      setResult(data)
+    } catch (err: any) {
+      console.error('Tracking error:', err)
+      setResult('not_found')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <Navbar />
+      
+      <main className="pt-32 pb-24 px-4 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto relative z-10">
+            <div className="text-center mb-12 animate-fade-in">
+                <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
+                    Project Transparency
+                </span>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4 sf-display-heavy">Lacak Progres Website</h2>
+                <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
+                    Masukkan <strong>Order ID</strong> (contoh: JA-2025-XXXXXXXX) atau <strong>nomor WhatsApp</strong> yang digunakan saat order untuk melihat status real-time.
+                </p>
+            </div>
+
+            <div className="bg-white rounded-[40px] p-8 md:p-12 apple-shadow border border-black/[0.03] animate-fade-up">
+                <form onSubmit={handleSearch} className="relative max-w-md mx-auto mb-10">
+                    <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Order ID atau Nomor WA..."
+                        className="w-full bg-gray-50 border border-black/5 rounded-2xl pl-6 pr-[120px] md:pr-[160px] py-4 text-lg font-bold placeholder-gray-300 focus:outline-none focus:ring-4 focus:ring-apple-blue/10 focus:bg-white transition-all shadow-inner"
+                    />
+                    <button 
+                        type="submit"
+                        disabled={loading}
+                        className="absolute right-2 top-2 bottom-2 bg-[#1D1D1F] text-white px-4 md:px-6 rounded-xl font-bold flex items-center gap-2 hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+                    >
+                        {loading ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+                        <span className="hidden sm:inline">Cek Status</span>
+                        <span className="sm:hidden">Cek</span>
+                    </button>
+                </form>
+
+                <AnimatePresence mode="wait">
+                    {result === 'not_found' && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                            className="text-center py-10 bg-red-50 rounded-[32px] border border-red-100"
+                        >
+                            <AlertCircle size={32} className="text-red-500 mx-auto mb-3" />
+                            <p className="text-red-600 font-bold">Data tidak ditemukan.</p>
+                            <p className="text-red-500 text-sm">Pastikan nomor WhatsApp yang Anda masukkan sudah benar.</p>
+                        </motion.div>
+                    )}
+
+                    {result && result !== 'not_found' && (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                            className="space-y-8 animate-fade-in"
+                        >
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-black/5 pb-8">
+                                <div>
+                                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Status Proyek</p>
+                                    <h3 className="text-2xl sf-display-heavy text-[#1D1D1F] capitalize">{result.status}</h3>
+                                    <p className="text-sm text-gray-500 mt-1">Estimasi rincian biaya: <span className="font-bold text-apple-blue">Rp {result.total_estimasi?.toLocaleString('id-ID')}</span></p>
+                                </div>
+                                <div className="bg-blue-50 text-apple-blue px-5 py-3 rounded-2xl text-sm font-bold flex items-center gap-3 border border-blue-100">
+                                    <div className="w-2 h-2 rounded-full bg-apple-blue animate-pulse" />
+                                    Project ID: {result.id.slice(0,8).toUpperCase()}
+                                </div>
+                            </div>
+
+                            {/* Apple Style Vertical Timeline */}
+                            <div className="relative pl-10 space-y-12 before:content-[''] before:absolute before:left-[14px] before:top-2 before:bottom-2 before:w-[3px] before:bg-gray-100">
+                                {STEPS.map((step, i) => {
+                                    const stepNum = i + 1
+                                    const isDone = result.progress_step > stepNum || result.status === 'completed'
+                                    const isCurrent = result.progress_step === stepNum && result.status !== 'completed'
+                                    
+                                    return (
+                                        <div key={i} className="relative group">
+                                            {/* Dot */}
+                                            <div className={`absolute -left-[43px] w-8 h-8 rounded-full border-4 border-white z-10 flex items-center justify-center transition-all duration-500 shadow-sm ${isDone ? 'bg-green-500' : isCurrent ? 'bg-apple-blue ring-4 ring-blue-100' : 'bg-gray-200'}`}>
+                                                {isDone && <CheckCircle2 size={14} className="text-white" />}
+                                                {isCurrent && <div className="w-2 h-2 rounded-full bg-white animate-ping" />}
+                                            </div>
+                                            
+                                            {/* Content */}
+                                            <div className={`flex items-start gap-6 transition-all duration-300 ${!isDone && !isCurrent ? 'opacity-30' : 'opacity-100'}`}>
+                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 apple-shadow border border-black/5 transition-transform group-hover:scale-105 ${isCurrent ? 'bg-apple-blue text-white shadow-blue-200' : 'bg-white text-gray-400'}`}>
+                                                    <step.icon size={24} />
+                                                </div>
+                                                <div className="pt-1">
+                                                    <h4 className={`text-lg font-bold ${isCurrent ? 'text-apple-blue' : 'text-[#1D1D1F]'}`}>{step.title}</h4>
+                                                    <p className="text-sm text-gray-500 font-medium">
+                                                        {isDone ? 'Tahap ini telah selesai.' : isCurrent ? 'Tim kami sedang mengerjakan tahap ini.' : 'Menunggu antrean pengerjaan.'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+
+                            <div className="pt-10 mt-10 border-t border-black/5 text-center">
+                                <p className="text-sm text-gray-400 mb-6">Butuh perubahan detail brief atau konsultasi?</p>
+                                <a 
+                                    href={`https://wa.me/${WA_NUMBER}`}
+                                    target="_blank"
+                                    className="inline-flex items-center gap-2 px-8 py-3 bg-[#1D1D1F] text-white rounded-full font-bold text-sm hover:bg-black transition-all shadow-lg glow-button"
+                                >
+                                    <MessageCircle size={18} /> Hubungi Project Manager
+                                </a>
+                            </div>
+
+                            {/* Self-Service Upgrade Section ala Rumahweb */}
+                            {(result.progress_step >= 4 || result.status === 'completed') && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+                                    className="mt-16 pt-16 border-t-2 border-dashed border-gray-200"
+                                >
+                                    <AddonMarketplace existingOrder={result} onSuccess={() => handleSearch({ preventDefault: () => {} } as any)} />
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
       </main>
 
-      <FloatingTrackButton />
       <Footer />
     </div>
   )
