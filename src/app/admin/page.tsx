@@ -21,6 +21,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import OrderStatusControl from './OrderStatusControl'
+import BuildButton from './BuildButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,6 +36,24 @@ async function getOrders() {
     return []
   }
   return data
+}
+
+// Peta tenant_id -> landing page pertama (untuk tombol "Kelola Website")
+async function getPagesByTenant(): Promise<Record<string, { id: string }>> {
+  const { data, error } = await supabaseAdmin
+    .from('landing_pages')
+    .select('id, tenant_id, created_at')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching landing pages:', error)
+    return {}
+  }
+  const map: Record<string, { id: string }> = {}
+  for (const p of data ?? []) {
+    if (p.tenant_id && !map[p.tenant_id]) map[p.tenant_id] = { id: p.id }
+  }
+  return map
 }
 
 function formatPrice(price: number) {
@@ -61,6 +80,7 @@ export default async function StudioAdminPage() {
   }
 
   const orders = await getOrders()
+  const pagesByTenant = await getPagesByTenant()
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
@@ -208,6 +228,15 @@ export default async function StudioAdminPage() {
                             currentNote={order.progress_note ?? null}
                             currentDeliveredUrl={order.delivered_url ?? null}
                             currentDeliveredCredentials={order.delivered_credentials ?? null}
+                        />
+                      </div>
+
+                      {/* Builder: provision / kelola website klien */}
+                      <div className="px-1">
+                        <BuildButton
+                          orderId={order.id}
+                          hasTenant={!!order.tenant_id}
+                          pageId={order.tenant_id ? pagesByTenant[order.tenant_id]?.id ?? null : null}
                         />
                       </div>
                     </div>
