@@ -38,9 +38,20 @@ export default function ThankYouPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+    // Support both our ?id=UUID (from callbacks.finish) and
+    // Midtrans dashboard redirect ?order_id=JA-2025-XXXXXXXX-DP
     const id = params.get('id')
+    const midtransOrderId = params.get('order_id') // e.g. JA-2025-ABCD1234-DP
 
-    setOrderId(id)
+    if (id) {
+      setOrderId(id)
+    } else if (midtransOrderId) {
+      // Extract 8-char shortId from JA-2025-ABCD1234-DP
+      const parts = midtransOrderId.replace(/-DP$/i, '').split('-')
+      const shortId = parts[2]?.toLowerCase() ?? null
+      setOrderId(shortId)
+      setDisplayId(midtransOrderId.replace(/-DP$/i, ''))
+    }
 
     const pending = sessionStorage.getItem('ja_pending_order')
     if (pending) {
@@ -68,6 +79,7 @@ export default function ThankYouPage() {
   }, [])
 
   const trackUrl = orderId ? `/track?id=${orderId}` : '/track'
+  // orderId may be a shortId (8-char) or full UUID — /track handles both via ilike
 
   if (!mounted) return null
 
