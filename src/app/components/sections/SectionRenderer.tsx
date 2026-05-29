@@ -4,7 +4,11 @@
 // dengan default aman. Dipakai oleh src/app/[slug]/page.tsx.
 // ============================================================
 
-import type { PageSection, TipeKomponen } from '@/types/websitebuilder'
+import type { PageSection, TipeKomponen, Product, BlogPost } from '@/types/websitebuilder'
+
+function formatHarga(n: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
+}
 
 type Isi = Record<string, any>
 
@@ -260,13 +264,73 @@ function CustomHtml({ isi }: { isi: Isi }) {
   return <section className="px-6 py-10" dangerouslySetInnerHTML={{ __html: String(isi.html) }} />
 }
 
-// ── Placeholder add-on (data dari tabel bersama — Stage 3) ────
+// ── Add-on: Product list (data dari tabel products) ──────────
+function ProductList({ isi, products }: { isi: Isi; products: Product[] }) {
+  return (
+    <section className="px-6 py-20 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">{isi.title ?? 'Produk Kami'}</h2>
+        {products.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm">Belum ada produk.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {products.map((p) => (
+              <div key={p.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden">
+                {p.gambar_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.gambar_url} alt={p.nama} className="w-full aspect-square object-cover" />
+                )}
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-900 text-sm">{p.nama}</h3>
+                  {p.kategori && <p className="text-[11px] text-gray-400 uppercase tracking-widest">{p.kategori}</p>}
+                  <p className="text-apple-blue font-extrabold mt-2">{formatHarga(p.harga)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// ── Add-on: Blog list (data dari tabel blog_posts) ───────────
+function BlogList({ isi, posts }: { isi: Isi; posts: BlogPost[] }) {
+  return (
+    <section className="px-6 py-20">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">{isi.title ?? 'Artikel Terbaru'}</h2>
+        {posts.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm">Belum ada artikel.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {posts.map((b) => (
+              <article key={b.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden">
+                {b.cover_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={b.cover_url} alt={b.judul} className="w-full aspect-video object-cover" />
+                )}
+                <div className="p-5">
+                  <h3 className="font-bold text-gray-900">{b.judul}</h3>
+                  {b.ringkasan && <p className="text-sm text-gray-500 mt-2 line-clamp-3">{b.ringkasan}</p>}
+                  {b.penulis && <p className="text-[11px] text-gray-400 mt-3">oleh {b.penulis}</p>}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// ── Placeholder add-on yg belum punya sumber data (social_feed) ─
 function AddonPlaceholder({ label }: { label: string }) {
   return (
     <section className="px-6 py-16 max-w-4xl mx-auto">
       <div className="rounded-2xl border border-dashed border-black/10 p-10 text-center text-gray-400">
         <p className="text-sm font-bold uppercase tracking-widest">{label}</p>
-        <p className="text-xs mt-1">Konten add-on ini akan tampil setelah data diisi (Stage 3).</p>
+        <p className="text-xs mt-1">Komponen ini akan terhubung ke sumber datanya kemudian.</p>
       </div>
     </section>
   )
@@ -290,18 +354,23 @@ const MAP: Partial<Record<TipeKomponen, (p: { isi: Isi }) => React.ReactElement 
   custom_html: CustomHtml,
 }
 
-const ADDON_LABEL: Partial<Record<TipeKomponen, string>> = {
-  product_list: 'Daftar Produk',
-  blog_list: 'Daftar Artikel',
-  social_feed: 'Social Feed',
-}
-
-export function SectionRenderer({ section }: { section: PageSection }) {
+export function SectionRenderer({
+  section,
+  products = [],
+  posts = [],
+}: {
+  section: PageSection
+  products?: Product[]
+  posts?: BlogPost[]
+}) {
   const isi = (section.isi_komponen ?? {}) as Isi
+
+  // Add-on dengan sumber data tabel bersama
+  if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} />
+  if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} />
+  if (section.tipe_komponen === 'social_feed') return <AddonPlaceholder label="Social Feed" />
+
   const Comp = MAP[section.tipe_komponen]
   if (Comp) return <Comp isi={isi} />
-  if (ADDON_LABEL[section.tipe_komponen]) {
-    return <AddonPlaceholder label={ADDON_LABEL[section.tipe_komponen]!} />
-  }
   return null
 }

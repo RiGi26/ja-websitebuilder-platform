@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
+import { fetchProductsByPage, fetchBlogPostsByPage } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
@@ -46,6 +47,14 @@ export default async function PublicSitePage({
   const primary = konfig.branding?.primary
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
 
+  // Fetch data add-on hanya jika ada section yang membutuhkannya.
+  const needProducts = sections.some((s) => s.tipe_komponen === 'product_list')
+  const needPosts = sections.some((s) => s.tipe_komponen === 'blog_list')
+  const [products, posts] = await Promise.all([
+    needProducts ? fetchProductsByPage(supabase, page.id) : Promise.resolve([]),
+    needPosts ? fetchBlogPostsByPage(supabase, page.id) : Promise.resolve([]),
+  ])
+
   return (
     <main className="min-h-screen bg-white">
       {/* aksen branding tipis (theming dasar) */}
@@ -57,7 +66,9 @@ export default async function PublicSitePage({
           <p className="mt-2 text-sm">Halaman ini belum memiliki konten.</p>
         </div>
       ) : (
-        sections.map((s) => <SectionRenderer key={s.id} section={s} />)
+        sections.map((s) => (
+          <SectionRenderer key={s.id} section={s} products={products} posts={posts} />
+        ))
       )}
     </main>
   )

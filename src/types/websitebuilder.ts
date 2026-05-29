@@ -196,3 +196,49 @@ export type InsertPageSectionInput = Omit<PageSection, 'id' | 'created_at' | 'up
 export interface LandingPageWithSections extends LandingPage {
   page_sections: PageSection[]
 }
+
+// ── Add-on data (tabel bersama multi-tenant — Stage 3) ────────
+
+export interface Product {
+  id: string
+  tenant_id: string
+  page_id: string
+  nama: string
+  deskripsi: string | null
+  harga: number
+  gambar_url: string | null
+  kategori: string | null
+  stok: number | null
+  is_active: boolean
+  urutan: number
+  created_at: string
+  updated_at: string
+}
+
+export interface BlogPost {
+  id: string
+  tenant_id: string
+  page_id: string
+  judul: string
+  slug: string | null
+  ringkasan: string | null
+  konten: string | null
+  cover_url: string | null
+  penulis: string | null
+  is_published: boolean
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Booking {
+  id: string
+  tenant_id: string
+  page_id: string
+  nama_pemesan: string
+  kontak: string | null
+  jadwal: string | null
+  catatan: string | null
+  status: 'pending' | 'confirmed' | 'cancelled' | 'done'
+  created_at: string
+}
