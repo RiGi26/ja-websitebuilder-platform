@@ -108,16 +108,17 @@ export default function PublicProjectTracker() {
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Order ID (JA-2025-XXXXXXXX) atau Nomor WA..."
-                        className="w-full bg-gray-50 border border-black/5 rounded-2xl px-6 py-4 text-lg font-bold placeholder-gray-300 focus:outline-none focus:ring-4 focus:ring-apple-blue/10 focus:bg-white transition-all shadow-inner"
+                        placeholder="Order ID atau Nomor WA..."
+                        className="w-full bg-gray-50 border border-black/5 rounded-2xl pl-6 pr-[120px] md:pr-[160px] py-4 text-lg font-bold placeholder-gray-300 focus:outline-none focus:ring-4 focus:ring-apple-blue/10 focus:bg-white transition-all shadow-inner"
                     />
                     <button 
                         type="submit"
                         disabled={loading}
-                        className="absolute right-2 top-2 bottom-2 bg-[#1D1D1F] text-white px-6 rounded-xl font-bold flex items-center gap-2 hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+                        className="absolute right-2 top-2 bottom-2 bg-[#1D1D1F] text-white px-4 md:px-6 rounded-xl font-bold flex items-center gap-2 hover:bg-black transition-all active:scale-95 disabled:opacity-50"
                     >
                         {loading ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
-                        Cek Status
+                        <span className="hidden sm:inline">Cek Status</span>
+                        <span className="sm:hidden">Cek</span>
                     </button>
                 </form>
 
