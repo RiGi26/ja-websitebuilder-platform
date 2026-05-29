@@ -1,6 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import Navbar from '@/app/components/Navbar'
 import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import { id as idLocale } from 'date-fns/locale'
+import AutoRefresh from './AutoRefresh'
 import {
   CheckCircle2,
   Loader2,
@@ -14,6 +17,7 @@ import {
   ClipboardList,
   Package,
   XCircle,
+  MessageSquareText,
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -205,6 +209,14 @@ export default async function TrackPage({
     PAYMENT_LABELS[order.payment_status as string] ?? PAYMENT_LABELS.unpaid
   const statusLabel = STATUS_LABELS[order.status as string] ?? order.status
   const clientName = order.nama_perusahaan || order.nama_usaha || 'Customer'
+  const progressNote: string | null = order.progress_note ?? null
+  const lastUpdatedAt: string | null = order.last_updated_at ?? order.created_at
+  const relativeTime = lastUpdatedAt
+    ? formatDistanceToNow(new Date(lastUpdatedAt), {
+        addSuffix: true,
+        locale: idLocale,
+      })
+    : null
   const waMsg = encodeURIComponent(
     `Halo Japan Arena, saya ingin tanya progress order ${displayId}`,
   )
@@ -248,7 +260,7 @@ export default async function TrackPage({
 
           {/* Progress timeline */}
           <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/[0.04] mb-4">
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
               <h2 className="text-lg font-black text-gray-900 tracking-tight">
                 Progress Pengerjaan
               </h2>
@@ -268,6 +280,30 @@ export default async function TrackPage({
                 </span>
               )}
             </div>
+
+            {/* Relative timestamp — kapan terakhir admin update */}
+            {relativeTime && (
+              <p className="text-xs text-gray-400 font-medium mb-5">
+                Update terakhir {relativeTime}
+              </p>
+            )}
+
+            {/* Note dari admin untuk customer */}
+            {progressNote && progressNote.trim().length > 0 && (
+              <div className="mb-6 bg-blue-50/60 border border-blue-100 rounded-2xl p-4 flex gap-3">
+                <div className="shrink-0 w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <MessageSquareText size={16} className="text-[#0071E3]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold text-[#0071E3] uppercase tracking-widest mb-1">
+                    Catatan dari Tim
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+                    {progressNote}
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-0">
               {STEPS.map((s, i) => {
@@ -384,6 +420,9 @@ export default async function TrackPage({
 
         </div>
       </main>
+
+      {/* Auto-refresh tiap 30 detik supaya update progress dari admin keliahatan tanpa reload manual */}
+      <AutoRefresh intervalMs={30000} />
     </div>
   )
 }
