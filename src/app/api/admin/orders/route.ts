@@ -9,11 +9,21 @@ export async function PATCH(request: Request) {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { id, status, progress_step } = await request.json()
-    
+    const { id, status, progress_step, progress_note } = await request.json()
+
+    const payload: Record<string, unknown> = {
+      status,
+      progress_step,
+      last_updated_at: new Date().toISOString(),
+    }
+    // progress_note opsional — hanya kirim kalau key-nya ada di request body
+    if (progress_note !== undefined) {
+      payload.progress_note = progress_note
+    }
+
     const { error } = await supabaseAdmin
       .from('orders')
-      .update({ status, progress_step })
+      .update(payload)
       .eq('id', id)
 
     if (error) throw error

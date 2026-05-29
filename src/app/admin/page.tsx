@@ -200,10 +200,11 @@ export default async function StudioAdminPage() {
 
                       {/* NEW: Admin Progress Control */}
                       <div className="px-1">
-                        <OrderStatusControl 
-                            orderId={order.id} 
-                            currentStep={order.progress_step || 1} 
-                            currentStatus={order.status || 'pending'} 
+                        <OrderStatusControl
+                            orderId={order.id}
+                            currentStep={order.progress_step || 1}
+                            currentStatus={order.status || 'pending'}
+                            currentNote={order.progress_note ?? null}
                         />
                       </div>
                     </div>
