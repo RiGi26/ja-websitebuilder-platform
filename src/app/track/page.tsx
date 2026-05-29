@@ -83,25 +83,40 @@ async function getOrder(rawId: string) {
   if (displayMatch) probe = displayMatch[1]
 
   try {
+    // Path 1: full UUID — direct equality
     if (UUID_RE.test(probe)) {
-      const { data } = await supabaseAdmin
+      const { data, error } = await supabaseAdmin
         .from('orders')
         .select('*')
-        .eq('id', probe)
+        .eq('id', probe.toLowerCase())
         .maybeSingle()
+      if (error) console.error('[track/getOrder] UUID query error:', error.message)
       return data
     }
 
-    // shortId path — match 8 char prefix UUID
-    const { data } = await supabaseAdmin
-      .from('orders')
-      .select('*')
-      .ilike('id', `${probe.toLowerCase()}%`)
-      .limit(1)
-      .maybeSingle()
-    return data
+    // Path 2: 8-char shortId — range query
+    // Kenapa range, bukan ILIKE: kolom `id` bertipe `uuid`. PostgreSQL tidak
+    // punya operator `uuid ~~* text`, jadi `.ilike()` selalu error silent.
+    // Range comparison di-cast otomatis oleh PostgreSQL dan cocok untuk prefix.
+    if (/^[0-9a-f]{8}$/i.test(probe)) {
+      const prefix = probe.toLowerCase()
+      const minUuid = `${prefix}-0000-0000-0000-000000000000`
+      const maxUuid = `${prefix}-ffff-ffff-ffff-ffffffffffff`
+      const { data, error } = await supabaseAdmin
+        .from('orders')
+        .select('*')
+        .gte('id', minUuid)
+        .lte('id', maxUuid)
+        .limit(1)
+        .maybeSingle()
+      if (error) console.error('[track/getOrder] range query error:', error.message)
+      return data
+    }
+
+    // Format tidak dikenal
+    return null
   } catch (err) {
-    console.error('[track/getOrder]', err)
+    console.error('[track/getOrder] exception:', err)
     return null
   }
 }
