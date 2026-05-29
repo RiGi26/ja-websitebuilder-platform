@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
 import { Badge } from '@/app/components/ui/badge'
-import { Star, Check, Zap, Rocket, BarChart2 } from 'lucide-react'
+import { Star, Check, Zap, Rocket, BarChart2, ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
@@ -158,13 +158,35 @@ function HeroSection() {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
+function TrackCallout() {
+  return (
+    <section className="px-6 pb-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-[#1D1D1F] rounded-[28px] px-8 py-7 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div>
+            <p className="text-white font-black text-base leading-tight">Sudah pernah order?</p>
+            <p className="text-gray-400 text-sm mt-0.5">Pantau progress website Anda secara real-time dengan Order ID.</p>
+          </div>
+          <Link
+            href="/track"
+            className="shrink-0 inline-flex items-center gap-2 bg-white text-[#1D1D1F] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 active:scale-95 transition-all whitespace-nowrap"
+          >
+            Lacak Progress <ArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1">
         <HeroSection />
+        <TrackCallout />
       </main>
 
       <Footer />
