@@ -18,6 +18,33 @@ export type TipeIndustri =
 
 export type StatusPage = 'draft' | 'published' | 'suspended' | 'archived'
 
+// ── Feature flags & konfigurasi website ──────────────────────
+// Bentuk baku kolom `landing_pages.konfigurasi` (JSONB). Saklar add-on
+// per website diatur di sini — bukan tabel/schema terpisah. Tim studio
+// menyalakan/mematikan sesuai struk add-on order.
+
+export interface FeatureFlags {
+  hasCart?: boolean // toko online / checkout (tabel add-on: products)
+  hasBlog?: boolean // artikel/berita (tabel add-on: blog_posts)
+  hasBooking?: boolean // reservasi/janji temu (tabel add-on: bookings)
+  hasGallery?: boolean // galeri foto
+  hasSEO?: boolean // meta SEO lanjutan
+  hasContactForm?: boolean // form kontak
+  hasMap?: boolean // peta lokasi
+}
+
+export interface BrandingConfig {
+  primary?: string // warna utama (hex)
+  secondary?: string
+  logo_url?: string
+  font?: string
+}
+
+export interface KonfigurasiWebsite {
+  features?: FeatureFlags
+  branding?: BrandingConfig
+}
+
 export type TipeKomponen =
   | 'hero_banner'
   | 'about'
@@ -142,7 +169,7 @@ export interface LandingPage {
   tipe_industri: TipeIndustri
   status: StatusPage
   data_konten: Record<string, unknown>
-  konfigurasi: Record<string, unknown>
+  konfigurasi: KonfigurasiWebsite
   created_at: string
   updated_at: string
 }
