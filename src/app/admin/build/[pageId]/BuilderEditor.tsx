@@ -37,6 +37,21 @@ const FEATURE_LABELS: Record<keyof FeatureFlags, string> = {
   hasSEO: 'SEO Lanjutan',
   hasContactForm: 'Form Kontak',
   hasMap: 'Peta Lokasi',
+  hasAdmin: 'Dashboard Admin / CMS',
+  hasClientPortal: 'Client Portal',
+  hasPayment: 'Payment Gateway',
+  hasShipping: 'Integrasi Ongkir',
+  hasMenu: 'Menu Digital QR',
+  hasDelivery: 'Integrasi Delivery',
+  hasMembership: 'Membership',
+  hasLMS: 'LMS / Kelas Online',
+  hasMultiLang: 'Multi-Bahasa',
+  hasWhatsApp: 'Otomasi WhatsApp',
+  hasAnalytics: 'Ads Tracking / Analytics',
+  hasNewsletter: 'Newsletter',
+  hasLiveChat: 'Live Chat',
+  hasCareer: 'Portal Karir',
+  hasEmail: 'Email Bisnis',
 }
 
 // Skema field untuk tipe section "flat" (key-value) → form isian, bukan JSON.
