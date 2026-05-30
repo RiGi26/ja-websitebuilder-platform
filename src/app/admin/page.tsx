@@ -13,7 +13,8 @@ import {
   ExternalLink,
   Zap,
   DollarSign,
-  LogOut
+  LogOut,
+  Globe
 } from 'lucide-react'
 import Link from 'next/link'
 import Navbar from '@/app/components/Navbar'
@@ -56,6 +57,21 @@ async function getPagesByTenant(): Promise<Record<string, { id: string }>> {
   return map
 }
 
+// Semua website (landing pages) — lepas dari order, agar yang dibuat manual
+// (tanpa order) tetap tampil di dashboard.
+async function getAllWebsites() {
+  const { data, error } = await supabaseAdmin
+    .from('landing_pages')
+    .select('id, nama_website, slug, status, tipe_industri, updated_at')
+    .order('updated_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching websites:', error)
+    return []
+  }
+  return data ?? []
+}
+
 function formatPrice(price: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
 }
@@ -81,6 +97,7 @@ export default async function StudioAdminPage() {
 
   const orders = await getOrders()
   const pagesByTenant = await getPagesByTenant()
+  const websites = await getAllWebsites()
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
@@ -115,6 +132,56 @@ export default async function StudioAdminPage() {
                   <LogOut size={20} />
                </a>
             </div>
+          </div>
+
+          {/* Semua Website (lepas dari order) */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue px-3 py-1 bg-blue-50 rounded-lg inline-block">
+                Semua Website
+              </p>
+              <span className="text-xs text-gray-400 font-medium">{websites.length} halaman</span>
+            </div>
+            <div className="bg-white rounded-[32px] p-4 sm:p-6 apple-shadow border border-black/[0.03]">
+              {websites.length === 0 ? (
+                <p className="text-sm text-gray-400 italic p-6 text-center">Belum ada website dibuat.</p>
+              ) : (
+                <div className="divide-y divide-black/[0.05]">
+                  {websites.map((w: any) => (
+                    <div key={w.id} className="flex items-center gap-4 py-4 px-2">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-apple-blue flex items-center justify-center shrink-0">
+                        <Globe size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-gray-900 truncate">{w.nama_website}</p>
+                        <p className="text-xs text-gray-400 truncate">/{w.slug} · {w.tipe_industri}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shrink-0 ${w.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                        {w.status}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Link href={`/admin/build/${w.id}`} className="px-4 py-2 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600 transition-colors">
+                          Kelola
+                        </Link>
+                        {w.status === 'published' && (
+                          <Link href={`/${w.slug}`} target="_blank" className="p-2 rounded-xl border border-black/10 text-gray-500 hover:text-apple-blue hover:border-apple-blue/30 transition-colors" title="Lihat halaman publik">
+                            <ExternalLink size={16} />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Order / Lead Masuk */}
+          <div className="flex items-center gap-3 mb-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue px-3 py-1 bg-blue-50 rounded-lg inline-block">
+              Order / Lead Masuk
+            </p>
+            <span className="text-xs text-gray-400 font-medium">{orders.length} order</span>
           </div>
 
           {/* Orders Grid */}
