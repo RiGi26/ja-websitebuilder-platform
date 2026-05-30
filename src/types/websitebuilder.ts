@@ -18,6 +18,33 @@ export type TipeIndustri =
 
 export type StatusPage = 'draft' | 'published' | 'suspended' | 'archived'
 
+// ── Feature flags & konfigurasi website ──────────────────────
+// Bentuk baku kolom `landing_pages.konfigurasi` (JSONB). Saklar add-on
+// per website diatur di sini — bukan tabel/schema terpisah. Tim studio
+// menyalakan/mematikan sesuai struk add-on order.
+
+export interface FeatureFlags {
+  hasCart?: boolean // toko online / checkout (tabel add-on: products)
+  hasBlog?: boolean // artikel/berita (tabel add-on: blog_posts)
+  hasBooking?: boolean // reservasi/janji temu (tabel add-on: bookings)
+  hasGallery?: boolean // galeri foto
+  hasSEO?: boolean // meta SEO lanjutan
+  hasContactForm?: boolean // form kontak
+  hasMap?: boolean // peta lokasi
+}
+
+export interface BrandingConfig {
+  primary?: string // warna utama (hex)
+  secondary?: string
+  logo_url?: string
+  font?: string
+}
+
+export interface KonfigurasiWebsite {
+  features?: FeatureFlags
+  branding?: BrandingConfig
+}
+
 export type TipeKomponen =
   | 'hero_banner'
   | 'about'
@@ -142,7 +169,7 @@ export interface LandingPage {
   tipe_industri: TipeIndustri
   status: StatusPage
   data_konten: Record<string, unknown>
-  konfigurasi: Record<string, unknown>
+  konfigurasi: KonfigurasiWebsite
   created_at: string
   updated_at: string
 }
@@ -168,4 +195,50 @@ export type InsertPageSectionInput = Omit<PageSection, 'id' | 'created_at' | 'up
 
 export interface LandingPageWithSections extends LandingPage {
   page_sections: PageSection[]
+}
+
+// ── Add-on data (tabel bersama multi-tenant — Stage 3) ────────
+
+export interface Product {
+  id: string
+  tenant_id: string
+  page_id: string
+  nama: string
+  deskripsi: string | null
+  harga: number
+  gambar_url: string | null
+  kategori: string | null
+  stok: number | null
+  is_active: boolean
+  urutan: number
+  created_at: string
+  updated_at: string
+}
+
+export interface BlogPost {
+  id: string
+  tenant_id: string
+  page_id: string
+  judul: string
+  slug: string | null
+  ringkasan: string | null
+  konten: string | null
+  cover_url: string | null
+  penulis: string | null
+  is_published: boolean
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Booking {
+  id: string
+  tenant_id: string
+  page_id: string
+  nama_pemesan: string
+  kontak: string | null
+  jadwal: string | null
+  catatan: string | null
+  status: 'pending' | 'confirmed' | 'cancelled' | 'done'
+  created_at: string
 }
