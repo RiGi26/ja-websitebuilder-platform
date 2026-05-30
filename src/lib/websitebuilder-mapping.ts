@@ -26,20 +26,73 @@ export function industriToTipe(industri: string | null | undefined): TipeIndustr
 }
 
 // ── selected_addons (id add-on) -> FeatureFlags ──
-// Best-effort: di praktik saat ini add-on sering masuk via referensi_manual
-// (teks), bukan selected_addons. Jadi ini titik awal — admin tetap bisa
-// override semua flag lewat toggle di editor.
+// Peta ID add-on RESMI dari form /order (src/app/order/page.tsx, konstanta ADDONS).
+// Inilah sumber utama: nilai di orders.selected_addons berupa id seperti
+// 'shop', 'katalog-pro', 'booking', dst — bukan kata bebas. Heuristik substring
+// dipertahankan sebagai fallback untuk teks bebas (mis. dari referensi_manual)
+// & variasi penulisan. Admin tetap bisa override semua flag lewat toggle editor.
+const ADDON_FLAG_MAP: Record<string, (keyof FeatureFlags)[]> = {
+  'admin': ['hasAdmin'],
+  'client-portal': ['hasClientPortal'],
+  'shop': ['hasCart'],
+  'midtrans': ['hasPayment'],
+  'ongkir': ['hasCart', 'hasShipping'],
+  'katalog-pro': ['hasCart'],
+  'variant': ['hasCart'],
+  'qr-menu': ['hasMenu'],
+  'delivery': ['hasDelivery'],
+  'booking': ['hasBooking'],
+  'telemedicine': ['hasBooking'],
+  'membership': ['hasMembership'],
+  'lms': ['hasLMS'],
+  'cert-auto': ['hasLMS'],
+  'live-session': ['hasLMS', 'hasBooking'],
+  'email-biz': ['hasEmail'],
+  'lang-multi': ['hasMultiLang'],
+  'wa': ['hasWhatsApp'],
+  'seo': ['hasSEO'],
+  'ads-tracking': ['hasAnalytics'],
+  'protection': [], // proteksi gambar — tak ada flag tampilan
+  'career': ['hasCareer'],
+  'newsletter': ['hasNewsletter'],
+  'chat': ['hasLiveChat'],
+}
+
 export function addonsToFeatures(addons: string[] | null | undefined): FeatureFlags {
   const features: FeatureFlags = {}
+  const set = (k: keyof FeatureFlags) => { features[k] = true }
+
   for (const raw of addons ?? []) {
-    const a = (raw ?? '').toLowerCase()
-    if (a.includes('cart') || a.includes('toko') || a.includes('ecommerce') || a.includes('checkout') || a.includes('produk')) features.hasCart = true
-    if (a.includes('blog') || a.includes('artikel') || a.includes('berita')) features.hasBlog = true
-    if (a.includes('booking') || a.includes('reservasi') || a.includes('janji') || a.includes('appointment')) features.hasBooking = true
-    if (a.includes('seo')) features.hasSEO = true
-    if (a.includes('galeri') || a.includes('gallery') || a.includes('foto')) features.hasGallery = true
-    if (a.includes('kontak') || a.includes('contact') || a.includes('form')) features.hasContactForm = true
-    if (a.includes('maps') || a.includes('peta') || a.includes('lokasi')) features.hasMap = true
+    const a = (raw ?? '').toLowerCase().trim()
+    if (!a) continue
+
+    // 1) cocokkan ID add-on resmi lebih dulu
+    const mapped = ADDON_FLAG_MAP[a]
+    if (mapped) { mapped.forEach(set); continue }
+
+    // 2) fallback heuristik substring (teks bebas / variasi penulisan)
+    if (a.includes('cart') || a.includes('toko') || a.includes('shop') || a.includes('ecommerce') || a.includes('checkout') || a.includes('produk') || a.includes('katalog')) set('hasCart')
+    if (a.includes('blog') || a.includes('artikel') || a.includes('berita')) set('hasBlog')
+    if (a.includes('booking') || a.includes('reservasi') || a.includes('janji') || a.includes('appointment') || a.includes('jadwal')) set('hasBooking')
+    if (a.includes('seo')) set('hasSEO')
+    if (a.includes('galeri') || a.includes('gallery') || a.includes('foto')) set('hasGallery')
+    if (a.includes('kontak') || a.includes('contact') || a.includes('form')) set('hasContactForm')
+    if (a.includes('maps') || a.includes('peta') || a.includes('lokasi')) set('hasMap')
+    if (a.includes('whatsapp') || a === 'wa') set('hasWhatsApp')
+    if (a.includes('membership') || a.includes('member')) set('hasMembership')
+    if (a.includes('lms') || a.includes('course') || a.includes('kelas') || a.includes('sertifikat')) set('hasLMS')
+    if (a.includes('bahasa') || a.includes('language') || a.includes('lang-')) set('hasMultiLang')
+    if (a.includes('chat')) set('hasLiveChat')
+    if (a.includes('newsletter')) set('hasNewsletter')
+    if (a.includes('ongkir') || a.includes('shipping') || a.includes('ekspedisi')) set('hasShipping')
+    if (a.includes('delivery') || a.includes('gofood') || a.includes('grabfood')) set('hasDelivery')
+    if (a.includes('menu') || a.includes('qr')) set('hasMenu')
+    if (a.includes('cms') || a.includes('admin') || a.includes('dashboard')) set('hasAdmin')
+    if (a.includes('portal')) set('hasClientPortal')
+    if (a.includes('payment') || a.includes('midtrans') || a.includes('bayar')) set('hasPayment')
+    if (a.includes('email')) set('hasEmail')
+    if (a.includes('career') || a.includes('lowongan') || a.includes('karir')) set('hasCareer')
+    if (a.includes('ads') || a.includes('pixel') || a.includes('analytics') || a.includes('tracking')) set('hasAnalytics')
   }
   return features
 }

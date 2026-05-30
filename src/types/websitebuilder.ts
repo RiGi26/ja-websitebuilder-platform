@@ -31,6 +31,22 @@ export interface FeatureFlags {
   hasSEO?: boolean // meta SEO lanjutan
   hasContactForm?: boolean // form kontak
   hasMap?: boolean // peta lokasi
+  // ── add-on lanjutan (dipetakan dari ID add-on form /order) ──
+  hasAdmin?: boolean // dashboard admin / CMS
+  hasClientPortal?: boolean // area login khusus klien
+  hasPayment?: boolean // payment gateway (Midtrans)
+  hasShipping?: boolean // integrasi ongkir
+  hasMenu?: boolean // menu digital QR (F&B)
+  hasDelivery?: boolean // integrasi delivery (GoFood/GrabFood)
+  hasMembership?: boolean // sistem membership
+  hasLMS?: boolean // LMS / kelas online / sertifikat
+  hasMultiLang?: boolean // multi-bahasa
+  hasWhatsApp?: boolean // otomasi WhatsApp
+  hasAnalytics?: boolean // ads tracking / pixel / GA
+  hasNewsletter?: boolean // newsletter
+  hasLiveChat?: boolean // live chat support
+  hasCareer?: boolean // portal lowongan kerja
+  hasEmail?: boolean // email bisnis
 }
 
 export interface BrandingConfig {
