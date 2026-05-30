@@ -1,5 +1,7 @@
 # Standard Operating Procedure (SOP): Custom Build Engine
 
+> ⚠️ **DEPRECATED (2026-05-29).** Dokumen ini memakai model **single-tenant** (1 klien = 1 project Supabase) yang **tidak lagi dipakai**. Acuan resmi sekarang adalah **`SOP_WEBSITE_BUILD_V2.md`** (shared multi-tenant + studio-managed). File ini dipertahankan hanya sebagai referensi, dan tetap relevan **HANYA** untuk kasus pengecualian "jual-putus source code" ke klien.
+
 ## Filosofi Arsitektur
 Proyek "Rakit Website" (Custom Build) yang dijual melalui Kalkulator di `ja-corp-landing` menggunakan pendekatan **Single-Tenant Modular Architecture**. 
 Artinya: **1 Klien = 1 Project Supabase = 1 Vercel Deployment.**

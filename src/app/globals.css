@@ -54,6 +54,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-background: var(--input-background);
+  /* Apple Blue — token utilitas (bg-apple-blue / text-apple-blue) dipakai di
+     seluruh app. Sebelumnya tidak terdefinisi di Tailwind v4 → tombol jadi
+     transparan/tak terlihat. */
+  --color-apple-blue: #0071E3;
 }
 
 @layer utilities {
