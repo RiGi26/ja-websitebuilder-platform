@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -319,9 +319,10 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
       </div>
 
       <p className="text-[11px] text-gray-400 mt-5 leading-relaxed">
-        Dapatkan Server Key & Client Key dari dashboard Midtrans Anda (Settings → Access Keys).
-        Gunakan mode Sandbox untuk uji coba sebelum Production. Set juga Notification URL ke
-        <code className="mx-1">/api/shop/webhook</code> di dashboard Midtrans agar status pesanan terupdate otomatis.
+        Dapatkan Server Key & Client Key dari dashboard Midtrans Anda (Settings → Access Keys),
+        lalu tempel di atas & Aktifkan — pembayaran langsung berfungsi. Gunakan mode Sandbox untuk
+        uji coba sebelum Production. Status pesanan diperbarui otomatis (tak perlu setel apa pun
+        lagi di Midtrans).
       </p>
     </div>
   )
@@ -347,6 +348,29 @@ function OrdersPanel({ initial }: { initial: ShopOrderRow[] }) {
   const [orders, setOrders] = useState<ShopOrderRow[]>(initial)
   const [busy, setBusy] = useState<string | null>(null)
   const [open, setOpen] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+
+  // Saat tab Pesanan dibuka: minta server cek status ke Midtrans (zero-config,
+  // tanpa webhook). Kalau ada yang berubah, muat ulang daftar dari DB.
+  const reload = async () => {
+    const { data } = await supabase
+      .from('shop_orders').select('*, shop_order_items(*)')
+      .order('created_at', { ascending: false }).limit(100)
+    if (data) setOrders(data as ShopOrderRow[])
+  }
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      setRefreshing(true)
+      try {
+        const res = await fetch('/api/portal/orders/refresh', { method: 'POST' })
+        const json = await res.json().catch(() => ({}))
+        if (alive && json?.updated > 0) await reload()
+      } catch { /* noop */ } finally { if (alive) setRefreshing(false) }
+    })()
+    return () => { alive = false }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const setStatus = async (id: string, status: string) => {
     setBusy(id)
@@ -364,7 +388,10 @@ function OrdersPanel({ initial }: { initial: ShopOrderRow[] }) {
     <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-bold text-gray-900">Pesanan Masuk</h2>
-        <span className="text-xs text-gray-400 font-medium">{paidOrders.length} dibayar · {orders.length} total</span>
+        <span className="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+          {refreshing && <Loader2 size={12} className="animate-spin" />}
+          {paidOrders.length} dibayar · {orders.length} total
+        </span>
       </div>
 
       {orders.length === 0 ? (
