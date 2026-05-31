@@ -4,7 +4,7 @@
 // dengan default aman. Dipakai oleh src/app/[slug]/page.tsx.
 // ============================================================
 
-import type { PageSection, TipeKomponen, Product, BlogPost } from '@/types/websitebuilder'
+import type { PageSection, TipeKomponen, Product, BlogPost, Service } from '@/types/websitebuilder'
 import AddToCartButton from '@/app/components/cart/AddToCartButton'
 
 function formatHarga(n: number) {
@@ -297,6 +297,52 @@ function ProductList({ isi, products, hasCart, primary }: { isi: Isi; products: 
   )
 }
 
+// ── Add-on: Service list (booking) — data dari tabel services ─
+function ServiceList({ isi, services, hasBooking, slug, primary }: { isi: Isi; services: Service[]; hasBooking?: boolean; slug?: string; primary?: string }) {
+  return (
+    <section className="px-6 py-20 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">{isi.title ?? 'Layanan Kami'}</h2>
+        {services.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm">Belum ada layanan.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {services.map((s) => (
+              <div key={s.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden flex flex-col">
+                {s.gambar_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.gambar_url} alt={s.nama} className="w-full aspect-video object-cover" />
+                )}
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-gray-900">{s.nama}</h3>
+                  {s.kategori && <p className="text-[11px] text-gray-400 uppercase tracking-widest">{s.kategori}</p>}
+                  {s.deskripsi && <p className="text-sm text-gray-500 mt-1 line-clamp-3">{s.deskripsi}</p>}
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-lg font-extrabold text-gray-900">{formatHarga(s.harga)}</span>
+                    {s.durasi_menit ? <span className="text-[11px] text-gray-400">· {s.durasi_menit} menit</span> : null}
+                  </div>
+                  {s.dp_amount > 0 && (
+                    <p className="text-[11px] text-gray-400 mt-0.5">Booking fee {formatHarga(s.dp_amount)}</p>
+                  )}
+                  {hasBooking && slug && (
+                    <a
+                      href={`/${slug}/booking?service=${s.id}`}
+                      style={primary ? { backgroundColor: primary } : undefined}
+                      className="mt-4 inline-block text-center py-2.5 rounded-xl text-white text-sm font-bold bg-gray-900 hover:opacity-90 transition-opacity"
+                    >
+                      Booking
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 // ── Add-on: Blog list (data dari tabel blog_posts) ───────────
 function BlogList({ isi, posts }: { isi: Isi; posts: BlogPost[] }) {
   return (
@@ -361,19 +407,26 @@ export function SectionRenderer({
   section,
   products = [],
   posts = [],
+  services = [],
   hasCart = false,
+  hasBooking = false,
+  slug,
   primary,
 }: {
   section: PageSection
   products?: Product[]
   posts?: BlogPost[]
+  services?: Service[]
   hasCart?: boolean
+  hasBooking?: boolean
+  slug?: string
   primary?: string
 }) {
   const isi = (section.isi_komponen ?? {}) as Isi
 
   // Add-on dengan sumber data tabel bersama
   if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} hasCart={hasCart} primary={primary} />
+  if (section.tipe_komponen === 'service_list') return <ServiceList isi={isi} services={services} hasBooking={hasBooking} slug={slug} primary={primary} />
   if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} />
   if (section.tipe_komponen === 'social_feed') return <AddonPlaceholder label="Social Feed" />
 

@@ -75,6 +75,7 @@ export type TipeKomponen =
   | 'stats'
   | 'blog_list'
   | 'product_list'
+  | 'service_list'
   | 'video_embed'
   | 'map_embed'
   | 'social_feed'
@@ -247,14 +248,41 @@ export interface BlogPost {
   updated_at: string
 }
 
+// Layanan yang bisa di-booking (pola mirip Product). harga = harga penuh
+// (informasi), dp_amount = nominal yang dibayar online saat booking
+// (0 = bayar di tempat / tanpa pembayaran online).
+export interface Service {
+  id: string
+  tenant_id: string
+  page_id: string
+  nama: string
+  deskripsi: string | null
+  harga: number
+  dp_amount: number
+  durasi_menit: number | null
+  gambar_url: string | null
+  kategori: string | null
+  is_active: boolean
+  urutan: number
+  created_at: string
+  updated_at: string
+}
+
 export interface Booking {
   id: string
   tenant_id: string
   page_id: string
+  service_id: string | null
   nama_pemesan: string
   kontak: string | null
+  email: string | null
   jadwal: string | null
   catatan: string | null
+  total: number
+  dp_amount: number
   status: 'pending' | 'confirmed' | 'cancelled' | 'done'
+  payment_status: 'not_required' | 'unpaid' | 'awaiting_payment' | 'paid' | 'failed' | 'expired'
+  midtrans_order_id: string | null
   created_at: string
+  updated_at: string
 }
