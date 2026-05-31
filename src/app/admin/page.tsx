@@ -23,6 +23,7 @@ import { redirect } from 'next/navigation'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import OrderStatusControl from './OrderStatusControl'
 import BuildButton from './BuildButton'
+import ClientAccountButton from './ClientAccountButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,7 +63,7 @@ async function getPagesByTenant(): Promise<Record<string, { id: string }>> {
 async function getAllWebsites() {
   const { data, error } = await supabaseAdmin
     .from('landing_pages')
-    .select('id, nama_website, slug, status, tipe_industri, updated_at')
+    .select('id, nama_website, slug, status, tipe_industri, updated_at, tenant_id, tenants(auth_user_id, email)')
     .order('updated_at', { ascending: false })
 
   if (error) {
@@ -160,6 +161,13 @@ export default async function StudioAdminPage() {
                         {w.status}
                       </span>
                       <div className="flex items-center gap-2 shrink-0">
+                        {w.tenant_id && (
+                          <ClientAccountButton
+                            tenantId={w.tenant_id}
+                            hasAccount={!!(w.tenants as any)?.auth_user_id}
+                            email={(w.tenants as any)?.email ?? null}
+                          />
+                        )}
                         <Link href={`/admin/build/${w.id}`} className="px-4 py-2 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600 transition-colors">
                           Kelola
                         </Link>
