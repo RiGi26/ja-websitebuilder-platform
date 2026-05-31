@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { refreshShopOrderStatus } from '@/lib/shop-order-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,10 @@ export default async function OrderStatusPage({
   const { slug } = await params
   const { id } = await searchParams
   if (!id) notFound()
+
+  // Zero-config: tanya status langsung ke Midtrans saat pembeli kembali,
+  // sehingga status terupdate walau client belum set Notification URL.
+  try { await refreshShopOrderStatus(id) } catch { /* non-fatal */ }
 
   const { data: order } = await supabaseAdmin
     .from('shop_orders')
