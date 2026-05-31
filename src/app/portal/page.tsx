@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
 import type { Product } from '@/types/websitebuilder'
-import PortalDashboard from './PortalDashboard'
+import PortalDashboard, { type ShopOrderRow } from './PortalDashboard'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,6 +41,18 @@ export default async function PortalPage() {
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
 
+  // Pesanan masuk (toko) — terbaru dulu, dengan item-nya.
+  let shopOrders: ShopOrderRow[] = []
+  if (hasShop && page?.id) {
+    const { data } = await supabaseAdmin
+      .from('shop_orders')
+      .select('*, shop_order_items(*)')
+      .eq('page_id', page.id)
+      .order('created_at', { ascending: false })
+      .limit(100)
+    shopOrders = (data ?? []) as ShopOrderRow[]
+  }
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -49,6 +61,7 @@ export default async function PortalPage() {
       initialProducts={products}
       hasShop={hasShop}
       paymentStatus={paymentStatus}
+      initialOrders={shopOrders}
     />
   )
 }
