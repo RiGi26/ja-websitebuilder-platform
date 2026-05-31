@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { createLandingPage } from '@/lib/supabase/websitebuilder'
 import { industriToTipe, addonsToFeatures, slugify } from '@/lib/websitebuilder-mapping'
+import { createClientAccountForTenant } from '@/lib/client-account'
 
 async function requireAdmin() {
   const cookieStore = await cookies()
@@ -112,7 +113,16 @@ export async function POST(request: Request) {
       .eq('id', orderId)
     if (linkErr) throw linkErr
 
-    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false })
+    // 6. Buat akun login customer (otomatis). Tidak fatal kalau gagal /
+    //    tak ada email — provisioning tetap sukses, akun bisa dibuat ulang nanti.
+    let clientAccount = null
+    try {
+      clientAccount = await createClientAccountForTenant(tenant.id, order.email, namaKlien)
+    } catch (e: any) {
+      console.error('createClientAccountForTenant gagal (non-fatal):', e?.message)
+    }
+
+    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false, clientAccount })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
