@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { KeyRound, Loader2, Copy, Check, RotateCw } from 'lucide-react'
+import { KeyRound, Loader2, RotateCw } from 'lucide-react'
+import CredentialBox from './CredentialBox'
 
 type Props = {
   tenantId: string
@@ -16,7 +17,6 @@ type Cred = { email: string; password: string }
 export default function ClientAccountButton({ tenantId, hasAccount, email }: Props) {
   const [loading, setLoading] = useState(false)
   const [cred, setCred] = useState<Cred | null>(null)
-  const [copied, setCopied] = useState(false)
   const [done, setDone] = useState(hasAccount)
 
   const run = async (method: 'POST' | 'PATCH') => {
@@ -48,14 +48,6 @@ export default function ClientAccountButton({ tenantId, hasAccount, email }: Pro
     } catch { alert('Error koneksi') } finally { setLoading(false) }
   }
 
-  const copyCred = async () => {
-    if (!cred) return
-    await navigator.clipboard.writeText(
-      `Login dashboard website Anda:\nURL: ${location.origin}/portal/login\nEmail: ${cred.email}\nPassword: ${cred.password}`,
-    )
-    setCopied(true); setTimeout(() => setCopied(false), 2000)
-  }
-
   return (
     <>
       {!done ? (
@@ -76,16 +68,8 @@ export default function ClientAccountButton({ tenantId, hasAccount, email }: Pro
             <div className="w-12 h-12 rounded-2xl bg-blue-50 text-apple-blue flex items-center justify-center mb-4"><KeyRound size={22} /></div>
             <h3 className="text-lg font-bold text-gray-900 mb-1">Akun Login Customer</h3>
             <p className="text-sm text-gray-500 mb-5">Kirim ke customer via WhatsApp. <strong>Password hanya tampil sekali.</strong></p>
-            <div className="bg-gray-50 rounded-2xl p-4 border border-black/5 space-y-2 text-sm font-mono">
-              <div><span className="text-gray-400 text-xs uppercase tracking-widest">Email</span><br />{cred.email}</div>
-              <div><span className="text-gray-400 text-xs uppercase tracking-widest">Password</span><br />{cred.password}</div>
-            </div>
-            <div className="flex gap-2 mt-5">
-              <button onClick={copyCred} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold uppercase hover:bg-gray-800">
-                {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Tersalin' : 'Salin'}
-              </button>
-              <button onClick={() => setCred(null)} className="flex-1 py-2.5 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600">Tutup</button>
-            </div>
+            <CredentialBox email={cred.email} password={cred.password} />
+            <button onClick={() => setCred(null)} className="w-full mt-2 py-2.5 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600">Tutup</button>
           </div>
         </div>
       )}
