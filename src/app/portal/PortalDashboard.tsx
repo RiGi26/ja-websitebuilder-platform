@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Package,
-  CreditCard, ShoppingBag, Receipt,
+  CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase,
 } from 'lucide-react'
-import type { Product } from '@/types/websitebuilder'
+import type { Product, Service } from '@/types/websitebuilder'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -27,23 +27,43 @@ export type ShopOrderRow = {
   shop_order_items: ShopOrderItem[]
 }
 
+export type BookingRow = {
+  id: string
+  service_id: string | null
+  nama_pemesan: string
+  kontak: string | null
+  email: string | null
+  jadwal: string | null
+  catatan: string | null
+  total: number
+  dp_amount: number
+  status: string
+  payment_status: string
+  created_at: string
+  services: { nama: string } | null
+}
+
 type Props = {
   tenantId: string
   namaTenant: string
   page: PageInfo | null
   initialProducts: Product[]
   hasShop: boolean
+  hasBooking: boolean
   paymentStatus: PaymentStatus
   initialOrders: ShopOrderRow[]
+  initialServices: Service[]
+  initialBookings: BookingRow[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, paymentStatus, initialOrders }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, paymentStatus, initialOrders, initialServices, initialBookings }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  const [tab, setTab] = useState<'produk' | 'pesanan' | 'pembayaran'>('produk')
+  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'pembayaran'
+  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : 'pembayaran')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -149,22 +169,36 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
             <p className="text-gray-500">Website Anda sedang disiapkan oleh tim. Silakan cek kembali nanti.</p>
           </div>
-        ) : !hasShop ? (
+        ) : !hasShop && !hasBooking ? (
           <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
             <Package size={40} className="text-gray-200 mx-auto mb-4" />
             <h2 className="text-lg font-bold text-gray-900 mb-1">Belum ada fitur yang bisa dikelola sendiri</h2>
-            <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko. Hubungi tim untuk perubahan konten.</p>
+            <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko atau booking. Hubungi tim untuk perubahan konten.</p>
           </div>
         ) : (
         <>
           {/* Tab nav */}
-          <div className="flex gap-2 mb-6">
-            <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
-              <ShoppingBag size={14} /> Produk
-            </button>
-            <button onClick={() => setTab('pesanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pesanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
-              <Receipt size={14} /> Pesanan
-            </button>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {hasShop && (
+              <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <ShoppingBag size={14} /> Produk
+              </button>
+            )}
+            {hasShop && (
+              <button onClick={() => setTab('pesanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pesanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <Receipt size={14} /> Pesanan
+              </button>
+            )}
+            {hasBooking && (
+              <button onClick={() => setTab('layanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'layanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <Briefcase size={14} /> Layanan
+              </button>
+            )}
+            {hasBooking && (
+              <button onClick={() => setTab('reservasi')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'reservasi' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <CalendarClock size={14} /> Reservasi
+              </button>
+            )}
             <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <CreditCard size={14} /> Pembayaran
             </button>
@@ -174,6 +208,10 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <PaymentPanel initial={paymentStatus} />
           ) : tab === 'pesanan' ? (
             <OrdersPanel initial={initialOrders} />
+          ) : tab === 'layanan' ? (
+            <ServicePanel page={page} tenantId={tenantId} initial={initialServices} />
+          ) : tab === 'reservasi' ? (
+            <BookingsPanel initial={initialBookings} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
@@ -252,10 +290,20 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
   const [msg, setMsg] = useState<string | null>(null)
 
   const save = async (extra?: Partial<{ isActive: boolean }>) => {
+    // Pengaman: cegah key tertukar (Server ⇄ Client) — kesalahan paling umum.
+    const sk = serverKey.trim()
+    if (sk && /client/i.test(sk)) {
+      setMsg('Server Key tampak seperti Client Key (mengandung kata "client"). Periksa kembali — Server Key diawali "Mid-server-" atau "SB-Mid-server-".')
+      return
+    }
+    if (clientKey && /server/i.test(clientKey)) {
+      setMsg('Client Key tampak seperti Server Key (mengandung kata "server"). Field ini untuk Client Key yang diawali "Mid-client-".')
+      return
+    }
     setBusy(true); setMsg(null)
     try {
       const body: Record<string, unknown> = { clientKey: clientKey || null, isProduction, ...extra }
-      if (serverKey.trim()) body.serverKey = serverKey.trim()
+      if (sk) body.serverKey = sk
       const res = await fetch('/api/portal/payment', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       })
@@ -298,6 +346,16 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
           <input type="checkbox" checked={isProduction} onChange={(e) => setIsProduction(e.target.checked)} />
           Mode Production (matikan untuk uji coba / Sandbox)
         </label>
+        {isProduction ? (
+          <p className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg p-2.5 leading-relaxed">
+            ⚠ <strong>Mode Production aktif</strong> — transaksi memakai <strong>UANG ASLI</strong> dan butuh key produksi.
+            Untuk uji coba (key sandbox), matikan centang ini agar memakai <strong>Sandbox</strong>.
+          </p>
+        ) : (
+          <p className="text-[11px] text-gray-400 leading-relaxed">
+            Mode <strong>Sandbox</strong> (uji coba) — gunakan key sandbox dari dashboard Midtrans Anda. Tidak ada uang asli berpindah.
+          </p>
+        )}
       </div>
 
       {msg && <p className="text-xs mt-3 text-gray-500">{msg}</p>}
@@ -442,6 +500,260 @@ function OrdersPanel({ initial }: { initial: ShopOrderRow[] }) {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel layanan (booking) — klien kelola daftar layanannya ─────
+type SvcDraft = { nama: string; harga: string; dp_amount: string; durasi_menit: string; kategori: string; gambar_url: string; deskripsi: string }
+const SVC_EMPTY: SvcDraft = { nama: '', harga: '', dp_amount: '', durasi_menit: '', kategori: '', gambar_url: '', deskripsi: '' }
+
+function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: Service[] }) {
+  const supabase = createClient()
+  const [items, setItems] = useState<Service[]>(initial)
+  const [add, setAdd] = useState<SvcDraft>(SVC_EMPTY)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<SvcDraft>(SVC_EMPTY)
+  const [busy, setBusy] = useState<string | null>(null)
+  const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
+
+  const payload = (d: SvcDraft) => ({
+    nama: d.nama,
+    harga: Number(d.harga) || 0,
+    dp_amount: Number(d.dp_amount) || 0,
+    durasi_menit: d.durasi_menit === '' ? null : Number(d.durasi_menit),
+    kategori: d.kategori || null,
+    gambar_url: d.gambar_url || null,
+    deskripsi: d.deskripsi || null,
+  })
+
+  const create = async () => {
+    if (!page) return
+    if (!add.nama.trim()) return alert('Nama layanan wajib')
+    setBusy('add')
+    try {
+      const { data, error } = await supabase.from('services')
+        .insert({ page_id: page.id, tenant_id: tenantId, is_active: true, ...payload(add) } as never)
+        .select().single()
+      if (error) throw error
+      setItems((p) => [...p, data as Service])
+      setAdd(SVC_EMPTY)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const startEdit = (s: Service) => {
+    setEditId(s.id)
+    setDraft({
+      nama: s.nama ?? '', harga: s.harga != null ? String(s.harga) : '',
+      dp_amount: s.dp_amount != null ? String(s.dp_amount) : '',
+      durasi_menit: s.durasi_menit != null ? String(s.durasi_menit) : '',
+      kategori: s.kategori ?? '', gambar_url: s.gambar_url ?? '', deskripsi: s.deskripsi ?? '',
+    })
+  }
+  const saveEdit = async (id: string) => {
+    if (!draft.nama.trim()) return alert('Nama layanan wajib')
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('services')
+        .update(payload(draft) as never).eq('id', id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === id ? (data as Service) : x)))
+      setEditId(null)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const toggle = async (s: Service) => {
+    setBusy(s.id)
+    try {
+      const { data, error } = await supabase.from('services')
+        .update({ is_active: !s.is_active } as never).eq('id', s.id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === s.id ? (data as Service) : x)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const remove = async (id: string) => {
+    if (!confirm('Hapus layanan ini?')) return
+    setBusy(id)
+    try {
+      const { error } = await supabase.from('services').delete().eq('id', id)
+      if (error) throw error
+      setItems((p) => p.filter((x) => x.id !== id))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Layanan</h2>
+        <span className="text-xs text-gray-400 font-medium">{items.length} layanan</span>
+      </div>
+
+      {/* form tambah */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-2">
+        <input value={add.nama} onChange={(e) => setAdd({ ...add, nama: e.target.value })} placeholder="Nama layanan *" className={`${inp} sm:col-span-2`} />
+        <input value={add.harga} onChange={(e) => setAdd({ ...add, harga: e.target.value })} placeholder="Harga penuh" inputMode="numeric" className={inp} />
+        <input value={add.dp_amount} onChange={(e) => setAdd({ ...add, dp_amount: e.target.value })} placeholder="DP/booking fee (0=tanpa)" inputMode="numeric" className={inp} />
+        <input value={add.durasi_menit} onChange={(e) => setAdd({ ...add, durasi_menit: e.target.value })} placeholder="Durasi (menit)" inputMode="numeric" className={inp} />
+        <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori" className={inp} />
+        <input value={add.gambar_url} onChange={(e) => setAdd({ ...add, gambar_url: e.target.value })} placeholder="URL gambar (opsional)" className={`${inp} sm:col-span-2`} />
+      </div>
+      <div className="flex justify-end mb-6">
+        <button disabled={busy === 'add'} onClick={create} className="flex items-center justify-center gap-1 px-5 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+          {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah Layanan
+        </button>
+      </div>
+      <p className="text-[11px] text-gray-400 mb-5 -mt-4">DP/booking fee = nominal yang dibayar online saat booking. Isi 0 jika reservasi tanpa pembayaran online (bayar di tempat).</p>
+
+      {/* daftar */}
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada layanan. Tambahkan layanan pertama Anda di atas.</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((it) =>
+            editId === it.id ? (
+              <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <input value={draft.nama} onChange={(e) => setDraft({ ...draft, nama: e.target.value })} placeholder="Nama *" className={`${inp} sm:col-span-2`} />
+                  <input value={draft.harga} onChange={(e) => setDraft({ ...draft, harga: e.target.value })} placeholder="Harga penuh" inputMode="numeric" className={inp} />
+                  <input value={draft.dp_amount} onChange={(e) => setDraft({ ...draft, dp_amount: e.target.value })} placeholder="DP" inputMode="numeric" className={inp} />
+                  <input value={draft.durasi_menit} onChange={(e) => setDraft({ ...draft, durasi_menit: e.target.value })} placeholder="Durasi (menit)" inputMode="numeric" className={inp} />
+                  <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
+                  <input value={draft.gambar_url} onChange={(e) => setDraft({ ...draft, gambar_url: e.target.value })} placeholder="URL gambar" className={`${inp} sm:col-span-2`} />
+                  <textarea value={draft.deskripsi} onChange={(e) => setDraft({ ...draft, deskripsi: e.target.value })} placeholder="Deskripsi" rows={2} className={`${inp} sm:col-span-4`} />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setEditId(null)} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-500 hover:bg-white">Batal</button>
+                  <button onClick={() => saveEdit(it.id)} disabled={busy === it.id} className="flex items-center gap-1 px-4 py-1.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+                    {busy === it.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Simpan
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={it.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-xl border border-black/5">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{it.nama} {!it.is_active && <span className="text-[10px] text-gray-400 uppercase">(non-aktif)</span>}</p>
+                  <p className="text-xs text-gray-500">
+                    Rp {Number(it.harga).toLocaleString('id-ID')}
+                    {it.dp_amount > 0 ? ` · DP Rp ${Number(it.dp_amount).toLocaleString('id-ID')}` : ' · tanpa DP'}
+                    {it.durasi_menit ? ` · ${it.durasi_menit} mnt` : ''}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
+                  <button onClick={() => toggle(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_active ? 'Sembunyikan' : 'Tampilkan'}>
+                    {it.is_active ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
+                  </button>
+                  <button onClick={() => remove(it.id)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Hapus"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel reservasi (booking) — klien lihat & kelola reservasi ───
+const BOOK_STEPS = ['confirmed', 'done', 'cancelled'] as const
+const BOOK_STATUS_LABEL: Record<string, string> = {
+  pending: 'Baru', confirmed: 'Dikonfirmasi', done: 'Selesai', cancelled: 'Dibatalkan',
+}
+
+function BookingsPanel({ initial }: { initial: BookingRow[] }) {
+  const supabase = createClient()
+  const [bookings, setBookings] = useState<BookingRow[]>(initial)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const reload = async () => {
+    const { data } = await supabase
+      .from('bookings').select('*, services(nama)')
+      .order('created_at', { ascending: false }).limit(100)
+    if (data) setBookings(data as BookingRow[])
+  }
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      setRefreshing(true)
+      try {
+        const res = await fetch('/api/portal/bookings/refresh', { method: 'POST' })
+        const json = await res.json().catch(() => ({}))
+        if (alive && json?.updated > 0) await reload()
+      } catch { /* noop */ } finally { if (alive) setRefreshing(false) }
+    })()
+    return () => { alive = false }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const setStatus = async (id: string, status: string) => {
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('bookings')
+        .update({ status } as never).eq('id', id).select('*, services(nama)').single()
+      if (error) throw error
+      setBookings((p) => p.map((b) => (b.id === id ? (data as BookingRow) : b)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Reservasi Masuk</h2>
+        <span className="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+          {refreshing && <Loader2 size={12} className="animate-spin" />}
+          {bookings.length} total
+        </span>
+      </div>
+
+      {bookings.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada reservasi. Booking dari pelanggan akan muncul di sini.</p>
+      ) : (
+        <div className="space-y-2">
+          {bookings.map((b) => (
+            <div key={b.id} className="rounded-xl border border-black/5 bg-gray-50">
+              <button onClick={() => setOpen(open === b.id ? null : b.id)} className="w-full flex items-center justify-between gap-3 p-3 text-left">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{b.nama_pemesan} · {b.services?.nama ?? 'Layanan'}</p>
+                  <p className="text-xs text-gray-500">
+                    {b.jadwal ? new Date(b.jadwal).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Jadwal belum ditentukan'}
+                    {' · '}#{b.id.slice(0, 8).toUpperCase()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {b.dp_amount > 0 && (
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${PAY_BADGE[b.payment_status] ?? 'bg-gray-100 text-gray-500'}`}>
+                      {b.payment_status === 'paid' ? 'DP Lunas' : b.payment_status === 'awaiting_payment' ? 'Menunggu' : b.payment_status}
+                    </span>
+                  )}
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gray-100 text-gray-500">
+                    {BOOK_STATUS_LABEL[b.status] ?? b.status}
+                  </span>
+                </div>
+              </button>
+
+              {open === b.id && (
+                <div className="px-3 pb-3 space-y-3 border-t border-black/5 pt-3">
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    <p>Layanan: <span className="text-gray-900 font-medium">{b.services?.nama ?? '-'}</span>{b.total > 0 ? ` (${rupiah2(Number(b.total))})` : ''}</p>
+                    {b.dp_amount > 0 && <p>DP: {rupiah2(Number(b.dp_amount))}</p>}
+                    {b.kontak && <p>Kontak: <a href={`https://wa.me/${b.kontak}`} target="_blank" className="text-apple-blue font-bold">{b.kontak}</a></p>}
+                    {b.email && <p>Email: {b.email}</p>}
+                    {b.catatan && <p>Catatan: {b.catatan}</p>}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {BOOK_STEPS.map((s) => (
+                      <button key={s} onClick={() => setStatus(b.id, s)} disabled={busy === b.id || b.status === s}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors ${b.status === s ? 'bg-apple-blue text-white' : 'border border-black/10 text-gray-500 hover:text-apple-blue'}`}>
+                        {BOOK_STATUS_LABEL[s]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Globe, Loader2, PencilRuler, KeyRound, Copy, Check } from 'lucide-react'
+import { Globe, Loader2, PencilRuler, KeyRound } from 'lucide-react'
+import CredentialBox from './CredentialBox'
 
 type Props = {
   orderId: string
@@ -20,7 +21,6 @@ export default function BuildButton({ orderId, hasTenant, pageId }: Props) {
   const [loading, setLoading] = useState(false)
   const [cred, setCred] = useState<Cred | null>(null)
   const [nextPageId, setNextPageId] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
 
   const provision = async () => {
     setLoading(true)
@@ -51,15 +51,6 @@ export default function BuildButton({ orderId, hasTenant, pageId }: Props) {
     }
   }
 
-  const copyCred = async () => {
-    if (!cred) return
-    await navigator.clipboard.writeText(
-      `Login dashboard website Anda:\nURL: ${location.origin}/portal/login\nEmail: ${cred.email}\nPassword: ${cred.password}`,
-    )
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const closeCred = () => {
     const pid = nextPageId
     setCred(null)
@@ -78,18 +69,10 @@ export default function BuildButton({ orderId, hasTenant, pageId }: Props) {
           <p className="text-sm text-gray-500 mb-5">
             Simpan & kirim ke customer via WhatsApp. <strong>Password hanya tampil sekali ini.</strong>
           </p>
-          <div className="bg-gray-50 rounded-2xl p-4 border border-black/5 space-y-2 text-sm font-mono">
-            <div><span className="text-gray-400 text-xs uppercase tracking-widest">Email</span><br />{cred.email}</div>
-            <div><span className="text-gray-400 text-xs uppercase tracking-widest">Password</span><br />{cred.password}</div>
-          </div>
-          <div className="flex gap-2 mt-5">
-            <button onClick={copyCred} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold uppercase hover:bg-gray-800">
-              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Tersalin' : 'Salin'}
-            </button>
-            <button onClick={closeCred} className="flex-1 py-2.5 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600">
-              Lanjut ke Editor
-            </button>
-          </div>
+          <CredentialBox email={cred.email} password={cred.password} />
+          <button onClick={closeCred} className="w-full mt-2 py-2.5 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600">
+            Lanjut ke Editor
+          </button>
         </div>
       </div>
     )

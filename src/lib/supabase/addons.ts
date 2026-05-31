@@ -6,7 +6,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Product, BlogPost } from '@/types/websitebuilder'
+import type { Product, BlogPost, Service } from '@/types/websitebuilder'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Client = SupabaseClient<any>
@@ -26,6 +26,23 @@ export async function fetchProductsByPage(client: Client, pageId: string): Promi
     return []
   }
   return (data ?? []) as Product[]
+}
+
+// Layanan aktif untuk sebuah halaman (booking), urut by urutan lalu nama.
+export async function fetchServicesByPage(client: Client, pageId: string): Promise<Service[]> {
+  const { data, error } = await client
+    .from('services')
+    .select('*')
+    .eq('page_id', pageId)
+    .eq('is_active', true)
+    .order('urutan', { ascending: true })
+    .order('nama', { ascending: true })
+
+  if (error) {
+    console.error('fetchServicesByPage:', error.message)
+    return []
+  }
+  return (data ?? []) as Service[]
 }
 
 // Artikel published untuk sebuah halaman, terbaru dulu.

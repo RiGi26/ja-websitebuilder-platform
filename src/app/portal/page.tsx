@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
-import type { Product } from '@/types/websitebuilder'
-import PortalDashboard, { type ShopOrderRow } from './PortalDashboard'
+import type { Product, Service } from '@/types/websitebuilder'
+import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +38,7 @@ export default async function PortalPage() {
 
   const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean> }
   const hasShop = !!konfig.features?.hasCart
+  const hasBooking = !!konfig.features?.hasBooking
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
 
@@ -53,6 +54,18 @@ export default async function PortalPage() {
     shopOrders = (data ?? []) as ShopOrderRow[]
   }
 
+  // Layanan + reservasi (booking) — kalau fitur booking aktif.
+  let services: Service[] = []
+  let bookings: BookingRow[] = []
+  if (hasBooking && page?.id) {
+    const [{ data: svc }, { data: bk }] = await Promise.all([
+      supabaseAdmin.from('services').select('*').eq('page_id', page.id).order('urutan', { ascending: true }),
+      supabaseAdmin.from('bookings').select('*, services(nama)').eq('page_id', page.id).order('created_at', { ascending: false }).limit(100),
+    ])
+    services = (svc ?? []) as Service[]
+    bookings = (bk ?? []) as BookingRow[]
+  }
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -60,8 +73,11 @@ export default async function PortalPage() {
       page={page ? { id: page.id, nama_website: page.nama_website, slug: page.slug, status: page.status } : null}
       initialProducts={products}
       hasShop={hasShop}
+      hasBooking={hasBooking}
       paymentStatus={paymentStatus}
       initialOrders={shopOrders}
+      initialServices={services}
+      initialBookings={bookings}
     />
   )
 }
