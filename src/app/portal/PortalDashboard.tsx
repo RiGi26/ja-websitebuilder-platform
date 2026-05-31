@@ -252,10 +252,20 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
   const [msg, setMsg] = useState<string | null>(null)
 
   const save = async (extra?: Partial<{ isActive: boolean }>) => {
+    // Pengaman: cegah key tertukar (Server ⇄ Client) — kesalahan paling umum.
+    const sk = serverKey.trim()
+    if (sk && /client/i.test(sk)) {
+      setMsg('Server Key tampak seperti Client Key (mengandung kata "client"). Periksa kembali — Server Key diawali "Mid-server-" atau "SB-Mid-server-".')
+      return
+    }
+    if (clientKey && /server/i.test(clientKey)) {
+      setMsg('Client Key tampak seperti Server Key (mengandung kata "server"). Field ini untuk Client Key yang diawali "Mid-client-".')
+      return
+    }
     setBusy(true); setMsg(null)
     try {
       const body: Record<string, unknown> = { clientKey: clientKey || null, isProduction, ...extra }
-      if (serverKey.trim()) body.serverKey = serverKey.trim()
+      if (sk) body.serverKey = sk
       const res = await fetch('/api/portal/payment', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       })
@@ -298,6 +308,16 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
           <input type="checkbox" checked={isProduction} onChange={(e) => setIsProduction(e.target.checked)} />
           Mode Production (matikan untuk uji coba / Sandbox)
         </label>
+        {isProduction ? (
+          <p className="text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg p-2.5 leading-relaxed">
+            ⚠ <strong>Mode Production aktif</strong> — transaksi memakai <strong>UANG ASLI</strong> dan butuh key produksi.
+            Untuk uji coba (key sandbox), matikan centang ini agar memakai <strong>Sandbox</strong>.
+          </p>
+        ) : (
+          <p className="text-[11px] text-gray-400 leading-relaxed">
+            Mode <strong>Sandbox</strong> (uji coba) — gunakan key sandbox dari dashboard Midtrans Anda. Tidak ada uang asli berpindah.
+          </p>
+        )}
       </div>
 
       {msg && <p className="text-xs mt-3 text-gray-500">{msg}</p>}
