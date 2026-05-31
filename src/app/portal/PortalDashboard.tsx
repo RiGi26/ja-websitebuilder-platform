@@ -5,24 +5,28 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Package,
+  CreditCard, ShoppingBag,
 } from 'lucide-react'
 import type { Product } from '@/types/websitebuilder'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
+type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
 type Props = {
   tenantId: string
   namaTenant: string
   page: PageInfo | null
   initialProducts: Product[]
   hasShop: boolean
+  paymentStatus: PaymentStatus
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, paymentStatus }: Props) {
   const router = useRouter()
   const supabase = createClient()
+  const [tab, setTab] = useState<'produk' | 'pembayaran'>('produk')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -135,6 +139,20 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko. Hubungi tim untuk perubahan konten.</p>
           </div>
         ) : (
+        <>
+          {/* Tab nav */}
+          <div className="flex gap-2 mb-6">
+            <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+              <ShoppingBag size={14} /> Produk
+            </button>
+            <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+              <CreditCard size={14} /> Pembayaran
+            </button>
+          </div>
+
+          {tab === 'pembayaran' ? (
+            <PaymentPanel initial={paymentStatus} />
+          ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900">Produk Toko</h2>
@@ -194,8 +212,94 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               </div>
             )}
           </div>
+          )}
+        </>
         )}
       </main>
+    </div>
+  )
+}
+
+// ── Panel konfigurasi pembayaran (Midtrans milik klien) ──────────
+function PaymentPanel({ initial }: { initial: PaymentStatus }) {
+  const [status, setStatus] = useState<PaymentStatus>(initial)
+  const [serverKey, setServerKey] = useState('')
+  const [clientKey, setClientKey] = useState(initial.clientKey ?? '')
+  const [isProduction, setIsProduction] = useState(initial.isProduction)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+
+  const save = async (extra?: Partial<{ isActive: boolean }>) => {
+    setBusy(true); setMsg(null)
+    try {
+      const body: Record<string, unknown> = { clientKey: clientKey || null, isProduction, ...extra }
+      if (serverKey.trim()) body.serverKey = serverKey.trim()
+      const res = await fetch('/api/portal/payment', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      })
+      const json = await res.json()
+      if (!res.ok) { setMsg(`Gagal: ${json.error}`); return }
+      setStatus(json.status)
+      setServerKey('') // jangan tahan plaintext di state
+      setMsg('Tersimpan.')
+    } catch { setMsg('Error koneksi') } finally { setBusy(false) }
+  }
+
+  const inp = 'w-full text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Pembayaran Online (Midtrans)</h2>
+      <p className="text-sm text-gray-500 mb-5">
+        Hubungkan akun Midtrans Anda agar pembeli bisa bayar online. <strong>Uang masuk langsung ke rekening Anda.</strong>
+      </p>
+
+      <div className="flex items-center gap-2 mb-5">
+        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${status.isActive ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+          {status.isActive ? 'Aktif' : status.configured ? 'Tersimpan (nonaktif)' : 'Belum dikonfigurasi'}
+        </span>
+        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gray-100 text-gray-500">
+          Mode: {status.isProduction ? 'Production' : 'Sandbox'}
+        </span>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Server Key {status.configured && <span className="text-green-600">(sudah tersimpan — isi untuk ganti)</span>}</label>
+          <input type="password" value={serverKey} onChange={(e) => setServerKey(e.target.value)} placeholder={status.configured ? '••••••••••••' : 'Mid-server-xxxxxxxx'} className={inp} autoComplete="off" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Client Key</label>
+          <input value={clientKey} onChange={(e) => setClientKey(e.target.value)} placeholder="Mid-client-xxxxxxxx" className={inp} autoComplete="off" />
+        </div>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" checked={isProduction} onChange={(e) => setIsProduction(e.target.checked)} />
+          Mode Production (matikan untuk uji coba / Sandbox)
+        </label>
+      </div>
+
+      {msg && <p className="text-xs mt-3 text-gray-500">{msg}</p>}
+
+      <div className="flex gap-2 mt-5">
+        <button onClick={() => save()} disabled={busy} className="flex items-center gap-1 px-5 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold uppercase hover:bg-gray-800 disabled:opacity-50">
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Simpan
+        </button>
+        {status.configured && !status.isActive && (
+          <button onClick={() => save({ isActive: true })} disabled={busy} className="px-5 py-2.5 bg-apple-blue text-white rounded-xl text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+            Aktifkan
+          </button>
+        )}
+        {status.isActive && (
+          <button onClick={() => save({ isActive: false })} disabled={busy} className="px-5 py-2.5 border border-black/10 text-gray-500 rounded-xl text-[11px] font-bold uppercase hover:bg-gray-50 disabled:opacity-50">
+            Nonaktifkan
+          </button>
+        )}
+      </div>
+
+      <p className="text-[11px] text-gray-400 mt-5 leading-relaxed">
+        Dapatkan Server Key & Client Key dari dashboard Midtrans Anda (Settings → Access Keys).
+        Gunakan mode Sandbox untuk uji coba sebelum Production.
+      </p>
     </div>
   )
 }

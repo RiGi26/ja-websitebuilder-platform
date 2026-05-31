@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
 import type { Product } from '@/types/websitebuilder'
 import PortalDashboard from './PortalDashboard'
 
@@ -38,6 +39,8 @@ export default async function PortalPage() {
   const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean> }
   const hasShop = !!konfig.features?.hasCart
 
+  const paymentStatus = await getTenantPaymentStatus(tenantId)
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -45,6 +48,7 @@ export default async function PortalPage() {
       page={page ? { id: page.id, nama_website: page.nama_website, slug: page.slug, status: page.status } : null}
       initialProducts={products}
       hasShop={hasShop}
+      paymentStatus={paymentStatus}
     />
   )
 }
