@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
 import { fetchProductsByPage, fetchBlogPostsByPage } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
+import { CartProvider } from '@/app/components/cart/CartProvider'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
@@ -45,6 +46,7 @@ export default async function PublicSitePage({
 
   const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
   const primary = konfig.branding?.primary
+  const hasCart = !!konfig.features?.hasCart
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
@@ -55,7 +57,7 @@ export default async function PublicSitePage({
     needPosts ? fetchBlogPostsByPage(supabase, page.id) : Promise.resolve([]),
   ])
 
-  return (
+  const body = (
     <main className="min-h-screen bg-white">
       {/* aksen branding tipis (theming dasar) */}
       {primary && <div style={{ height: 4, backgroundColor: primary }} />}
@@ -67,9 +69,15 @@ export default async function PublicSitePage({
         </div>
       ) : (
         sections.map((s) => (
-          <SectionRenderer key={s.id} section={s} products={products} posts={posts} />
+          <SectionRenderer key={s.id} section={s} products={products} posts={posts} hasCart={hasCart} primary={primary} />
         ))
       )}
     </main>
   )
+
+  // Bungkus dengan keranjang hanya bila fitur toko aktif.
+  if (hasCart) {
+    return <CartProvider slug={slug} primary={primary}>{body}</CartProvider>
+  }
+  return body
 }

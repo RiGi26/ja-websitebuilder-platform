@@ -5,12 +5,28 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Package,
-  CreditCard, ShoppingBag,
+  CreditCard, ShoppingBag, Receipt,
 } from 'lucide-react'
 import type { Product } from '@/types/websitebuilder'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
+
+export type ShopOrderItem = { id: string; nama: string; harga_satuan: number; qty: number; subtotal: number }
+export type ShopOrderRow = {
+  id: string
+  pembeli_nama: string
+  pembeli_hp: string | null
+  pembeli_email: string | null
+  alamat: string | null
+  catatan: string | null
+  total: number
+  status: string
+  payment_status: string
+  created_at: string
+  shop_order_items: ShopOrderItem[]
+}
+
 type Props = {
   tenantId: string
   namaTenant: string
@@ -18,15 +34,16 @@ type Props = {
   initialProducts: Product[]
   hasShop: boolean
   paymentStatus: PaymentStatus
+  initialOrders: ShopOrderRow[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, paymentStatus }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, paymentStatus, initialOrders }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  const [tab, setTab] = useState<'produk' | 'pembayaran'>('produk')
+  const [tab, setTab] = useState<'produk' | 'pesanan' | 'pembayaran'>('produk')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -145,6 +162,9 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <ShoppingBag size={14} /> Produk
             </button>
+            <button onClick={() => setTab('pesanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pesanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+              <Receipt size={14} /> Pesanan
+            </button>
             <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <CreditCard size={14} /> Pembayaran
             </button>
@@ -152,6 +172,8 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
 
           {tab === 'pembayaran' ? (
             <PaymentPanel initial={paymentStatus} />
+          ) : tab === 'pesanan' ? (
+            <OrdersPanel initial={initialOrders} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
@@ -298,8 +320,107 @@ function PaymentPanel({ initial }: { initial: PaymentStatus }) {
 
       <p className="text-[11px] text-gray-400 mt-5 leading-relaxed">
         Dapatkan Server Key & Client Key dari dashboard Midtrans Anda (Settings → Access Keys).
-        Gunakan mode Sandbox untuk uji coba sebelum Production.
+        Gunakan mode Sandbox untuk uji coba sebelum Production. Set juga Notification URL ke
+        <code className="mx-1">/api/shop/webhook</code> di dashboard Midtrans agar status pesanan terupdate otomatis.
       </p>
+    </div>
+  )
+}
+
+// ── Panel pesanan toko (klien lihat & kelola pesanan masuk) ──────
+const FULFILL_STEPS = ['paid', 'processing', 'shipped', 'done'] as const
+const STATUS_LABEL: Record<string, string> = {
+  pending: 'Belum bayar', paid: 'Dibayar', processing: 'Diproses',
+  shipped: 'Dikirim', done: 'Selesai', cancelled: 'Dibatalkan',
+}
+const PAY_BADGE: Record<string, string> = {
+  paid: 'bg-green-50 text-green-600', awaiting_payment: 'bg-amber-50 text-amber-600',
+  unpaid: 'bg-gray-100 text-gray-500', failed: 'bg-red-50 text-red-500', expired: 'bg-red-50 text-red-500',
+}
+
+function rupiah2(n: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
+}
+
+function OrdersPanel({ initial }: { initial: ShopOrderRow[] }) {
+  const supabase = createClient()
+  const [orders, setOrders] = useState<ShopOrderRow[]>(initial)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(null)
+
+  const setStatus = async (id: string, status: string) => {
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('shop_orders')
+        .update({ status } as never).eq('id', id).select('*, shop_order_items(*)').single()
+      if (error) throw error
+      setOrders((p) => p.map((o) => (o.id === id ? (data as ShopOrderRow) : o)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  const paidOrders = orders.filter((o) => o.payment_status === 'paid')
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Pesanan Masuk</h2>
+        <span className="text-xs text-gray-400 font-medium">{paidOrders.length} dibayar · {orders.length} total</span>
+      </div>
+
+      {orders.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada pesanan. Pesanan dari pembeli akan muncul di sini.</p>
+      ) : (
+        <div className="space-y-2">
+          {orders.map((o) => (
+            <div key={o.id} className="rounded-xl border border-black/5 bg-gray-50">
+              <button onClick={() => setOpen(open === o.id ? null : o.id)} className="w-full flex items-center justify-between gap-3 p-3 text-left">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{o.pembeli_nama} · {rupiah2(Number(o.total))}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {' · '}#{o.id.slice(0, 8).toUpperCase()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${PAY_BADGE[o.payment_status] ?? 'bg-gray-100 text-gray-500'}`}>
+                    {o.payment_status === 'paid' ? 'Dibayar' : o.payment_status === 'awaiting_payment' ? 'Menunggu' : o.payment_status}
+                  </span>
+                </div>
+              </button>
+
+              {open === o.id && (
+                <div className="px-3 pb-3 space-y-3 border-t border-black/5 pt-3">
+                  {/* item */}
+                  <div className="space-y-1">
+                    {o.shop_order_items?.map((it) => (
+                      <div key={it.id} className="flex justify-between text-xs text-gray-600">
+                        <span>{it.nama} ×{it.qty}</span><span>{rupiah2(Number(it.subtotal))}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* kontak */}
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    {o.pembeli_hp && <p>WA: <a href={`https://wa.me/${o.pembeli_hp}`} target="_blank" className="text-apple-blue font-bold">{o.pembeli_hp}</a></p>}
+                    {o.alamat && <p>Alamat: {o.alamat}</p>}
+                    {o.catatan && <p>Catatan: {o.catatan}</p>}
+                  </div>
+                  {/* aksi status fulfilment (hanya kalau sudah dibayar) */}
+                  {o.payment_status === 'paid' && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {FULFILL_STEPS.map((s) => (
+                        <button key={s} onClick={() => setStatus(o.id, s)} disabled={busy === o.id || o.status === s}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors ${o.status === s ? 'bg-apple-blue text-white' : 'border border-black/10 text-gray-500 hover:text-apple-blue'}`}>
+                          {STATUS_LABEL[s]}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
