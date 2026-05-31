@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
 // ============================================================
 // Proxy (Next 16; menggantikan konvensi "middleware") — domain custom.
@@ -27,8 +28,35 @@ function isPrimaryHost(host: string): boolean {
   return false
 }
 
+// Refresh sesi Supabase Auth (cookie) untuk area portal customer, sesuai
+// pola @supabase/ssr. Tanpa ini, token bisa basi & server component gagal
+// membaca user. Hanya menyentuh request ke /portal.
+async function refreshPortalSession(req: NextRequest): Promise<NextResponse> {
+  const res = NextResponse.next({ request: req })
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !anonKey) return res
+
+  const supabase = createServerClient(supabaseUrl, anonKey, {
+    cookies: {
+      getAll() { return req.cookies.getAll() },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => res.cookies.set(name, value, options))
+      },
+    },
+  })
+  await supabase.auth.getUser()
+  return res
+}
+
 export async function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? ''
+
+  // Area portal customer: jaga sesi auth tetap segar.
+  if (req.nextUrl.pathname.startsWith('/portal')) {
+    return refreshPortalSession(req)
+  }
+
   if (!host || isPrimaryHost(host)) return NextResponse.next()
 
   // Hanya tangani root path; path lain (aset, dsb) dibiarkan.
