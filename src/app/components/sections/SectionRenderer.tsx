@@ -5,6 +5,7 @@
 // ============================================================
 
 import type { PageSection, TipeKomponen, Product, BlogPost } from '@/types/websitebuilder'
+import AddToCartButton from '@/app/components/cart/AddToCartButton'
 
 function formatHarga(n: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
@@ -265,7 +266,8 @@ function CustomHtml({ isi }: { isi: Isi }) {
 }
 
 // ── Add-on: Product list (data dari tabel products) ──────────
-function ProductList({ isi, products }: { isi: Isi; products: Product[] }) {
+// hasCart → tampilkan tombol "Tambah ke Keranjang" (butuh CartProvider di atasnya).
+function ProductList({ isi, products, hasCart, primary }: { isi: Isi; products: Product[]; hasCart?: boolean; primary?: string }) {
   return (
     <section className="px-6 py-20 bg-gray-50">
       <div className="max-w-5xl mx-auto">
@@ -275,15 +277,16 @@ function ProductList({ isi, products }: { isi: Isi; products: Product[] }) {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {products.map((p) => (
-              <div key={p.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden">
+              <div key={p.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden flex flex-col">
                 {p.gambar_url && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={p.gambar_url} alt={p.nama} className="w-full aspect-square object-cover" />
                 )}
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-1">
                   <h3 className="font-bold text-gray-900 text-sm">{p.nama}</h3>
                   {p.kategori && <p className="text-[11px] text-gray-400 uppercase tracking-widest">{p.kategori}</p>}
                   <p className="text-apple-blue font-extrabold mt-2">{formatHarga(p.harga)}</p>
+                  {hasCart && <div className="mt-auto"><AddToCartButton product={p} primary={primary} /></div>}
                 </div>
               </div>
             ))}
@@ -358,15 +361,19 @@ export function SectionRenderer({
   section,
   products = [],
   posts = [],
+  hasCart = false,
+  primary,
 }: {
   section: PageSection
   products?: Product[]
   posts?: BlogPost[]
+  hasCart?: boolean
+  primary?: string
 }) {
   const isi = (section.isi_komponen ?? {}) as Isi
 
   // Add-on dengan sumber data tabel bersama
-  if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} />
+  if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} hasCart={hasCart} primary={primary} />
   if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} />
   if (section.tipe_komponen === 'social_feed') return <AddonPlaceholder label="Social Feed" />
 
