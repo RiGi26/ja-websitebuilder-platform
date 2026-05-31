@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
-import { fetchProductsByPage, fetchBlogPostsByPage } from '@/lib/supabase/addons'
+import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
@@ -47,14 +47,17 @@ export default async function PublicSitePage({
   const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
   const primary = konfig.branding?.primary
   const hasCart = !!konfig.features?.hasCart
+  const hasBooking = !!konfig.features?.hasBooking
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
   const needProducts = sections.some((s) => s.tipe_komponen === 'product_list')
   const needPosts = sections.some((s) => s.tipe_komponen === 'blog_list')
-  const [products, posts] = await Promise.all([
+  const needServices = sections.some((s) => s.tipe_komponen === 'service_list')
+  const [products, posts, services] = await Promise.all([
     needProducts ? fetchProductsByPage(supabase, page.id) : Promise.resolve([]),
     needPosts ? fetchBlogPostsByPage(supabase, page.id) : Promise.resolve([]),
+    needServices ? fetchServicesByPage(supabase, page.id) : Promise.resolve([]),
   ])
 
   const body = (
@@ -69,7 +72,7 @@ export default async function PublicSitePage({
         </div>
       ) : (
         sections.map((s) => (
-          <SectionRenderer key={s.id} section={s} products={products} posts={posts} hasCart={hasCart} primary={primary} />
+          <SectionRenderer key={s.id} section={s} products={products} posts={posts} services={services} hasCart={hasCart} hasBooking={hasBooking} slug={slug} primary={primary} />
         ))
       )}
     </main>
