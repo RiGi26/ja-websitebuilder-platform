@@ -5,7 +5,7 @@
 // Dipilih oleh [slug]/page.tsx saat konfigurasi.branding.theme==='batik_toko'.
 // ============================================================
 
-import { Cormorant_Garamond, Nunito } from 'next/font/google'
+import { Cormorant_Garamond, Josefin_Sans } from 'next/font/google'
 import AddToCartButton from '@/app/components/cart/AddToCartButton'
 import type { PageSection, Product, TenantProfile } from '@/types/websitebuilder'
 
@@ -17,9 +17,9 @@ const serif = Cormorant_Garamond({
   variable: '--font-batik-serif',
 })
 
-const sans = Nunito({
+const sans = Josefin_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['300', '400', '600', '700'],
   display: 'swap',
   variable: '--font-batik-sans',
 })
@@ -187,10 +187,34 @@ function Hero({ isi }: { isi: Isi }) {
   )
 }
 
+// ── SVG motif batik mini (parang, kawung, truntum) ───────────
+const BATIK_ICONS = [
+  // Parang — diagonal blade motif
+  <svg key="parang" width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <path d="M4 24L14 4L24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M8 17h12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    <circle cx="14" cy="4" r="1.5" fill="currentColor"/>
+  </svg>,
+  // Kawung — four-petal circle motif
+  <svg key="kawung" width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <ellipse cx="14" cy="7" rx="4.5" ry="3" stroke="currentColor" strokeWidth="1.3"/>
+    <ellipse cx="14" cy="21" rx="4.5" ry="3" stroke="currentColor" strokeWidth="1.3"/>
+    <ellipse cx="7" cy="14" rx="3" ry="4.5" stroke="currentColor" strokeWidth="1.3"/>
+    <ellipse cx="21" cy="14" rx="3" ry="4.5" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="14" cy="14" r="2.5" stroke="currentColor" strokeWidth="1.2"/>
+  </svg>,
+  // Truntum — star/jasmine blossom motif
+  <svg key="truntum" width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <path d="M14 3v5M14 20v5M3 14h5M20 14h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <path d="M6.5 6.5l3.5 3.5M18 18l3.5 3.5M21.5 6.5l-3.5 3.5M10 18l-3.5 3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    <circle cx="14" cy="14" r="3" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="14" cy="14" r="1" fill="currentColor"/>
+  </svg>,
+]
+
 // ── Features / Keunggulan ─────────────────────────────────────
 function Features({ isi }: { isi: Isi }) {
   const items = asArray(isi.items ?? isi.fitur)
-  const icons = ['✦', '◈', '✧']
   return (
     <section id="keunggulan" style={{ backgroundColor: CREAM }}>
       <div className="max-w-5xl mx-auto px-6 py-24">
@@ -218,19 +242,19 @@ function Features({ isi }: { isi: Isi }) {
           {items.map((it: Isi, i: number) => (
             <div
               key={i}
-              className="relative p-8 rounded-2xl text-center group transition-shadow hover:shadow-xl"
+              className={`relative p-8 rounded-2xl text-center group transition-shadow hover:shadow-xl b-reveal b-delay-${i + 1}`}
               style={{
                 backgroundColor: PAPER,
                 border: `1px solid ${SOFT}`,
                 boxShadow: '0 2px 12px rgba(26,16,64,0.06)',
               }}
             >
-              {/* Icon ornament */}
+              {/* Icon ornament batik */}
               <div
-                className={`${serif.className} text-3xl mb-4`}
-                style={{ color: GOLD }}
+                className="flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-5"
+                style={{ backgroundColor: `${GOLD}15`, color: GOLD }}
               >
-                {icons[i] ?? '◆'}
+                {BATIK_ICONS[i] ?? BATIK_ICONS[0]}
               </div>
               <h3
                 className={`${serif.className} text-xl mb-3 font-medium`}
@@ -284,11 +308,11 @@ function ProductList({ isi, products, hasCart, primary }: {
             Koleksi segera hadir.
           </p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {products.map((p) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {products.map((p, i) => (
               <div
                 key={p.id}
-                className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                className={`group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl b-reveal b-delay-${Math.min(i + 1, 3)}`}
                 style={{
                   backgroundColor: CREAM,
                   border: `1px solid ${SOFT}`,
@@ -387,7 +411,7 @@ function Testimonials({ isi }: { isi: Isi }) {
           {items.map((it: Isi, i: number) => (
             <blockquote
               key={i}
-              className="relative p-8 rounded-2xl"
+              className={`relative p-8 rounded-2xl b-reveal b-delay-${i + 1}`}
               style={{
                 backgroundColor: 'rgba(255,248,237,0.06)',
                 border: `1px solid ${GOLD}25`,
@@ -524,17 +548,58 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
 // ── Footer ────────────────────────────────────────────────────
 function Footer({ nama }: { nama: string }) {
   return (
-    <footer
-      className="py-8 text-center"
-      style={{ backgroundColor: INK }}
-    >
-      <p
-        className={`${serif.className} italic text-sm`}
-        style={{ color: `${GOLD}80` }}
-      >
-        © {new Date().getFullYear()} {nama} — Warisan Wastra Nusantara
-      </p>
+    <footer style={{ backgroundColor: INK }}>
+      {/* Kawung decorative border row */}
+      <div
+        className="w-full h-10 opacity-20"
+        style={{
+          backgroundImage: kawungPattern(0.7, 'C8922A'),
+          backgroundSize: '40px 40px',
+          borderTop: `1px solid ${GOLD}30`,
+        }}
+      />
+      <div className="py-8 text-center">
+        <Ornament color={`${GOLD}50`} />
+        <p
+          className={`${serif.className} italic text-sm mt-4`}
+          style={{ color: `${GOLD}70` }}
+        >
+          © {new Date().getFullYear()} {nama}
+        </p>
+        <p
+          className={`${sans.className} text-[10px] uppercase tracking-[0.3em] mt-1`}
+          style={{ color: `${GOLD}40` }}
+        >
+          Warisan Wastra Nusantara
+        </p>
+      </div>
     </footer>
+  )
+}
+
+// ── Scroll Reveal Script (injected once per page) ─────────────
+function ScrollRevealScript() {
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .b-reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .b-reveal.b-visible { opacity: 1; transform: translateY(0); }
+        .b-delay-1 { transition-delay: 100ms; }
+        .b-delay-2 { transition-delay: 200ms; }
+        .b-delay-3 { transition-delay: 300ms; }
+      ` }} />
+      <script dangerouslySetInnerHTML={{ __html: `
+        (function(){
+          function init(){
+            var io = new IntersectionObserver(function(entries){
+              entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('b-visible'); io.unobserve(e.target); } });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.b-reveal').forEach(function(el){ io.observe(el); });
+          }
+          if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+        })();
+      ` }} />
+    </>
   )
 }
 
@@ -576,6 +641,7 @@ export default function BatikTokoRenderer({
 
   return (
     <div className={`${serif.variable} ${sans.variable}`} style={{ backgroundColor: PAPER }}>
+      <ScrollRevealScript />
       <TopBar nama={nama} wa={waContact} />
       <main>
         {sections
