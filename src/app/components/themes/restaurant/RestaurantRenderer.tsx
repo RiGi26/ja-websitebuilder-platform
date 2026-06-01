@@ -7,7 +7,7 @@
 // ============================================================
 
 import { Playfair_Display } from 'next/font/google'
-import type { PageSection, MenuItem } from '@/types/websitebuilder'
+import type { PageSection, MenuItem, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 
 const display = Playfair_Display({
   subsets: ['latin'],
@@ -148,8 +148,8 @@ function Menu({ isi, menuItems }: { isi: Isi; menuItems?: MenuItem[] }) {
 }
 
 // ── Galeri — grid asimetris ───────────────────────────────────
-function Gallery({ isi }: { isi: Isi }) {
-  const images = asArray(isi.images ?? isi.gambar)
+function Gallery({ isi, gallery }: { isi: Isi; gallery?: GalleryImage[] }) {
+  const images = (gallery && gallery.length > 0) ? gallery.map((g) => g.url) : asArray(isi.images ?? isi.gambar)
   if (images.length === 0) return null
   return (
     <section id="galeri" className="py-24 px-6" style={{ backgroundColor: CREAM }}>
@@ -172,7 +172,16 @@ function Gallery({ isi }: { isi: Isi }) {
 }
 
 // ── Kunjungi (kontak/jam/lokasi) ──────────────────────────────
-function Visit({ isi }: { isi: Isi }) {
+// Profil bisnis dari tabel tenant_profile (customer) menimpa isi section.
+function Visit({ isi, profile }: { isi: Isi; profile?: TenantProfile | null }) {
+  isi = {
+    ...isi,
+    alamat: profile?.alamat ?? isi.alamat,
+    jam: profile?.jam ?? isi.jam,
+    wa: profile?.wa ?? isi.wa,
+    email: profile?.email ?? isi.email,
+    maps_url: profile?.maps_url ?? isi.maps_url,
+  }
   return (
     <section id="kunjungi" className="py-24 px-6" style={{ backgroundColor: PAPER }}>
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
@@ -225,12 +234,14 @@ function Footer({ nama }: { nama: string }) {
 }
 
 export default function RestaurantRenderer({
-  nama, sections, wa, menuItems,
+  nama, sections, wa, menuItems, gallery, profile,
 }: {
   nama: string
   sections: PageSection[]
   wa?: string
   menuItems?: MenuItem[]
+  gallery?: GalleryImage[]
+  profile?: TenantProfile | null
 }) {
   return (
     <main style={{ backgroundColor: PAPER }}>
@@ -241,8 +252,8 @@ export default function RestaurantRenderer({
           case 'hero_banner': return <Hero key={s.id} isi={isi} />
           case 'about': return <Story key={s.id} isi={isi} />
           case 'pricing_table': return <Menu key={s.id} isi={isi} menuItems={menuItems} />
-          case 'gallery': return <Gallery key={s.id} isi={isi} />
-          case 'contact_form': return <Visit key={s.id} isi={isi} />
+          case 'gallery': return <Gallery key={s.id} isi={isi} gallery={gallery} />
+          case 'contact_form': return <Visit key={s.id} isi={isi} profile={profile} />
           case 'cta': return <Closing key={s.id} isi={isi} />
           default: return null
         }

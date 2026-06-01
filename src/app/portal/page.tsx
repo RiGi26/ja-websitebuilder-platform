@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
-import type { Product, Service, MenuItem } from '@/types/websitebuilder'
+import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 
 export const dynamic = 'force-dynamic'
@@ -40,6 +40,8 @@ export default async function PortalPage() {
   const hasShop = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
   const hasMenu = !!konfig.features?.hasMenu
+  const hasBlog = !!konfig.features?.hasBlog
+  const hasGallery = !!konfig.features?.hasGallery
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
 
@@ -75,6 +77,26 @@ export default async function PortalPage() {
     menu = (data ?? []) as MenuItem[]
   }
 
+  // Blog & galeri & profil bisnis (customer-editable).
+  let blog: BlogPost[] = []
+  if (hasBlog && page?.id) {
+    const { data } = await supabaseAdmin
+      .from('blog_posts').select('*').eq('page_id', page.id).order('created_at', { ascending: false })
+    blog = (data ?? []) as BlogPost[]
+  }
+  let gallery: GalleryImage[] = []
+  if (hasGallery && page?.id) {
+    const { data } = await supabaseAdmin
+      .from('gallery_images').select('*').eq('page_id', page.id).order('urutan', { ascending: true })
+    gallery = (data ?? []) as GalleryImage[]
+  }
+  let profile: TenantProfile | null = null
+  if (page?.id) {
+    const { data } = await supabaseAdmin
+      .from('tenant_profile').select('*').eq('page_id', page.id).maybeSingle()
+    profile = (data ?? null) as TenantProfile | null
+  }
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -84,11 +106,16 @@ export default async function PortalPage() {
       hasShop={hasShop}
       hasBooking={hasBooking}
       hasMenu={hasMenu}
+      hasBlog={hasBlog}
+      hasGallery={hasGallery}
       paymentStatus={paymentStatus}
       initialOrders={shopOrders}
       initialServices={services}
       initialBookings={bookings}
       initialMenu={menu}
+      initialBlog={blog}
+      initialGallery={gallery}
+      initialProfile={profile}
     />
   )
 }
