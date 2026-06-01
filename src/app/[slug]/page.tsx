@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
-import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage } from '@/lib/supabase/addons'
+import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage, fetchMenuItemsByPage } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
@@ -54,7 +54,8 @@ export default async function PublicSitePage({
 
   // Tema visual bespoke per industri (custom design, bukan tema generik).
   if (theme === 'restaurant') {
-    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={(page.data_konten as Record<string, any>)?.wa} />
+    const menuItems = await fetchMenuItemsByPage(supabase, page.id)
+    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={(page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} />
   }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
