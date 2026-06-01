@@ -7,7 +7,7 @@
 // ============================================================
 
 import { Playfair_Display } from 'next/font/google'
-import type { PageSection } from '@/types/websitebuilder'
+import type { PageSection, MenuItem } from '@/types/websitebuilder'
 
 const display = Playfair_Display({
   subsets: ['latin'],
@@ -108,8 +108,11 @@ function Story({ isi }: { isi: Isi }) {
 }
 
 // ── Menu — bergaya klasik, dikelompokkan per kategori ─────────
-function Menu({ isi }: { isi: Isi }) {
-  const items = asArray(isi.items)
+// Sumber utama: tabel menu_items (dikelola customer). Fallback: isi.items section.
+function Menu({ isi, menuItems }: { isi: Isi; menuItems?: MenuItem[] }) {
+  const items: Isi[] = (menuItems && menuItems.length > 0)
+    ? menuItems.map((m) => ({ nama: m.nama, harga: m.harga, desc: m.deskripsi, kategori: m.kategori ?? 'Menu' }))
+    : asArray(isi.items)
   const kategoris: string[] = [...new Set(items.map((i: Isi) => i.kategori ?? 'Menu'))]
   return (
     <section id="menu" className="py-24 px-6" style={{ backgroundColor: INK }}>
@@ -222,11 +225,12 @@ function Footer({ nama }: { nama: string }) {
 }
 
 export default function RestaurantRenderer({
-  nama, sections, wa,
+  nama, sections, wa, menuItems,
 }: {
   nama: string
   sections: PageSection[]
   wa?: string
+  menuItems?: MenuItem[]
 }) {
   return (
     <main style={{ backgroundColor: PAPER }}>
@@ -236,7 +240,7 @@ export default function RestaurantRenderer({
         switch (s.tipe_komponen) {
           case 'hero_banner': return <Hero key={s.id} isi={isi} />
           case 'about': return <Story key={s.id} isi={isi} />
-          case 'pricing_table': return <Menu key={s.id} isi={isi} />
+          case 'pricing_table': return <Menu key={s.id} isi={isi} menuItems={menuItems} />
           case 'gallery': return <Gallery key={s.id} isi={isi} />
           case 'contact_form': return <Visit key={s.id} isi={isi} />
           case 'cta': return <Closing key={s.id} isi={isi} />

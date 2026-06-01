@@ -233,6 +233,22 @@ export interface Product {
   updated_at: string
 }
 
+// Item menu restoran (pola mirip Product). Dikelola customer via portal.
+export interface MenuItem {
+  id: string
+  tenant_id: string
+  page_id: string
+  kategori: string | null
+  nama: string
+  deskripsi: string | null
+  harga: number
+  gambar_url: string | null
+  is_active: boolean
+  urutan: number
+  created_at: string
+  updated_at: string
+}
+
 export interface BlogPost {
   id: string
   tenant_id: string
