@@ -5,6 +5,7 @@ import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
 import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
+import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
@@ -46,9 +47,15 @@ export default async function PublicSitePage({
 
   const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
   const primary = konfig.branding?.primary
+  const theme = konfig.branding?.theme
   const hasCart = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
+
+  // Tema visual bespoke per industri (custom design, bukan tema generik).
+  if (theme === 'restaurant') {
+    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={(page.data_konten as Record<string, any>)?.wa} />
+  }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
   const needProducts = sections.some((s) => s.tipe_komponen === 'product_list')
