@@ -4,7 +4,7 @@
 // dengan default aman. Dipakai oleh src/app/[slug]/page.tsx.
 // ============================================================
 
-import type { PageSection, TipeKomponen, Product, BlogPost, Service } from '@/types/websitebuilder'
+import type { PageSection, TipeKomponen, Product, BlogPost, Service, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import AddToCartButton from '@/app/components/cart/AddToCartButton'
 
 function formatHarga(n: number) {
@@ -97,8 +97,9 @@ function Stats({ isi }: { isi: Isi }) {
 }
 
 // ── Gallery ───────────────────────────────────────────────────
-function Gallery({ isi }: { isi: Isi }) {
-  const images = asArray(isi.images ?? isi.gambar)
+// Sumber utama: tabel gallery_images (customer). Fallback: isi.images.
+function Gallery({ isi, gallery }: { isi: Isi; gallery?: GalleryImage[] }) {
+  const images = (gallery && gallery.length > 0) ? gallery.map((g) => g.url) : asArray(isi.images ?? isi.gambar)
   return (
     <section className="px-6 py-20">
       <div className="max-w-5xl mx-auto">
@@ -219,19 +220,33 @@ function Cta({ isi }: { isi: Isi }) {
 }
 
 // ── Contact form (statis — submit ke wa/email) ────────────────
-function ContactForm({ isi }: { isi: Isi }) {
+// Profil bisnis (kontak/jam/alamat/peta) dari tabel tenant_profile (customer)
+// menimpa isi section bila ada.
+function ContactForm({ isi, profile }: { isi: Isi; profile?: TenantProfile | null }) {
+  const wa = profile?.wa ?? isi.wa
+  const email = profile?.email ?? isi.email
+  const alamat = profile?.alamat ?? isi.alamat
+  const jam = profile?.jam ?? isi.jam
+  const maps = profile?.maps_url ?? isi.maps_url ?? isi.url
   return (
     <section className="px-6 py-20 max-w-2xl mx-auto text-center">
       <h2 className="text-3xl font-bold text-gray-900 mb-4">{isi.title ?? 'Hubungi Kami'}</h2>
-      {isi.deskripsi && <p className="text-gray-500 mb-8">{isi.deskripsi}</p>}
+      {isi.deskripsi && <p className="text-gray-500 mb-6">{isi.deskripsi}</p>}
+      {(alamat || jam) && (
+        <div className="text-sm text-gray-600 mb-6 space-y-1">
+          {alamat && <p>{alamat}</p>}
+          {jam && <p className="whitespace-pre-wrap text-gray-400">{jam}</p>}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        {isi.wa && (
-          <a href={`https://wa.me/${isi.wa}`} className="px-6 py-3 bg-green-500 text-white rounded-2xl font-bold">WhatsApp</a>
-        )}
-        {isi.email && (
-          <a href={`mailto:${isi.email}`} className="px-6 py-3 bg-gray-900 text-white rounded-2xl font-bold">Email</a>
-        )}
+        {wa && <a href={`https://wa.me/${wa}`} className="px-6 py-3 bg-green-500 text-white rounded-2xl font-bold">WhatsApp</a>}
+        {email && <a href={`mailto:${email}`} className="px-6 py-3 bg-gray-900 text-white rounded-2xl font-bold">Email</a>}
       </div>
+      {maps && (
+        <div className="mt-8 rounded-2xl overflow-hidden aspect-video">
+          <iframe src={maps} className="w-full h-full" loading="lazy" title="peta" />
+        </div>
+      )}
     </section>
   )
 }
@@ -391,13 +406,11 @@ const MAP: Partial<Record<TipeKomponen, (p: { isi: Isi }) => React.ReactElement 
   about: About,
   features: Features,
   stats: Stats,
-  gallery: Gallery,
   testimonials: Testimonials,
   team: Team,
   pricing_table: PricingTable,
   faq: Faq,
   cta: Cta,
-  contact_form: ContactForm,
   video_embed: VideoEmbed,
   map_embed: MapEmbed,
   custom_html: CustomHtml,
@@ -408,6 +421,8 @@ export function SectionRenderer({
   products = [],
   posts = [],
   services = [],
+  gallery = [],
+  profile = null,
   hasCart = false,
   hasBooking = false,
   slug,
@@ -417,6 +432,8 @@ export function SectionRenderer({
   products?: Product[]
   posts?: BlogPost[]
   services?: Service[]
+  gallery?: GalleryImage[]
+  profile?: TenantProfile | null
   hasCart?: boolean
   hasBooking?: boolean
   slug?: string
@@ -428,6 +445,8 @@ export function SectionRenderer({
   if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} hasCart={hasCart} primary={primary} />
   if (section.tipe_komponen === 'service_list') return <ServiceList isi={isi} services={services} hasBooking={hasBooking} slug={slug} primary={primary} />
   if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} />
+  if (section.tipe_komponen === 'gallery') return <Gallery isi={isi} gallery={gallery} />
+  if (section.tipe_komponen === 'contact_form') return <ContactForm isi={isi} profile={profile} />
   if (section.tipe_komponen === 'social_feed') return <AddonPlaceholder label="Social Feed" />
 
   const Comp = MAP[section.tipe_komponen]

@@ -6,7 +6,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Product, BlogPost, Service, MenuItem } from '@/types/websitebuilder'
+import type { Product, BlogPost, Service, MenuItem, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Client = SupabaseClient<any>
@@ -60,6 +60,29 @@ export async function fetchMenuItemsByPage(client: Client, pageId: string): Prom
     return []
   }
   return (data ?? []) as MenuItem[]
+}
+
+// Galeri foto aktif untuk sebuah halaman, urut by urutan.
+export async function fetchGalleryByPage(client: Client, pageId: string): Promise<GalleryImage[]> {
+  const { data, error } = await client
+    .from('gallery_images')
+    .select('*')
+    .eq('page_id', pageId)
+    .eq('is_active', true)
+    .order('urutan', { ascending: true })
+  if (error) { console.error('fetchGalleryByPage:', error.message); return [] }
+  return (data ?? []) as GalleryImage[]
+}
+
+// Profil bisnis (1 baris) untuk sebuah halaman. null bila belum diisi.
+export async function fetchTenantProfile(client: Client, pageId: string): Promise<TenantProfile | null> {
+  const { data, error } = await client
+    .from('tenant_profile')
+    .select('*')
+    .eq('page_id', pageId)
+    .maybeSingle()
+  if (error) { console.error('fetchTenantProfile:', error.message); return null }
+  return (data ?? null) as TenantProfile | null
 }
 
 // Artikel published untuk sebuah halaman, terbaru dulu.
