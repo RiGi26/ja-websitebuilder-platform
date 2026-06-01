@@ -6,6 +6,7 @@ import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage, fetchMe
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
+import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
@@ -60,6 +61,26 @@ export default async function PublicSitePage({
       fetchTenantProfile(supabase, page.id),
     ])
     return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} />
+  }
+
+  if (theme === 'batik_toko') {
+    const [products, profile] = await Promise.all([
+      fetchProductsByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    const renderer = (
+      <BatikTokoRenderer
+        nama={page.nama_website}
+        sections={sections}
+        products={products}
+        profile={profile}
+        hasCart={hasCart}
+        slug={slug}
+        primary={primary}
+        wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa}
+      />
+    )
+    return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
   }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
