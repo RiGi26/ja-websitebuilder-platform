@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Package,
-  CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase,
+  CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
 } from 'lucide-react'
-import type { Product, Service } from '@/types/websitebuilder'
+import type { Product, Service, MenuItem } from '@/types/websitebuilder'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -50,20 +50,22 @@ type Props = {
   initialProducts: Product[]
   hasShop: boolean
   hasBooking: boolean
+  hasMenu: boolean
   paymentStatus: PaymentStatus
   initialOrders: ShopOrderRow[]
   initialServices: Service[]
   initialBookings: BookingRow[]
+  initialMenu: MenuItem[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, paymentStatus, initialOrders, initialServices, initialBookings }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'pembayaran'
-  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : 'pembayaran')
+  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'pembayaran'
+  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : 'pembayaran')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -169,11 +171,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
             <p className="text-gray-500">Website Anda sedang disiapkan oleh tim. Silakan cek kembali nanti.</p>
           </div>
-        ) : !hasShop && !hasBooking ? (
+        ) : !hasShop && !hasBooking && !hasMenu ? (
           <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
             <Package size={40} className="text-gray-200 mx-auto mb-4" />
             <h2 className="text-lg font-bold text-gray-900 mb-1">Belum ada fitur yang bisa dikelola sendiri</h2>
-            <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko atau booking. Hubungi tim untuk perubahan konten.</p>
+            <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko, booking, atau menu. Hubungi tim untuk perubahan konten.</p>
           </div>
         ) : (
         <>
@@ -199,6 +201,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 <CalendarClock size={14} /> Reservasi
               </button>
             )}
+            {hasMenu && (
+              <button onClick={() => setTab('menu')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'menu' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <UtensilsCrossed size={14} /> Menu
+              </button>
+            )}
             <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <CreditCard size={14} /> Pembayaran
             </button>
@@ -212,6 +219,8 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <ServicePanel page={page} tenantId={tenantId} initial={initialServices} />
           ) : tab === 'reservasi' ? (
             <BookingsPanel initial={initialBookings} />
+          ) : tab === 'menu' ? (
+            <MenuPanel page={page} tenantId={tenantId} initial={initialMenu} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
@@ -758,6 +767,142 @@ function BookingsPanel({ initial }: { initial: BookingRow[] }) {
               )}
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel menu (resto) — pemilik kelola daftar menu sendiri ──────
+type MenuDraft = { nama: string; harga: string; kategori: string; deskripsi: string; gambar_url: string }
+const MENU_EMPTY: MenuDraft = { nama: '', harga: '', kategori: '', deskripsi: '', gambar_url: '' }
+
+function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: MenuItem[] }) {
+  const supabase = createClient()
+  const [items, setItems] = useState<MenuItem[]>(initial)
+  const [add, setAdd] = useState<MenuDraft>(MENU_EMPTY)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<MenuDraft>(MENU_EMPTY)
+  const [busy, setBusy] = useState<string | null>(null)
+  const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
+
+  const payload = (d: MenuDraft) => ({
+    nama: d.nama,
+    harga: Number(d.harga) || 0,
+    kategori: d.kategori || null,
+    deskripsi: d.deskripsi || null,
+    gambar_url: d.gambar_url || null,
+  })
+
+  const create = async () => {
+    if (!page) return
+    if (!add.nama.trim()) return alert('Nama menu wajib')
+    setBusy('add')
+    try {
+      const { data, error } = await supabase.from('menu_items')
+        .insert({ page_id: page.id, tenant_id: tenantId, is_active: true, ...payload(add) } as never)
+        .select().single()
+      if (error) throw error
+      setItems((p) => [...p, data as MenuItem])
+      setAdd(MENU_EMPTY)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const startEdit = (m: MenuItem) => {
+    setEditId(m.id)
+    setDraft({
+      nama: m.nama ?? '', harga: m.harga != null ? String(m.harga) : '',
+      kategori: m.kategori ?? '', deskripsi: m.deskripsi ?? '', gambar_url: m.gambar_url ?? '',
+    })
+  }
+  const saveEdit = async (id: string) => {
+    if (!draft.nama.trim()) return alert('Nama menu wajib')
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('menu_items')
+        .update(payload(draft) as never).eq('id', id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === id ? (data as MenuItem) : x)))
+      setEditId(null)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const toggle = async (m: MenuItem) => {
+    setBusy(m.id)
+    try {
+      const { data, error } = await supabase.from('menu_items')
+        .update({ is_active: !m.is_active } as never).eq('id', m.id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === m.id ? (data as MenuItem) : x)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const remove = async (id: string) => {
+    if (!confirm('Hapus menu ini?')) return
+    setBusy(id)
+    try {
+      const { error } = await supabase.from('menu_items').delete().eq('id', id)
+      if (error) throw error
+      setItems((p) => p.filter((x) => x.id !== id))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+        <span className="text-xs text-gray-400 font-medium">{items.length} item</span>
+      </div>
+
+      {/* form tambah */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-2">
+        <input value={add.nama} onChange={(e) => setAdd({ ...add, nama: e.target.value })} placeholder="Nama menu *" className={`${inp} sm:col-span-2`} />
+        <input value={add.harga} onChange={(e) => setAdd({ ...add, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
+        <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori (mis. Pembuka)" className={inp} />
+        <input value={add.gambar_url} onChange={(e) => setAdd({ ...add, gambar_url: e.target.value })} placeholder="URL gambar (opsional)" className={`${inp} sm:col-span-2`} />
+        <input value={add.deskripsi} onChange={(e) => setAdd({ ...add, deskripsi: e.target.value })} placeholder="Deskripsi (opsional)" className={`${inp} sm:col-span-2`} />
+      </div>
+      <div className="flex justify-end mb-6">
+        <button disabled={busy === 'add'} onClick={create} className="flex items-center justify-center gap-1 px-5 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+          {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah Menu
+        </button>
+      </div>
+
+      {/* daftar */}
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada menu. Tambahkan item pertama Anda di atas.</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((it) =>
+            editId === it.id ? (
+              <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <input value={draft.nama} onChange={(e) => setDraft({ ...draft, nama: e.target.value })} placeholder="Nama *" className={`${inp} sm:col-span-2`} />
+                  <input value={draft.harga} onChange={(e) => setDraft({ ...draft, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
+                  <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
+                  <input value={draft.gambar_url} onChange={(e) => setDraft({ ...draft, gambar_url: e.target.value })} placeholder="URL gambar" className={`${inp} sm:col-span-2`} />
+                  <input value={draft.deskripsi} onChange={(e) => setDraft({ ...draft, deskripsi: e.target.value })} placeholder="Deskripsi" className={`${inp} sm:col-span-2`} />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setEditId(null)} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-500 hover:bg-white">Batal</button>
+                  <button onClick={() => saveEdit(it.id)} disabled={busy === it.id} className="flex items-center gap-1 px-4 py-1.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+                    {busy === it.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Simpan
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={it.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-xl border border-black/5">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{it.nama} {!it.is_active && <span className="text-[10px] text-gray-400 uppercase">(non-aktif)</span>}</p>
+                  <p className="text-xs text-gray-500">Rp {Number(it.harga).toLocaleString('id-ID')}{it.kategori ? ` · ${it.kategori}` : ''}</p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
+                  <button onClick={() => toggle(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_active ? 'Sembunyikan' : 'Tampilkan'}>
+                    {it.is_active ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
+                  </button>
+                  <button onClick={() => remove(it.id)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Hapus"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            )
+          )}
         </div>
       )}
     </div>

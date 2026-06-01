@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
-import type { Product, Service } from '@/types/websitebuilder'
+import type { Product, Service, MenuItem } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 
 export const dynamic = 'force-dynamic'
@@ -39,6 +39,7 @@ export default async function PortalPage() {
   const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean> }
   const hasShop = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
+  const hasMenu = !!konfig.features?.hasMenu
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
 
@@ -66,6 +67,14 @@ export default async function PortalPage() {
     bookings = (bk ?? []) as BookingRow[]
   }
 
+  // Menu (resto) — kalau fitur menu aktif.
+  let menu: MenuItem[] = []
+  if (hasMenu && page?.id) {
+    const { data } = await supabaseAdmin
+      .from('menu_items').select('*').eq('page_id', page.id).order('urutan', { ascending: true })
+    menu = (data ?? []) as MenuItem[]
+  }
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -74,10 +83,12 @@ export default async function PortalPage() {
       initialProducts={products}
       hasShop={hasShop}
       hasBooking={hasBooking}
+      hasMenu={hasMenu}
       paymentStatus={paymentStatus}
       initialOrders={shopOrders}
       initialServices={services}
       initialBookings={bookings}
+      initialMenu={menu}
     />
   )
 }
