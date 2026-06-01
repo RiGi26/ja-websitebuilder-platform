@@ -54,6 +54,7 @@ export interface BrandingConfig {
   secondary?: string
   logo_url?: string
   font?: string
+  theme?: string // tema visual renderer (mis. 'restaurant'); default = tema generik
 }
 
 export interface KonfigurasiWebsite {
