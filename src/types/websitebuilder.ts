@@ -285,6 +285,34 @@ export interface Service {
   updated_at: string
 }
 
+// Galeri foto — dikelola customer via portal (reklasifikasi studio→customer).
+export interface GalleryImage {
+  id: string
+  tenant_id: string
+  page_id: string
+  url: string
+  caption: string | null
+  is_active: boolean
+  urutan: number
+  created_at: string
+}
+
+// Profil bisnis (1 baris per halaman) — kontak/jam/alamat/peta/sosial, editable customer.
+export interface TenantProfile {
+  page_id: string
+  tenant_id: string
+  wa: string | null
+  email: string | null
+  alamat: string | null
+  jam: string | null
+  maps_url: string | null
+  instagram: string | null
+  ongkir: string | null
+  delivery: string | null
+  newsletter: boolean
+  updated_at: string
+}
+
 export interface Booking {
   id: string
   tenant_id: string
