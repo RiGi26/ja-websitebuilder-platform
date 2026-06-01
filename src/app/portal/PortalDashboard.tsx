@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
-  Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Package,
+  Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
+  FileText, Image as ImageIcon, Store,
 } from 'lucide-react'
-import type { Product, Service, MenuItem } from '@/types/websitebuilder'
+import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -51,21 +52,26 @@ type Props = {
   hasShop: boolean
   hasBooking: boolean
   hasMenu: boolean
+  hasBlog: boolean
+  hasGallery: boolean
   paymentStatus: PaymentStatus
   initialOrders: ShopOrderRow[]
   initialServices: Service[]
   initialBookings: BookingRow[]
   initialMenu: MenuItem[]
+  initialBlog: BlogPost[]
+  initialGallery: GalleryImage[]
+  initialProfile: TenantProfile | null
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'pembayaran'
-  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : 'pembayaran')
+  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
+  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -171,12 +177,6 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
             <p className="text-gray-500">Website Anda sedang disiapkan oleh tim. Silakan cek kembali nanti.</p>
           </div>
-        ) : !hasShop && !hasBooking && !hasMenu ? (
-          <div className="bg-white rounded-3xl p-12 text-center apple-shadow border border-black/5">
-            <Package size={40} className="text-gray-200 mx-auto mb-4" />
-            <h2 className="text-lg font-bold text-gray-900 mb-1">Belum ada fitur yang bisa dikelola sendiri</h2>
-            <p className="text-sm text-gray-500">Website Anda belum mengaktifkan fitur toko, booking, atau menu. Hubungi tim untuk perubahan konten.</p>
-          </div>
         ) : (
         <>
           {/* Tab nav */}
@@ -206,6 +206,19 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 <UtensilsCrossed size={14} /> Menu
               </button>
             )}
+            {hasBlog && (
+              <button onClick={() => setTab('blog')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'blog' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <FileText size={14} /> Blog
+              </button>
+            )}
+            {hasGallery && (
+              <button onClick={() => setTab('galeri')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'galeri' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <ImageIcon size={14} /> Galeri
+              </button>
+            )}
+            <button onClick={() => setTab('profil')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'profil' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+              <Store size={14} /> Profil
+            </button>
             <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <CreditCard size={14} /> Pembayaran
             </button>
@@ -221,6 +234,12 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <BookingsPanel initial={initialBookings} />
           ) : tab === 'menu' ? (
             <MenuPanel page={page} tenantId={tenantId} initial={initialMenu} />
+          ) : tab === 'blog' ? (
+            <BlogPanel page={page} tenantId={tenantId} initial={initialBlog} />
+          ) : tab === 'galeri' ? (
+            <GalleryPanel page={page} tenantId={tenantId} initial={initialGallery} />
+          ) : tab === 'profil' ? (
+            <ProfilePanel page={page} tenantId={tenantId} initial={initialProfile} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
@@ -905,6 +924,264 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Panel Blog (artikel) — customer kelola sendiri ──────────────
+type BlogDraft = { judul: string; ringkasan: string; konten: string; cover_url: string; penulis: string }
+const BLOG_EMPTY: BlogDraft = { judul: '', ringkasan: '', konten: '', cover_url: '', penulis: '' }
+
+function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: BlogPost[] }) {
+  const supabase = createClient()
+  const [items, setItems] = useState<BlogPost[]>(initial)
+  const [add, setAdd] = useState<BlogDraft>(BLOG_EMPTY)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<BlogDraft>(BLOG_EMPTY)
+  const [busy, setBusy] = useState<string | null>(null)
+  const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none w-full'
+
+  const slugify = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  const payload = (d: BlogDraft) => ({
+    judul: d.judul, slug: slugify(d.judul) || null,
+    ringkasan: d.ringkasan || null, konten: d.konten || null,
+    cover_url: d.cover_url || null, penulis: d.penulis || null,
+  })
+
+  const create = async () => {
+    if (!page) return
+    if (!add.judul.trim()) return alert('Judul wajib')
+    setBusy('add')
+    try {
+      const { data, error } = await supabase.from('blog_posts')
+        .insert({ page_id: page.id, tenant_id: tenantId, is_published: false, ...payload(add) } as never)
+        .select().single()
+      if (error) throw error
+      setItems((p) => [data as BlogPost, ...p])
+      setAdd(BLOG_EMPTY)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const startEdit = (b: BlogPost) => {
+    setEditId(b.id)
+    setDraft({ judul: b.judul ?? '', ringkasan: b.ringkasan ?? '', konten: b.konten ?? '', cover_url: b.cover_url ?? '', penulis: b.penulis ?? '' })
+  }
+  const saveEdit = async (id: string) => {
+    if (!draft.judul.trim()) return alert('Judul wajib')
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('blog_posts').update(payload(draft) as never).eq('id', id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === id ? (data as BlogPost) : x)))
+      setEditId(null)
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const togglePublish = async (b: BlogPost) => {
+    setBusy(b.id)
+    try {
+      const willPublish = !b.is_published
+      const { data, error } = await supabase.from('blog_posts')
+        .update({ is_published: willPublish, published_at: willPublish ? new Date().toISOString() : null } as never)
+        .eq('id', b.id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === b.id ? (data as BlogPost) : x)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const remove = async (id: string) => {
+    if (!confirm('Hapus artikel ini?')) return
+    setBusy(id)
+    try {
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id)
+      if (error) throw error
+      setItems((p) => p.filter((x) => x.id !== id))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Blog / Artikel</h2>
+        <span className="text-xs text-gray-400 font-medium">{items.length} artikel</span>
+      </div>
+      <div className="space-y-2 mb-3">
+        <input value={add.judul} onChange={(e) => setAdd({ ...add, judul: e.target.value })} placeholder="Judul artikel *" className={inp} />
+        <input value={add.ringkasan} onChange={(e) => setAdd({ ...add, ringkasan: e.target.value })} placeholder="Ringkasan singkat" className={inp} />
+        <textarea value={add.konten} onChange={(e) => setAdd({ ...add, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <input value={add.cover_url} onChange={(e) => setAdd({ ...add, cover_url: e.target.value })} placeholder="URL cover (opsional)" className={inp} />
+          <input value={add.penulis} onChange={(e) => setAdd({ ...add, penulis: e.target.value })} placeholder="Penulis (opsional)" className={inp} />
+        </div>
+      </div>
+      <div className="flex justify-end mb-6">
+        <button disabled={busy === 'add'} onClick={create} className="flex items-center justify-center gap-1 px-5 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+          {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah Artikel
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada artikel.</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((it) =>
+            editId === it.id ? (
+              <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
+                <input value={draft.judul} onChange={(e) => setDraft({ ...draft, judul: e.target.value })} placeholder="Judul *" className={inp} />
+                <input value={draft.ringkasan} onChange={(e) => setDraft({ ...draft, ringkasan: e.target.value })} placeholder="Ringkasan" className={inp} />
+                <textarea value={draft.konten} onChange={(e) => setDraft({ ...draft, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input value={draft.cover_url} onChange={(e) => setDraft({ ...draft, cover_url: e.target.value })} placeholder="URL cover" className={inp} />
+                  <input value={draft.penulis} onChange={(e) => setDraft({ ...draft, penulis: e.target.value })} placeholder="Penulis" className={inp} />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setEditId(null)} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-500 hover:bg-white">Batal</button>
+                  <button onClick={() => saveEdit(it.id)} disabled={busy === it.id} className="flex items-center gap-1 px-4 py-1.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+                    {busy === it.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Simpan
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={it.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-xl border border-black/5">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{it.judul} {!it.is_published && <span className="text-[10px] text-gray-400 uppercase">(draft)</span>}</p>
+                  {it.ringkasan && <p className="text-xs text-gray-500 truncate">{it.ringkasan}</p>}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
+                  <button onClick={() => togglePublish(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_published ? 'Jadikan draft' : 'Terbitkan'}>
+                    {it.is_published ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
+                  </button>
+                  <button onClick={() => remove(it.id)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Hapus"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel Galeri foto — customer kelola sendiri ─────────────────
+function GalleryPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: GalleryImage[] }) {
+  const supabase = createClient()
+  const [items, setItems] = useState<GalleryImage[]>(initial)
+  const [url, setUrl] = useState('')
+  const [caption, setCaption] = useState('')
+  const [busy, setBusy] = useState<string | null>(null)
+  const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
+
+  const add = async () => {
+    if (!page) return
+    if (!url.trim()) return alert('URL gambar wajib')
+    setBusy('add')
+    try {
+      const { data, error } = await supabase.from('gallery_images')
+        .insert({ page_id: page.id, tenant_id: tenantId, url: url.trim(), caption: caption || null, is_active: true, urutan: items.length } as never)
+        .select().single()
+      if (error) throw error
+      setItems((p) => [...p, data as GalleryImage])
+      setUrl(''); setCaption('')
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const remove = async (id: string) => {
+    if (!confirm('Hapus foto ini?')) return
+    setBusy(id)
+    try {
+      const { error } = await supabase.from('gallery_images').delete().eq('id', id)
+      if (error) throw error
+      setItems((p) => p.filter((x) => x.id !== id))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-lg font-bold text-gray-900">Galeri Foto</h2>
+        <span className="text-xs text-gray-400 font-medium">{items.length} foto</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
+        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL gambar *" className={`${inp} sm:col-span-2`} />
+        <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption (opsional)" className={inp} />
+        <button disabled={busy === 'add'} onClick={add} className="sm:col-span-3 flex items-center justify-center gap-1 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
+          {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah Foto
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada foto.</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {items.map((it) => (
+            <div key={it.id} className="relative rounded-xl overflow-hidden border border-black/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={it.url} alt={it.caption ?? ''} className="w-full aspect-square object-cover bg-gray-100" />
+              <button onClick={() => remove(it.id)} disabled={busy === it.id} className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 text-red-500 hover:bg-white" title="Hapus"><Trash2 size={14} /></button>
+              {it.caption && <p className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] p-1.5 truncate">{it.caption}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel Profil Bisnis — kontak/jam/alamat/peta/sosial ─────────
+function ProfilePanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: TenantProfile | null }) {
+  const supabase = createClient()
+  const [f, setF] = useState({
+    wa: initial?.wa ?? '', email: initial?.email ?? '', alamat: initial?.alamat ?? '',
+    jam: initial?.jam ?? '', maps_url: initial?.maps_url ?? '', instagram: initial?.instagram ?? '',
+    ongkir: initial?.ongkir ?? '', delivery: initial?.delivery ?? '', newsletter: initial?.newsletter ?? false,
+  })
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+  const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none w-full'
+
+  const save = async () => {
+    if (!page) return
+    setBusy(true); setMsg(null)
+    try {
+      const { error } = await supabase.from('tenant_profile').upsert({
+        page_id: page.id, tenant_id: tenantId,
+        wa: f.wa || null, email: f.email || null, alamat: f.alamat || null, jam: f.jam || null,
+        maps_url: f.maps_url || null, instagram: f.instagram || null, ongkir: f.ongkir || null,
+        delivery: f.delivery || null, newsletter: f.newsletter, updated_at: new Date().toISOString(),
+      } as never, { onConflict: 'page_id' })
+      if (error) throw error
+      setMsg('Tersimpan.')
+    } catch (e: any) { setMsg(`Gagal: ${e.message}`) } finally { setBusy(false) }
+  }
+
+  const field = (label: string, key: keyof typeof f, placeholder = '', textarea = false) => (
+    <div>
+      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</label>
+      {textarea
+        ? <textarea value={f[key] as string} onChange={(e) => setF({ ...f, [key]: e.target.value })} placeholder={placeholder} rows={2} className={inp} />
+        : <input value={f[key] as string} onChange={(e) => setF({ ...f, [key]: e.target.value })} placeholder={placeholder} className={inp} />}
+    </div>
+  )
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Profil Bisnis</h2>
+      <p className="text-sm text-gray-500 mb-5">Kontak, jam buka, alamat, dan info lain yang tampil di website Anda.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {field('Nomor WhatsApp', 'wa', '6281...')}
+        {field('Email Bisnis', 'email', 'halo@bisnis.id')}
+        {field('Instagram', 'instagram', '@bisnis')}
+        {field('Jam Buka', 'jam', 'Senin-Jumat 09.00-21.00', true)}
+        <div className="sm:col-span-2">{field('Alamat', 'alamat', 'Jl. ...', true)}</div>
+        <div className="sm:col-span-2">{field('URL Google Maps (embed)', 'maps_url', 'https://www.google.com/maps?q=...&output=embed')}</div>
+        {field('Info Ongkir', 'ongkir', 'mis. Gratis ongkir min. 100rb')}
+        {field('Info Delivery', 'delivery', 'mis. GoFood, GrabFood')}
+      </div>
+      <label className="flex items-center gap-2 text-sm text-gray-700 mt-4">
+        <input type="checkbox" checked={f.newsletter} onChange={(e) => setF({ ...f, newsletter: e.target.checked })} />
+        Aktifkan pendaftaran newsletter
+      </label>
+      {msg && <p className="text-xs mt-3 text-gray-500">{msg}</p>}
+      <div className="flex justify-end mt-5">
+        <button onClick={save} disabled={busy} className="flex items-center gap-1 px-5 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold uppercase hover:bg-gray-800 disabled:opacity-50">
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Simpan Profil
+        </button>
+      </div>
     </div>
   )
 }

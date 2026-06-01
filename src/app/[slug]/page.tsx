@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
-import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage, fetchMenuItemsByPage } from '@/lib/supabase/addons'
+import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage, fetchMenuItemsByPage, fetchGalleryByPage, fetchTenantProfile } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
@@ -54,18 +54,26 @@ export default async function PublicSitePage({
 
   // Tema visual bespoke per industri (custom design, bukan tema generik).
   if (theme === 'restaurant') {
-    const menuItems = await fetchMenuItemsByPage(supabase, page.id)
-    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={(page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} />
+    const [menuItems, gallery, profile] = await Promise.all([
+      fetchMenuItemsByPage(supabase, page.id),
+      fetchGalleryByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} />
   }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
   const needProducts = sections.some((s) => s.tipe_komponen === 'product_list')
   const needPosts = sections.some((s) => s.tipe_komponen === 'blog_list')
   const needServices = sections.some((s) => s.tipe_komponen === 'service_list')
-  const [products, posts, services] = await Promise.all([
+  const needGallery = sections.some((s) => s.tipe_komponen === 'gallery')
+  const needProfile = sections.some((s) => s.tipe_komponen === 'contact_form')
+  const [products, posts, services, gallery, profile] = await Promise.all([
     needProducts ? fetchProductsByPage(supabase, page.id) : Promise.resolve([]),
     needPosts ? fetchBlogPostsByPage(supabase, page.id) : Promise.resolve([]),
     needServices ? fetchServicesByPage(supabase, page.id) : Promise.resolve([]),
+    needGallery ? fetchGalleryByPage(supabase, page.id) : Promise.resolve([]),
+    needProfile ? fetchTenantProfile(supabase, page.id) : Promise.resolve(null),
   ])
 
   const body = (
@@ -80,7 +88,7 @@ export default async function PublicSitePage({
         </div>
       ) : (
         sections.map((s) => (
-          <SectionRenderer key={s.id} section={s} products={products} posts={posts} services={services} hasCart={hasCart} hasBooking={hasBooking} slug={slug} primary={primary} />
+          <SectionRenderer key={s.id} section={s} products={products} posts={posts} services={services} gallery={gallery} profile={profile} hasCart={hasCart} hasBooking={hasBooking} slug={slug} primary={primary} />
         ))
       )}
     </main>
