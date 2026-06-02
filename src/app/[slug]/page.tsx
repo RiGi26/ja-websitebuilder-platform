@@ -8,6 +8,7 @@ import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
+import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRenderer'
 import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
 import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
 import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
@@ -65,7 +66,16 @@ export default async function PublicSitePage({
       fetchServicesByPage(supabase, page.id),
       fetchTenantProfile(supabase, page.id),
     ])
-    return <KlinikRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as Record<string, any>} features={konfig.features} />
+    const klinikProps = {
+      nama: page.nama_website, sections, services, profile,
+      wa: profile?.wa ?? (page.data_konten as Record<string, any>)?.wa,
+      slug, primary, konten: page.data_konten as Record<string, any>,
+      features: konfig.features,
+    }
+    const variant = konfig.branding?.variant
+    if (variant === 'clean') return <KlinikCleanRenderer {...klinikProps} />
+    // variant 'warm' (default) atau tidak di-set
+    return <KlinikRenderer {...klinikProps} />
   }
 
   if (theme === 'company') {

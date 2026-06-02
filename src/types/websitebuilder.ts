@@ -63,8 +63,9 @@ export interface BrandingConfig {
   secondary?: string
   logo_url?: string
   font?: string
-  theme?: string // tema visual renderer (mis. 'restaurant'); default = tema generik
-  design_tokens?: DesignTokens // token dari build-order design refinement step
+  theme?: string    // tema visual renderer (mis. 'restaurant', 'klinik', 'rental')
+  variant?: string  // gaya visual per industri (mis. 'warm', 'clean', 'premium')
+  design_tokens?: DesignTokens
 }
 
 // Konfigurasi spesifik per add-on (data operasional, bukan feature flag).
