@@ -184,6 +184,24 @@ export interface DataKontenKlinik {
   warna_tema?: string
 }
 
+export interface DataKontenRental {
+  nama_usaha: string
+  tagline?: string
+  deskripsi?: string
+  kota_layanan?: string[]
+  wa?: string
+  kontak?: {
+    telepon?: string
+    email?: string
+    alamat?: string
+  }
+  sosial_media?: {
+    instagram?: string
+    tiktok?: string
+  }
+  warna_tema?: string
+}
+
 // ── Database row types ────────────────────────────────────────
 
 export interface LandingPage {
