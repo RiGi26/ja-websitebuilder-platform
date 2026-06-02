@@ -99,7 +99,7 @@ export default async function PublicSitePage({
       fetchServicesByPage(supabase, page.id),
       fetchTenantProfile(supabase, page.id),
     ])
-    return <RentalRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} features={konfig.features} />
+    return <RentalRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} features={konfig.features} designTokens={konfig.branding?.design_tokens} />
   }
 
   if (theme === 'batik_toko') {
