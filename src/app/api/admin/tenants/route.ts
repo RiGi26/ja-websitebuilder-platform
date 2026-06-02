@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { createLandingPage } from '@/lib/supabase/websitebuilder'
-import { industriToTipe, addonsToFeatures, slugify } from '@/lib/websitebuilder-mapping'
+import { industriToTipe, addonsToFeatures, slugify, industryToTheme } from '@/lib/websitebuilder-mapping'
 import { createClientAccountForTenant } from '@/lib/client-account'
 
 async function requireAdmin() {
@@ -92,17 +92,18 @@ export async function POST(request: Request) {
 
     // 4. Buat landing page awal (status draft)
     const slug = await uniqueSlug(slugify(namaKlien))
+    const tipeIndustri = industriToTipe(order.industri)
     const page = await createLandingPage(supabaseAdmin, {
       tenant_id: tenant.id,
       nama_website: namaKlien,
       slug,
       domain_custom: null,
-      tipe_industri: industriToTipe(order.industri),
+      tipe_industri: tipeIndustri,
       status: 'draft',
       data_konten: {},
       konfigurasi: {
         features: addonsToFeatures(order.selected_addons),
-        branding: {},
+        branding: { theme: industryToTheme(tipeIndustri) },
       },
     })
 
