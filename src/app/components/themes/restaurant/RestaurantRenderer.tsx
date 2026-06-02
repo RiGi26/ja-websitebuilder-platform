@@ -23,6 +23,17 @@ const PAPER = '#FBF7F0'    // krem terang
 const CLAY = '#B5532A'     // terracotta aksen
 const MUTED = '#8A7E72'    // teks sekunder
 
+const S_CLAY = `0 8px 24px rgba(181,83,42,.32), 0 2px 8px rgba(181,83,42,.16)`
+const EASE   = 'cubic-bezier(0.16,1,0.3,1)'
+const RT_CSS = `
+  .rt-root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-variant-numeric:tabular-nums}
+  .rt-btn{transition:transform 200ms ${EASE},box-shadow 200ms ease}
+  .rt-btn:hover{transform:translateY(-2px)}.rt-btn:active{transform:scale(0.96)}
+  .rt-menu-item{transition:background 150ms ease,padding-left 150ms ease}
+  .rt-menu-item:hover{background:rgba(181,83,42,.04);padding-left:4px}
+  .rt-wa{transition:transform 220ms cubic-bezier(0.34,1.56,0.64,1)}.rt-wa:hover{transform:scale(1.12)}
+`
+
 type Isi = Record<string, any>
 function asArray(v: unknown): any[] { return Array.isArray(v) ? v : [] }
 function rupiah(n: number) {
@@ -42,7 +53,7 @@ function TopBar({ nama, wa }: { nama: string; wa?: string }) {
           <a href="#kunjungi" className="hover:opacity-70 transition-opacity">Kunjungi</a>
         </nav>
         {wa && (
-          <a href={`https://wa.me/${wa}`} target="_blank" className="text-[11px] font-bold uppercase tracking-[0.18em] px-4 py-2 rounded-full transition-transform hover:scale-[1.03]" style={{ backgroundColor: CLAY, color: CREAM }}>
+          <a href={`https://wa.me/${wa}`} target="_blank" className="rt-btn text-[11px] font-bold uppercase tracking-[0.18em] px-4 py-2 rounded-full" style={{ backgroundColor: CLAY, color: CREAM, boxShadow: S_CLAY }}>
             Reservasi
           </a>
         )}
@@ -71,7 +82,7 @@ function Hero({ isi }: { isi: Isi }) {
           <p className="mt-7 text-base md:text-lg leading-relaxed mx-auto max-w-xl" style={{ color: '#D9CEC0' }}>{isi.subtitle}</p>
         )}
         <div className="mt-10 flex flex-wrap gap-3 justify-center">
-          <a href="#menu" className="px-7 py-3.5 rounded-full text-[12px] font-bold uppercase tracking-[0.18em] transition-transform hover:scale-[1.03]" style={{ backgroundColor: CLAY, color: CREAM }}>
+          <a href="#menu" className="rt-btn px-7 py-3.5 rounded-full text-[12px] font-bold uppercase tracking-[0.18em]" style={{ backgroundColor: CLAY, color: CREAM, boxShadow: S_CLAY }}>
             {isi.cta_text ?? 'Lihat Menu'}
           </a>
           {isi.wa && (
@@ -192,7 +203,7 @@ function Visit({ isi, profile }: { isi: Isi; profile?: TenantProfile | null }) {
             {isi.alamat && (<div><p className="text-[11px] uppercase tracking-[0.2em] mb-1" style={{ color: INK }}>Alamat</p><p>{isi.alamat}</p></div>)}
             {isi.jam && (<div><p className="text-[11px] uppercase tracking-[0.2em] mb-1" style={{ color: INK }}>Jam Buka</p><p className="whitespace-pre-wrap">{isi.jam}</p></div>)}
             <div className="flex flex-wrap gap-3 pt-2">
-              {isi.wa && <a href={`https://wa.me/${isi.wa}`} target="_blank" className="px-6 py-3 rounded-full text-[12px] font-bold uppercase tracking-[0.16em]" style={{ backgroundColor: CLAY, color: CREAM }}>Reservasi via WhatsApp</a>}
+              {isi.wa && <a href={`https://wa.me/${isi.wa}`} target="_blank" className="rt-btn px-6 py-3 rounded-full text-[12px] font-bold uppercase tracking-[0.16em]" style={{ backgroundColor: CLAY, color: CREAM, boxShadow: S_CLAY }}>Reservasi via WhatsApp</a>}
               {isi.email && <a href={`mailto:${isi.email}`} className="px-6 py-3 rounded-full text-[12px] font-bold uppercase tracking-[0.16em] border" style={{ borderColor: INK, color: INK }}>Email</a>}
             </div>
           </div>
@@ -215,7 +226,7 @@ function Closing({ isi }: { isi: Isi }) {
         <h2 className={`${display.className} text-4xl md:text-5xl`} style={{ color: CREAM }}>{isi.title ?? 'Pesan Meja Anda'}</h2>
         {isi.subtitle && <p className="mt-4" style={{ color: MUTED }}>{isi.subtitle}</p>}
         {isi.wa && (
-          <a href={`https://wa.me/${isi.wa}`} target="_blank" className="inline-block mt-9 px-9 py-4 rounded-full text-[12px] font-bold uppercase tracking-[0.2em] transition-transform hover:scale-[1.03]" style={{ backgroundColor: CLAY, color: CREAM }}>
+          <a href={`https://wa.me/${isi.wa}`} target="_blank" className="rt-btn inline-block mt-9 px-9 py-4 rounded-full text-[12px] font-bold uppercase tracking-[0.2em]" style={{ backgroundColor: CLAY, color: CREAM, boxShadow: S_CLAY }}>
             {isi.cta_text ?? 'Reservasi Sekarang'}
           </a>
         )}
@@ -244,7 +255,8 @@ export default function RestaurantRenderer({
   profile?: TenantProfile | null
 }) {
   return (
-    <main style={{ backgroundColor: PAPER }}>
+    <main className="rt-root" style={{ backgroundColor: PAPER }}>
+      <style dangerouslySetInnerHTML={{ __html: RT_CSS }} />
       <TopBar nama={nama} wa={wa} />
       {sections.map((s) => {
         const isi = (s.isi_komponen ?? {}) as Isi

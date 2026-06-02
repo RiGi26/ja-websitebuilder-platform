@@ -35,6 +35,19 @@ const DARK    = '#1A0A0E'
 const MUTED   = '#7A6B5A'
 const SOFT    = '#EDE4D4'
 
+const S_AMBER = `0 8px 24px rgba(212,134,10,.30), 0 2px 8px rgba(212,134,10,.15)`
+const EASE    = 'cubic-bezier(0.16,1,0.3,1)'
+const SK_CSS  = `
+  .sk-root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-variant-numeric:tabular-nums}
+  .sk-btn{transition:transform 200ms ${EASE},box-shadow 200ms ease}
+  .sk-btn:hover{transform:translateY(-2px)}.sk-btn:active{transform:scale(0.96)}
+  .sk-card{transition:transform 220ms ${EASE},box-shadow 220ms ease,border-color 180ms ease}
+  .sk-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(123,45,62,.12),0 4px 12px rgba(123,45,62,.06)!important;border-color:rgba(212,134,10,.28)!important}
+  .sk-testi{transition:transform 200ms ${EASE},border-color 180ms ease}
+  .sk-testi:hover{transform:translateY(-3px);border-color:rgba(212,134,10,.28)!important}
+  .sk-wa{transition:transform 220ms cubic-bezier(0.34,1.56,0.64,1)}.sk-wa:hover{transform:scale(1.12)}
+`
+
 type Isi = Record<string, any>
 function asArray(v: unknown): any[] { return Array.isArray(v) ? v : [] }
 
@@ -63,8 +76,8 @@ function Divider({ color = AMBER }: { color?: string }) {
 function FloatingWA({ wa }: { wa?: string }) {
   if (!wa) return null
   return (
-    <a href={`https://wa.me/${wa}`} target="_blank" aria-label="WhatsApp"
-      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 52, height: 52, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.35)' }}>
+    <a href={`https://wa.me/${wa}`} target="_blank" aria-label="WhatsApp" className="sk-wa"
+      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 52, height: 52, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.40)' }}>
       <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.116 1.535 5.845L.057 23.492a.5.5 0 00.618.618l5.647-1.478A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.917 0-3.71-.504-5.263-1.385l-.378-.217-3.922 1.027 1.027-3.922-.217-.378A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
       </svg>
@@ -135,8 +148,8 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
           <div className="flex flex-wrap gap-4">
             {wa && (
               <a href={`https://wa.me/${wa}?text=Halo, saya ingin informasi PPDB`} target="_blank"
-                className={`px-8 py-4 font-700 text-sm uppercase tracking-[0.12em] rounded transition-all hover:-translate-y-0.5 ${sans.className}`}
-                style={{ backgroundColor: AMBER, color: DARK, boxShadow: `0 8px 24px ${AMBER}40` }}>
+                className={`sk-btn px-8 py-4 font-700 text-sm uppercase tracking-[0.12em] rounded ${sans.className}`}
+                style={{ backgroundColor: AMBER, color: DARK, boxShadow: S_AMBER }}>
                 Daftar PPDB Online
               </a>
             )}
@@ -198,8 +211,8 @@ function Features({ isi }: { isi: Isi }) {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {data.map((it: Isi, i: number) => (
-            <div key={i} className="group p-8 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-xl"
-              style={{ backgroundColor: PARCHM, border: `1px solid ${AMBER}18` }}>
+            <div key={i} className="sk-card group p-8 rounded-2xl"
+              style={{ backgroundColor: PARCHM, border: `1px solid ${AMBER}18`, boxShadow: '0 2px 8px rgba(123,45,62,.06)' }}>
               <div className="mb-6">
                 <Crest size={28} color={AMBER} />
               </div>
@@ -237,8 +250,8 @@ function PpdbCta({ wa }: { wa?: string }) {
             </p>
             {wa && (
               <a href={`https://wa.me/${wa}?text=Halo, saya ingin daftar PPDB online`} target="_blank"
-                className={`inline-flex items-center gap-2 px-8 py-4 font-700 text-sm uppercase tracking-[0.12em] rounded transition-all hover:-translate-y-0.5 ${sans.className}`}
-                style={{ backgroundColor: AMBER, color: DARK }}>
+                className={`sk-btn inline-flex items-center gap-2 px-8 py-4 font-700 text-sm uppercase tracking-[0.12em] rounded ${sans.className}`}
+                style={{ backgroundColor: AMBER, color: DARK, boxShadow: S_AMBER }}>
                 Daftar Sekarang →
               </a>
             )}
@@ -284,7 +297,7 @@ function Testimonials({ isi }: { isi: Isi }) {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.map((it: Isi, i: number) => (
-            <blockquote key={i} className="p-8 rounded-2xl" style={{ backgroundColor: CREAM, border: `1px solid ${AMBER}18` }}>
+            <blockquote key={i} className="sk-testi p-8 rounded-2xl" style={{ backgroundColor: CREAM, border: `1px solid ${AMBER}18` }}>
               <div className={`${serif.className} text-4xl leading-none mb-4`} style={{ color: AMBER, opacity: 0.3 }}>"</div>
               <p className={`${serif.className} italic text-lg leading-relaxed mb-6`} style={{ color: DARK }}>
                 {it.quote ?? it.isi ?? ''}
@@ -402,7 +415,8 @@ export default function SekolahRenderer({
   }
 
   return (
-    <div className={`${serif.variable} ${sans.variable}`} style={{ backgroundColor: CREAM }}>
+    <div className={`sk-root ${serif.variable} ${sans.variable}`} style={{ backgroundColor: CREAM }}>
+      <style dangerouslySetInnerHTML={{ __html: SK_CSS }} />
       <Navbar nama={nama} wa={waContact} />
       <main>
         {visible.length === 0 ? (
