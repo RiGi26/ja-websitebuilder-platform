@@ -1,3 +1,4 @@
+'use client'
 // ============================================================
 // Tema "klinik" — Warm Sanctuary.
 // Palet sage-green + terracotta + warm-cream. Tipografi DM Serif Display
