@@ -50,12 +50,21 @@ export interface FeatureFlags {
   hasEmail?: boolean // email bisnis
 }
 
+export interface DesignTokens {
+  visual_mood?: 'energetic' | 'authoritative' | 'warm' | 'minimal' | 'luxury' | 'playful'
+  bg_style?: 'dark' | 'light' | 'warm'
+  typography_weight?: 'black' | 'bold' | 'regular' | 'light'
+  hero_style?: 'editorial' | 'split' | 'centered' | 'immersive'
+  accent_secondary?: string // hex warna turunan dari primary
+}
+
 export interface BrandingConfig {
   primary?: string // warna utama (hex)
   secondary?: string
   logo_url?: string
   font?: string
   theme?: string // tema visual renderer (mis. 'restaurant'); default = tema generik
+  design_tokens?: DesignTokens // token dari build-order design refinement step
 }
 
 // Konfigurasi spesifik per add-on (data operasional, bukan feature flag).
