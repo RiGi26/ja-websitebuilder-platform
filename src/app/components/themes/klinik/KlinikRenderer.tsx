@@ -7,7 +7,7 @@
 // ============================================================
 
 import { DM_Serif_Display, Outfit } from 'next/font/google'
-import type { PageSection, Service, TenantProfile } from '@/types/websitebuilder'
+import type { PageSection, Service, TenantProfile, FeatureFlags, DesignTokens } from '@/types/websitebuilder'
 
 const serif = DM_Serif_Display({
   subsets: ['latin'],
@@ -109,7 +109,7 @@ function Navbar({ nama, wa }: { nama: string; wa?: string }) {
 }
 
 // ── Hero ──────────────────────────────────────────────────────
-function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
+function Hero({ isi, wa, konten, features }: { isi: Isi; wa?: string; konten?: Isi; features?: FeatureFlags }) {
   return (
     <section
       className="relative min-h-[90vh] flex items-center overflow-hidden"
@@ -158,37 +158,46 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
               Lihat Layanan
             </a>
           </div>
-          {/* Addon badges */}
+          {/* Addon badges — dari feature flags yang dipesan */}
           <div className="flex flex-wrap gap-3 mt-10">
-            {['Reservasi Online', 'Antrian Digital', 'Jadwal Dokter', 'Notif WA Otomatis'].map(b => (
-              <span key={b} className={`text-[10px] font-semibold px-3 py-1 rounded-full ${sans.className}`}
+            {[
+              { flag: 'hasBooking',   label: 'Reservasi Online' },
+              { flag: 'hasWhatsApp',  label: 'Notif WA Otomatis' },
+              { flag: 'hasSEO',       label: 'SEO Teroptimasi' },
+              { flag: 'hasPayment',   label: 'Bayar Online' },
+              { flag: 'hasLiveChat',  label: 'Live Chat' },
+              { flag: 'hasAdmin',     label: 'Dashboard Admin' },
+            ].filter(b => features?.[b.flag as keyof FeatureFlags]).map(b => (
+              <span key={b.label} className={`text-[10px] font-semibold px-3 py-1 rounded-full ${sans.className}`}
                 style={{ backgroundColor: `${SAGE_LT}15`, color: SAGE_LT, border: `1px solid ${SAGE_LT}30` }}>
-                ✓ {b}
+                ✓ {b.label}
               </span>
             ))}
           </div>
         </div>
-        {/* Right — schedule card mock */}
+        {/* Right — schedule card dari data_konten.dokter */}
         <div id="jadwal" className="hidden lg:block">
           <div className="rounded-3xl overflow-hidden" style={{ backgroundColor: `${CREAM}0D`, border: `1px solid ${SAGE_LT}20`, backdropFilter: 'blur(16px)' }}>
             <div className="px-6 pt-6 pb-3 border-b" style={{ borderColor: `${SAGE_LT}15` }}>
-              <p className={`text-[10px] font-bold uppercase tracking-[0.25em] mb-1 ${sans.className}`} style={{ color: SAGE_LT }}>Jadwal Dokter Hari Ini</p>
-              <p className={`text-[11px] ${sans.className}`} style={{ color: '#8AADA0' }}>Senin — Sabtu, 08.00 – 20.00</p>
+              <p className={`text-[10px] font-bold uppercase tracking-[0.25em] mb-1 ${sans.className}`} style={{ color: SAGE_LT }}>Jadwal Dokter</p>
+              <p className={`text-[11px] ${sans.className}`} style={{ color: '#8AADA0' }}>{konten?.jam_operasional ?? 'Senin–Sabtu 08.00–21.00'}</p>
             </div>
-            {[
-              { name: 'dr. Amelia Kusuma', sp: 'Sp. Penyakit Dalam', jam: '08:00 – 12:00', tersedia: true },
-              { name: 'dr. Reza Pratama', sp: 'Sp. Kulit & Kelamin', jam: '13:00 – 17:00', tersedia: true },
-              { name: 'dr. Nadia Sari', sp: 'Sp. Gizi Klinik', jam: '09:00 – 14:00', tersedia: false },
-            ].map((d, i) => (
+            {(asArray(konten?.dokter).length > 0
+              ? asArray(konten?.dokter).slice(0, 4)
+              : [
+                  { nama: 'dr. Amelia Kusuma', spesialis: 'Sp. Penyakit Dalam', jadwal: '08:00–12:00' },
+                  { nama: 'dr. Reza Pratama',  spesialis: 'Sp. Kulit & Kelamin', jadwal: '13:00–17:00' },
+                ]
+            ).map((d: Isi, i: number) => (
               <div key={i} className="flex items-center justify-between px-6 py-4 border-b last:border-0" style={{ borderColor: `${SAGE_LT}10` }}>
                 <div>
-                  <p className={`text-sm font-semibold ${sans.className}`} style={{ color: CREAM }}>{d.name}</p>
-                  <p className={`text-[11px] ${sans.className}`} style={{ color: '#7A9E94' }}>{d.sp}</p>
-                  <p className={`text-[10px] mt-0.5 ${sans.className}`} style={{ color: '#5A7A70' }}>{d.jam}</p>
+                  <p className={`text-sm font-semibold ${sans.className}`} style={{ color: CREAM }}>{d.nama ?? d.name}</p>
+                  <p className={`text-[11px] ${sans.className}`} style={{ color: '#7A9E94' }}>{d.spesialis ?? d.sp}</p>
+                  <p className={`text-[10px] mt-0.5 ${sans.className}`} style={{ color: '#5A7A70' }}>{d.jadwal ?? d.jam}</p>
                 </div>
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${sans.className}`}
-                  style={{ backgroundColor: d.tersedia ? `${SAGE_LT}20` : `${TERRA}15`, color: d.tersedia ? SAGE_LT : TERRA }}>
-                  {d.tersedia ? 'Tersedia' : 'Penuh'}
+                  style={{ backgroundColor: `${SAGE_LT}20`, color: SAGE_LT }}>
+                  Tersedia
                 </span>
               </div>
             ))}
@@ -200,11 +209,14 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
 }
 
 // ── Stats Bar ─────────────────────────────────────────────────
-function StatsBar() {
+function StatsBar({ konten }: { konten?: Isi }) {
+  const dokterCount = asArray(konten?.dokter).length || 3
+  const fasilitasCount = asArray(konten?.fasilitas).length || 4
+  const asuransiCount = asArray(konten?.asuransi_diterima).length || 4
   const stats = [
-    { v: '12+', l: 'Tahun Pengalaman' },
-    { v: '8', l: 'Dokter Spesialis' },
-    { v: '15rb+', l: 'Pasien Ditangani' },
+    { v: `${dokterCount}`, l: 'Dokter Spesialis' },
+    { v: `${fasilitasCount}+`, l: 'Fasilitas Medis' },
+    { v: `${asuransiCount}+`, l: 'Asuransi Diterima' },
     { v: '4.9★', l: 'Rating Google' },
   ]
   return (
@@ -222,8 +234,10 @@ function StatsBar() {
 }
 
 // ── Features / Layanan ────────────────────────────────────────
-function Features({ isi }: { isi: Isi }) {
-  const items = asArray(isi.items ?? isi.fitur)
+function Features({ isi, services }: { isi: Isi; services?: Service[] }) {
+  const items = services && services.length > 0
+    ? services.map(s => ({ title: s.nama, desc: s.deskripsi ?? '' }))
+    : asArray(isi.items ?? isi.fitur)
   const icons = [
     <svg key="a" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/></svg>,
     <svg key="b" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" fill="currentColor"/></svg>,
@@ -257,6 +271,32 @@ function Features({ isi }: { isi: Isi }) {
               <p className={`text-sm leading-relaxed ${sans.className}`} style={{ color: MUTED }}>
                 {it.desc ?? it.deskripsi ?? ''}
               </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Keunggulan — dari briefing customer ──────────────────────
+function Keunggulan({ konten }: { konten?: Isi }) {
+  const items = asArray(konten?.keunggulan).filter((k: string) => k?.trim())
+  if (items.length === 0) return null
+  return (
+    <section style={{ backgroundColor: DARK }}>
+      <div className="max-w-6xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <p className={`text-[11px] font-bold uppercase tracking-[0.3em] mb-3 ${sans.className}`} style={{ color: TERRA }}>Mengapa Pilih Kami</p>
+          <h2 className={`${serif.className}`} style={{ fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', color: CREAM }}>
+            Komitmen Nyata untuk Kesehatan Anda
+          </h2>
+        </div>
+        <div className={`grid gap-6`} style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)` }}>
+          {items.map((k: string, i: number) => (
+            <div key={i} className="p-7 rounded-2xl" style={{ backgroundColor: `${SAGE}20`, border: `1px solid ${SAGE_LT}20` }}>
+              <div className="mb-4"><Leaf size={24} color={SAGE_LT} /></div>
+              <p className={`text-sm leading-relaxed font-medium ${sans.className}`} style={{ color: `${CREAM}CC` }}>{k}</p>
             </div>
           ))}
         </div>
@@ -341,7 +381,7 @@ function Testimonials({ isi }: { isi: Isi }) {
 }
 
 // ── Contact ───────────────────────────────────────────────────
-function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null }) {
+function Contact({ isi, profile, features }: { isi: Isi; profile?: TenantProfile | null; features?: FeatureFlags }) {
   const wa = profile?.wa ?? isi.wa
   const alamat = profile?.alamat ?? isi.alamat
   const jam = profile?.jam ?? isi.jam
@@ -372,13 +412,15 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
             </a>
           )}
           <div className="p-6 rounded-2xl" style={{ backgroundColor: SURFACE, border: `1px solid ${SAGE}15` }}>
-            <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${sans.className}`} style={{ color: SAGE }}>Fitur Add-On Aktif</p>
+            <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${sans.className}`} style={{ color: SAGE }}>Fitur Aktif di Website Ini</p>
             {[
-              { label: 'Reservasi Online', desc: 'Booking jadwal dari HP' },
-              { label: 'Antrian Digital', desc: 'Tidak perlu antre di klinik' },
-              { label: 'Notif WA Otomatis', desc: 'Konfirmasi & reminder jadwal' },
-              { label: 'Jadwal Dokter Live', desc: 'Ketersediaan real-time' },
-            ].map(f => (
+              { flag: 'hasBooking',  label: 'Reservasi Online',    desc: 'Booking jadwal dari HP' },
+              { flag: 'hasWhatsApp', label: 'Notif WA Otomatis',   desc: 'Konfirmasi & reminder jadwal' },
+              { flag: 'hasSEO',      label: 'SEO Teroptimasi',     desc: 'Mudah ditemukan di Google' },
+              { flag: 'hasPayment',  label: 'Pembayaran Online',   desc: 'Bayar DP konsultasi online' },
+              { flag: 'hasLiveChat', label: 'Live Chat Support',   desc: 'Chat langsung dengan staf' },
+              { flag: 'hasAdmin',    label: 'Dashboard Admin',     desc: 'Kelola jadwal & pasien' },
+            ].filter(f => features?.[f.flag as keyof FeatureFlags]).map(f => (
               <div key={f.label} className="flex items-start gap-3 mb-3">
                 <span style={{ color: SAGE_LT, marginTop: 2 }}>✓</span>
                 <div>
@@ -409,6 +451,7 @@ function Footer({ nama }: { nama: string }) {
 // ── Root Renderer ─────────────────────────────────────────────
 export default function KlinikRenderer({
   nama, sections, services = [], profile = null, wa, primary,
+  konten, features = {},
 }: {
   nama: string
   sections: PageSection[]
@@ -417,18 +460,21 @@ export default function KlinikRenderer({
   wa?: string
   slug?: string
   primary?: string
+  konten?: Record<string, any>
+  features?: FeatureFlags
 }) {
   const waContact = wa ?? profile?.wa ?? undefined
+  const k = konten ?? {}
   const visible = [...sections].filter(s => s.is_visible).sort((a, b) => a.urutan - b.urutan)
 
   const renderSection = (s: PageSection) => {
     const isi = (s.isi_komponen ?? {}) as Isi
     switch (s.tipe_komponen) {
-      case 'hero_banner':  return <Hero key={s.id} isi={isi} wa={waContact} />
-      case 'features':     return <Features key={s.id} isi={isi} />
+      case 'hero_banner':  return <Hero key={s.id} isi={isi} wa={waContact} konten={k} features={features} />
+      case 'features':     return <Features key={s.id} isi={isi} services={services} />
       case 'testimonials': return <Testimonials key={s.id} isi={isi} />
       case 'cta':          return <BookingCta key={s.id} wa={waContact} />
-      case 'contact_form': return <Contact key={s.id} isi={isi} profile={profile} />
+      case 'contact_form': return <Contact key={s.id} isi={isi} profile={profile} features={features} />
       default:             return null
     }
   }
@@ -439,17 +485,18 @@ export default function KlinikRenderer({
       <main>
         {visible.length === 0 ? (
           <>
-            <Hero isi={{ title: nama }} wa={waContact} />
-            <StatsBar />
-            <Features isi={{}} />
+            <Hero isi={{ title: k.nama_klinik ?? nama }} wa={waContact} konten={k} features={features} />
+            <StatsBar konten={k} />
+            <Features isi={{}} services={services} />
+            <Keunggulan konten={k} />
             <BookingCta wa={waContact} />
             <Testimonials isi={{}} />
-            <Contact isi={{}} profile={profile} />
+            <Contact isi={{}} profile={profile} features={features} />
           </>
         ) : (
           <>
             {visible.map(renderSection)}
-            <StatsBar />
+            <StatsBar konten={k} />
           </>
         )}
       </main>
