@@ -50,6 +50,7 @@ const FEATURE_LABELS: Record<keyof FeatureFlags, string> = {
   hasAnalytics: 'Ads Tracking / Analytics',
   hasNewsletter: 'Newsletter',
   hasLiveChat: 'Live Chat',
+  hasTracking: 'Tracking Resi',
   hasCareer: 'Portal Karir',
   hasEmail: 'Email Bisnis',
 }
