@@ -16,7 +16,7 @@ export function industriToTipe(industri: string | null | undefined): TipeIndustr
   if (s.includes('perusahaan') || s.includes('corporate') || s.includes('company') || s.includes('bisnis')) return 'corporate'
   if (s.includes('sekolah') || s.includes('kampus') || s.includes('pendidikan') || s.includes('school')) return 'sekolah'
   if (s.includes('klinik') || s.includes('dokter') || s.includes('kesehatan') || s.includes('rumah sakit') || s.includes('clinic')) return 'klinik'
-  if (s.includes('travel') || s.includes('wisata') || s.includes('tour')) return 'travel'
+  if (s.includes('travel') || s.includes('wisata') || s.includes('tour') || s.includes('rental') || s.includes('sewa') || s.includes('rent')) return 'travel'
   if (s.includes('resto') || s.includes('restaurant') || s.includes('cafe') || s.includes('kuliner') || s.includes('makan')) return 'restaurant'
   if (s.includes('personal') || s.includes('pribadi') || s.includes('portfolio') || s.includes('cv')) return 'personal'
   if (s.includes('blog') || s.includes('berita') || s.includes('news')) return 'blog'
@@ -56,6 +56,12 @@ const ADDON_FLAG_MAP: Record<string, (keyof FeatureFlags)[]> = {
   'career': ['hasCareer'],
   'newsletter': ['hasNewsletter'],
   'chat': ['hasLiveChat'],
+  // rental-specific add-ons (dari services.ts ADDON_GROUPS.travel)
+  'gps': ['hasTracking'],
+  'e-ticket': ['hasTracking'],
+  'driver-sched': ['hasBooking'],
+  'seat': ['hasBooking'],
+  'invoice-travel': [],
 }
 
 export function addonsToFeatures(addons: string[] | null | undefined): FeatureFlags {
@@ -95,6 +101,21 @@ export function addonsToFeatures(addons: string[] | null | undefined): FeatureFl
     if (a.includes('ads') || a.includes('pixel') || a.includes('analytics') || a.includes('tracking')) set('hasAnalytics')
   }
   return features
+}
+
+// ── industri -> tema visual renderer ──────────────────────────
+// Dipakai saat provisioning supaya theme di-set otomatis tanpa
+// intervensi manual admin. Admin masih bisa override via builder.
+const TIPE_TO_THEME: Partial<Record<TipeIndustri, string>> = {
+  restaurant: 'restaurant',
+  klinik:     'klinik',
+  corporate:  'company',
+  sekolah:    'sekolah',
+  toko_online:'batik_toko',
+  travel:     'rental',
+}
+export function industryToTheme(tipe: TipeIndustri): string {
+  return TIPE_TO_THEME[tipe] ?? ''
 }
 
 // ── slugify: hasilkan slug valid sesuai CHECK ^[a-z0-9]+(-[a-z0-9]+)*$ ──

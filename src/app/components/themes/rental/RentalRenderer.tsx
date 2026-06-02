@@ -5,7 +5,7 @@
 // Data armada dari tabel services. Profile (wa, kontak) dari tenant_profile.
 // ============================================================
 
-import type { PageSection, Service, TenantProfile } from '@/types/websitebuilder'
+import type { PageSection, Service, TenantProfile, FeatureFlags } from '@/types/websitebuilder'
 import type { DataKontenRental } from '@/types/websitebuilder'
 
 // ── Palette ──────────────────────────────────────────────────
@@ -65,12 +65,20 @@ interface RentalRendererProps {
   slug: string
   primary?: string
   konten?: DataKontenRental
+  features?: FeatureFlags
 }
 
 // ── Main renderer ─────────────────────────────────────────────
-export default function RentalRenderer({ nama, services, profile, wa, primary = ORG, konten }: RentalRendererProps) {
+export default function RentalRenderer({ nama, services, profile, wa, primary = ORG, konten, features = {} }: RentalRendererProps) {
   const accent = primary || ORG
   const waNum = wa ?? profile?.wa ?? null
+
+  // Feature flags — default false jika tidak di-set (belum order add-on tsb)
+  const hasBooking  = !!features.hasBooking   // form booking real + kalender
+  const hasPayment  = !!features.hasPayment   // tombol bayar Midtrans
+  const hasWA       = !!features.hasWhatsApp  // floating WA + CTA WA
+  const hasTracking = !!features.hasTracking  // section GPS/tracking
+  const hasLiveChat = !!features.hasLiveChat  // live chat widget
 
   // Build fleet dari services, fallback ke static
   const fleet = services.length > 0
@@ -174,10 +182,14 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
                   </div>
                 ))}
               </div>
-              {waNum ? (
+              {hasBooking ? (
+                <button style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60` }}>
+                  📅 Cek Ketersediaan & Booking
+                </button>
+              ) : waNum ? (
                 <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo, saya ingin booking kendaraan di ${nama}.`)}`} target="_blank" rel="noopener noreferrer"
                   style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60`, textAlign: 'center', textDecoration: 'none', display: 'block', letterSpacing: '0.02em' }}>
-                  🔍 Cari Kendaraan via WhatsApp
+                  🔍 Tanya Ketersediaan via WhatsApp
                 </a>
               ) : (
                 <button style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60` }}>
@@ -242,16 +254,27 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
                   <span style={{ fontSize: 22, fontWeight: 900, color: accent }}>Rp {v.price.toLocaleString('id-ID')}</span>
                   <span style={{ fontSize: 12, fontWeight: 700, color: MUTED }}>/hari</span>
                 </div>
-                {waNum ? (
+                {!v.available ? (
+                  <button disabled style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'default', backgroundColor: '#E7E5E4', color: '#A8A29E' }}>
+                    Tidak Tersedia
+                  </button>
+                ) : hasPayment ? (
+                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                    💳 Pesan & Bayar Online
+                  </button>
+                ) : hasBooking ? (
+                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                    📅 Booking Sekarang
+                  </button>
+                ) : waNum ? (
                   <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo, saya ingin booking *${v.name}* — Rp ${v.price.toLocaleString('id-ID')}/hari.`)}`}
                     target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', width: '100%', textAlign: 'center', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, textDecoration: 'none', boxSizing: 'border-box', backgroundColor: v.available ? accent : '#E7E5E4', color: v.available ? '#fff' : '#A8A29E', boxShadow: v.available ? `0 4px 12px ${accent}40` : 'none', pointerEvents: v.available ? 'auto' : 'none' }}>
-                    {v.available ? 'Booking Sekarang' : 'Tidak Tersedia'}
+                    style={{ display: 'block', width: '100%', textAlign: 'center', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, textDecoration: 'none', boxSizing: 'border-box', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                    Hubungi via WhatsApp
                   </a>
                 ) : (
-                  <button disabled={!v.available}
-                    style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: v.available ? 'pointer' : 'default', backgroundColor: v.available ? accent : '#E7E5E4', color: v.available ? '#fff' : '#A8A29E', boxShadow: v.available ? `0 4px 12px ${accent}40` : 'none' }}>
-                    {v.available ? 'Booking Sekarang' : 'Tidak Tersedia'}
+                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                    Tanya Ketersediaan
                   </button>
                 )}
               </div>
@@ -269,11 +292,11 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 24 }}>
             {[
-              { emoji: '🔧', title: 'Armada Terawat', desc: 'Setiap kendaraan melalui pemeriksaan teknis menyeluruh sebelum dan sesudah penyewaan.' },
-              { emoji: '👨‍✈️', title: 'Driver Profesional', desc: 'Tersedia opsi driver berpengalaman, ramah, dan menguasai rute terbaik di daerah Anda.' },
-              { emoji: '📍', title: 'GPS Real-Time', desc: 'Pantau posisi kendaraan Anda secara real-time. Aman dan transparan selama perjalanan.' },
-              { emoji: '🕐', title: 'Support 24/7', desc: 'Tim kami siaga 24 jam. Hubungi kami kapan saja jika ada kendala di perjalanan.' },
-            ].map((r) => (
+              { emoji: '🔧', title: 'Armada Terawat', desc: 'Setiap kendaraan melalui pemeriksaan teknis menyeluruh sebelum dan sesudah penyewaan.', show: true },
+              { emoji: '👨‍✈️', title: 'Driver Profesional', desc: 'Tersedia opsi driver berpengalaman, ramah, dan menguasai rute terbaik di daerah Anda.', show: true },
+              { emoji: '📍', title: 'GPS Real-Time', desc: 'Pantau posisi kendaraan Anda secara real-time. Aman dan transparan selama perjalanan.', show: hasTracking },
+              { emoji: '🕐', title: 'Support 24/7', desc: 'Tim kami siaga 24 jam. Hubungi kami kapan saja jika ada kendala di perjalanan.', show: true },
+            ].filter(r => r.show).map((r) => (
               <div key={r.title} style={{ backgroundColor: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.10)', borderRadius: 20, padding: 28 }}>
                 <div style={{ fontSize: 36, marginBottom: 20 }}>{r.emoji}</div>
                 <h3 style={{ color: '#fff', fontWeight: 900, fontSize: 17, margin: '0 0 8px', lineHeight: 1.2 }}>{r.title}</h3>
@@ -353,13 +376,21 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
             Pesan sekarang dan dapatkan konfirmasi dalam 5 menit. Lebih dari 10.000 pelanggan telah mempercayai kami.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            {waNum && (
+            {hasPayment ? (
+              <button style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
+                💳 Pesan & Bayar Online
+              </button>
+            ) : hasBooking ? (
+              <button style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
+                📅 Booking Sekarang
+              </button>
+            ) : waNum ? (
               <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo ${nama}, saya ingin booking kendaraan.`)}`} target="_blank" rel="noopener noreferrer"
                 style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
-                Booking Sekarang
+                Hubungi Kami
               </a>
-            )}
-            {waNum && (
+            ) : null}
+            {(hasWA && waNum) && (
               <a href={`https://wa.me/${waNum}`} target="_blank" rel="noopener noreferrer"
                 style={{ border: '2px solid rgba(255,255,255,.5)', color: '#fff', fontWeight: 700, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
                 💬 Chat WhatsApp
@@ -414,7 +445,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
         </div>
       </footer>
 
-      <FloatingWA wa={waNum} />
+      {hasWA && <FloatingWA wa={waNum} />}
     </div>
   )
 }
