@@ -9,13 +9,78 @@ import type { PageSection, Service, TenantProfile, FeatureFlags, DesignTokens } 
 import type { DataKontenRental } from '@/types/websitebuilder'
 
 // ── Palette ──────────────────────────────────────────────────
-const ORG   = '#EA580C' // orange-600
-const ORG_D = '#9A3412' // orange-900
-const ORG_L = '#FED7AA' // orange-200
-const STN   = '#1C1917' // stone-900
-const MUTED = '#78716C' // stone-500
-const BDR   = '#E7E5E4' // stone-200
+const ORG   = '#EA580C'
+const ORG_D = '#9A3412'
+const ORG_L = '#FED7AA'
+const STN   = '#1C1917'
+const MUTED = '#78716C'
+const BDR   = '#E7E5E4'
 const PAGE  = '#FFFBF7'
+
+// ── Shadow system ─────────────────────────────────────────────
+const S_SM  = '0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)'
+const S_MD  = '0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04)'
+const S_ORG = (a: string) => `0 8px 28px ${a}40, 0 2px 8px ${a}20`
+
+// ── Global CSS ────────────────────────────────────────────────
+const GLOBAL_CSS = `
+  .rd-root {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+  @keyframes rd-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .rd-up { animation: rd-up 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+  .rd-d0 { animation-delay: 0ms; }
+  .rd-d1 { animation-delay: 80ms; }
+  .rd-d2 { animation-delay: 160ms; }
+  .rd-d3 { animation-delay: 240ms; }
+  .rd-d4 { animation-delay: 320ms; }
+  .rd-card {
+    transition: transform 220ms cubic-bezier(0.16,1,0.3,1),
+                box-shadow 220ms cubic-bezier(0.16,1,0.3,1),
+                border-color 220ms ease;
+  }
+  .rd-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0,0,0,.12), 0 6px 14px rgba(0,0,0,.06) !important;
+  }
+  .rd-card-fleet:hover {
+    border-color: rgba(234,88,12,.3) !important;
+  }
+  .rd-card-testi:hover {
+    border-color: rgba(234,88,12,.2) !important;
+  }
+  .rd-step:hover .rd-step-circle {
+    transform: scale(1.06);
+    box-shadow: 0 12px 32px rgba(234,88,12,.22) !important;
+  }
+  .rd-step-circle {
+    transition: transform 200ms cubic-bezier(0.16,1,0.3,1),
+                box-shadow 200ms ease;
+  }
+  .rd-btn {
+    transition: transform 200ms cubic-bezier(0.16,1,0.3,1),
+                box-shadow 200ms ease, opacity 150ms ease;
+  }
+  .rd-btn:hover { transform: translateY(-2px); }
+  .rd-btn:active { transform: scale(0.96); }
+  .rd-nav-link {
+    transition: color 150ms ease;
+    text-decoration: none;
+  }
+  .rd-nav-link:hover { color: #EA580C !important; }
+  .rd-footer-link {
+    transition: color 150ms ease;
+    text-decoration: none;
+  }
+  .rd-footer-link:hover { color: #D6D3D1 !important; }
+  .rd-wa-float { transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1); }
+  .rd-wa-float:hover { transform: scale(1.12); }
+`
 
 // ── Static fallback fleet (jika services kosong) ─────────────
 const FALLBACK_FLEET: Array<{
@@ -46,7 +111,8 @@ function FloatingWA({ wa }: { wa?: string | null }) {
   if (!wa) return null
   return (
     <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 56, height: 56, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,.35)', textDecoration: 'none' }}>
+      className="rd-wa-float"
+      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 56, height: 56, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,.40)', textDecoration: 'none' }}>
       <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z" />
         <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.116 1.535 5.845L.057 23.492a.5.5 0 00.618.618l5.647-1.478A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.917 0-3.71-.504-5.263-1.385l-.378-.217-3.922 1.027 1.027-3.922-.217-.378A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
@@ -118,7 +184,8 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
   const taglineLines = tagline.split('\n')
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: PAGE, fontFamily: 'system-ui, -apple-system, sans-serif', fontVariantNumeric: 'tabular-nums' }}>
+    <div className="rd-root" style={{ minHeight: '100vh', backgroundColor: PAGE, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
 
       {/* Navbar */}
       <nav style={{ position: 'sticky', top: 0, backgroundColor: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${BDR}`, zIndex: 50, boxShadow: '0 1px 4px rgba(0,0,0,.04)' }}>
@@ -139,7 +206,8 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
           </div>
           {waNum && (
             <a href={`https://wa.me/${waNum}`} target="_blank" rel="noopener noreferrer"
-              style={{ backgroundColor: accent, color: '#fff', fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 999, textDecoration: 'none', boxShadow: `0 4px 12px ${accent}40` }}>
+              className="rd-btn"
+              style={{ backgroundColor: accent, color: '#fff', fontSize: 13, fontWeight: 700, padding: '10px 20px', borderRadius: 999, textDecoration: 'none', boxShadow: S_ORG(accent) }}>
               Booking Sekarang
             </a>
           )}
@@ -148,22 +216,30 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
 
       {/* Hero */}
       <section style={{ background: heroBg, color: heroTextColor, padding: '80px 24px 120px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `radial-gradient(circle at 20% 80%, ${accent}30 0%, transparent 50%), radial-gradient(circle at 80% 20%, #D9770630 0%, transparent 50%)`, pointerEvents: 'none' }} />
+        {/* Gradient mesh — 3 layer radial untuk atmosfer kaya */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: [
+          `radial-gradient(ellipse 80% 60% at 15% 85%, ${accent}28 0%, transparent 55%)`,
+          `radial-gradient(ellipse 60% 50% at 85% 15%, #D9770625 0%, transparent 50%)`,
+          `radial-gradient(ellipse 40% 40% at 50% 50%, ${accent}10 0%, transparent 60%)`,
+        ].join(', '), pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 420px', gap: 48, alignItems: 'center', position: 'relative', zIndex: 1 }}>
           {/* Copy */}
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, backgroundColor: `${accent}30`, border: `1px solid ${accent}50`, color: ORG_L, fontSize: 11, fontWeight: 900, padding: '7px 16px', borderRadius: 999, marginBottom: 24, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              🏆 #1 Rental Terpercaya
+            {/* Eyebrow */}
+            <div className="rd-up rd-d0" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, backgroundColor: `${accent}28`, border: `1px solid ${accent}45`, color: ORG_L, fontSize: 11, fontWeight: 900, padding: '7px 16px', borderRadius: 999, marginBottom: 24, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#FB923C', display: 'inline-block', boxShadow: '0 0 6px #FB923C80' }} />
+              {kota.split(',')[0]} · Rental Terpercaya
             </div>
-            <h1 style={{ fontSize: 56, fontWeight: headingWeight, lineHeight: 0.95, letterSpacing: '-0.02em', margin: '0 0 20px', color: heroTextColor }}>
+            <h1 className="rd-up rd-d1" style={{ fontSize: 'clamp(2.8rem,5.5vw,4.2rem)', fontWeight: headingWeight, lineHeight: 0.96, letterSpacing: '-0.03em', margin: '0 0 20px' }}>
               {taglineLines.map((line, i) => (
-                <span key={i} style={{ display: 'block', color: i === 1 ? '#FB923C' : '#fff' }}>{line}</span>
+                <span key={i} style={{ display: 'block', color: i === 1 ? '#FB923C' : heroTextColor }}>{line}</span>
               ))}
             </h1>
-            <p style={{ color: heroMutedColor, fontSize: 17, lineHeight: 1.6, marginBottom: 28, fontWeight: 500 }}>{deskripsi}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <p className="rd-up rd-d2" style={{ color: heroMutedColor, fontSize: 17, lineHeight: 1.65, marginBottom: 28, fontWeight: 400, maxWidth: 480 }}>{deskripsi}</p>
+            {/* Trust badges */}
+            <div className="rd-up rd-d3" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {['500+ Armada', '10.000+ Pelanggan', 'Driver Profesional', 'Asuransi Inklusif'].map((b) => (
-                <span key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,.10)', border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.9)', fontSize: 12, fontWeight: 700, padding: '7px 12px', borderRadius: 999 }}>
+                <span key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,.10)', border: '1px solid rgba(255,255,255,.18)', color: 'rgba(255,255,255,.92)', fontSize: 12, fontWeight: 700, padding: '7px 14px', borderRadius: 999 }}>
                   ✓ {b}
                 </span>
               ))}
@@ -196,16 +272,17 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
                 ))}
               </div>
               {hasBooking ? (
-                <button style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60` }}>
+                <button className="rd-btn" style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: S_ORG(accent) }}>
                   📅 Cek Ketersediaan & Booking
                 </button>
               ) : waNum ? (
                 <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo, saya ingin booking kendaraan di ${nama}.`)}`} target="_blank" rel="noopener noreferrer"
-                  style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60`, textAlign: 'center', textDecoration: 'none', display: 'block', letterSpacing: '0.02em' }}>
+                  className="rd-btn"
+                  style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: S_ORG(accent), textAlign: 'center', textDecoration: 'none', display: 'block', letterSpacing: '0.02em' }}>
                   🔍 Tanya Ketersediaan via WhatsApp
                 </a>
               ) : (
-                <button style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: `0 8px 24px ${ORG_D}60` }}>
+                <button className="rd-btn" style={{ width: '100%', backgroundColor: accent, color: '#fff', fontWeight: 900, fontSize: 14, padding: '16px 0', borderRadius: 999, border: 'none', cursor: 'pointer', boxShadow: S_ORG(accent) }}>
                   🔍 Cari Kendaraan Tersedia
                 </button>
               )}
@@ -218,17 +295,17 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
       </section>
 
       {/* Stats */}
-      <section style={{ backgroundColor: '#fff', borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}`, padding: '24px 24px' }}>
+      <section style={{ backgroundColor: '#fff', borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}`, padding: '32px 24px' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 24, textAlign: 'center' }}>
           {[
             { num: '500+', label: 'Unit Armada' },
             { num: '10rb+', label: 'Pelanggan Puas' },
             { num: '50+', label: 'Kota Layanan' },
             { num: '4.9★', label: 'Rating Google' },
-          ].map((s) => (
-            <div key={s.label}>
-              <p style={{ fontSize: 28, fontWeight: 900, color: STN, letterSpacing: '-0.02em', margin: '0 0 4px' }}>{s.num}</p>
-              <p style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{s.label}</p>
+          ].map((s, i) => (
+            <div key={s.label} className={`rd-up rd-d${i}`}>
+              <p style={{ fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 900, color: accent, letterSpacing: '-0.03em', margin: '0 0 4px' }}>{s.num}</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -243,8 +320,10 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
           {fleet.slice(0, 6).map((v, i) => (
-            <div key={i} style={{ backgroundColor: '#fff', border: `1px solid ${BDR}`, borderRadius: 20, padding: 20, display: 'flex', flexDirection: 'column', transition: 'box-shadow .2s' }}>
-              <div style={{ width: '100%', aspectRatio: '4/3', backgroundColor: '#FFF7ED', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <div key={i} className={`rd-card rd-card-fleet rd-up rd-d${Math.min(i, 4)}`}
+              style={{ backgroundColor: '#fff', border: `1px solid ${BDR}`, borderRadius: 20, padding: 20, display: 'flex', flexDirection: 'column', boxShadow: S_SM }}>
+              {/* Concentric: card 20, image bg 14 = 20 - (20-14) gap */}
+              <div style={{ width: '100%', aspectRatio: '4/3', background: `linear-gradient(135deg, #FFF7ED, #FEF3C7)`, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                 <span style={{ fontSize: 56 }}>{v.emoji}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -272,21 +351,22 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
                     Tidak Tersedia
                   </button>
                 ) : hasPayment ? (
-                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                  <button className="rd-btn" style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: S_ORG(accent) }}>
                     💳 Pesan & Bayar Online
                   </button>
                 ) : hasBooking ? (
-                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                  <button className="rd-btn" style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: S_ORG(accent) }}>
                     📅 Booking Sekarang
                   </button>
                 ) : waNum ? (
                   <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo, saya ingin booking *${v.name}* — Rp ${v.price.toLocaleString('id-ID')}/hari.`)}`}
                     target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', width: '100%', textAlign: 'center', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, textDecoration: 'none', boxSizing: 'border-box', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                    className="rd-btn"
+                    style={{ display: 'block', width: '100%', textAlign: 'center', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, textDecoration: 'none', boxSizing: 'border-box', backgroundColor: accent, color: '#fff', boxShadow: S_ORG(accent) }}>
                     Hubungi via WhatsApp
                   </a>
                 ) : (
-                  <button style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: `0 4px 12px ${accent}40` }}>
+                  <button className="rd-btn" style={{ width: '100%', padding: '12px 0', borderRadius: 999, fontSize: 13, fontWeight: 900, border: 'none', cursor: 'pointer', backgroundColor: accent, color: '#fff', boxShadow: S_ORG(accent) }}>
                     Tanya Ketersediaan
                   </button>
                 )}
@@ -370,16 +450,16 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
               { num: '01', emoji: '🔍', title: 'Pilih Kendaraan', desc: 'Pilih kendaraan sesuai kebutuhan dan budget dari katalog lengkap kami.' },
               { num: '02', emoji: '💳', title: 'Bayar & Konfirmasi', desc: 'Lakukan pembayaran DP via transfer atau dompet digital. Konfirmasi otomatis via WhatsApp.' },
               { num: '03', emoji: '🚀', title: 'Jemput & Berangkat', desc: 'Kendaraan diantar ke lokasi Anda tepat waktu. Selamat menikmati perjalanan!' },
-            ].map((s) => (
-              <div key={s.num} style={{ textAlign: 'center', position: 'relative' }}>
+            ].map((s, i) => (
+              <div key={s.num} className={`rd-step rd-up rd-d${i}`} style={{ textAlign: 'center', position: 'relative' }}>
                 <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24 }}>
-                  <div style={{ width: 96, height: 96, backgroundColor: '#fff', border: `4px solid ${ORG_L}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: `0 8px 24px ${accent}20` }}>
+                  <div className="rd-step-circle" style={{ width: 96, height: 96, backgroundColor: '#fff', border: `4px solid ${ORG_L}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: `0 8px 24px ${accent}20` }}>
                     <span style={{ fontSize: 40 }}>{s.emoji}</span>
                   </div>
-                  <div style={{ position: 'absolute', top: -8, right: -8, backgroundColor: accent, color: '#fff', fontSize: 10, fontWeight: 900, padding: '4px 10px', borderRadius: 999 }}>{s.num}</div>
+                  <div style={{ position: 'absolute', top: -8, right: -8, backgroundColor: accent, color: '#fff', fontSize: 10, fontWeight: 900, padding: '4px 10px', borderRadius: 999, boxShadow: S_ORG(accent) }}>{s.num}</div>
                 </div>
-                <h3 style={{ fontWeight: 900, color: STN, fontSize: 19, margin: '0 0 8px' }}>{s.title}</h3>
-                <p style={{ color: MUTED, fontSize: 14, fontWeight: 500, lineHeight: 1.6, margin: 0, maxWidth: 240, marginLeft: 'auto', marginRight: 'auto' }}>{s.desc}</p>
+                <h3 style={{ fontWeight: 900, color: STN, fontSize: 19, margin: '0 0 8px', letterSpacing: '-0.01em' }}>{s.title}</h3>
+                <p style={{ color: MUTED, fontSize: 14, fontWeight: 400, lineHeight: 1.65, margin: 0, maxWidth: 240, marginLeft: 'auto', marginRight: 'auto' }}>{s.desc}</p>
               </div>
             ))}
           </div>
@@ -398,8 +478,8 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
               { name: 'Budi Santoso', city: 'Jakarta', role: 'Pengusaha', text: 'Avanza-nya bersih dan AC dingin. Driver tepat waktu, sangat membantu selama perjalanan bisnis ke Bandung.' },
               { name: 'Siti Rahayu', city: 'Surabaya', role: 'Content Creator', text: 'Booking mudah, respon cepat. NMAX yang kami sewa dalam kondisi prima. Pasti balik lagi!' },
               { name: 'Ahmad Fauzi', city: 'Yogyakarta', role: 'Dokter', text: 'Sewa Innova untuk family trip 3 hari. Harga sangat terjangkau dengan kualitas kendaraan yang luar biasa.' },
-            ].map((t) => (
-              <div key={t.name} style={{ backgroundColor: PAGE, border: `1px solid ${BDR}`, borderRadius: 20, padding: 28 }}>
+            ].map((t, i) => (
+              <div key={t.name} className={`rd-card rd-card-testi rd-up rd-d${i}`} style={{ backgroundColor: PAGE, border: `1px solid ${BDR}`, borderRadius: 20, padding: 28, boxShadow: S_SM }}>
                 <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
                   {Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ color: '#F59E0B', fontSize: 18 }}>★</span>)}
                 </div>
@@ -418,32 +498,42 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
       </section>
 
       {/* CTA */}
-      <section style={{ background: `linear-gradient(135deg, ${accent}, #D97706)`, padding: '80px 24px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 10% 50%, rgba(255,255,255,.15) 0%, transparent 40%), radial-gradient(circle at 90% 50%, rgba(255,255,255,.15) 0%, transparent 40%)', pointerEvents: 'none' }} />
+      <section style={{ background: `linear-gradient(135deg, ${ORG_D} 0%, ${accent} 50%, #D97706 100%)`, padding: '80px 24px', position: 'relative', overflow: 'hidden' }}>
+        {/* Atmospheric radial glows */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: [
+          'radial-gradient(ellipse 60% 80% at 10% 50%, rgba(255,255,255,.14) 0%, transparent 45%)',
+          'radial-gradient(ellipse 40% 60% at 90% 50%, rgba(255,255,255,.10) 0%, transparent 40%)',
+        ].join(', '), pointerEvents: 'none' }} />
+        {/* Decorative circle borders */}
+        <div style={{ position: 'absolute', bottom: -80, right: -80, width: 320, height: 320, borderRadius: '50%', border: '1px solid rgba(255,255,255,.12)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -40, right: -40, width: 200, height: 200, borderRadius: '50%', border: '1px solid rgba(255,255,255,.16)', pointerEvents: 'none' }} />
+
         <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 56, marginBottom: 24 }}>🚗</div>
-          <h2 style={{ fontSize: 44, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 16px', lineHeight: 1 }}>Siap Melakukan Perjalanan?</h2>
-          <p style={{ color: 'rgba(255,255,255,.85)', fontSize: 17, fontWeight: 500, marginBottom: 36, lineHeight: 1.6 }}>
+          <div style={{ fontSize: 56, marginBottom: 20 }}>🚗</div>
+          <h2 style={{ fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', margin: '0 0 16px', lineHeight: 1.05 }}>Siap Melakukan Perjalanan?</h2>
+          <p style={{ color: 'rgba(255,255,255,.8)', fontSize: 17, fontWeight: 400, marginBottom: 36, lineHeight: 1.65, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
             Pesan sekarang dan dapatkan konfirmasi dalam 5 menit. Lebih dari 10.000 pelanggan telah mempercayai kami.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             {hasPayment ? (
-              <button style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
+              <button className="rd-btn" style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 28px rgba(0,0,0,.20)' }}>
                 💳 Pesan & Bayar Online
               </button>
             ) : hasBooking ? (
-              <button style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
+              <button className="rd-btn" style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 8px 28px rgba(0,0,0,.20)' }}>
                 📅 Booking Sekarang
               </button>
             ) : waNum ? (
               <a href={`https://wa.me/${waNum}?text=${encodeURIComponent(`Halo ${nama}, saya ingin booking kendaraan.`)}`} target="_blank" rel="noopener noreferrer"
-                style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}>
+                className="rd-btn"
+                style={{ backgroundColor: '#fff', color: accent, fontWeight: 900, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 28px rgba(0,0,0,.20)', display: 'inline-block' }}>
                 Hubungi Kami
               </a>
             ) : null}
             {(hasWA && waNum) && (
               <a href={`https://wa.me/${waNum}`} target="_blank" rel="noopener noreferrer"
-                style={{ border: '2px solid rgba(255,255,255,.5)', color: '#fff', fontWeight: 700, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+                className="rd-btn"
+                style={{ border: '2px solid rgba(255,255,255,.45)', color: '#fff', fontWeight: 700, padding: '16px 36px', borderRadius: 999, fontSize: 14, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
                 💬 Chat WhatsApp
               </a>
             )}
@@ -467,7 +557,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {['Rental Mobil', 'Rental Motor', 'Paket Wisata', 'Antar Jemput Bandara', 'Rental Minibus'].map((item) => (
                   <li key={item} style={{ marginBottom: 10 }}>
-                    <a href="#" style={{ fontSize: 13, fontWeight: 500, color: '#78716C', textDecoration: 'none' }}>{item}</a>
+                    <a href="#" className="rd-footer-link" style={{ fontSize: 13, fontWeight: 500, color: '#78716C' }}>{item}</a>
                   </li>
                 ))}
               </ul>
