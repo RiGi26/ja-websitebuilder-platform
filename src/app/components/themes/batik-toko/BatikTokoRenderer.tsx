@@ -34,6 +34,54 @@ const MUTED    = '#7A6348'
 const INK      = '#2C1C0E'
 const SOFT     = '#F0E6D3'
 
+// ── Shadow system ─────────────────────────────────────────────
+const S_SM    = '0 2px 12px rgba(26,16,64,.07), 0 1px 3px rgba(26,16,64,.04)'
+const S_MD    = '0 8px 28px rgba(26,16,64,.11), 0 3px 8px rgba(26,16,64,.06)'
+const S_AMBER = `0 8px 24px rgba(180,83,9,.30), 0 2px 8px rgba(180,83,9,.16)`
+const S_INDIGO = `0 8px 24px rgba(26,16,64,.40), 0 2px 8px rgba(26,16,64,.20)`
+
+// ── Easing constants ──────────────────────────────────────────
+const EASE_SPRING = 'cubic-bezier(0.16, 1, 0.3, 1)'
+
+// ── Extra CSS injected ────────────────────────────────────────
+const EXTRA_CSS = `
+  .bt-root {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+  .bt-card-feat {
+    transition: transform 220ms ${EASE_SPRING}, box-shadow 220ms ease, border-color 180ms ease;
+  }
+  .bt-card-feat:hover {
+    transform: translateY(-5px);
+    box-shadow: ${S_MD} !important;
+    border-color: rgba(200,146,42,.25) !important;
+  }
+  .bt-card-prod {
+    transition: transform 240ms ${EASE_SPRING}, box-shadow 240ms ease;
+  }
+  .bt-card-prod:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(26,16,64,.14), 0 6px 14px rgba(26,16,64,.08) !important;
+  }
+  .bt-card-testi {
+    transition: transform 200ms ${EASE_SPRING}, background 200ms ease, border-color 200ms ease;
+  }
+  .bt-card-testi:hover {
+    transform: translateY(-4px);
+    background: rgba(255,248,237,.10) !important;
+    border-color: rgba(200,146,42,.35) !important;
+  }
+  .bt-btn {
+    transition: transform 200ms ${EASE_SPRING}, opacity 150ms ease, box-shadow 200ms ease;
+  }
+  .bt-btn:hover { transform: translateY(-2px); opacity: .92; }
+  .bt-btn:active { transform: scale(0.96); }
+  .bt-wa-float { transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1); }
+  .bt-wa-float:hover { transform: scale(1.12); }
+`
+
 // ── Kawung SVG pattern (motif batik Jawa) ─────────────────────
 const kawungPattern = (opacity = 0.09, color = 'D4A544') =>
   `url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${color}' fill-opacity='${opacity}'%3E%3Cellipse cx='32' cy='8' rx='10' ry='7'/%3E%3Cellipse cx='32' cy='56' rx='10' ry='7'/%3E%3Cellipse cx='8' cy='32' rx='7' ry='10'/%3E%3Cellipse cx='56' cy='32' rx='7' ry='10'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3C/g%3E%3C/svg%3E")`
@@ -86,8 +134,8 @@ function TopBar({ nama, wa }: { nama: string; wa?: string }) {
           <a
             href={`https://wa.me/${wa}`}
             target="_blank"
-            className={`text-[11px] font-bold uppercase tracking-[0.18em] px-4 py-2 rounded-full transition-all hover:opacity-85 ${sans.className}`}
-            style={{ backgroundColor: AMBER, color: '#FFF8ED' }}
+            className={`bt-btn text-[11px] font-bold uppercase tracking-[0.18em] px-4 py-2.5 rounded-full ${sans.className}`}
+            style={{ backgroundColor: AMBER, color: '#FFF8ED', boxShadow: S_AMBER }}
           >
             Pesan Kini
           </a>
@@ -114,11 +162,16 @@ function Hero({ isi }: { isi: Isi }) {
         />
       )}
 
-      {/* Overlay gradient bawah */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: `linear-gradient(to top, ${INDIGO} 0%, transparent 55%, ${INDIGO}80 100%)` }}
-      />
+      {/* Overlay gradient bawah + atmospheric mesh */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `linear-gradient(to top, ${INDIGO} 0%, transparent 55%, ${INDIGO}80 100%)`
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: [
+          `radial-gradient(ellipse 70% 50% at 20% 75%, rgba(200,146,42,.12) 0%, transparent 55%)`,
+          `radial-gradient(ellipse 50% 40% at 80% 25%, rgba(180,83,9,.09) 0%, transparent 45%)`,
+        ].join(', '),
+      }} />
 
       {/* Kawung pattern subtle */}
       <div
@@ -171,8 +224,8 @@ function Hero({ isi }: { isi: Isi }) {
         {isi.cta_text && (
           <a
             href={isi.cta_link ?? '#koleksi'}
-            className={`inline-block mt-10 px-10 py-3.5 rounded-full font-bold tracking-widest text-sm uppercase transition-all hover:opacity-90 hover:-translate-y-0.5 ${sans.className}`}
-            style={{ backgroundColor: AMBER, color: CREAM, letterSpacing: '0.18em' }}
+            className={`bt-btn inline-block mt-10 px-10 py-3.5 rounded-full font-bold text-sm uppercase ${sans.className}`}
+            style={{ backgroundColor: AMBER, color: CREAM, letterSpacing: '0.18em', boxShadow: S_AMBER }}
           >
             {isi.cta_text}
           </a>
@@ -242,12 +295,8 @@ function Features({ isi }: { isi: Isi }) {
           {items.map((it: Isi, i: number) => (
             <div
               key={i}
-              className={`relative p-8 rounded-2xl text-center group transition-shadow hover:shadow-xl b-reveal b-delay-${i + 1}`}
-              style={{
-                backgroundColor: PAPER,
-                border: `1px solid ${SOFT}`,
-                boxShadow: '0 2px 12px rgba(26,16,64,0.06)',
-              }}
+              className={`bt-card-feat relative p-8 rounded-2xl text-center group b-reveal b-delay-${i + 1}`}
+              style={{ backgroundColor: PAPER, border: `1px solid ${SOFT}`, boxShadow: S_SM }}
             >
               {/* Icon ornament batik */}
               <div
@@ -312,12 +361,8 @@ function ProductList({ isi, products, hasCart, primary }: {
             {products.map((p, i) => (
               <div
                 key={p.id}
-                className={`group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl b-reveal b-delay-${Math.min(i + 1, 3)}`}
-                style={{
-                  backgroundColor: CREAM,
-                  border: `1px solid ${SOFT}`,
-                  boxShadow: '0 2px 16px rgba(26,16,64,0.07)',
-                }}
+                className={`bt-card-prod group flex flex-col rounded-2xl overflow-hidden b-reveal b-delay-${Math.min(i + 1, 3)}`}
+                style={{ backgroundColor: CREAM, border: `1px solid ${SOFT}`, boxShadow: S_SM }}
               >
                 {/* Foto produk */}
                 <div className="relative overflow-hidden aspect-square">
@@ -411,11 +456,8 @@ function Testimonials({ isi }: { isi: Isi }) {
           {items.map((it: Isi, i: number) => (
             <blockquote
               key={i}
-              className={`relative p-8 rounded-2xl b-reveal b-delay-${i + 1}`}
-              style={{
-                backgroundColor: 'rgba(255,248,237,0.06)',
-                border: `1px solid ${GOLD}25`,
-              }}
+              className={`bt-card-testi relative p-8 rounded-2xl b-reveal b-delay-${i + 1}`}
+              style={{ backgroundColor: 'rgba(255,248,237,0.06)', border: `1px solid ${GOLD}25` }}
             >
               {/* Tanda kutip besar */}
               <div
@@ -475,8 +517,8 @@ function Cta({ isi }: { isi: Isi }) {
           <a
             href={isi.cta_link ?? '#'}
             target="_blank"
-            className={`inline-block px-10 py-4 rounded-full font-bold text-sm uppercase tracking-[0.18em] transition-all hover:opacity-90 hover:-translate-y-0.5 shadow-lg ${sans.className}`}
-            style={{ backgroundColor: INDIGO, color: '#F5E6C8' }}
+            className={`bt-btn inline-block px-10 py-4 rounded-full font-bold text-sm uppercase tracking-[0.18em] ${sans.className}`}
+            style={{ backgroundColor: INDIGO, color: '#F5E6C8', boxShadow: S_INDIGO }}
           >
             {isi.cta_text}
           </a>
@@ -521,21 +563,16 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
         )}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {wa && (
-            <a
-              href={`https://wa.me/${wa}`}
-              target="_blank"
-              className={`px-7 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all hover:opacity-90 ${sans.className}`}
-              style={{ backgroundColor: AMBER, color: CREAM }}
-            >
+            <a href={`https://wa.me/${wa}`} target="_blank"
+              className={`bt-btn px-7 py-3 rounded-full font-bold text-sm uppercase tracking-widest ${sans.className}`}
+              style={{ backgroundColor: AMBER, color: CREAM, boxShadow: S_AMBER }}>
               WhatsApp
             </a>
           )}
           {email && (
-            <a
-              href={`mailto:${email}`}
-              className={`px-7 py-3 rounded-full font-bold text-sm uppercase tracking-widest transition-all hover:opacity-90 ${sans.className}`}
-              style={{ backgroundColor: INDIGO, color: CREAM }}
-            >
+            <a href={`mailto:${email}`}
+              className={`bt-btn px-7 py-3 rounded-full font-bold text-sm uppercase tracking-widest ${sans.className}`}
+              style={{ backgroundColor: INDIGO, color: CREAM, boxShadow: S_INDIGO }}>
               Email
             </a>
           )}
@@ -584,9 +621,10 @@ function ScrollRevealScript() {
       <style dangerouslySetInnerHTML={{ __html: `
         .b-reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
         .b-reveal.b-visible { opacity: 1; transform: translateY(0); }
-        .b-delay-1 { transition-delay: 100ms; }
-        .b-delay-2 { transition-delay: 200ms; }
-        .b-delay-3 { transition-delay: 300ms; }
+        .b-delay-1 { transition-delay: 80ms; }
+        .b-delay-2 { transition-delay: 160ms; }
+        .b-delay-3 { transition-delay: 240ms; }
+        ${EXTRA_CSS}
       ` }} />
       <script dangerouslySetInnerHTML={{ __html: `
         (function(){
@@ -640,7 +678,7 @@ export default function BatikTokoRenderer({
   }
 
   return (
-    <div className={`${serif.variable} ${sans.variable}`} style={{ backgroundColor: PAPER }}>
+    <div className={`bt-root ${serif.variable} ${sans.variable}`} style={{ backgroundColor: PAPER }}>
       <ScrollRevealScript />
       <TopBar nama={nama} wa={waContact} />
       <main>
