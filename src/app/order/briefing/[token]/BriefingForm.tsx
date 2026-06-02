@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
+import { getVariants } from '@/lib/website-variants'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ interface FormState {
   keunggulan: [string, string, string]
   syarat_sewa: string
   // Step 2 — Branding
+  variant: string
   primary_color: string
   logo_url: string
   referensi_website: string
@@ -68,6 +70,7 @@ const INIT: FormState = {
   bio: '', topik: '',
   keunggulan: ['', '', ''],
   syarat_sewa: '',
+  variant: '',
   primary_color: '#0071E3', logo_url: '', referensi_website: '',
   instagram: '', tiktok: '', shopee: '',
 }
@@ -114,6 +117,8 @@ interface Props {
 export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri }: Props) {
   const tipe = industriToTipe(industri)
   const defaultColor = INDUSTRY_COLOR[tipe] ?? '#0071E3'
+  const variants = getVariants(tipe)
+  const defaultVariant = variants[0]?.id ?? ''
 
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<FormState>({
@@ -121,6 +126,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
     nama_usaha: namaKlien,
     wa: nomorWa,
     email,
+    variant: defaultVariant,
     primary_color: defaultColor,
   })
   const [submitting, setSubmitting] = useState(false)
@@ -181,6 +187,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         kota_layanan: form.kota_layanan.split(',').map(s => s.trim()).filter(Boolean),
       },
       branding: {
+        variant: form.variant,
         primary_color: form.primary_color,
         logo_url: form.logo_url,
         referensi_website: form.referensi_website,
@@ -565,9 +572,49 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         {step === 2 && (
           <div className="space-y-6 animate-fade-in">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Branding & Referensi</h2>
-              <p className="text-sm text-gray-400 font-medium">Semua opsional — tim kami akan menyesuaikan jika tidak diisi.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Gaya & Branding Website</h2>
+              <p className="text-sm text-gray-400 font-medium">Pilih gaya yang paling cocok dengan bisnis Anda.</p>
             </div>
+
+            {/* Variant selector */}
+            <div>
+              <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3">
+                Gaya Visual Website
+              </label>
+              <div className="grid grid-cols-1 gap-3">
+                {variants.map(v => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => {
+                      set('variant', v.id)
+                      set('primary_color', v.mood)
+                    }}
+                    className={`flex items-center gap-4 p-4 rounded-[16px] border-2 text-left transition-all ${
+                      form.variant === v.id
+                        ? 'border-[#0071E3] bg-blue-50/40'
+                        : 'border-black/[0.06] hover:border-blue-200 bg-white'
+                    }`}
+                  >
+                    {/* Color swatch */}
+                    <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-lg"
+                      style={{ backgroundColor: v.mood + '20', border: `2px solid ${v.mood}` }}>
+                      {v.emoji}
+                    </div>
+                    <div className="flex-1">
+                      <p className={`font-bold text-sm ${form.variant === v.id ? 'text-[#0071E3]' : 'text-gray-900'}`}>
+                        {v.nama}
+                      </p>
+                      <p className="text-xs text-gray-400 font-medium mt-0.5">{v.deskripsi}</p>
+                    </div>
+                    {form.variant === v.id && (
+                      <Check size={16} className="text-[#0071E3] shrink-0" strokeWidth={3} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <Field label="Warna Utama Website">
               <div className="flex items-center gap-3">
                 <input type="color" value={form.primary_color} onChange={e => set('primary_color', e.target.value)}
