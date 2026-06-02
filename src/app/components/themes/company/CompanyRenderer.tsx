@@ -32,6 +32,21 @@ const LIGHT   = '#F0F0EC'
 const MUTED   = '#7A7D84'
 const BORDER  = 'rgba(245,166,35,0.12)'
 
+const S_AMBER = `0 8px 28px rgba(245,166,35,.28), 0 2px 8px rgba(245,166,35,.14)`
+const EASE    = 'cubic-bezier(0.16,1,0.3,1)'
+const CO_CSS  = `
+  .co-root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-variant-numeric:tabular-nums}
+  .co-btn{transition:transform 200ms ${EASE},box-shadow 200ms ease,opacity 150ms ease}
+  .co-btn:hover{transform:translateY(-2px)}.co-btn:active{transform:scale(0.96)}
+  .co-svc{transition:background 200ms ease,border-color 200ms ease}
+  .co-svc:hover{background:rgba(245,166,35,.06)!important;border-color:rgba(245,166,35,.22)!important}
+  .co-svc:hover .co-arrow{opacity:1!important;transform:translate(2px,-2px)}
+  .co-arrow{transition:opacity 150ms ease,transform 200ms ${EASE}}
+  .co-testi{transition:transform 220ms ${EASE},border-color 200ms ease}
+  .co-testi:hover{transform:translateY(-4px);border-color:rgba(245,166,35,.28)!important}
+  .co-wa{transition:transform 220ms cubic-bezier(0.34,1.56,0.64,1)}.co-wa:hover{transform:scale(1.12)}
+`
+
 type Isi = Record<string, any>
 function asArray(v: unknown): any[] { return Array.isArray(v) ? v : [] }
 
@@ -39,8 +54,8 @@ function asArray(v: unknown): any[] { return Array.isArray(v) ? v : [] }
 function FloatingWA({ wa }: { wa?: string }) {
   if (!wa) return null
   return (
-    <a href={`https://wa.me/${wa}`} target="_blank" aria-label="WhatsApp"
-      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 52, height: 52, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.35)' }}>
+    <a href={`https://wa.me/${wa}`} target="_blank" aria-label="WhatsApp" className="co-wa"
+      style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, width: 52, height: 52, borderRadius: '50%', backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.40)' }}>
       <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.116 1.535 5.845L.057 23.492a.5.5 0 00.618.618l5.647-1.478A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.917 0-3.71-.504-5.263-1.385l-.378-.217-3.922 1.027 1.027-3.922-.217-.378A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
       </svg>
@@ -63,8 +78,8 @@ function Navbar({ nama, wa }: { nama: string; wa?: string }) {
         </nav>
         {wa && (
           <a href={`https://wa.me/${wa}`} target="_blank"
-            className={`text-[11px] font-600 uppercase tracking-[0.15em] px-5 py-2.5 transition-all hover:opacity-85 ${body.className}`}
-            style={{ backgroundColor: AMBER, color: INK }}>
+            className={`co-btn text-[11px] font-600 uppercase tracking-[0.15em] px-5 py-2.5 ${body.className}`}
+            style={{ backgroundColor: AMBER, color: INK, boxShadow: S_AMBER }}>
             Hubungi Kami
           </a>
         )}
@@ -113,12 +128,12 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
           </p>
           <div className="flex gap-4 shrink-0">
             <a href="#kontak"
-              className={`px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
-              style={{ backgroundColor: AMBER, color: INK }}>
+              className={`co-btn px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
+              style={{ backgroundColor: AMBER, color: INK, boxShadow: S_AMBER }}>
               Konsultasi Gratis
             </a>
             <a href="#layanan"
-              className={`px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
+              className={`co-btn px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
               style={{ border: `1px solid ${BORDER}`, color: MUTED }}>
               Lihat Layanan
             </a>
@@ -169,12 +184,12 @@ function Services({ isi }: { isi: Isi }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: BORDER }}>
           {data.map((it: Isi, i: number) => (
-            <div key={i} className="group p-10 transition-colors" style={{ backgroundColor: CARD }}>
+            <div key={i} className="co-svc group p-10" style={{ backgroundColor: CARD }}>
               <div className="flex items-start justify-between mb-8">
                 <span className={`${display.className} font-700 text-5xl leading-none`} style={{ color: `${AMBER}20` }}>
                   0{i + 1}
                 </span>
-                <svg className="opacity-0 group-hover:opacity-100 transition-opacity" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <svg className="co-arrow opacity-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M7 17L17 7M17 7H7M17 7v10" stroke={AMBER} strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
@@ -231,7 +246,7 @@ function Testimonials({ isi }: { isi: Isi }) {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {data.map((it: Isi, i: number) => (
-            <blockquote key={i} className="p-10" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
+            <blockquote key={i} className="co-testi p-10" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
               <p className={`${display.className} font-400 text-2xl leading-snug mb-8 italic`} style={{ color: LIGHT }}>
                 "{it.quote ?? it.isi ?? ''}"
               </p>
@@ -260,8 +275,8 @@ function Cta({ isi, wa }: { isi: Isi; wa?: string }) {
         <div className="flex flex-col sm:flex-row gap-4">
           {wa ? (
             <a href={`https://wa.me/${wa}?text=Halo, saya ingin konsultasi`} target="_blank"
-              className={`inline-flex items-center gap-2 px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
-              style={{ backgroundColor: INK, color: LIGHT }}>
+              className={`co-btn inline-flex items-center gap-2 px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
+              style={{ backgroundColor: INK, color: LIGHT, boxShadow: '0 8px 24px rgba(8,9,11,.40)' }}>
               Mulai Konsultasi →
             </a>
           ) : null}
@@ -377,7 +392,8 @@ export default function CompanyRenderer({
   }
 
   return (
-    <div className={`${display.variable} ${body.variable}`} style={{ backgroundColor: INK }}>
+    <div className={`co-root ${display.variable} ${body.variable}`} style={{ backgroundColor: INK }}>
+      <style dangerouslySetInnerHTML={{ __html: CO_CSS }} />
       <Navbar nama={nama} wa={waContact} />
       <main>
         {visible.length === 0 ? (
