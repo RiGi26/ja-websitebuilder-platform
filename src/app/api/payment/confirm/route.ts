@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { notifyCustomer } from '@/lib/fonnte'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -28,10 +29,26 @@ export async function POST(request: Request) {
     const isPending = tx.transaction_status === 'pending'
 
     if (isPaid) {
-      await supabaseAdmin
+      const { data: updated } = await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'dp_paid', status: 'pending' })
         .eq('id', order_id)
+        .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
+        .maybeSingle()
+
+      if (updated?.nomor_wa) {
+        const clientName = updated.nama_perusahaan || updated.nama_usaha || 'Customer'
+        const year = new Date(updated.created_at ?? Date.now()).getFullYear()
+        const displayId = `JA-${year}-${updated.id.slice(0, 8).toUpperCase()}`
+        const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+        notifyCustomer({ type: 'dp_confirmed' }, updated.nomor_wa, {
+          clientName,
+          displayId,
+          trackUrl: `${base}/track?id=${updated.id}`,
+          briefingUrl: `${base}/order/briefing/${updated.tracking_token}`,
+        }).catch((e) => console.error('[confirm] WA dp_confirmed failed:', e))
+      }
+
       return NextResponse.json({ confirmed: true, status: 'dp_paid' })
     }
 

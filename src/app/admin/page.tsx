@@ -244,10 +244,19 @@ export default async function StudioAdminPage() {
                         </div>
                       </div>
 
-                      <div className="pt-4 flex items-center gap-3">
+                      <div className="pt-4 flex flex-wrap items-center gap-2">
                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${order.status === 'pending' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'}`}>
                            Status: {order.status}
                         </span>
+                        {(order as any).briefing_submitted_at ? (
+                          <span className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
+                            ✅ Briefing Masuk
+                          </span>
+                        ) : (order as any).payment_status === 'dp_paid' ? (
+                          <span className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100 flex items-center gap-1">
+                            ⏳ Belum Briefing
+                          </span>
+                        ) : null}
                       </div>
 
                       {/* Builder: provision / kelola website klien (posisi menonjol) */}

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { notifyCustomer } from '@/lib/fonnte'
 import crypto from 'crypto'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
@@ -48,15 +49,28 @@ export async function POST(request: Request) {
     }
 
     if (Object.keys(update).length > 0) {
-      // Lookup by midtrans_order_id (exact match) — kolom ini sudah di-index dan
-      // disimpan saat order dibuat di payment/create. Jauh lebih reliable
-      // dibanding ilike pada UUID (yang silent fail karena UUID tidak punya operator ILIKE).
-      const { error } = await supabaseAdmin
+      const { data: updatedOrder, error } = await supabaseAdmin
         .from('orders')
         .update(update)
         .eq('midtrans_order_id', order_id)
+        .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
+        .maybeSingle()
 
       if (error) console.error('[webhook] DB update error:', error.message)
+
+      // Kirim WA briefing link setelah dp_paid (fire-and-forget)
+      if (isPaid && updatedOrder?.nomor_wa) {
+        const clientName = updatedOrder.nama_perusahaan || updatedOrder.nama_usaha || 'Customer'
+        const year = new Date(updatedOrder.created_at ?? Date.now()).getFullYear()
+        const displayId = `JA-${year}-${updatedOrder.id.slice(0, 8).toUpperCase()}`
+        const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+        notifyCustomer({ type: 'dp_confirmed' }, updatedOrder.nomor_wa, {
+          clientName,
+          displayId,
+          trackUrl: `${base}/track?id=${updatedOrder.id}`,
+          briefingUrl: `${base}/order/briefing/${updatedOrder.tracking_token}`,
+        }).catch((e) => console.error('[webhook] WA dp_confirmed failed:', e))
+      }
     }
 
     return NextResponse.json({ received: true })
