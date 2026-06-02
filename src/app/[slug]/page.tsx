@@ -6,6 +6,12 @@ import { fetchProductsByPage, fetchBlogPostsByPage, fetchServicesByPage, fetchMe
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
+import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
+import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
+import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
+import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
+import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
+import LiveChatWidget from '@/app/components/LiveChatWidget'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
@@ -50,9 +56,35 @@ export default async function PublicSitePage({
   const theme = konfig.branding?.theme
   const hasCart = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
+  const tawkId = konfig.features?.hasLiveChat ? (konfig.addons?.tawk_property_id ?? null) : null
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
 
-  // Tema visual bespoke per industri (custom design, bukan tema generik).
+  // ── Tema visual bespoke per industri ────────────────────────
+  if (theme === 'klinik') {
+    const [services, profile] = await Promise.all([
+      fetchServicesByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <KlinikRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} />
+  }
+
+  if (theme === 'company') {
+    const [services, gallery, profile] = await Promise.all([
+      fetchServicesByPage(supabase, page.id),
+      fetchGalleryByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <CompanyRenderer nama={page.nama_website} sections={sections} services={services} gallery={gallery} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} />
+  }
+
+  if (theme === 'sekolah') {
+    const [services, profile] = await Promise.all([
+      fetchServicesByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <SekolahRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} />
+  }
+
   if (theme === 'restaurant') {
     const [menuItems, gallery, profile] = await Promise.all([
       fetchMenuItemsByPage(supabase, page.id),
@@ -60,6 +92,34 @@ export default async function PublicSitePage({
       fetchTenantProfile(supabase, page.id),
     ])
     return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} />
+  }
+
+  if (theme === 'rental') {
+    const [services, profile] = await Promise.all([
+      fetchServicesByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <RentalRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} />
+  }
+
+  if (theme === 'batik_toko') {
+    const [products, profile] = await Promise.all([
+      fetchProductsByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    const renderer = (
+      <BatikTokoRenderer
+        nama={page.nama_website}
+        sections={sections}
+        products={products}
+        profile={profile}
+        hasCart={hasCart}
+        slug={slug}
+        primary={primary}
+        wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa}
+      />
+    )
+    return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
   }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
@@ -94,9 +154,11 @@ export default async function PublicSitePage({
     </main>
   )
 
+  const liveChat = tawkId ? <LiveChatWidget propertyId={tawkId} /> : null
+
   // Bungkus dengan keranjang hanya bila fitur toko aktif.
   if (hasCart) {
-    return <CartProvider slug={slug} primary={primary}>{body}</CartProvider>
+    return <CartProvider slug={slug} primary={primary}>{body}{liveChat}</CartProvider>
   }
-  return body
+  return <>{body}{liveChat}</>
 }

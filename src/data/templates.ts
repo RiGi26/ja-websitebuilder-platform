@@ -64,6 +64,17 @@ export const templatesData: Record<string, TemplateDetail> = {
     tags: ['Health', 'Clinic', 'Doctor'], platform: 'Next.js + Tailwind', pages: '6 Halaman', rating: 4.7, reviewCount: 34,
   },
 
+  // === TIER BUSINESS (continued) ===
+  'rental-travel': {
+    id: 'rental-travel', title: 'Rental & Travel', category: 'Travel', tier: 'business',
+    description: 'Website rental kendaraan profesional lengkap dengan katalog armada, booking form, GPS tracking, dan konfirmasi otomatis via WhatsApp.',
+    price: 'Rp 999.000', price_numeric: 999000, renewal_price: 899000, originalPrice: 'Rp 1.800.000',
+    demoUrl: 'https://ja-websitebuilder-platform-nfoa.vercel.app/demo/rental', repoUrl: '#',
+    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1200&auto=format&fit=crop',
+    features: ['Katalog Armada Kendaraan', 'Booking Form + WhatsApp', 'GPS Tracking Badge', 'Halaman Testimoni'],
+    tags: ['Rental', 'Travel', 'Transport'], platform: 'Next.js + Tailwind', pages: '5 Halaman', rating: 4.8, reviewCount: 27,
+  },
+
   // === TIER ELITE (Rp 1.5jt - Rp 2.5jt) ===
   'toko-online': {
     id: 'toko-online', title: 'Toko Online E-Commerce', category: 'Retail', tier: 'elite',

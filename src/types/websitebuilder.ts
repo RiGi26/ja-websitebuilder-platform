@@ -44,7 +44,8 @@ export interface FeatureFlags {
   hasWhatsApp?: boolean // otomasi WhatsApp
   hasAnalytics?: boolean // ads tracking / pixel / GA
   hasNewsletter?: boolean // newsletter
-  hasLiveChat?: boolean // live chat support
+  hasLiveChat?: boolean // live chat support (Tawk.to)
+  hasTracking?: boolean // tracking paket resi (Binderbyte)
   hasCareer?: boolean // portal lowongan kerja
   hasEmail?: boolean // email bisnis
 }
@@ -57,9 +58,16 @@ export interface BrandingConfig {
   theme?: string // tema visual renderer (mis. 'restaurant'); default = tema generik
 }
 
+// Konfigurasi spesifik per add-on (data operasional, bukan feature flag).
+export interface AddonsConfig {
+  tawk_property_id?: string  // Live Chat — property ID dari Tawk.to dashboard
+  sheets_webhook?: string    // Google Sheets — URL Apps Script webhook milik tenant
+}
+
 export interface KonfigurasiWebsite {
   features?: FeatureFlags
   branding?: BrandingConfig
+  addons?: AddonsConfig
 }
 
 export type TipeKomponen =
@@ -173,6 +181,24 @@ export interface DataKontenKlinik {
     wa?: string
   }
   asuransi_diterima?: string[]
+  warna_tema?: string
+}
+
+export interface DataKontenRental {
+  nama_usaha: string
+  tagline?: string
+  deskripsi?: string
+  kota_layanan?: string[]
+  wa?: string
+  kontak?: {
+    telepon?: string
+    email?: string
+    alamat?: string
+  }
+  sosial_media?: {
+    instagram?: string
+    tiktok?: string
+  }
   warna_tema?: string
 }
 
