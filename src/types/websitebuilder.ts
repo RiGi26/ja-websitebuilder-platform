@@ -190,6 +190,8 @@ export interface DataKontenRental {
   deskripsi?: string
   kota_layanan?: string[]
   wa?: string
+  keunggulan?: string[]   // max 4 poin dari customer, tampil di "Mengapa Kami"
+  syarat_sewa?: string    // persyaratan & kebijakan sewa
   kontak?: {
     telepon?: string
     email?: string
