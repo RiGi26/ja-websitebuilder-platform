@@ -283,29 +283,67 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
         </div>
       </section>
 
-      {/* Why Us */}
-      <section style={{ backgroundColor: '#0C0A09', padding: '80px 24px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={{ fontSize: 11, fontWeight: 900, color: '#FB923C', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>Mengapa Kami</p>
-            <h2 style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>Bukan Sekadar Rental Biasa</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 24 }}>
-            {[
-              { emoji: '🔧', title: 'Armada Terawat', desc: 'Setiap kendaraan melalui pemeriksaan teknis menyeluruh sebelum dan sesudah penyewaan.', show: true },
-              { emoji: '👨‍✈️', title: 'Driver Profesional', desc: 'Tersedia opsi driver berpengalaman, ramah, dan menguasai rute terbaik di daerah Anda.', show: true },
-              { emoji: '📍', title: 'GPS Real-Time', desc: 'Pantau posisi kendaraan Anda secara real-time. Aman dan transparan selama perjalanan.', show: hasTracking },
-              { emoji: '🕐', title: 'Support 24/7', desc: 'Tim kami siaga 24 jam. Hubungi kami kapan saja jika ada kendala di perjalanan.', show: true },
-            ].filter(r => r.show).map((r) => (
-              <div key={r.title} style={{ backgroundColor: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.10)', borderRadius: 20, padding: 28 }}>
-                <div style={{ fontSize: 36, marginBottom: 20 }}>{r.emoji}</div>
-                <h3 style={{ color: '#fff', fontWeight: 900, fontSize: 17, margin: '0 0 8px', lineHeight: 1.2 }}>{r.title}</h3>
-                <p style={{ color: '#78716C', fontSize: 13, fontWeight: 500, lineHeight: 1.6, margin: 0 }}>{r.desc}</p>
+      {/* Why Us — pakai keunggulan dari briefing jika ada, fallback ke default */}
+      {(() => {
+        const KEUNGGULAN_EMOJI = ['🏆', '⭐', '🔐', '🚀', '💎', '✅', '🎯', '🛡️']
+        const DEFAULT_ITEMS = [
+          { emoji: '🔧', title: 'Armada Terawat', desc: 'Setiap kendaraan melalui pemeriksaan teknis menyeluruh sebelum dan sesudah penyewaan.', show: true },
+          { emoji: '👨‍✈️', title: 'Driver Profesional', desc: 'Tersedia opsi driver berpengalaman, ramah, dan menguasai rute terbaik di daerah Anda.', show: true },
+          { emoji: '📍', title: 'GPS Real-Time', desc: 'Pantau posisi kendaraan Anda secara real-time. Aman dan transparan selama perjalanan.', show: hasTracking },
+          { emoji: '🕐', title: 'Support 24/7', desc: 'Tim kami siaga 24 jam. Hubungi kami kapan saja jika ada kendala di perjalanan.', show: true },
+        ].filter(r => r.show)
+
+        const customerKeunggulan = (konten?.keunggulan ?? []).filter((k: string) => k.trim())
+
+        // Jika customer isi keunggulan → tampilkan kata-kata mereka sendiri
+        // Jika tidak → fallback ke default
+        const items = customerKeunggulan.length > 0
+          ? customerKeunggulan.map((k: string, i: number) => {
+              // Ekstrak ~3 kata pertama sebagai judul, sisa sebagai deskripsi
+              const words = k.trim().split(/\s+/)
+              const titleWords = words.slice(0, 3).join(' ')
+              const descWords = words.length > 3 ? words.slice(3).join(' ') : k
+              return {
+                emoji: KEUNGGULAN_EMOJI[i % KEUNGGULAN_EMOJI.length],
+                title: titleWords,
+                desc: words.length > 3 ? `${titleWords} ${descWords}` : k,
+                fullText: k,
+              }
+            })
+          : DEFAULT_ITEMS.map(d => ({ ...d, fullText: d.desc }))
+
+        const cols = items.length <= 3 ? `repeat(${items.length},1fr)` : 'repeat(4,1fr)'
+
+        return (
+          <section style={{ backgroundColor: '#0C0A09', padding: '80px 24px' }}>
+            <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: 56 }}>
+                <p style={{ fontSize: 11, fontWeight: 900, color: '#FB923C', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>Mengapa Kami</p>
+                <h2 style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>
+                  {customerKeunggulan.length > 0 ? `Kenapa Pilih ${nama}?` : 'Bukan Sekadar Rental Biasa'}
+                </h2>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 24 }}>
+                {items.map((r, i) => (
+                  <div key={i} style={{ backgroundColor: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.10)', borderRadius: 20, padding: 28 }}>
+                    <div style={{ fontSize: 36, marginBottom: 20 }}>{r.emoji}</div>
+                    {customerKeunggulan.length > 0 ? (
+                      // Customer mode — tampilkan full text sebagai paragraf kuat
+                      <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{r.fullText}</p>
+                    ) : (
+                      // Default mode — title + desc
+                      <>
+                        <h3 style={{ color: '#fff', fontWeight: 900, fontSize: 17, margin: '0 0 8px', lineHeight: 1.2 }}>{(r as typeof DEFAULT_ITEMS[0]).title}</h3>
+                        <p style={{ color: '#78716C', fontSize: 13, fontWeight: 500, lineHeight: 1.6, margin: 0 }}>{r.fullText}</p>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
+      })()}
 
       {/* How It Works */}
       <section id="cara-pesan" style={{ backgroundColor: '#FFFBEB', padding: '80px 24px' }}>
