@@ -5,7 +5,7 @@
 // Data armada dari tabel services. Profile (wa, kontak) dari tenant_profile.
 // ============================================================
 
-import type { PageSection, Service, TenantProfile, FeatureFlags } from '@/types/websitebuilder'
+import type { PageSection, Service, TenantProfile, FeatureFlags, DesignTokens } from '@/types/websitebuilder'
 import type { DataKontenRental } from '@/types/websitebuilder'
 
 // ── Palette ──────────────────────────────────────────────────
@@ -66,12 +66,25 @@ interface RentalRendererProps {
   primary?: string
   konten?: DataKontenRental
   features?: FeatureFlags
+  designTokens?: DesignTokens
 }
 
 // ── Main renderer ─────────────────────────────────────────────
-export default function RentalRenderer({ nama, services, profile, wa, primary = ORG, konten, features = {} }: RentalRendererProps) {
+export default function RentalRenderer({ nama, services, profile, wa, primary = ORG, konten, features = {}, designTokens = {} }: RentalRendererProps) {
   const accent = primary || ORG
   const waNum = wa ?? profile?.wa ?? null
+
+  // Design tokens — visual customization per klien
+  const bgStyle    = designTokens.bg_style ?? 'dark'
+  const typoWeight = designTokens.typography_weight ?? 'black'
+  const headingWeight = typoWeight === 'black' ? 900 : typoWeight === 'bold' ? 800 : typoWeight === 'regular' ? 700 : 600
+  const heroBg = bgStyle === 'light'
+    ? `linear-gradient(135deg, #F8FAFC, #EFF6FF, #DBEAFE)`
+    : bgStyle === 'warm'
+    ? `linear-gradient(135deg, #FFFBEB, #FEF3C7, #FDE68A)`
+    : `linear-gradient(135deg, #1C0A00, ${ORG_D}, #7C2D12)`
+  const heroTextColor  = bgStyle === 'dark' ? '#fff' : STN
+  const heroMutedColor = bgStyle === 'dark' ? '#D6D3D1' : MUTED
 
   // Feature flags — default false jika tidak di-set (belum order add-on tsb)
   const hasBooking  = !!features.hasBooking   // form booking real + kalender
@@ -134,7 +147,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
       </nav>
 
       {/* Hero */}
-      <section style={{ background: `linear-gradient(135deg, #1C0A00, ${ORG_D}, #7C2D12)`, color: '#fff', padding: '80px 24px 120px', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ background: heroBg, color: heroTextColor, padding: '80px 24px 120px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `radial-gradient(circle at 20% 80%, ${accent}30 0%, transparent 50%), radial-gradient(circle at 80% 20%, #D9770630 0%, transparent 50%)`, pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 420px', gap: 48, alignItems: 'center', position: 'relative', zIndex: 1 }}>
           {/* Copy */}
@@ -142,12 +155,12 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, backgroundColor: `${accent}30`, border: `1px solid ${accent}50`, color: ORG_L, fontSize: 11, fontWeight: 900, padding: '7px 16px', borderRadius: 999, marginBottom: 24, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               🏆 #1 Rental Terpercaya
             </div>
-            <h1 style={{ fontSize: 56, fontWeight: 900, lineHeight: 0.95, letterSpacing: '-0.02em', margin: '0 0 20px', color: '#fff' }}>
+            <h1 style={{ fontSize: 56, fontWeight: headingWeight, lineHeight: 0.95, letterSpacing: '-0.02em', margin: '0 0 20px', color: heroTextColor }}>
               {taglineLines.map((line, i) => (
                 <span key={i} style={{ display: 'block', color: i === 1 ? '#FB923C' : '#fff' }}>{line}</span>
               ))}
             </h1>
-            <p style={{ color: '#D6D3D1', fontSize: 17, lineHeight: 1.6, marginBottom: 28, fontWeight: 500 }}>{deskripsi}</p>
+            <p style={{ color: heroMutedColor, fontSize: 17, lineHeight: 1.6, marginBottom: 28, fontWeight: 500 }}>{deskripsi}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {['500+ Armada', '10.000+ Pelanggan', 'Driver Profesional', 'Asuransi Inklusif'].map((b) => (
                 <span key={b} style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,.10)', border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.9)', fontSize: 12, fontWeight: 700, padding: '7px 12px', borderRadius: 999 }}>
@@ -333,7 +346,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
                     ) : (
                       // Default mode — title + desc
                       <>
-                        <h3 style={{ color: '#fff', fontWeight: 900, fontSize: 17, margin: '0 0 8px', lineHeight: 1.2 }}>{(r as typeof DEFAULT_ITEMS[0]).title}</h3>
+                        <h3 style={{ color: '#fff', fontWeight: 900, fontSize: 17, margin: '0 0 8px', lineHeight: 1.2 }}>{(r as unknown as typeof DEFAULT_ITEMS[0]).title}</h3>
                         <p style={{ color: '#78716C', fontSize: 13, fontWeight: 500, lineHeight: 1.6, margin: 0 }}>{r.fullText}</p>
                       </>
                     )}
