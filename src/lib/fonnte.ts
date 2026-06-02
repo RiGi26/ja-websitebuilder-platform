@@ -83,6 +83,9 @@ type NotifContext = {
   note?: string | null
   deliveredUrl?: string | null
   deliveredCredentials?: string | null
+  briefingUrl?: string | null
+  industri?: string | null
+  adminUrl?: string | null
 }
 
 const STEP_TEMPLATES: Record<number, (ctx: NotifContext) => string> = {
@@ -146,6 +149,35 @@ export type NotifyEvent =
   | { type: 'step'; step: 2 | 3 | 4 }
   | { type: 'launch' }
   | { type: 'cancelled' }
+  | { type: 'dp_confirmed' }
+  | { type: 'briefing_received' }
+
+function dpConfirmedTemplate(c: NotifContext): string {
+  return [
+    `Halo ${c.clientName}! 👋`,
+    ``,
+    `DP project *${c.displayId}* sudah kami terima. Terima kasih!`,
+    ``,
+    `Satu langkah lagi — mohon isi *Form Briefing Website* Anda:`,
+    `📋 ${c.briefingUrl ?? c.trackUrl}`,
+    ``,
+    `Form ini ~5–10 menit. Makin detail, makin akurat website Anda!`,
+    ``,
+    `Lacak progress: ${c.trackUrl}`,
+  ].join('\n')
+}
+
+function briefingReceivedTemplate(c: NotifContext): string {
+  return [
+    `📋 *Briefing baru masuk!*`,
+    ``,
+    `Dari: *${c.clientName}*`,
+    `Industri: ${c.industri ?? '-'}`,
+    `Order: ${c.displayId}`,
+    ``,
+    `Buka admin: ${c.adminUrl ?? 'https://ja-websitebuilder-platform-nfoa.vercel.app/admin'}`,
+  ].join('\n')
+}
 
 export async function notifyCustomer(
   event: NotifyEvent,
@@ -162,6 +194,12 @@ export async function notifyCustomer(
       break
     case 'cancelled':
       message = cancelledTemplate(ctx)
+      break
+    case 'dp_confirmed':
+      message = dpConfirmedTemplate(ctx)
+      break
+    case 'briefing_received':
+      message = briefingReceivedTemplate(ctx)
       break
   }
   return sendWhatsApp(phone, message)
