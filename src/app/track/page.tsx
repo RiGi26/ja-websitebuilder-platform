@@ -299,6 +299,30 @@ export default async function TrackPage({
             </div>
           )}
 
+          {/* Banner Tahap 2 — muncul saat briefing done + website sudah draft/published, tapi detail belum */}
+          {(order as any).briefing_submitted_at &&
+           !(order as any).briefing_data?.tahap_2 &&
+           (order as any).tracking_token &&
+           ['pending','active','completed'].includes(order.status as string) && (
+            <div className="bg-blue-50 border border-blue-100 rounded-[24px] p-6 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0 text-blue-600 text-xl">
+                🖼️
+              </div>
+              <div className="flex-1">
+                <p className="font-black text-blue-900 text-base leading-tight">Lengkapi Website Anda</p>
+                <p className="text-blue-700 text-sm font-medium mt-0.5">
+                  Tambahkan foto asli dan testimoni nyata agar website lebih menarik dan terpercaya.
+                </p>
+              </div>
+              <a
+                href={`/order/briefing/${(order as any).tracking_token}/detail`}
+                className="shrink-0 bg-[#0071E3] text-white font-black text-xs px-5 py-3 rounded-full hover:bg-blue-600 transition-colors whitespace-nowrap"
+              >
+                Lengkapi Detail →
+              </a>
+            </div>
+          )}
+
           {/* Hero: Website Live — muncul saat admin sudah isi delivered_url */}
           {deliveredUrl && (
             <div className="relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 rounded-[32px] p-8 shadow-lg mb-4 text-white">
