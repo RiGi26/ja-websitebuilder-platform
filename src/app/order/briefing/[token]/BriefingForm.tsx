@@ -5,7 +5,7 @@ import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────
-interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string }
+interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
 interface MenuRow { nama: string; kategori: string; harga: string; deskripsi: string }
 interface LayananRow { nama: string; deskripsi: string }
 interface DokterRow { nama: string; spesialis: string; jadwal: string }
@@ -41,6 +41,9 @@ interface FormState {
   sosmed_marketplace: string
   bio: string
   topik: string
+  // Universal — Keunggulan & Syarat
+  keunggulan: [string, string, string]
+  syarat_sewa: string
   // Step 2 — Branding
   primary_color: string
   logo_url: string
@@ -53,7 +56,7 @@ interface FormState {
 const INIT: FormState = {
   nama_usaha: '', tagline: '', deskripsi: '', wa: '', email: '',
   alamat: '', jam_operasional: '', kota_layanan: '',
-  fleet: [{ nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '' }],
+  fleet: [{ nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '', foto_url: '' }],
   menu: [{ nama: '', kategori: '', harga: '', deskripsi: '' }],
   layanan: [{ nama: '', deskripsi: '' }],
   bidang_usaha: '', tahun_berdiri: '', klien_unggulan: '',
@@ -63,6 +66,8 @@ const INIT: FormState = {
   akreditasi: '', visi: '', ppdb_aktif: false,
   kategori_produk: '', produk_unggulan: [{ nama: '', harga: '' }], sosmed_marketplace: '',
   bio: '', topik: '',
+  keunggulan: ['', '', ''],
+  syarat_sewa: '',
   primary_color: '#0071E3', logo_url: '', referensi_website: '',
   instagram: '', tiktok: '', shopee: '',
 }
@@ -188,8 +193,11 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
     }
 
     const konten: Record<string, unknown> = {}
+    // Keunggulan universal (semua industri)
+    konten.keunggulan = form.keunggulan.filter(k => k.trim())
     if (tipe === 'travel') {
       konten.fleet = form.fleet.filter(r => r.nama.trim())
+      if (form.syarat_sewa.trim()) konten.syarat_sewa = form.syarat_sewa
     } else if (tipe === 'restaurant') {
       konten.menu = form.menu.filter(r => r.nama.trim())
     } else if (tipe === 'corporate') {
@@ -332,13 +340,38 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                       <input className={inputCls} placeholder="Kapasitas (7 Kursi)" value={row.kapasitas} onChange={e => updateRow('fleet', i, 'kapasitas', e.target.value)} />
                       <input className={inputCls} placeholder="Transmisi (Manual/Otomatis)" value={row.transmisi} onChange={e => updateRow('fleet', i, 'transmisi', e.target.value)} />
                       <input className={inputCls} placeholder="Harga/hari (350000)" value={row.harga} onChange={e => updateRow('fleet', i, 'harga', e.target.value)} />
+                      <input className={`${inputCls} md:col-span-3`} placeholder="Link foto kendaraan (Google Drive / URL) — opsional" value={row.foto_url} onChange={e => updateRow('fleet', i, 'foto_url', e.target.value)} />
                     </div>
                   </div>
                 ))}
-                <button onClick={() => addRow('fleet', { nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '' })}
+                <button onClick={() => addRow('fleet', { nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '', foto_url: '' })}
                   className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                   <Plus size={16} /> Tambah Kendaraan
                 </button>
+
+                {/* Keunggulan & Syarat Sewa — khusus rental */}
+                <div className="pt-4 border-t border-black/[0.05] space-y-4">
+                  <div>
+                    <p className="text-sm font-bold text-gray-700 mb-1">3 Keunggulan Bisnis Anda</p>
+                    <p className="text-xs text-gray-400 mb-3">Dalam kalimat Anda sendiri — ini yang membedakan Anda dari kompetitor.</p>
+                    {([0,1,2] as const).map(i => (
+                      <input key={i} className={`${inputCls} mb-2`}
+                        placeholder={['Contoh: Satu-satunya rental di Jakarta yang antar jemput bandara 24 jam', 'Contoh: Semua armada ber-GPS dan diasuransikan Jasindo', 'Contoh: Driver berpengalaman 5+ tahun, ramah & profesional'][i]}
+                        value={form.keunggulan[i]}
+                        onChange={e => {
+                          const arr: [string,string,string] = [...form.keunggulan] as [string,string,string]
+                          arr[i] = e.target.value
+                          set('keunggulan', arr)
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <Field label="Syarat Sewa (opsional)">
+                    <textarea className={textareaCls} rows={2} value={form.syarat_sewa}
+                      onChange={e => set('syarat_sewa', e.target.value)}
+                      placeholder="Contoh: KTP asli + SIM A/C, deposit Rp 500.000, minimal sewa 12 jam" />
+                  </Field>
+                </div>
               </div>
             )}
 
@@ -504,6 +537,25 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <Field label="Spesialisasi / Keahlian Utama">
                   <input className={inputCls} placeholder="Fotografi, Web Development, Jastip Jepang..." value={form.topik} onChange={e => set('topik', e.target.value)} />
                 </Field>
+              </div>
+            )}
+
+            {/* KEUNGGULAN UNIVERSAL — semua industri kecuali rental (sudah ada di atas) */}
+            {tipe !== 'travel' && (
+              <div className="pt-4 border-t border-black/[0.05] space-y-3">
+                <p className="text-sm font-bold text-gray-700">3 Keunggulan Bisnis Anda</p>
+                <p className="text-xs text-gray-400">Dalam kalimat Anda sendiri. Ini yang ditampilkan di section "Mengapa Kami".</p>
+                {([0,1,2] as const).map(i => (
+                  <input key={i} className={inputCls}
+                    placeholder={`Keunggulan ${i+1} (contoh: Berpengalaman 10+ tahun, 500+ klien puas...)`}
+                    value={form.keunggulan[i]}
+                    onChange={e => {
+                      const arr: [string,string,string] = [...form.keunggulan] as [string,string,string]
+                      arr[i] = e.target.value
+                      set('keunggulan', arr)
+                    }}
+                  />
+                ))}
               </div>
             )}
           </div>
