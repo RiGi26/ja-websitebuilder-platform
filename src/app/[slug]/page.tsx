@@ -10,6 +10,7 @@ import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRende
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
 import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
 import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
+import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
@@ -91,6 +92,14 @@ export default async function PublicSitePage({
       fetchTenantProfile(supabase, page.id),
     ])
     return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} />
+  }
+
+  if (theme === 'rental') {
+    const [services, profile] = await Promise.all([
+      fetchServicesByPage(supabase, page.id),
+      fetchTenantProfile(supabase, page.id),
+    ])
+    return <RentalRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} />
   }
 
   if (theme === 'batik_toko') {
