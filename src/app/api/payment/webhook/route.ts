@@ -48,28 +48,61 @@ export async function POST(request: Request) {
       update.status = 'pending_payment'
     }
 
+    // Deteksi apakah ini transaksi pelunasan (suffix -LUNAS)
+    const isPelunasan = order_id.endsWith('-LUNAS')
+
     if (Object.keys(update).length > 0) {
-      const { data: updatedOrder, error } = await supabaseAdmin
-        .from('orders')
-        .update(update)
-        .eq('midtrans_order_id', order_id)
-        .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
-        .maybeSingle()
+      if (isPelunasan) {
+        // Pelunasan: match by pelunasan_midtrans_order_id
+        const pelunasanUpdate: Record<string, unknown> = {}
+        if (isPaid) {
+          pelunasanUpdate.payment_status = 'lunas'
+          pelunasanUpdate.pelunasan_paid_at = new Date().toISOString()
+        }
+        if (Object.keys(pelunasanUpdate).length > 0) {
+          const { data: pOrder, error: pErr } = await supabaseAdmin
+            .from('orders')
+            .update(pelunasanUpdate)
+            .eq('pelunasan_midtrans_order_id', order_id)
+            .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, delivered_url')
+            .maybeSingle()
 
-      if (error) console.error('[webhook] DB update error:', error.message)
+          if (pErr) console.error('[webhook] pelunasan DB error:', pErr.message)
 
-      // Kirim WA briefing link setelah dp_paid (fire-and-forget)
-      if (isPaid && updatedOrder?.nomor_wa) {
-        const clientName = updatedOrder.nama_perusahaan || updatedOrder.nama_usaha || 'Customer'
-        const year = new Date(updatedOrder.created_at ?? Date.now()).getFullYear()
-        const displayId = `JA-${year}-${updatedOrder.id.slice(0, 8).toUpperCase()}`
-        const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
-        notifyCustomer({ type: 'dp_confirmed' }, updatedOrder.nomor_wa, {
-          clientName,
-          displayId,
-          trackUrl: `${base}/track?id=${updatedOrder.id}`,
-          briefingUrl: `${base}/order/briefing/${updatedOrder.tracking_token}`,
-        }).catch((e) => console.error('[webhook] WA dp_confirmed failed:', e))
+          if (isPaid && pOrder?.nomor_wa) {
+            const clientName = pOrder.nama_perusahaan || pOrder.nama_usaha || 'Customer'
+            const year = new Date(pOrder.created_at ?? Date.now()).getFullYear()
+            const displayId = `JA-${year}-${pOrder.id.slice(0, 8).toUpperCase()}`
+            const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+            notifyCustomer({ type: 'payment_lunas' }, pOrder.nomor_wa, {
+              clientName, displayId,
+              trackUrl: `${base}/track?id=${pOrder.id}`,
+              deliveredUrl: pOrder.delivered_url ?? null,
+            }).catch((e) => console.error('[webhook] WA payment_lunas failed:', e))
+          }
+        }
+      } else {
+        // DP: match by midtrans_order_id
+        const { data: updatedOrder, error } = await supabaseAdmin
+          .from('orders')
+          .update(update)
+          .eq('midtrans_order_id', order_id)
+          .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
+          .maybeSingle()
+
+        if (error) console.error('[webhook] DB update error:', error.message)
+
+        if (isPaid && updatedOrder?.nomor_wa) {
+          const clientName = updatedOrder.nama_perusahaan || updatedOrder.nama_usaha || 'Customer'
+          const year = new Date(updatedOrder.created_at ?? Date.now()).getFullYear()
+          const displayId = `JA-${year}-${updatedOrder.id.slice(0, 8).toUpperCase()}`
+          const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+          notifyCustomer({ type: 'dp_confirmed' }, updatedOrder.nomor_wa, {
+            clientName, displayId,
+            trackUrl: `${base}/track?id=${updatedOrder.id}`,
+            briefingUrl: `${base}/order/briefing/${updatedOrder.tracking_token}`,
+          }).catch((e) => console.error('[webhook] WA dp_confirmed failed:', e))
+        }
       }
     }
 
