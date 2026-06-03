@@ -125,6 +125,13 @@ export const PACKS: Record<string, TokenPack> = {
 
 export const DEFAULT_PACK_ID = 'clean-modern'
 
+// Theme yang punya renderer bespoke sendiri (RentalRenderer dll) — biarkan
+// pakai renderer-nya, JANGAN token-driven. Sisanya kandidat token-driven.
+const BESPOKE_THEMES = new Set(['klinik', 'company', 'sekolah', 'restaurant', 'rental', 'batik_toko'])
+export function isTokenDrivenTheme(theme?: string): boolean {
+  return !theme || !BESPOKE_THEMES.has(theme)
+}
+
 // ── Registry: (theme:variant) → packId ────────────────────────
 // Memetakan variant yang sudah dijanjikan di website-variants.ts ke
 // token pack. Ini menutup gap "variant tak dirender" tanpa renderer baru.
