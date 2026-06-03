@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { getVariants } from '@/lib/website-variants'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2 } from 'lucide-react'
@@ -115,6 +116,7 @@ interface Props {
 }
 
 export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri }: Props) {
+  const router = useRouter()
   const tipe = industriToTipe(industri)
   const defaultColor = INDUSTRY_COLOR[tipe] ?? '#0071E3'
   const variants = getVariants(tipe)
@@ -697,8 +699,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         {/* ── NAVIGASI ─────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-6 mt-6 border-t border-black/[0.04]">
           <button
-            onClick={() => setStep(s => Math.max(0, s - 1))}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all ${step === 0 ? 'invisible' : 'text-gray-500 hover:bg-gray-100'}`}
+            onClick={() => step === 0 ? router.back() : setStep(s => s - 1)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all text-gray-500 hover:bg-gray-100"
           >
             <ChevronLeft size={16} /> Kembali
           </button>

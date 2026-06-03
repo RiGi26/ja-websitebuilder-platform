@@ -54,19 +54,34 @@ interface Props {
   orderId: string
   namaKlien: string
   industri: string
+  existingData?: Record<string, unknown>
 }
 
-export default function DetailForm({ token, orderId, namaKlien, industri }: Props) {
+export default function DetailForm({ token, orderId, namaKlien, industri, existingData }: Props) {
   const tipe = industriToTipe(industri)
   const fotoLabels = FOTO_LABELS[tipe] ?? ['Foto Utama', 'Foto Pendukung 1', 'Foto Pendukung 2']
 
-  const [form, setForm] = useState<DetailState>({
-    ...INIT,
-    foto_items: fotoLabels.map(label => ({ label, url: '' })),
-  })
+  const buildInitialForm = (): DetailState => {
+    if (!existingData) return { ...INIT, foto_items: fotoLabels.map(label => ({ label, url: '' })) }
+    const ex = existingData as Partial<DetailState>
+    return {
+      foto_hero: (ex.foto_hero as string) ?? '',
+      foto_items: fotoLabels.map((label, i) => ({
+        label,
+        url: ((ex.foto_items as { label: string; url: string }[])?.[i]?.url) ?? '',
+      })),
+      testimoni: (ex.testimoni as TestimoniRow[]) ?? INIT.testimoni,
+      kebijakan: (ex.kebijakan as string) ?? '',
+      catatan_tambahan: (ex.catatan_tambahan as string) ?? '',
+    }
+  }
+
+  const [form, setForm] = useState<DetailState>(buildInitialForm)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Jika sudah ada data sebelumnya → tampilkan summary dulu, bukan form langsung
+  const [editMode, setEditMode] = useState(!existingData)
 
   const set = (key: keyof DetailState, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
@@ -115,19 +130,90 @@ export default function DetailForm({ token, orderId, namaKlien, industri }: Prop
     }
   }
 
+  const fotoTerisi = form.foto_items.filter(f => f.url.trim()).length
+  const totalFoto = form.foto_items.length
+  const fotoHeroTerisi = form.foto_hero.trim().length > 0
+
   if (submitted) {
     return (
       <div className="max-w-lg mx-auto text-center">
         <div className="bg-white rounded-[32px] p-10 shadow-sm border border-black/[0.04]">
           <div className="text-4xl mb-4">🎉</div>
-          <h1 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Website Siap Disempurnakan!</h1>
-          <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-            Detail lengkap diterima, {namaKlien}. Tim kami akan update website dengan foto dan testimoni nyata Anda.
+          <h1 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Foto & Detail Terkirim!</h1>
+          <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+            Terima kasih {namaKlien}. Tim kami akan update website dengan foto dan testimoni asli Anda.
           </p>
-          <a href={`/track?id=${orderId}`}
-            className="inline-flex items-center gap-2 py-3 px-6 bg-[#0071E3] text-white font-bold rounded-2xl hover:bg-blue-600 transition-colors text-sm">
-            Lacak Progress
-          </a>
+          {fotoTerisi < totalFoto && (
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 text-left">
+              <p className="text-sm font-bold text-amber-800 mb-1">
+                {fotoTerisi}/{totalFoto} foto pendukung diisi
+              </p>
+              <p className="text-xs text-amber-700">
+                Masih ada foto yang belum diisi. Kembali ke form ini kapan saja untuk melengkapi.
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col gap-3">
+            <a href={`/track?id=${orderId}`}
+              className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-[#0071E3] text-white font-bold rounded-2xl hover:bg-blue-600 transition-colors text-sm">
+              Lacak Progress
+            </a>
+            <button onClick={() => { setSubmitted(false); setEditMode(true) }}
+              className="inline-flex items-center justify-center gap-2 py-3 px-6 border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition-colors text-sm">
+              Tambah / Perbarui Foto
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Summary mode — sudah pernah submit, tampilkan ringkasan + tombol edit
+  if (!editMode) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/[0.04]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center shrink-0">
+              <Check size={22} className="text-green-600" strokeWidth={3} />
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-gray-900">Detail Website Sudah Ada</h1>
+              <p className="text-sm text-gray-500">Halo {namaKlien}, data Tahap 2 sudah diterima.</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between items-center py-2.5 border-b border-black/[0.04]">
+              <span className="text-sm text-gray-500">Foto Utama</span>
+              <span className={`text-sm font-bold ${form.foto_hero.trim() ? 'text-green-600' : 'text-red-400'}`}>
+                {form.foto_hero.trim() ? '✓ Terisi' : '✗ Belum diisi'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-2.5 border-b border-black/[0.04]">
+              <span className="text-sm text-gray-500">Foto Pendukung</span>
+              <span className={`text-sm font-bold ${fotoTerisi === totalFoto ? 'text-green-600' : 'text-amber-600'}`}>
+                {fotoTerisi}/{totalFoto} terisi
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-2.5">
+              <span className="text-sm text-gray-500">Testimoni</span>
+              <span className="text-sm font-bold text-gray-700">
+                {form.testimoni.filter(t => t.nama.trim() && t.teks.trim()).length} testimoni
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <button onClick={() => setEditMode(true)}
+              className="w-full py-3.5 rounded-2xl bg-[#0071E3] text-white font-black text-sm hover:bg-blue-600 transition-colors">
+              {fotoTerisi < totalFoto ? 'Lengkapi Foto yang Kurang' : 'Perbarui Foto & Detail'}
+            </button>
+            <a href={`/track?id=${orderId}`}
+              className="w-full py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold text-sm text-center hover:bg-gray-50 transition-colors">
+              Kembali ke Lacak Progress
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -218,18 +304,27 @@ export default function DetailForm({ token, orderId, namaKlien, industri }: Prop
             placeholder="Contoh: Mohon gunakan warna yang lebih gelap, saya ingin tampilan mewah..." />
         </Field>
 
+        {!fotoHeroTerisi && (
+          <div className="p-4 rounded-[16px] bg-amber-50 border border-amber-100 flex items-start gap-3">
+            <span className="text-amber-500 text-lg shrink-0">⚠️</span>
+            <p className="text-sm font-bold text-amber-800">
+              Foto Utama wajib diisi sebelum bisa mengirim. Masukkan link foto hero di atas.
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="p-4 rounded-[16px] bg-red-50 border border-red-100">
             <p className="text-sm font-bold text-red-700">{error}</p>
           </div>
         )}
 
-        <button onClick={handleSubmit} disabled={submitting}
-          className="w-full py-4 rounded-2xl bg-[#0071E3] text-white font-black text-sm disabled:opacity-50 hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+        <button onClick={handleSubmit} disabled={submitting || !fotoHeroTerisi}
+          className="w-full py-4 rounded-2xl bg-[#0071E3] text-white font-black text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
           {submitting ? <><Loader2 size={18} className="animate-spin" /> Mengirim...</> : <><Check size={18} /> Kirim Detail Website</>}
         </button>
-        <p className="text-center text-[11px] text-gray-400 font-medium">
-          Semua field opsional. Lewati yang belum siap — bisa diupdate kapan saja via portal.
+        <p className="text-center text-[11px] text-gray-500 font-medium">
+          Foto pendukung dan testimoni opsional — bisa dilengkapi kapan saja.
         </p>
       </div>
     </div>
