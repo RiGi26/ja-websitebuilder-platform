@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { notifyCustomer } from '@/lib/fonnte'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -94,6 +95,17 @@ export async function POST(request: Request) {
       .from('orders')
       .update({ midtrans_order_id: midtransOrderId, dp_amount: dpAmount })
       .eq('id', order.id)
+
+    // 4. WA post-order ke customer (fire-and-forget)
+    if (nomor_wa) {
+      const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+      notifyCustomer({ type: 'order_created' }, nomor_wa, {
+        clientName: clientName ?? 'Customer',
+        displayId,
+        trackUrl: `${base}/track?id=${order.id}`,
+        paymentUrl: snapData.redirect_url,
+      }).catch((e) => console.error('[payment/create] WA order_created failed:', e))
+    }
 
     return NextResponse.json({
       snap_token: snapData.token,
