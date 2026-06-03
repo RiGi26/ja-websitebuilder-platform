@@ -137,14 +137,57 @@ function OrderFormContent() {
   const kalkulatorPaket = searchParams.get('paket') ?? ''
   const kalkulatorAddons = searchParams.get('addons') ?? ''
 
+  // Mapping corp-landing addon IDs → order form addon IDs
+  const CORP_TO_ORDER_ID: Record<string, string> = {
+    'admin-dash': 'admin',
+    'wa-auto': 'wa',
+    'live-chat': 'chat',
+    'cart': 'shop',
+    'checkout': 'shop',
+    'track-pack': 'ads-tracking',
+    'blog': 'newsletter',
+    'email-auto': 'newsletter',
+    'zoom': 'lms',
+    'cert': 'cert-auto',
+    'vendor': 'shop',
+    'stock': 'katalog-pro',
+    'g-sheets': 'admin',
+  }
+
   useEffect(() => {
     const tid = searchParams.get('template')
     if (tid && templatesData[tid]) setForm(f => ({ ...f, templateId: tid }))
     if (kalkulatorIndustri) setForm(f => ({ ...f, industri: kalkulatorIndustri }))
-    if (kalkulatorAddons) setForm(f => ({ ...f, referensiManual: `Dari kalkulator:\nPaket: ${kalkulatorPaket}\nFitur: ${kalkulatorAddons}` }))
+
+    if (kalkulatorAddons) {
+      const rawIds = kalkulatorAddons.split(',').map(s => s.trim()).filter(Boolean)
+      const mappedIds = rawIds.map(id => CORP_TO_ORDER_ID[id] ?? id)
+      const validIds = [...new Set(mappedIds)].filter(id => ADDONS.some(a => a.id === id))
+      if (validIds.length > 0) {
+        setForm(f => ({ ...f, selectedAddons: validIds }))
+      }
+    }
   }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Dari kalkulator → skip step addon (sudah dipilih di sana)
+  const fromKalkulator = !!(kalkulatorPaket || kalkulatorEstimasi)
+
   const set = (key: keyof FormData, val: any) => setForm(f => ({ ...f, [key]: val }))
+
+  const handleNext = () => {
+    if (fromKalkulator && step === 1) {
+      setStep(3) // lompat langsung ke konfirmasi
+    } else {
+      setStep(s => s + 1)
+    }
+  }
+  const handlePrev = () => {
+    if (fromKalkulator && step === 3) {
+      setStep(1) // balik ke identitas, skip addon
+    } else {
+      setStep(s => s - 1)
+    }
+  }
 
   const totalAddons = form.selectedAddons.reduce((acc, id) => {
     const addon = ADDONS.find(a => a.id === id)
@@ -164,8 +207,7 @@ function OrderFormContent() {
   const finalPrice = currentBasePrice + totalAddons
   const totalYearlyMaint = currentBaseRenewal + totalAddonYearly
 
-  const handleNext = () => setStep(s => s + 1)
-  const handlePrev = () => setStep(s => s - 1)
+
 
   const toggleAddon = (id: string) => {
     if (form.selectedAddons.includes(id)) {
@@ -218,8 +260,9 @@ function OrderFormContent() {
     }
   }
 
-  const totalSteps = 4
-  const progress = step === 0 ? 0 : Math.round((step / (totalSteps - 1)) * 100)
+  const totalSteps = fromKalkulator ? 3 : 4
+  const displayStep = fromKalkulator && step === 3 ? 2 : step
+  const progress = displayStep === 0 ? 0 : Math.round((displayStep / (totalSteps - 1)) * 100)
 
   if (submitted && orderResult) {
     const displayId = orderResult.display_id
@@ -321,8 +364,8 @@ function OrderFormContent() {
       {/* Header (Apple Style) */}
       <div className="text-center mb-12 animate-fade-in px-4">
           <div className="flex items-center justify-center gap-3 mb-6">
-              {[1,2,3,4].map((s) => (
-                  <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${step >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
+              {(fromKalkulator ? [1,2,3] : [1,2,3,4]).map((s) => (
+                  <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${displayStep >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
               ))}
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Order & Briefing</h1>
@@ -330,7 +373,7 @@ function OrderFormContent() {
       </div>
 
       {/* Banner dari kalkulator */}
-      {kalkulatorEstimasi && (
+      {(kalkulatorEstimasi || kalkulatorAddons) && (
         <div className="bg-blue-50 border border-blue-100 rounded-[28px] p-5 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-[#0071E3] rounded-2xl flex items-center justify-center text-white shrink-0">
             <Sparkles size={20} />
@@ -338,10 +381,17 @@ function OrderFormContent() {
           <div>
             <p className="text-sm font-black text-blue-900 mb-1">Melanjutkan dari Kalkulator</p>
             <p className="text-xs text-blue-700 font-medium leading-relaxed">
-              Industri: <strong>{kalkulatorIndustri}</strong> · Paket: <strong>{kalkulatorPaket}</strong>
-              {kalkulatorAddons && <> · Fitur: <strong>{kalkulatorAddons}</strong></>}
+              {kalkulatorIndustri && <>Industri: <strong>{kalkulatorIndustri}</strong></>}
+              {kalkulatorPaket && <> · Paket: <strong>{kalkulatorPaket}</strong></>}
             </p>
-            <p className="text-xs text-blue-600 mt-1">Estimasi Setup: <strong>Rp {kalkulatorEstimasi.toLocaleString('id-ID')}</strong></p>
+            {form.selectedAddons.length > 0 && (
+              <p className="text-xs text-blue-600 mt-1">
+                Fitur pre-selected: <strong>{form.selectedAddons.map(id => ADDONS.find(a => a.id === id)?.name ?? id).join(', ')}</strong>
+              </p>
+            )}
+            {kalkulatorEstimasi && (
+              <p className="text-xs text-blue-600 mt-1">Estimasi Setup: <strong>Rp {kalkulatorEstimasi.toLocaleString('id-ID')}</strong></p>
+            )}
           </div>
         </div>
       )}
