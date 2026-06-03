@@ -12,6 +12,9 @@ import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRende
 import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
 import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
 import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
+import TokenDrivenRenderer from '@/app/components/themes/universal/TokenDrivenRenderer'
+import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
+import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
 import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
 
@@ -55,6 +58,7 @@ export default async function PublicSitePage({
   const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
   const primary = konfig.branding?.primary
   const theme = konfig.branding?.theme
+  const variant = konfig.branding?.variant
   const hasCart = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
   const tawkId = konfig.features?.hasLiveChat ? (konfig.addons?.tawk_property_id ?? null) : null
@@ -130,6 +134,25 @@ export default async function PublicSitePage({
       />
     )
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
+  }
+
+  // ── Token-driven (registry) ─────────────────────────────────
+  // Tema tanpa renderer bespoke + halaman murni konten (tanpa add-on
+  // commerce/booking) → render token-driven. Variant + warna brand klien
+  // di-resolve ke token pack. Halaman commerce/booking jatuh ke
+  // SectionRenderer generik di bawah (tetap dukung cart/booking).
+  const tipe = (page as { tipe_industri?: string }).tipe_industri
+  const hasCommerce = sections.some((s) => ['product_list', 'service_list', 'blog_list'].includes(s.tipe_komponen))
+  if (isTokenDrivenTheme(theme) && !hasCart && !hasBooking && !hasCommerce && sections.length > 0) {
+    const profile = await fetchTenantProfile(supabase, page.id)
+    const pack = resolveTokenPack(tipe ?? theme, variant, primary)
+    const content = sectionsToSiteContent(page.nama_website, sections, profile, page.data_konten as Record<string, unknown>)
+    return (
+      <>
+        <TokenDrivenRenderer content={content} pack={pack} />
+        {tawkId ? <LiveChatWidget propertyId={tawkId} /> : null}
+      </>
+    )
   }
 
   // Fetch data add-on hanya jika ada section yang membutuhkannya.
