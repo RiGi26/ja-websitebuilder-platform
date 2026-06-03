@@ -86,6 +86,7 @@ type NotifContext = {
   briefingUrl?: string | null
   industri?: string | null
   adminUrl?: string | null
+  paymentUrl?: string | null
 }
 
 const STEP_TEMPLATES: Record<number, (ctx: NotifContext) => string> = {
@@ -151,6 +152,26 @@ export type NotifyEvent =
   | { type: 'cancelled' }
   | { type: 'dp_confirmed' }
   | { type: 'briefing_received' }
+  | { type: 'order_created' }
+
+function orderCreatedTemplate(c: NotifContext): string {
+  return [
+    `Halo ${c.clientName}! 👋`,
+    ``,
+    `Pesanan website Anda berhasil dibuat di Japan Arena Studio.`,
+    ``,
+    `📋 *Order ID: ${c.displayId}*`,
+    `Simpan ID ini — gunakan untuk cek progress kapan saja.`,
+    ``,
+    `💳 Lanjutkan pembayaran:`,
+    c.paymentUrl ?? '-',
+    ``,
+    `📍 Lacak progress:`,
+    c.trackUrl,
+    ``,
+    `Ada pertanyaan? Balas pesan ini. Tim kami siap membantu 🚀`,
+  ].join('\n')
+}
 
 function dpConfirmedTemplate(c: NotifContext): string {
   return [
@@ -200,6 +221,9 @@ export async function notifyCustomer(
       break
     case 'briefing_received':
       message = briefingReceivedTemplate(ctx)
+      break
+    case 'order_created':
+      message = orderCreatedTemplate(ctx)
       break
   }
   return sendWhatsApp(phone, message)

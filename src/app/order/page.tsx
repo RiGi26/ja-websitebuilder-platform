@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
-  Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck
+  Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck,
+  Copy, Shield
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -127,6 +128,9 @@ function OrderFormContent() {
   const [form, setForm] = useState<FormData>(INIT)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [pendingPayment, setPendingPayment] = useState<{
+    displayId: string; dpAmount: number; redirectUrl: string
+  } | null>(null)
 
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
@@ -250,11 +254,18 @@ function OrderFormContent() {
 
       const { redirect_url, order_id, display_id, dp_amount } = data
 
-      // Simpan info order ke sessionStorage supaya halaman /track bisa tampilkan success state
+      // Simpan ke sessionStorage (fallback GoPay deep link)
       sessionStorage.setItem('ja_pending_order', JSON.stringify({ order_id, display_id, dp_amount }))
 
-      // Redirect ke halaman pembayaran Midtrans
-      window.location.href = redirect_url
+      // Simpan ke localStorage (fallback permanen kalau browser ditutup)
+      localStorage.setItem('ja_last_order', JSON.stringify({
+        order_id, display_id, dp_amount,
+        redirect_url, created_at: new Date().toISOString(),
+      }))
+
+      // Tampilkan interstitial page (bukan langsung redirect)
+      setPendingPayment({ displayId: display_id, dpAmount: dp_amount, redirectUrl: redirect_url })
+      setIsSubmitting(false)
     } catch (err: any) {
       console.error('Submission error:', err)
       setSubmitError(err.message || 'Terjadi kesalahan koneksi. Silakan hubungi tim kami via WhatsApp.')
@@ -265,6 +276,16 @@ function OrderFormContent() {
   const totalSteps = fromKalkulator ? 3 : 4
   const displayStep = fromKalkulator && step === 3 ? 2 : step
   const progress = displayStep === 0 ? 0 : Math.round((displayStep / (totalSteps - 1)) * 100)
+
+  // ── Interstitial page setelah order dibuat ─────────────────────────────────
+  if (pendingPayment) {
+    return <InterstitialPage
+      displayId={pendingPayment.displayId}
+      dpAmount={pendingPayment.dpAmount}
+      redirectUrl={pendingPayment.redirectUrl}
+      isDP={isDP}
+    />
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -538,5 +559,101 @@ function OrderFormContent() {
         </AnimatePresence>
       </div>
     </div>
+  )
+}
+
+// ── Interstitial Page ──────────────────────────────────────────────────────────
+function InterstitialPage({
+  displayId, dpAmount, redirectUrl, isDP,
+}: {
+  displayId: string; dpAmount: number; redirectUrl: string; isDP: boolean
+}) {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    // Auto-copy Order ID ke clipboard saat halaman muncul
+    navigator.clipboard?.writeText(displayId).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 3000)
+    }).catch(() => {})
+  }, [displayId])
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displayId)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="max-w-lg mx-auto py-8 px-4"
+    >
+      <div className="bg-white rounded-[40px] apple-shadow p-8 md:p-10 border border-black/[0.03] text-center">
+        <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check size={40} className="text-green-500" strokeWidth={3} />
+        </div>
+
+        <h1 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">
+          Pesanan Berhasil Dibuat!
+        </h1>
+        <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+          Simpan Order ID berikut — gunakan kapan saja untuk lacak progress dan akses form briefing.
+        </p>
+
+        {/* Order ID card */}
+        <div className="bg-[#1D1D1F] rounded-[24px] p-6 mb-2 text-left relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-2xl" />
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Order ID</p>
+          <p className="text-2xl font-black text-white tracking-wider mb-3">{displayId}</p>
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-white transition-colors"
+          >
+            {copied
+              ? <><Check size={13} className="text-green-400" /> Disalin ke clipboard!</>
+              : <><Copy size={13} /> Salin Order ID</>
+            }
+          </button>
+        </div>
+
+        {/* localStorage indicator */}
+        <p className="text-[11px] text-gray-400 mb-6 flex items-center justify-center gap-1.5">
+          <Shield size={11} className="text-green-500" />
+          Tersimpan otomatis di browser Anda sebagai backup
+        </p>
+
+        {/* Payment info */}
+        <div className="bg-green-50 rounded-2xl p-4 border border-green-100 mb-6 text-left">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+            {isDP ? 'Bayar Sekarang (DP 50%)' : 'Bayar Sekarang (Lunas)'}
+          </p>
+          <p className="text-xl font-black text-green-700 tabular-nums">
+            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpAmount)}
+          </p>
+        </div>
+
+        <p className="text-[11px] text-gray-400 mb-4">
+          WA konfirmasi + link pembayaran sudah dikirim ke nomor Anda
+        </p>
+
+        <Button
+          onClick={() => { window.location.href = redirectUrl }}
+          className="w-full h-14 rounded-2xl bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl shadow-blue-200 flex items-center justify-center gap-3"
+        >
+          <Rocket size={18} /> Lanjut ke Pembayaran
+        </Button>
+
+        <a
+          href={`/track?id=${displayId.split('-').slice(2).join('-').toLowerCase()}`}
+          className="block text-center text-xs text-gray-400 hover:text-gray-600 mt-4 font-medium"
+        >
+          Bayar nanti? Lacak pesanan via Order ID →
+        </a>
+      </div>
+    </motion.div>
   )
 }
