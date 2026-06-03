@@ -9,7 +9,7 @@ import Image from 'next/image'
 const CORP_URL = 'https://ja-landingpage-platform.vercel.app'
 
 const NAV_LINKS = [
-  { label: 'Track Pesanan', href: '/' },
+  { label: 'Track Pesanan', href: '/track' },
 ]
 
 export default function Navbar() {
