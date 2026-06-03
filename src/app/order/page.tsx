@@ -276,7 +276,7 @@ function OrderFormContent() {
       `💰 DP Dibayar: Rp ${dpAmount.toLocaleString('id-ID')}\n\n` +
       `Mohon konfirmasi penerimaan DP saya ya. Terima kasih!`
     )
-    const trackUrl = `/`
+    const trackUrl = `/track?id=${displayId}`
 
     return (
       <div className="max-w-xl mx-auto py-12 px-6">
@@ -287,12 +287,12 @@ function OrderFormContent() {
           </div>
 
           <h1 className="text-3xl sf-display-heavy text-gray-900 mb-2 tracking-tight text-center">
-            {paymentPending ? 'Menunggu Konfirmasi Pembayaran' : 'DP Berhasil! 🎉'}
+            {paymentPending ? 'Menunggu Konfirmasi Pembayaran' : 'Pembayaran Diterima! 🎉'}
           </h1>
           <p className="text-gray-500 text-sm text-center mb-8 leading-relaxed">
             {paymentPending
-              ? 'Pembayaran Anda sedang diproses. Kami akan mulai pengerjaan setelah pembayaran terkonfirmasi.'
-              : <>Tim kami akan menghubungi Anda dalam <strong>1×24 jam</strong> untuk sesi Onboarding.</>
+              ? 'Pembayaran Anda sedang diproses. Pengerjaan dimulai setelah pembayaran terkonfirmasi.'
+              : <>Link form briefing dikirim ke WhatsApp Anda. Isi dalam <strong>1×24 jam</strong> agar website segera diproses.</>
             }
           </p>
 
@@ -333,7 +333,7 @@ function OrderFormContent() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm transition-all"
             >
-              <span className="text-base">💬</span> Konfirmasi DP via WhatsApp
+              <span className="text-base">💬</span> Ada pertanyaan? Chat via WhatsApp
             </a>
           </div>
 
@@ -341,9 +341,9 @@ function OrderFormContent() {
           <div className="bg-[#F5F5F7] rounded-3xl p-6 space-y-4 border border-black/[0.02]">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alur Selanjutnya</p>
             {[
-              { t: 'Konfirmasi DP', c: 'Admin verifikasi pembayaran DP dalam 1×24 jam.' },
-              { t: 'Video Call Onboarding', c: 'Brief detail & kunci scope pengerjaan bersama.' },
-              { t: 'Pengerjaan & Launch', c: 'Website live dalam 7–14 hari kerja. Pelunasan sebelum go-live.' },
+              { t: 'Terima Link Briefing', c: 'Link form konten dikirim otomatis ke WhatsApp Anda.' },
+              { t: 'Isi Form Briefing', c: 'Isi detail bisnis & konten website. Selesai dalam ~5 menit.' },
+              { t: 'Website Live', c: 'Tim kami bangun dan kirim URL live dalam 3–5 hari kerja. Pelunasan sebelum go-live.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4">
                 <div className="w-6 h-6 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
@@ -368,8 +368,8 @@ function OrderFormContent() {
                   <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${displayStep >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
               ))}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Order & Briefing</h1>
-          <p className="text-gray-500 font-medium">Bantu kami memahami visi digital bisnis Anda.</p>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Pesanan</h1>
+          <p className="text-gray-500 font-medium">Lengkapi data diri dan pilih fitur yang Anda butuhkan.</p>
       </div>
 
       {/* Banner dari kalkulator */}
