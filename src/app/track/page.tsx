@@ -278,6 +278,29 @@ export default async function TrackPage({
             </div>
           </div>
 
+          {/* Banner Sudah Bayar — muncul saat unpaid, bantu customer konfirmasi */}
+          {order.payment_status === 'unpaid' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-[24px] p-6 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0 text-2xl">
+                💳
+              </div>
+              <div className="flex-1">
+                <p className="font-black text-amber-900 text-base leading-tight">Sudah Selesai Bayar?</p>
+                <p className="text-amber-800 text-sm font-medium mt-0.5">
+                  Konfirmasi ke tim kami via WhatsApp dengan menyebutkan Order ID <span className="font-black">{displayId}</span>. Status akan diupdate dalam 1×24 jam.
+                </p>
+              </div>
+              <a
+                href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Halo Japan Arena, saya sudah bayar untuk order ${displayId}. Mohon dikonfirmasi. Terima kasih.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 bg-amber-600 text-white font-black text-xs px-5 py-3 rounded-full hover:bg-amber-700 transition-colors whitespace-nowrap"
+              >
+                Konfirmasi Bayar →
+              </a>
+            </div>
+          )}
+
           {/* Banner Briefing — muncul saat dp_paid + belum submit briefing */}
           {order.payment_status === 'dp_paid' && !(order as any).briefing_submitted_at && (order as any).tracking_token && (
             <div className="bg-amber-400 rounded-[24px] p-6 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -505,7 +528,9 @@ export default async function TrackPage({
               </div>
               {order.dp_amount != null && (
                 <div className="flex justify-between items-center pt-3">
-                  <span className="text-gray-500">DP 50%</span>
+                  <span className="text-gray-500">
+                    {order.dp_amount === order.total_estimasi ? 'Dibayar Lunas' : 'DP 50%'}
+                  </span>
                   <span className="font-bold text-green-600">
                     {formatPrice(order.dp_amount)}
                   </span>
