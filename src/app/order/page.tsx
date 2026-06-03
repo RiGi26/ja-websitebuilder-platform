@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
-  Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck, Search
+  Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -126,10 +126,7 @@ function OrderFormContent() {
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<FormData>(INIT)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [orderResult, setOrderResult] = useState<any>(null)
-  const [paymentPending, setPaymentPending] = useState(false)
 
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
@@ -263,101 +260,6 @@ function OrderFormContent() {
   const totalSteps = fromKalkulator ? 3 : 4
   const displayStep = fromKalkulator && step === 3 ? 2 : step
   const progress = displayStep === 0 ? 0 : Math.round((displayStep / (totalSteps - 1)) * 100)
-
-  if (submitted && orderResult) {
-    const displayId = orderResult.display_id
-    const dpAmount = orderResult.dp_amount
-    const remaining = finalPrice - dpAmount
-    const clientName = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
-    const waMsg = encodeURIComponent(
-      `Halo Japan Arena Studio! 👋\n\nSaya sudah bayar DP untuk order website.\n\n` +
-      `📋 Order ID: *${displayId}*\n` +
-      `🏢 Nama: ${clientName}\n` +
-      `💰 DP Dibayar: Rp ${dpAmount.toLocaleString('id-ID')}\n\n` +
-      `Mohon konfirmasi penerimaan DP saya ya. Terima kasih!`
-    )
-    const trackUrl = `/track?id=${displayId}`
-
-    return (
-      <div className="max-w-xl mx-auto py-12 px-6">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[40px] apple-shadow p-10 border border-black/[0.03]">
-
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ${paymentPending ? 'bg-amber-50 text-amber-500' : 'bg-green-50 text-green-500'}`}>
-            {paymentPending ? <Loader2 size={36} /> : <Check size={40} strokeWidth={3} />}
-          </div>
-
-          <h1 className="text-3xl sf-display-heavy text-gray-900 mb-2 tracking-tight text-center">
-            {paymentPending ? 'Menunggu Konfirmasi Pembayaran' : 'Pembayaran Diterima! 🎉'}
-          </h1>
-          <p className="text-gray-500 text-sm text-center mb-8 leading-relaxed">
-            {paymentPending
-              ? 'Pembayaran Anda sedang diproses. Pengerjaan dimulai setelah pembayaran terkonfirmasi.'
-              : <>Link form briefing dikirim ke WhatsApp Anda. Isi dalam <strong>1×24 jam</strong> agar website segera diproses.</>
-            }
-          </p>
-
-          {/* Order ID Card */}
-          <div className="bg-gradient-to-br from-[#1D1D1F] to-gray-800 rounded-[28px] p-7 text-white mb-4 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#0071E3]/20 blur-3xl" />
-            <div className="relative z-10">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID</p>
-              <p className="text-2xl font-black tracking-wider text-white mb-1">{displayId}</p>
-              <p className="text-gray-400 text-xs font-medium">Simpan ID ini untuk lacak progress pengerjaan</p>
-            </div>
-          </div>
-
-          {/* Payment breakdown */}
-          <div className="bg-[#F9F9FB] rounded-[24px] p-5 mb-6 border border-black/[0.04] space-y-3">
-            <div className="flex items-center gap-3">
-              <p className="text-sm text-gray-500 flex-1">DP 50% {paymentPending ? '(menunggu konfirmasi)' : 'Dibayar'}</p>
-              <p className={`font-black text-sm shrink-0 ${paymentPending ? 'text-amber-500' : 'text-green-600'}`}>
-                {formatPrice(dpAmount)}
-              </p>
-            </div>
-            <div className="flex items-center gap-3 pt-2 border-t border-black/[0.04]">
-              <p className="text-sm text-gray-400 flex-1">Pelunasan (dibayar sebelum go-live)</p>
-              <p className="font-black text-sm text-gray-500 shrink-0">{formatPrice(remaining)}</p>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="space-y-3 mb-8">
-            <Button asChild className="w-full py-6 rounded-2xl bg-[#0071E3] hover:bg-blue-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
-              <Link href={trackUrl}>
-                <Search size={18} /> Lacak Progress Sekarang
-              </Link>
-            </Button>
-            <a
-              href={`https://wa.me/6281296917963?text=${waMsg}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-sm transition-all"
-            >
-              <span className="text-base">💬</span> Ada pertanyaan? Chat via WhatsApp
-            </a>
-          </div>
-
-          {/* Next steps */}
-          <div className="bg-[#F5F5F7] rounded-3xl p-6 space-y-4 border border-black/[0.02]">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alur Selanjutnya</p>
-            {[
-              { t: 'Terima Link Briefing', c: 'Link form konten dikirim otomatis ke WhatsApp Anda.' },
-              { t: 'Isi Form Briefing', c: 'Isi detail bisnis & konten website. Selesai dalam ~5 menit.' },
-              { t: 'Website Live', c: 'Tim kami bangun dan kirim URL live dalam 3–5 hari kerja. Pelunasan sebelum go-live.' },
-            ].map((item, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{item.t}</p>
-                  <p className="text-xs text-gray-500">{item.c}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    )
-  }
 
   return (
     <div className="max-w-4xl mx-auto">
