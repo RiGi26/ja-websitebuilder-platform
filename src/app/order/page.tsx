@@ -470,24 +470,22 @@ function OrderFormContent() {
                                   <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">{formatPrice(finalPrice)}</span>
                               </div>
 
-                              {/* DP Breakdown */}
-                              <div className="mt-4 pt-4 border-t border-black/5 space-y-2.5">
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <p className="text-sm font-bold text-gray-900">Dibayar Sekarang</p>
-                                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700 whitespace-nowrap">
-                                        {isDP ? 'DP 50%' : 'Lunas'}
-                                      </span>
-                                    </div>
-                                    {!isDP && <p className="text-xs text-gray-400 mt-1">Pembayaran lunas untuk order di bawah Rp 3 juta</p>}
+                              {/* DP Breakdown — distinct payment card */}
+                              <div className="mt-4 pt-4 border-t border-black/5">
+                                <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Dibayar Sekarang</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                                      {isDP ? 'DP 50%' : 'Lunas'}
+                                    </span>
                                   </div>
-                                  <span className="text-xl font-black text-green-600 shrink-0 tabular-nums">{formatPrice(dpAmount)}</span>
+                                  <p className="text-2xl font-black text-green-700 tabular-nums">{formatPrice(dpAmount)}</p>
+                                  {!isDP && <p className="text-xs text-gray-500 mt-1.5">Pembayaran lunas — order di bawah Rp 3 juta</p>}
                                 </div>
                                 {isDP && (
-                                  <div className="flex items-center justify-between gap-3 text-gray-400">
-                                    <p className="text-sm font-medium flex-1">Pelunasan sebelum go-live</p>
-                                    <span className="text-sm font-bold shrink-0 tabular-nums">{formatPrice(pelunasan)}</span>
+                                  <div className="flex items-center justify-between gap-3 mt-2 px-1">
+                                    <span className="text-sm text-gray-500 flex-1">Pelunasan sebelum go-live</span>
+                                    <span className="text-sm font-bold text-gray-700 tabular-nums shrink-0">{formatPrice(pelunasan)}</span>
                                   </div>
                                 )}
                               </div>
@@ -515,7 +513,7 @@ function OrderFormContent() {
                             </a>
                           </p>
                           <p className="text-xs text-gray-500 leading-relaxed">
-                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah pembayaran DP berhasil dilakukan.
+                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah {isDP ? `pembayaran DP 50% (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan. Pelunasan dibayar sebelum website go-live.` : `pembayaran lunas (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan.`}
                           </p>
                       </div>
                   </button>
