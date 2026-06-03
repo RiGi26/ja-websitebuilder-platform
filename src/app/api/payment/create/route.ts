@@ -38,7 +38,9 @@ export async function POST(request: Request) {
 
     const year = new Date().getFullYear()
     const displayId = `JA-${year}-${order.id.slice(0, 8).toUpperCase()}`
-    const dpAmount = Math.ceil(total_estimasi * 0.5)
+    const DP_THRESHOLD = 3_000_000
+    const isDP = total_estimasi > DP_THRESHOLD
+    const dpAmount = isDP ? Math.ceil(total_estimasi * 0.5) : total_estimasi
     const clientName = client_type === 'perusahaan' ? nama_perusahaan : nama_usaha
     const midtransOrderId = `${displayId}-DP`
     const finishUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/thank-you?id=${order.id}`
@@ -53,10 +55,12 @@ export async function POST(request: Request) {
         gross_amount: dpAmount,
       },
       item_details: [{
-        id: 'dp-50pct',
+        id: isDP ? 'dp-50pct' : 'lunas',
         price: dpAmount,
         quantity: 1,
-        name: `DP 50% — Japan Arena Studio (${industri || 'Website'})`,
+        name: isDP
+          ? `DP 50% — Japan Arena Studio (${industri || 'Website'})`
+          : `Pembayaran Lunas — Japan Arena Studio (${industri || 'Website'})`,
       }],
       customer_details: {
         first_name: clientName,

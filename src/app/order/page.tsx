@@ -204,6 +204,11 @@ function OrderFormContent() {
   const finalPrice = currentBasePrice + totalAddons
   const totalYearlyMaint = currentBaseRenewal + totalAddonYearly
 
+  const DP_THRESHOLD = 3_000_000
+  const isDP = finalPrice > DP_THRESHOLD
+  const dpAmount = isDP ? Math.ceil(finalPrice * 0.5) : finalPrice
+  const pelunasan = isDP ? finalPrice - dpAmount : 0
+
 
 
   const toggleAddon = (id: string) => {
@@ -464,6 +469,28 @@ function OrderFormContent() {
                                   <span className="text-lg sm:text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
                                   <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">{formatPrice(finalPrice)}</span>
                               </div>
+
+                              {/* DP Breakdown */}
+                              <div className="mt-4 pt-4 border-t border-black/5 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-sm font-bold text-gray-900">
+                                      Dibayar Sekarang
+                                      <span className="ml-2 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                                        {isDP ? 'DP 50%' : 'Lunas'}
+                                      </span>
+                                    </p>
+                                    {!isDP && <p className="text-xs text-gray-400 mt-0.5">Order di bawah Rp 3 juta — pembayaran lunas</p>}
+                                  </div>
+                                  <span className="text-xl font-black text-green-600 shrink-0">{formatPrice(dpAmount)}</span>
+                                </div>
+                                {isDP && (
+                                  <div className="flex items-center justify-between text-gray-400">
+                                    <p className="text-sm font-medium">Pelunasan (dibayar sebelum go-live)</p>
+                                    <span className="text-sm font-bold shrink-0">{formatPrice(pelunasan)}</span>
+                                  </div>
+                                )}
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -503,7 +530,7 @@ function OrderFormContent() {
                             </>
                         ) : (
                             <>
-                                <Rocket size={20} /> Selesaikan Pesanan & Bayar DP
+                                <Rocket size={20} /> {isDP ? 'Selesaikan Pesanan & Bayar DP' : 'Selesaikan Pesanan & Bayar Lunas'}
                             </>
                         )}
                     </Button>
