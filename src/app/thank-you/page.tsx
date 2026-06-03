@@ -12,22 +12,22 @@ const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
 
 const NEXT_STEPS = [
   {
-    icon: Phone,
-    time: 'Dalam 1×24 jam',
-    title: 'Tim kami menghubungi Anda',
-    desc: 'Project Manager akan konfirmasi via WhatsApp untuk jadwal sesi Onboarding.',
+    icon: MessageCircle,
+    time: 'Sekarang — otomatis',
+    title: 'Cek WhatsApp Anda',
+    desc: 'Link form briefing dikirim ke nomor WA Anda. Isi dalam 1×24 jam agar website segera diproses.',
   },
   {
     icon: Layers,
-    time: 'Sesi Onboarding',
-    title: 'Briefing & finalisasi brief',
-    desc: 'Kami review semua kebutuhan Anda — konten, referensi desain, dan akses yang diperlukan.',
+    time: 'Setelah briefing masuk',
+    title: 'Tim membangun website',
+    desc: 'Kami kerjakan berdasarkan data briefing Anda. Tidak perlu video call — semua via form.',
   },
   {
     icon: Clock,
-    time: 'Setelah onboarding',
-    title: 'Pengerjaan dimulai',
-    desc: 'Progress bisa dilacak real-time lewat halaman tracking dengan Order ID Anda.',
+    time: '3–5 hari kerja',
+    title: 'Website live & URL dikirim',
+    desc: 'URL website dikirim via WhatsApp. Pelunasan dilakukan sebelum go-live.',
   },
 ]
 
