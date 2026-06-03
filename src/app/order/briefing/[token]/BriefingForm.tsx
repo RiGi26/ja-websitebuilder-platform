@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { getVariants } from '@/lib/website-variants'
-import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2, Clock, Sparkles } from 'lucide-react'
 import BrandingPreview from './BrandingPreview'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -135,10 +135,30 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editKontak, setEditKontak] = useState(false)
 
   const selectedVariant = variants.find(v => v.id === form.variant) ?? variants[0]
 
   const set = (key: keyof FormState, val: unknown) => setForm(f => ({ ...f, [key]: val }))
+
+  // ── Draft auto-save (P0) — tab ketutup tidak hilang ───────────
+  const DRAFT_KEY = `ja_briefing_draft_${token}`
+
+  // Pulihkan draft saat mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY)
+      if (raw) setForm(f => ({ ...f, ...JSON.parse(raw) }))
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Simpan otomatis tiap perubahan
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(form))
+    } catch { /* ignore */ }
+  }, [DRAFT_KEY, form])
 
   // ── Dynamic row helpers ───────────────────────────────────────
   function addRow<T>(key: keyof FormState, empty: T) {
@@ -170,6 +190,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Gagal submit')
+      try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
       setSubmitted(true)
     } catch (e: any) {
       setError(e.message)
@@ -278,6 +299,14 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         <p className="text-gray-500 font-medium text-sm">
           Halo <strong>{namaKlien}</strong>! Isi detail di bawah agar tim kami bisa membangun website yang tepat untuk Anda.
         </p>
+        <div className="flex items-center justify-center gap-x-5 gap-y-2 flex-wrap mt-4 text-xs font-medium text-gray-400">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock size={13} /> Sekitar 5 menit
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-green-600">
+            <Check size={13} strokeWidth={3} /> Progres tersimpan otomatis — boleh ditinggal
+          </span>
+        </div>
       </div>
 
       <div className="bg-white rounded-[32px] p-6 sm:p-8 md:p-10 shadow-sm border border-black/[0.03]">
@@ -300,14 +329,29 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             <Field label="Deskripsi Singkat Bisnis">
               <textarea className={textareaCls} rows={3} value={form.deskripsi} onChange={e => set('deskripsi', e.target.value)} placeholder="Ceritakan bisnis Anda dalam 2-3 kalimat..." />
             </Field>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Field label="Nomor WhatsApp" required>
-                <input className={inputCls} value={form.wa} onChange={e => set('wa', e.target.value)} placeholder="628123456789" />
-              </Field>
-              <Field label="Email Bisnis">
-                <input type="email" className={inputCls} value={form.email} onChange={e => set('email', e.target.value)} placeholder="halo@bisnis.com" />
-              </Field>
-            </div>
+            {!editKontak ? (
+              <div className="flex items-center justify-between gap-4 p-4 rounded-[16px] bg-gray-50 border border-black/[0.05]">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Kontak Anda</p>
+                  <p className="text-sm font-bold text-gray-900 truncate">
+                    {form.wa || 'Nomor belum diisi'}{form.email ? ` · ${form.email}` : ''}
+                  </p>
+                </div>
+                <button type="button" onClick={() => setEditKontak(true)}
+                  className="text-[#0071E3] text-sm font-bold shrink-0 hover:underline">
+                  Ubah
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Field label="Nomor WhatsApp" required>
+                  <input className={inputCls} value={form.wa} onChange={e => set('wa', e.target.value)} placeholder="628123456789" />
+                </Field>
+                <Field label="Email Bisnis">
+                  <input type="email" className={inputCls} value={form.email} onChange={e => set('email', e.target.value)} placeholder="halo@bisnis.com" />
+                </Field>
+              </div>
+            )}
             <Field label="Alamat Operasional">
               <input className={inputCls} value={form.alamat} onChange={e => set('alamat', e.target.value)} placeholder="Jl. Sudirman No. 1, Jakarta Pusat" />
             </Field>
@@ -328,8 +372,18 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">Konten Website</h2>
               <p className="text-sm text-gray-400 font-medium">
-                Opsional — skip jika belum siap. Tim kami akan menyiapkan konten awal.
+                Bagian ini sepenuhnya opsional.
               </p>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 rounded-[16px] bg-blue-50/60 border border-blue-100">
+              <Sparkles size={18} className="text-[#0071E3] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-gray-900">Belum punya semua data? Tidak masalah.</p>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                  Isi yang sudah siap saja. Sisanya tim kami siapkan draf awal — Anda tinggal revisi nanti.
+                </p>
+              </div>
             </div>
 
             {/* TRAVEL / RENTAL */}
@@ -570,6 +624,14 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 ))}
               </div>
             )}
+
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="w-full text-center text-sm text-gray-400 hover:text-gray-700 font-medium py-3 transition-colors"
+            >
+              Lewati — biar tim kami siapkan konten awalnya →
+            </button>
           </div>
         )}
 
