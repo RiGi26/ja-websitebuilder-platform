@@ -1,9 +1,10 @@
 'use client'
 
 // ============================================================
-// /token-lab — preview POC token-pack system.
+// Token Lab (client) — preview POC token-pack system.
 // Satu TokenDrivenRenderer, tukar pack → tampilan berubah total.
 // Termasuk demo override warna brand klien (primary).
+// Dipakai oleh /admin/token-lab (guarded + noindex).
 // ============================================================
 import { useState } from 'react'
 import { PACKS, resolveTokenPack } from '@/lib/design-tokens/packs'
@@ -38,20 +39,17 @@ const DEMO: SiteContent = {
 
 const PACK_IDS = Object.keys(PACKS)
 
-export default function TokenLabPage() {
+export default function TokenLab() {
   const [packId, setPackId] = useState(PACK_IDS[0])
   const [brand, setBrand] = useState('')
 
-  // Resolve langsung dari pack id; brand override mensimulasikan primary klien.
   const pack = brand
     ? { ...PACKS[packId], color: { ...PACKS[packId].color, primary: brand } }
     : PACKS[packId]
-  // demonstrasi resolver lengkap (theme:variant → pack + brand):
   const resolvedNote = resolveTokenPack('rental', 'luxury', brand || undefined).id
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
-      {/* Control bar */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, background: '#0B0B0C', color: '#fff', padding: '12px 20px', display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
         <strong style={{ fontSize: 13, letterSpacing: '.04em' }}>TOKEN LAB</strong>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
