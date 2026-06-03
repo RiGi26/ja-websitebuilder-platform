@@ -634,13 +634,6 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               </div>
             </div>
 
-            <Field label="Warna Utama Website">
-              <div className="flex items-center gap-3">
-                <input type="color" value={form.primary_color} onChange={e => set('primary_color', e.target.value)}
-                  className="w-12 h-12 rounded-xl border border-black/10 cursor-pointer p-1" />
-                <input className={inputCls} value={form.primary_color} onChange={e => set('primary_color', e.target.value)} placeholder="#EA580C" />
-              </div>
-            </Field>
             <Field label="URL Logo (jika sudah punya)">
               <input className={inputCls} value={form.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://drive.google.com/..." />
             </Field>
