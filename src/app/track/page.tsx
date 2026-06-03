@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import AutoRefresh from './AutoRefresh'
+import RetryPaymentButton from './RetryPaymentButton'
 import {
   CheckCircle2,
   Loader2,
@@ -277,6 +278,24 @@ export default async function TrackPage({
               </div>
             </div>
           </div>
+
+          {/* Banner Retry — muncul saat gagal bayar */}
+          {order.payment_status === 'failed' && (
+            <div className="bg-red-50 border border-red-200 rounded-[24px] p-6 mb-4">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-2xl flex items-center justify-center shrink-0 text-2xl">
+                  ❌
+                </div>
+                <div>
+                  <p className="font-black text-red-900 text-base leading-tight">Pembayaran Gagal</p>
+                  <p className="text-red-700 text-sm font-medium mt-0.5">
+                    Transaksi tidak berhasil. Coba lagi dengan metode pembayaran yang sama atau berbeda.
+                  </p>
+                </div>
+              </div>
+              <RetryPaymentButton orderId={order.id} />
+            </div>
+          )}
 
           {/* Banner Sudah Bayar — muncul saat unpaid, bantu customer konfirmasi */}
           {order.payment_status === 'unpaid' && (

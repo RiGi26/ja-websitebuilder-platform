@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     const displayId = `JA-${year}-${order.id.slice(0, 8).toUpperCase()}`
     const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
 
+    // WA ke admin
     notifyCustomer({ type: 'briefing_received' }, ADMIN_WA, {
       clientName,
       displayId,
@@ -51,6 +52,15 @@ export async function POST(request: Request) {
       industri: order.industri ?? '-',
       adminUrl: `${base}/admin`,
     }).catch((e) => console.error('[briefing] WA admin notify failed:', e))
+
+    // WA ke customer — konfirmasi briefing diterima
+    if (order.nomor_wa) {
+      notifyCustomer({ type: 'briefing_submitted' }, order.nomor_wa, {
+        clientName,
+        displayId,
+        trackUrl: `${base}/track?id=${order.id}`,
+      }).catch((e) => console.error('[briefing] WA customer notify failed:', e))
+    }
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

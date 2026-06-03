@@ -153,6 +153,23 @@ export type NotifyEvent =
   | { type: 'dp_confirmed' }
   | { type: 'briefing_received' }
   | { type: 'order_created' }
+  | { type: 'briefing_submitted' }
+
+function briefingSubmittedTemplate(c: NotifContext): string {
+  return [
+    `Halo ${c.clientName}! 🎉`,
+    ``,
+    `Briefing website Anda *${c.displayId}* sudah kami terima!`,
+    ``,
+    `Tim kami akan segera mulai membangun website Anda.`,
+    `Estimasi: *3–5 hari kerja* setelah briefing diterima.`,
+    ``,
+    `📍 Pantau progress kapan saja:`,
+    c.trackUrl,
+    ``,
+    `Ada pertanyaan? Balas pesan ini 🙌`,
+  ].join('\n')
+}
 
 function orderCreatedTemplate(c: NotifContext): string {
   return [
@@ -224,6 +241,9 @@ export async function notifyCustomer(
       break
     case 'order_created':
       message = orderCreatedTemplate(ctx)
+      break
+    case 'briefing_submitted':
+      message = briefingSubmittedTemplate(ctx)
       break
   }
   return sendWhatsApp(phone, message)
