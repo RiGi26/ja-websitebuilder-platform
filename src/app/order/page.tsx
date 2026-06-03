@@ -472,22 +472,22 @@ function OrderFormContent() {
 
                               {/* DP Breakdown */}
                               <div className="mt-4 pt-4 border-t border-black/5 space-y-2.5">
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className="text-sm font-bold text-gray-900">
-                                      Dibayar Sekarang
-                                      <span className="ml-2 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <p className="text-sm font-bold text-gray-900">Dibayar Sekarang</p>
+                                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700 whitespace-nowrap">
                                         {isDP ? 'DP 50%' : 'Lunas'}
                                       </span>
-                                    </p>
-                                    {!isDP && <p className="text-xs text-gray-400 mt-0.5">Order di bawah Rp 3 juta — pembayaran lunas</p>}
+                                    </div>
+                                    {!isDP && <p className="text-xs text-gray-400 mt-1">Pembayaran lunas untuk order di bawah Rp 3 juta</p>}
                                   </div>
-                                  <span className="text-xl font-black text-green-600 shrink-0">{formatPrice(dpAmount)}</span>
+                                  <span className="text-xl font-black text-green-600 shrink-0 tabular-nums">{formatPrice(dpAmount)}</span>
                                 </div>
                                 {isDP && (
-                                  <div className="flex items-center justify-between text-gray-400">
-                                    <p className="text-sm font-medium">Pelunasan (dibayar sebelum go-live)</p>
-                                    <span className="text-sm font-bold shrink-0">{formatPrice(pelunasan)}</span>
+                                  <div className="flex items-center justify-between gap-3 text-gray-400">
+                                    <p className="text-sm font-medium flex-1">Pelunasan sebelum go-live</p>
+                                    <span className="text-sm font-bold shrink-0 tabular-nums">{formatPrice(pelunasan)}</span>
                                   </div>
                                 )}
                               </div>
