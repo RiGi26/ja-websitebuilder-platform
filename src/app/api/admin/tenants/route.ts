@@ -77,6 +77,10 @@ export async function POST(request: Request) {
 
     const namaKlien = order.nama_perusahaan || order.nama_usaha || 'Klien Tanpa Nama'
 
+    // Variant + warna brand dari briefing (jika sudah diisi sebelum provisioning).
+    // Render ([slug]) baca konfig.branding.variant/primary untuk resolve token pack.
+    const briefBranding = (order.briefing_data as { branding?: { variant?: string; primary_color?: string } } | null)?.branding
+
     // 3. Buat tenant
     const { data: tenant, error: tenantErr } = await supabaseAdmin
       .from('tenants')
@@ -103,7 +107,11 @@ export async function POST(request: Request) {
       data_konten: {},
       konfigurasi: {
         features: addonsToFeatures(order.selected_addons),
-        branding: { theme: industryToTheme(tipeIndustri) },
+        branding: {
+          theme: industryToTheme(tipeIndustri),
+          ...(briefBranding?.variant ? { variant: briefBranding.variant } : {}),
+          ...(briefBranding?.primary_color ? { primary: briefBranding.primary_color } : {}),
+        },
       },
     })
 
