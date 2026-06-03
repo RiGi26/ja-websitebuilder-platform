@@ -58,9 +58,7 @@ export async function POST(request: Request) {
         id: isDP ? 'dp-50pct' : 'lunas',
         price: dpAmount,
         quantity: 1,
-        name: isDP
-          ? `DP 50% — Japan Arena Studio (${industri || 'Website'})`
-          : `Pembayaran Lunas — Japan Arena Studio (${industri || 'Website'})`,
+        name: isDP ? 'DP 50% — Japan Arena Studio' : 'Lunas — Japan Arena Studio',
       }],
       customer_details: {
         first_name: clientName,
