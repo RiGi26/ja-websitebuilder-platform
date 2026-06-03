@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import AutoRefresh from './AutoRefresh'
 import RetryPaymentButton from './RetryPaymentButton'
+import PelunasanButton from './PelunasanButton'
 import {
   CheckCircle2,
   Loader2,
@@ -41,6 +42,7 @@ const PAYMENT_LABELS: Record<string, { label: string; color: string }> = {
   awaiting_payment: { label: 'Menunggu Pembayaran', color: 'bg-amber-50 text-amber-700 border-amber-100' },
   dp_paid: { label: 'DP Terbayar', color: 'bg-green-50 text-green-700 border-green-100' },
   failed: { label: 'Gagal Bayar', color: 'bg-red-50 text-red-700 border-red-100' },
+  lunas: { label: 'Lunas ✓', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -410,6 +412,29 @@ export default async function TrackPage({
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Banner Pelunasan — muncul saat dp_paid + website sudah live + bukan order lunas */}
+          {order.payment_status === 'dp_paid' &&
+           deliveredUrl &&
+           Number(order.dp_amount) < Number(order.total_estimasi) && (
+            <div className="bg-blue-50 border border-blue-200 rounded-[24px] p-6 mb-4">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center shrink-0 text-2xl">
+                  💳
+                </div>
+                <div className="flex-1">
+                  <p className="font-black text-blue-900 text-base leading-tight">Satu Langkah Lagi — Lunasi Pembayaran</p>
+                  <p className="text-blue-700 text-sm font-medium mt-0.5">
+                    Website Anda sudah live! Selesaikan pelunasan untuk mengaktifkan domain dan akses penuh.
+                  </p>
+                  <p className="text-blue-600 text-sm font-black mt-1.5">
+                    Sisa: {formatPrice(Number(order.total_estimasi) - Number(order.dp_amount))}
+                  </p>
+                </div>
+              </div>
+              <PelunasanButton orderId={order.id} />
             </div>
           )}
 

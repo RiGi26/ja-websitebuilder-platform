@@ -154,6 +154,21 @@ export type NotifyEvent =
   | { type: 'briefing_received' }
   | { type: 'order_created' }
   | { type: 'briefing_submitted' }
+  | { type: 'payment_lunas' }
+
+function paymentLunasTemplate(c: NotifContext): string {
+  return [
+    `Halo ${c.clientName}! 🎉`,
+    ``,
+    `Pembayaran lunas untuk project *${c.displayId}* sudah kami terima.`,
+    ``,
+    `Website Anda sepenuhnya aktif dan siap digunakan.`,
+    c.deliveredUrl ? `\n🌐 ${c.deliveredUrl}` : '',
+    ``,
+    `Terima kasih telah mempercayai Japan Arena Studio!`,
+    `Untuk pertanyaan atau bantuan, balas pesan ini. 🙏`,
+  ].filter(Boolean).join('\n')
+}
 
 function briefingSubmittedTemplate(c: NotifContext): string {
   return [
@@ -244,6 +259,9 @@ export async function notifyCustomer(
       break
     case 'briefing_submitted':
       message = briefingSubmittedTemplate(ctx)
+      break
+    case 'payment_lunas':
+      message = paymentLunasTemplate(ctx)
       break
   }
   return sendWhatsApp(phone, message)
