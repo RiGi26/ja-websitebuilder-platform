@@ -135,6 +135,7 @@ function OrderFormContent() {
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
   const kalkulatorEstimasi = searchParams.get('estimasi') ? Number(searchParams.get('estimasi')) : null
+  const kalkulatorMaintain = searchParams.get('maintain') ? Number(searchParams.get('maintain')) : null
   const kalkulatorPaket = searchParams.get('paket') ?? ''
   const kalkulatorAddons = searchParams.get('addons') ?? ''
 
@@ -190,23 +191,31 @@ function OrderFormContent() {
     }
   }
 
-  const totalAddons = form.selectedAddons.reduce((acc, id) => {
-    const addon = ADDONS.find(a => a.id === id)
-    return acc + (addon?.price || 0)
-  }, 0)
+  // Kalau dari kalkulator, addon sudah termasuk dalam kalkulatorEstimasi — jangan double count
+  const totalAddons = fromKalkulator
+    ? 0
+    : form.selectedAddons.reduce((acc, id) => {
+        const addon = ADDONS.find(a => a.id === id)
+        return acc + (addon?.price || 0)
+      }, 0)
 
   // DYNAMIC PRICING LOGIC
   const selectedTemplate = form.templateId ? templatesData[form.templateId] : null
   const currentBasePrice = selectedTemplate?.price_numeric || kalkulatorEstimasi || 499000
   const currentBaseRenewal = selectedTemplate?.renewal_price || 699000
 
-  const totalAddonYearly = form.selectedAddons.reduce((acc, id) => {
-    const addon = ADDONS.find(a => a.id === id)
-    return acc + (addon?.yearlyMaint || 0)
-  }, 0)
+  const totalAddonYearly = fromKalkulator
+    ? 0
+    : form.selectedAddons.reduce((acc, id) => {
+        const addon = ADDONS.find(a => a.id === id)
+        return acc + (addon?.yearlyMaint || 0)
+      }, 0)
 
   const finalPrice = currentBasePrice + totalAddons
-  const totalYearlyMaint = currentBaseRenewal + totalAddonYearly
+  // Kalau dari kalkulator, pakai maintainTotal dari URL supaya inline dengan yang ditampilkan
+  const totalYearlyMaint = fromKalkulator
+    ? (kalkulatorMaintain ?? currentBaseRenewal)
+    : currentBaseRenewal + totalAddonYearly
 
   const DP_THRESHOLD = 3_000_000
   const isDP = finalPrice > DP_THRESHOLD
@@ -482,7 +491,11 @@ function OrderFormContent() {
                                   return addon ? (
                                   <div key={id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[#0071E3]">
                                       <span className="font-medium text-sm flex-1">+ {addon.name}</span>
-                                      <span className="font-bold shrink-0 text-left sm:text-right">{formatPrice(addon.price)}</span>
+                                      <span className="font-bold shrink-0 text-left sm:text-right">
+                                        {fromKalkulator ? (
+                                          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Termasuk</span>
+                                        ) : formatPrice(addon.price)}
+                                      </span>
                                   </div>
                                   ) : null
                               })}
