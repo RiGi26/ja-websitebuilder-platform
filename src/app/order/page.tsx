@@ -528,7 +528,7 @@ function OrderFormContent() {
                             </>
                         ) : (
                             <>
-                                <Rocket size={20} /> {isDP ? 'Selesaikan Pesanan & Bayar DP' : 'Selesaikan Pesanan & Bayar Lunas'}
+                                <Rocket size={20} /> {isDP ? 'Bayar DP & Mulai Project' : 'Bayar & Mulai Project'}
                             </>
                         )}
                     </Button>
