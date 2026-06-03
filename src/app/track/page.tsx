@@ -262,7 +262,7 @@ export default async function TrackPage({
                 {payment.label}
               </span>
             </div>
-            <div className="border-t border-black/[0.04] pt-4 grid grid-cols-2 gap-4 text-sm">
+            <div className="border-t border-black/[0.04] pt-4 grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                   Nama

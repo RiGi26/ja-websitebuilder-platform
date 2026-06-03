@@ -453,10 +453,10 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                         <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Dokter {i + 1}</span>
                         {form.dokter.length > 1 && <button onClick={() => removeRow('dokter', i)} className="text-red-400"><Trash2 size={14} /></button>}
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         <input className={inputCls} placeholder="Nama dokter" value={row.nama} onChange={e => updateRow('dokter', i, 'nama', e.target.value)} />
                         <input className={inputCls} placeholder="Spesialisasi" value={row.spesialis} onChange={e => updateRow('dokter', i, 'spesialis', e.target.value)} />
-                        <input className={inputCls} placeholder="Jadwal praktik" value={row.jadwal} onChange={e => updateRow('dokter', i, 'jadwal', e.target.value)} />
+                        <input className={`${inputCls} col-span-2 sm:col-span-1`} placeholder="Jadwal praktik" value={row.jadwal} onChange={e => updateRow('dokter', i, 'jadwal', e.target.value)} />
                       </div>
                     </div>
                   ))}
@@ -477,7 +477,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             {/* SEKOLAH */}
             {tipe === 'sekolah' && (
               <div className="space-y-5">
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <Field label="Akreditasi">
                     <input className={inputCls} placeholder="A / B / C" value={form.akreditasi} onChange={e => set('akreditasi', e.target.value)} />
                   </Field>
