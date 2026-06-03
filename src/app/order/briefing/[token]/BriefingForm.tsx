@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { getVariants } from '@/lib/website-variants'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2 } from 'lucide-react'
+import BrandingPreview from './BrandingPreview'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
@@ -134,6 +135,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const selectedVariant = variants.find(v => v.id === form.variant) ?? variants[0]
 
   const set = (key: keyof FormState, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
@@ -578,6 +581,21 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               <p className="text-sm text-gray-400 font-medium">Pilih gaya yang paling cocok dengan bisnis Anda.</p>
             </div>
 
+            {/* Live Preview */}
+            <div className="space-y-2">
+              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400">
+                Preview Tampilan Website
+              </p>
+              <BrandingPreview
+                bg={selectedVariant?.bg ?? 'light'}
+                primaryColor={form.primary_color}
+                namaUsaha={form.nama_usaha}
+                tagline={form.tagline}
+                emoji={selectedVariant?.emoji ?? '⚡'}
+                variantNama={selectedVariant?.nama ?? ''}
+              />
+            </div>
+
             {/* Variant selector */}
             <div>
               <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3">
@@ -598,7 +616,6 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                         : 'border-black/[0.06] hover:border-blue-200 bg-white'
                     }`}
                   >
-                    {/* Color swatch */}
                     <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-lg"
                       style={{ backgroundColor: v.mood + '20', border: `2px solid ${v.mood}` }}>
                       {v.emoji}
