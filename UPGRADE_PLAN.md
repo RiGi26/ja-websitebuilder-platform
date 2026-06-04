@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 3 dimulai — **F4 (layout arketipe) SELESAI, LIVE production.** Lanjut F5 (robustness) / P5DB (hardening). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
-- **Step berikutnya:** F5 (preview sebelum publish → rollback/versi → self-edit klien → CI snapshot) ATAU P5DB (rate limit + CSP + monitoring). Pilih bersama user.
-- **Catatan terakhir:** 2026-06-04 — F4 LIVE (PR#54, deploy Ready 711495a): field `layout` di TokenPack + TokenDrivenRenderer ubah SUSUNAN (hero Centered/Split/Fullbleed, features Grid/Rows/List). luxury=split+rows+airy, energetic=fullbleed, minimal=list, clean/warm=centered+grid (baseline no-regression). Verified renderToStaticMarkup. SEBELUMNYA: F2+F3 jalur default LENGKAP (F3-2 PR#53; F2 restaurant PR#52); F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 3 — **F5 (robustness) dimulai. F5-1 (preview sebelum publish) SELESAI (PR#55, preview deploy Ready), nunggu merge ke prod.** Lanjut F5-2 (rollback/versi). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
+- **Step berikutnya:** Merge PR#55 → lanjut F5-2 (rollback/versi) → F5-3 (self-edit klien) → F5-4 (CI snapshot). P5DB hardening setelah F5.
+- **Catatan terakhir:** 2026-06-04 — F5-1 DONE (PR#55, preview deploy Ready): `SiteRenderer.tsx` ekstrak logika render tema dari `[slug]` jadi komponen server bersama (terima `client`, no-regression); `fetchPageByIdAdmin` fetch by id tanpa filter status (service role); route `/admin/preview/[pageId]` admin-gated render WYSIWYG draft + `PreviewBar` sticky (badge Draft/Live, Publish, Buka Live); `BuildButton` "Bangun Otomatis"→"Bangun Draft" (publish:false) lalu redirect Preview. Publish lewat PATCH /api/admin/pages action=publish (existing). tsc+next build clean. SEBELUMNYA: F4 LIVE (PR#54 711495a); F2+F3 jalur default LENGKAP; F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -237,7 +237,12 @@ Token-pack saat ini cuma re-skin. Tambah layout arketipe.
 
 ## Fase F5 — Robustness Produk (GAP 5)
 
-- [ ] **F5-1** Preview sebelum publish (admin lihat hasil build sebelum live).
+- [x] **F5-1** Preview sebelum publish (admin lihat hasil build sebelum live). ✅ 2026-06-04 (PR#55, preview deploy Ready).
+  - `SiteRenderer.tsx`: ekstrak semua cabang render tema dari `[slug]/page.tsx` jadi komponen server bersama `renderSite({page,slug,client})`. Publik pakai anon (RLS gated published), preview pakai service role (lihat draft). Refactor no-regression.
+  - `fetchPageByIdAdmin(client,pageId)`: fetch by id + section visible, TANPA filter status.
+  - Route `/admin/preview/[pageId]`: admin-gated (cookie verify), render WYSIWYG via renderer sama; `PreviewBar` sticky top (badge Draft/Live, Publish via PATCH /api/admin/pages action=publish, link Buka Live).
+  - `BuildButton`: "Bangun Otomatis"→"Bangun Draft" (publish:false) → redirect ke Preview; tombol Preview + Kelola.
+  - Rollback: revert PR#55. Tidak ada perubahan DB/schema.
 - [ ] **F5-2** Rollback/versi (balik ke versi sebelum kalau build salah).
 - [ ] **F5-3** Self-edit klien (ganti teks/gambar sendiri).
 - [ ] **F5-4** Test suite render (snapshot tiap theme+variant) di CI.
@@ -282,3 +287,4 @@ Target skor:
 | 2026-06-04 | F3-1 | (sejak F1-2) | ✅ done | template isi briefing nyata; fallback spesifik nama+kota, bukan Lorem |
 | 2026-06-04 | F3-2 | PR#53 (5c15e60) | ✅ done | copyVariants.ts: 3 register copy/industri, tone by variant + rotasi nama; **F3 jalur default TUNTAS** |
 | 2026-06-04 | F4-1..F4-3 | PR#54 (711495a) | ✅ done | arketipe layout TokenPack: split/fullbleed/list + centered baseline; verified SSR |
+| 2026-06-04 | F5-1 | PR#55 | ✅ done | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; preview deploy Ready |
