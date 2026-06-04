@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 3 — **F5 (robustness). F5-1 MERGED ke prod (PR#55, prod deploy Ready). F5-2 (rollback/versi) SELESAI (PR#56, preview deploy Ready), nunggu merge.** Lanjut F5-3 (self-edit klien). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
-- **Step berikutnya:** Merge PR#56 → lanjut F5-3 (self-edit klien) → F5-4 (CI snapshot). P5DB hardening setelah F5.
-- **Catatan terakhir:** 2026-06-04 — F5-2 DONE (PR#56, preview deploy Ready): migration `page_versions` (jsonb snapshot/page, RLS deny_public_access service-role-only, advisor bersih); `src/lib/build/versions.ts` snapshotPage(prune 15)/listPageVersions/restorePageVersion (wipe+insert add-on, update data_konten/konfigurasi, status TAK diubah, auto pre_restore safety); `persist.ts` applyBuildPlan auto-snapshot pre_build sebelum wipe (non-fatal); API `/api/admin/pages/[id]/versions` GET+POST(restore|snapshot); `PreviewBar` panel Riwayat (Pulihkan/Simpan Versi). E2e round-trip verified (temp page). SEBELUMNYA: F5-1 MERGED prod (PR#55) preview draft + SiteRenderer bersama; F4 LIVE (PR#54); F2+F3 default LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 3 — **F5 (robustness). F5-1+F5-2 MERGED ke prod. F5-3 (self-edit klien) SELESAI (PR#57, preview deploy Ready), nunggu merge.** Lanjut F5-4 (CI snapshot test) = step terakhir F5. P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
+- **Step berikutnya:** Merge PR#57 → lanjut F5-4 (test suite render snapshot di CI). Setelah F5-4: F5 TUNTAS → skor fitur 10. Lalu P5DB hardening.
+- **Catatan terakhir:** 2026-06-04 — F5-3 DONE (PR#57, preview deploy Ready): self-edit konten klien dari portal. API `/api/portal/sections` PATCH (verifikasi sesi JWT tenant_id + ownership section, tulis via service role — TAK melebarkan RLS page_sections); `ContentPanel.tsx` editor generik per section (string top-level + array items features/testi/faq, label ramah, preview gambar, Simpan per section); `portal/page.tsx` fetch sections; `PortalDashboard` tab "Konten" (default kalau ada section). Live langsung setelah simpan. tsc+build clean. SEBELUMNYA: F5-2 MERGED (PR#56) page_versions+rollback; F5-1 MERGED (PR#55) preview draft; F4 LIVE; F2+F3 default LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -250,7 +250,11 @@ Token-pack saat ini cuma re-skin. Tambah layout arketipe.
   - API `/api/admin/pages/[id]/versions`: GET list, POST `restore`|`snapshot` (validasi versi milik page).
   - `PreviewBar`: panel Riwayat (list versi + Pulihkan + Simpan Versi).
   - Rollback: revert PR + `drop table page_versions` (additive, tak dipakai render publik).
-- [ ] **F5-3** Self-edit klien (ganti teks/gambar sendiri).
+- [x] **F5-3** Self-edit klien (ganti teks/gambar sendiri). ✅ 2026-06-04 (PR#57, preview deploy Ready).
+  - API `/api/portal/sections` PATCH: verifikasi sesi portal (JWT `app_metadata.tenant_id`) + ownership section, update `isi_komponen` via service role. TAK melebarkan RLS `page_sections` (konsisten dgn route portal lain).
+  - `ContentPanel.tsx`: editor generik per section — field string top-level (judul/subjudul/cta/deskripsi/gambar) + array `items` (features/testimoni/faq), label ramah, textarea teks panjang, preview thumbnail gambar, Simpan per section + badge "Belum disimpan".
+  - `portal/page.tsx` fetch `page_sections`; `PortalDashboard` tab "Konten" (default kalau ada section). Live langsung setelah simpan.
+  - Rollback: revert PR. Tak ada perubahan DB.
 - [ ] **F5-4** Test suite render (snapshot tiap theme+variant) di CI.
 
 ---
@@ -294,4 +298,5 @@ Target skor:
 | 2026-06-04 | F3-2 | PR#53 (5c15e60) | ✅ done | copyVariants.ts: 3 register copy/industri, tone by variant + rotasi nama; **F3 jalur default TUNTAS** |
 | 2026-06-04 | F4-1..F4-3 | PR#54 (711495a) | ✅ done | arketipe layout TokenPack: split/fullbleed/list + centered baseline; verified SSR |
 | 2026-06-04 | F5-1 | PR#55 | ✅ merged | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; prod deploy Ready |
-| 2026-06-04 | F5-2 | PR#56 | ✅ done | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
+| 2026-06-04 | F5-2 | PR#56 | ✅ merged | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
+| 2026-06-04 | F5-3 | PR#57 | ✅ done | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; preview deploy Ready |
