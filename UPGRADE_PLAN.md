@@ -175,7 +175,12 @@ Murah, cepat, tutup risiko. Kerjain barengan awal.
 ## Fase P5-DB — DB Hardening lanjut (backlog, setelah fitur jalan)
 
 - [ ] **P5DB-1** Rate limiting di API publik (`/api/track`, `/api/admin/*`).
-- [ ] **P5DB-2** Security headers (CSP, HSTS) di `next.config`.
+- [x] **P5DB-2** Security headers (CSP, HSTS) di `next.config`. ✅ 2026-06-04 (PR#59).
+  - Semua route: HSTS (max-age 1th, tanpa includeSubDomains), X-Content-Type-Options nosniff, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geolocation off), X-DNS-Prefetch-Control.
+  - `/admin` + `/portal`: anti-clickjacking (X-Frame-Options DENY + CSP frame-ancestors none).
+  - **Situs klien `[slug]` SENGAJA tetap bisa di-iframe** (galeri corp-landing) → proteksi frame hanya di area sensitif, nol regresi galeri. HSTS tanpa includeSubDomains (jangan paksa subdomain ekosistem). CSP konten penuh utk situs publik DITUNDA (klien embed konten arbitrer).
+  - Verified curl lokal (next start): /pricing dapat header aman tanpa frame-block; /admin/login dapat DENY+frame-ancestors none.
+  - Rollback: revert PR (cuma next.config).
 - [ ] **P5DB-3** Monitoring/alert (login gagal beruntun, lonjakan akses).
 
 ---
@@ -305,4 +310,5 @@ Target skor:
 | 2026-06-04 | F5-1 | PR#55 | ✅ merged | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; prod deploy Ready |
 | 2026-06-04 | F5-2 | PR#56 | ✅ merged | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
 | 2026-06-04 | F5-3 | PR#57 | ✅ merged | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; prod deploy Ready |
-| 2026-06-04 | F5-4 | PR#58 | ✅ done | test suite render + CI: Vitest + packs/TokenDriven snapshot + GH Actions; CI hijau PR pertama; **F5 TUNTAS** |
+| 2026-06-04 | F5-4 | PR#58 | ✅ merged | test suite render + CI: Vitest + packs/TokenDriven snapshot + GH Actions; CI hijau PR pertama; **F5 TUNTAS** |
+| 2026-06-04 | P5DB-2 | PR#59 | ✅ done | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
