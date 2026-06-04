@@ -214,6 +214,7 @@ Pindah generasi konten dari skill manual `.md` → API route TypeScript. Order m
 - [x] **F1-4** Tombol "Bangun Otomatis" (emerald, Wand2) di kartu order admin (`BuildButton.tsx`) → 1 klik → konfirmasi hasil. ✅ 2026-06-04
 - [ ] **F1-5** (Opsional) Auto-trigger setelah DP lunas via Midtrans webhook → draft auto-build → admin review+publish.
   - ⚠️ Jangan auto-publish tanpa review di tahap awal. Draft dulu.
+  - 📋 **Rancangan detail siap eksekusi ada di akhir file: lihat section "F1-5 — Rancangan Detail Auto-Build Webhook".** Catatan kunci: pemicu terbaik = SETELAH briefing submit (data lengkap), bukan saat DP lunas (konten belum ada); wajib refactor `runBuild.ts` reusable + penanda idempotensi anti-timpa-editan.
 
 Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API 200, 6 section + 3 service (3 dokter nyata) + tenant_profile, design_tokens derived (#059669→accent #76c5ad), render `[slug]` HTTP 200 41KB konten nyata, rebuild idempoten tetap 6 section.
 
@@ -325,6 +326,7 @@ Target skor:
 | 2026-06-04 | P5DB-2 | PR#59 | ✅ merged | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
 | 2026-06-04 | P5DB-1 | PR#60 | ✅ merged | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |
 | 2026-06-04 | P5DB-3 | PR#61 | ✅ done | monitoring: security_events + logSecurityEvent (login gagal/ratelimit, track ratelimit); persist+log tanpa channel; **P5DB TUNTAS** |
+| 2026-06-04 | UX briefing | PR#62 | 🔵 open | DetailForm tahap-2 benar-benar opsional (hapus jebakan foto hero wajib + jalan keluar "lewati"); audit form: tahap-1 sudah ramping |
 
 ---
 
@@ -557,3 +559,81 @@ order → generateContent() → BuildPlan (copy template)        [F3-1/F3-2, ADA
 
 ## 10. Definisi "selesai" F3-3
 Flag OFF = byte-identik dengan jalur template sekarang (no-regression). Flag ON + tombol = copy dipoles, fakta utuh, biaya tercatat, gagal-anggun ke template, ada badge sumber. Semua lewat CI + 1 PR (sesuai Aturan Produksi).
+
+---
+
+# F1-5 — Rancangan Detail Auto-Build Webhook *(BELUM DIIMPLEMENTASI — spec untuk nanti)*
+
+> **Status:** OPSIONAL, ditunda. Sekarang admin klik manual: "Buatkan Website" (provisioning) → "Bangun Draft" (F1/F5-1). F1-5 = otomatiskan pemicunya supaya **draft jadi sendiri** begitu data siap, admin tinggal review+publish. **Baca dulu sebelum implement.**
+
+## 1. Tujuan & prinsip
+- **Tujuan:** Hilangkan langkah klik manual. Order bayar + briefing masuk → sistem provisioning + bangun **DRAFT** otomatis → admin cukup review & publish (F5-1).
+- **Prinsip yang TAK boleh dilanggar:**
+  1. **JANGAN auto-publish.** Selalu berhenti di DRAFT. Publik baru lihat setelah admin klik Publish (F5-1). (Aman: hindari konten salah/PII tampil tanpa review.)
+  2. **Idempoten & non-destruktif.** Jangan rebuild kalau halaman sudah pernah dibangun **dan** sudah diedit admin/klien. Auto-build hanya untuk build PERTAMA. (Pakai penanda, lihat §4.)
+  3. **Non-fatal.** Gagal auto-build TIDAK boleh menggagalkan webhook pembayaran / submit briefing. Bungkus try/catch, log, biar admin tetap bisa klik manual.
+  4. **Flag-gated, default OFF.** `AUTO_BUILD_ENABLED=true` baru aktif. OFF = perilaku sekarang (manual).
+  5. **Aman dipanggil tanpa cookie admin** — pemicu (webhook/briefing) bukan admin login.
+
+## 2. Pemicu: KAPAN auto-build? (keputusan kunci)
+Ada 2 momen; **rekomendasi: pakai keduanya, peran beda.**
+| Momen | Sinyal | Aksi |
+|---|---|---|
+| **DP lunas** | Midtrans webhook `payment_status → paid` | **Provisioning** (tenant + landing page kosong). Konten belum ada → JANGAN build penuh. |
+| **Briefing tahap-1 submit** | `POST /api/briefing` sukses (`briefing_submitted_at` set) | **Auto-build DRAFT** (di sini konten/briefing baru lengkap). |
+- **Kenapa bukan build saat DP lunas?** Saat DP lunas, briefing konten sering BELUM diisi (alur: bayar dulu, briefing belakangan) → hasil build cuma fallback. Build paling bernas SETELAH briefing masuk. (Kalau mau super simpel, cukup hook 1 titik: briefing submit, sekaligus provisioning bila belum ada.)
+
+## 3. Arsitektur & refactor wajib
+- **Masalah sekarang:** logika build ada di route `/api/admin/build-order/[id]` yang **di-guard cookie admin**. Webhook/briefing tak punya cookie itu.
+- **Refactor:** ekstrak inti jadi fungsi reusable **`src/lib/build/runBuild.ts`** → `runBuild(orderId, { publish:false }): Promise<BuildResult>` (ambil order → `generateContent` → `applyBuildPlan`). Tak ada dependensi cookie.
+  - Route admin **memanggil** `runBuild` (tetap di-guard admin).
+  - Pemicu auto (webhook/briefing) **memanggil** `runBuild` juga (di-guard flag + signature webhook), pakai `supabaseAdmin`.
+- **Provisioning reusable:** ekstrak logika `/api/admin/tenants` (provisioning) jadi `provisionFromOrder(orderId)` biar bisa dipanggil otomatis juga.
+```
+Midtrans webhook (paid) → [flag ON] provisionFromOrder(orderId)            (draft kosong)
+POST /api/briefing OK   → [flag ON] ensureProvisioned() → runBuild(draft)  (draft terisi)
+                                          │ gagal → log, non-fatal (admin bisa manual)
+                                          ▼
+Admin → Preview (F5-1) → Publish
+```
+
+## 4. Idempotensi & penanda (cegah timpa kerja admin)
+- Tambah penanda di `landing_pages.konfigurasi._build` atau kolom: `{ auto_built_at, build_count, locked_by_edit: boolean }`.
+- Aturan auto-build jalan HANYA jika: `tenant_id` ada **dan** belum pernah auto-build (`auto_built_at` null) **dan** belum ada edit manual (`locked_by_edit` false / belum published).
+- Saat admin/klien edit (F5-3 ContentPanel / builder) → set `locked_by_edit=true` → auto-build tak akan menimpa lagi.
+- `runBuild` sendiri sudah idempoten (F1: wipe+insert), tapi penanda ini mencegah rebuild MENGHAPUS editan manual.
+
+## 5. Keamanan webhook
+- **Verifikasi signature Midtrans** (`signature_key` = SHA512(order_id+status_code+gross_amount+ServerKey)) sebelum proses — tolak kalau tak cocok. (Cek apakah `/api/payment/webhook` sudah verifikasi; kalau belum, ini prasyarat.)
+- Webhook harus **balas cepat 200** lalu kerja berat async, atau pastlikan runBuild cukup cepat (<~10s). Pertimbangkan jalankan build di "after response" / queue ringan agar Midtrans tak timeout/retry.
+- Rate-limit & log (`security_events` kind `auto_build`).
+
+## 6. Notifikasi admin (review siap)
+- Setelah draft auto-build sukses → tandai order "Draft siap direview" (kolom status / badge di `/admin`).
+- Log `security_events` / (nanti) kirim WA ke admin: "Order X draft siap, klik Preview".
+- Admin buka `/admin` → kartu order tampil tombol **Preview** (sudah ada F5-1) → review → Publish.
+
+## 7. Fallback & kegagalan
+- `runBuild` throw → tangkap, log, set order flag `auto_build_failed` → admin tetap lihat tombol manual "Bangun Draft". **Webhook/briefing tetap balas sukses.**
+- Briefing belum cukup data → build tetap jalan (fallback copy F3-1/F3-2). Tak apa, itu draft.
+- Flag OFF / belum provisioned → lewati diam-diam.
+
+## 8. Langkah implementasi (checklist saat dikerjakan)
+- [ ] Refactor `runBuild.ts` (ekstrak dari route admin) + `provisionFromOrder.ts` (ekstrak dari `/api/admin/tenants`). Route admin pakai fungsi ini (no behaviour change).
+- [ ] Env `AUTO_BUILD_ENABLED` (default OFF) di Vercel.
+- [ ] Penanda idempotensi di `landing_pages` (additive, via MCP) + set `locked_by_edit` saat edit (F5-3/builder).
+- [ ] Hook di `POST /api/briefing` (setelah sukses): flag ON → ensureProvisioned → runBuild draft → set `auto_built_at` → log. Try/catch non-fatal.
+- [ ] (Opsional) Hook di `/api/payment/webhook` (paid): flag ON → provisionFromOrder. Pastikan signature terverifikasi.
+- [ ] Badge "Draft siap review" di `/admin` + (opsional) notif.
+- [ ] Test: webhook/briefing mock → draft terbentuk, TAK published; rebuild kedua tak menimpa editan (locked); flag OFF = perilaku lama; gagal build = non-fatal.
+- [ ] Verify e2e: order baru → bayar (sandbox) → isi briefing → cek draft otomatis ada di Preview, status draft, konten dari briefing.
+
+## 9. Risiko & mitigasi
+- **Auto-publish konten salah** → HARD RULE draft-only; publish tetap manual.
+- **Timpa editan admin/klien** → penanda `locked_by_edit` + cek `auto_built_at`.
+- **Webhook timeout/duplikat** (Midtrans retry) → idempoten + balas 200 cepat + signature verify.
+- **PII/briefing bocor** → tetap di draft (RLS gated published; preview admin-only).
+- **Build berat saat trafik order tinggi** → ringan (kode murni); kalau perlu, antrian.
+
+## 10. Definisi "selesai" F1-5
+Flag OFF = perilaku manual sekarang (no-regression). Flag ON = order+briefing → draft otomatis muncul di Preview tanpa klik, TIDAK pernah auto-publish, tak menimpa editan manual, gagal-anggun ke jalur manual. Lewat CI + PR bertahap (refactor dulu, baru hook).
