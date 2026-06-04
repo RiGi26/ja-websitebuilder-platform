@@ -489,6 +489,41 @@ Keamanan    → headers (P5DB-2) + rate limit (P5DB-1) + audit log (P5DB-3)
 
 > **Status:** OPSIONAL, ditunda. Jalur default (F3-1 template + F3-2 copyVariants) sudah layak jual & nol-opex. F3-3 = lapisan premium di atasnya. Dokumen ini = blueprint siap eksekusi saat user memutuskan menyalakan. **Baca dulu sebelum implement.**
 
+## 0. Strategi aktivasi & kualitas (BACA DULU — lapisan di atas implementasi)
+> Bagian 1–10 menjawab **BAGAIMANA** memoles. Bagian 0 ini menjawab **KAPAN layak** & **BAGAIMANA tahu hasilnya lebih baik, bukan lebih buruk.** Ditambahkan 2026-06-05 setelah diskusi strategi AI.
+
+### 0.a Risiko sejati: regresi diam-diam (bukan biaya/halusinasi)
+Biaya (Haiku = pecahan sen) & halusinasi (validasi regex) sudah dimitigasi. Risiko terbesar yang TERSISA: **copy template di `copyVariants.ts` sudah ditulis manusia — spesifik, hangat, anti-klise.** LLM gampang meregresikannya jadi klise generik ("solusi terpercaya", "harga terjangkau", "pelayanan memuaskan"), dan **di skala ribuan order tak akan ketahuan.** Maka strategi WAJIB punya gerbang kualitas, bukan cuma gerbang fakta.
+
+### 0.b Reframe inti — Polish vs Transform
+| Mode | Input | Nilai | Risiko |
+|---|---|---|---|
+| **Polish** | template (sudah bagus) → dihaluskan | rendah (marginal) | tinggi (jadi AI-ish/klise) |
+| **Transform** | kata-kata mentah klien (briefing freeform) → copy rapi | **tinggi** (benar-benar khusus bisnis) | rendah (ada bahan nyata) |
+
+**Keputusan: F3-3 diposisikan sebagai TRANSFORM, bukan Polish.** Nilai sejati LLM = merapikan cerita/keunggulan yang ditulis klien dengan kata-kata mereka sendiri — sesuatu yang template tak akan pernah bisa. Memoles template yang sudah bagus = effort sia-sia berisiko regresi.
+
+### 0.c Kriteria pemicu (trigger gating) — polish hanya jalan saat layak
+Hitung **skor kekayaan briefing** dari field freeform terisi (panjang `deskripsi`, ada `keunggulan`, cerita/USP, dll).
+- **Briefing KAYA** → kandidat transform, jalankan LLM. Di sinilah nilai muncul.
+- **Briefing TIPIS** → **SKIP LLM**, pakai template+rotasi (F3-2). Lebih aman dari LLM mengarang basa-basi, sekaligus hemat biaya otomatis.
+Jadi guardrail biaya bukan cuma rate-limit — tapi *relevansi*: order yang tak punya bahan tak dipoles.
+
+### 0.d Gerbang kualitas (eval) — WAJIB sebelum default-on premium
+Jangan ship tanpa bukti polish menang. Sebelum aktifkan:
+1. Kumpulkan **golden set 15–20 briefing nyata** lintas industri (campur tipis & kaya).
+2. Render **template vs hasil-LLM** untuk tiap briefing.
+3. **Rating blind manual** (kamu): mana lebih baik?
+4. **Gerbang lulus:** hasil-LLM harus MENANG di mayoritas briefing kaya, **dan TAK PERNAH lebih buruk** di briefing tipis. Kalau kalah → perbaiki prompt, **jangan ship.**
+5. Simpan golden set sebagai **uji regresi** — tiap ubah prompt/model, jalankan ulang.
+
+### 0.e Pemaketan & ekonomi
+Biaya Haiku per order = pecahan sen → margin ~penuh kalau dijual. **Posisikan sebagai add-on berbayar "Copywriting AI khusus bisnismu" di tier premium**, BUKAN default paket dasar (template sudah layak jual). Prinsip: AI = nilai tambah berbayar, jangan jadi biaya tertanam di harga dasar.
+
+### 0.f Sinergi & gerbang keputusan
+- **Sinergi:** mode Transform = jembatan ke "Normalisasi input briefing" (titik AI #3). Kalau normalisasi dibangun, F3-3 transform numpang pipeline yang sama. Pertimbangkan bangun berbarengan.
+- **Gerbang keputusan (kapan mulai ngoding):** bangun F3-3 HANYA jika (1) ada permintaan tier premium nyata / klien mau bayar lebih, ATAU (2) data konversi menunjukkan copy template jadi bottleneck. Sampai itu: tetap blueprint. **Jangan bangun karena "keren".**
+
 ## 1. Tujuan & prinsip
 - **Tujuan:** Setelah draft copy template jadi, perhalus pakai Claude API → copy lebih natural, spesifik, persuasif, "ditulis khusus" untuk bisnis itu (bukan template isi-formulir).
 - **Prinsip yang TAK boleh dilanggar:**
