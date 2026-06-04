@@ -11,6 +11,7 @@
 - **Tanggal mulai:** 2026-06-04
 - **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Semua kode SELESAI & MERGED. Sisa OPT-IN: P0-1 (DEFERRED — butuh Pro plan, user aktifkan stlh upgrade), F1-5 (webhook auto-build), F3-3 (LLM polish).
 - **Step berikutnya:** Tak ada pekerjaan kode wajib. P0-1 nunggu upgrade Pro plan (2026-06-04 dicoba, gagal — fitur Pro-only). F1-5/F3-3 kalau ada kebutuhan. Builder = 10/10, DB hardening = ~9.5.
+- **📋 Blueprint siap eksekusi (di akhir file) — buka saat mau jalankan:** (1) **F3-3** LLM polish copy, (2) **F1-5** auto-build webhook, (3) **CD** custom domain (wildcard subdomain + domain klien + otomasi Vercel API). Lapis aplikasi custom domain SUDAH ada di `src/proxy.ts`; sisanya wildcard/DNS + deep-path + otomasi.
 - **Catatan terakhir:** 2026-06-04 — P5DB-3 DONE (PR#61, CI pass + Vercel Ready): migration `security_events` (kind/ip/detail jsonb, RLS deny_public_access, index); `security-log.ts` logSecurityEvent (console.warn + insert, non-fatal); login log failed+ratelimited, track log ratelimited. Persist+log tanpa channel (keputusan user). SEBELUMNYA: P5DB-1 MERGED (PR#60) rate limit login 8/10mnt+track 60/mnt; P5DB-2 MERGED (PR#59) security headers; F5 TUNTAS (F5-1..4 PR#55-58); F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
@@ -637,3 +638,77 @@ Admin → Preview (F5-1) → Publish
 
 ## 10. Definisi "selesai" F1-5
 Flag OFF = perilaku manual sekarang (no-regression). Flag ON = order+briefing → draft otomatis muncul di Preview tanpa klik, TIDAK pernah auto-publish, tak menimpa editan manual, gagal-anggun ke jalur manual. Lewat CI + PR bertahap (refactor dulu, baru hook).
+
+---
+
+# CD — Rancangan Detail Custom Domain *(BELUM DIIMPLEMENTASI PENUH — spec untuk nanti)*
+
+> **Status:** Lapis aplikasi SUDAH ADA (`src/proxy.ts`), tapi langkah Vercel + DNS masih MANUAL dan deep-path belum di-rewrite. Spec ini = blueprint untuk menyempurnakan + otomasi. **Baca dulu sebelum implement.**
+
+## 1. Tujuan
+Klien bisa pakai domainnya sendiri (`tokobudi.com`) atau subdomain studio (`tokobudi.japanarena.id`) untuk menampilkan website-nya, dengan setup seminimal mungkin (idealnya tanpa kerja manual tim).
+
+## 2. Yang SUDAH ada (jangan dibangun ulang)
+- **`src/proxy.ts`** (Next 16 "proxy", pengganti middleware): request dari host non-utama → query `landing_pages` `domain_custom = host` & `status=published` → **rewrite root `/` ke `/<slug>`**.
+- Kolom **`landing_pages.domain_custom`** (diset admin via `PATCH /api/admin/pages`).
+- `isPrimaryHost()`: localhost / `*.vercel.app` / `NEXT_PUBLIC_BASE_URL` dilewati apa adanya.
+- **Keterbatasan saat ini:**
+  1. Hanya rewrite **pathname `/`** → situs >1 halaman (commerce `/checkout`, `/booking`) belum ikut.
+  2. Domain harus **manual** di-add ke Vercel + DNS diarahkan tim. Belum ada otomasi.
+
+## 3. Dua model domain (pilih sesuai kebutuhan)
+| Model | Contoh | Setup Vercel | Cocok untuk |
+|---|---|---|---|
+| **Subdomain studio (wildcard)** | `tokobudi.japanarena.id` | add `*.japanarena.id` **sekali** | Skala besar — tiap klien instan, nol setup per-domain |
+| **Domain milik klien** | `tokobudi.com` | add per-domain (manual/API) + DNS klien | Klien yang sudah punya brand domain |
+- **Rekomendasi:** dukung **dua-duanya**. Default tiap klien dapat subdomain wildcard gratis-instan; domain sendiri = upgrade.
+
+## 4. Lapis infra (DNS & Vercel)
+- **Wildcard** `*.japanarena.id`: add 1× di Vercel, DNS `*.japanarena.id` CNAME → `cname.vercel-dns.com`. Setelah itu subdomain klien tak perlu sentuh DNS lagi.
+- **Domain klien** `tokobudi.com`:
+  - Apex: **A → `76.76.21.21`** (verifikasi nilai terkini di Vercel).
+  - `www`/subdomain: **CNAME → `cname.vercel-dns.com`**.
+  - SSL: Vercel auto Let's Encrypt setelah DNS valid.
+
+## 5. Otomasi via Vercel Domains API (hilangkan kerja manual tim)
+- Saat admin/klien set `domain_custom`, panggil **Vercel REST API** dari server:
+  - `POST /v10/projects/{projectId}/domains` body `{ name }` (+ header `Authorization: Bearer VERCEL_TOKEN`, query `teamId`).
+  - `GET /v9/projects/{projectId}/domains/{domain}/verify` untuk status verifikasi.
+  - Tampilkan **instruksi DNS** (record + nilai) ke klien di portal, plus indikator status: *Menunggu DNS → Aktif (SSL ✓)*.
+- Env baru: `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID`. Simpan di Vercel env (jangan commit). Flag `CUSTOM_DOMAIN_AUTOMATION`.
+- Untuk subdomain wildcard: **tak perlu API call** (sudah ke-cover wildcard) — cukup set `domain_custom` = subdomain & pastikan proxy match.
+
+## 6. Rewrite deep-path (untuk situs commerce/booking di domain sendiri)
+- Perluas `proxy.ts`: kalau host = domain custom → rewrite **semua path** `/<x>` ke `/<slug>/<x>` (bukan cuma root), KECUALI aset/api.
+- Hati-hati: hindari double-rewrite & loop; pertahankan query string; jangan ganggu `/portal`, `/admin` (itu area studio, bukan situs klien).
+- Cache resolusi host→slug (mis. in-memory TTL pendek / header) supaya tak query DB tiap request.
+
+## 7. Skema data
+- Pakai `landing_pages.domain_custom` (sudah ada). Tambah status: `domain_status` (`none|pending_dns|active`) + `domain_added_at`. Additive via MCP.
+- Index `domain_custom` (unik, where not null) supaya lookup proxy cepat & cegah dobel klaim domain.
+
+## 8. Keamanan & validasi
+- **Cegah domain hijack:** verifikasi kepemilikan via Vercel verify (TXT/CNAME) sebelum `domain_status=active`. Jangan render situs di domain yang belum terverifikasi.
+- Validasi format domain (regex) + tolak domain milik studio sendiri (japanarena.id/.com) sebagai domain_custom klien.
+- Unik: 1 domain → 1 page (constraint DB).
+- `domain_custom` lookup hanya untuk `status=published` (sudah di proxy) — draft tak bocor lewat domain.
+
+## 9. Langkah implementasi (checklist saat dikerjakan)
+- [ ] Wildcard `*.japanarena.id` di Vercel + DNS CNAME (1× setup infra). Uji 1 subdomain klien.
+- [ ] Migration: `domain_status` + `domain_added_at` + index unik `domain_custom`. (MCP, additive)
+- [ ] Perluas `proxy.ts`: rewrite deep-path untuk custom domain + cache host→slug.
+- [ ] (Otomasi) `src/lib/vercel-domains.ts`: add/verify domain via Vercel API. Flag-gated.
+- [ ] Admin/portal UI: input domain + tampilkan instruksi DNS + status (pending/active).
+- [ ] Validasi & keamanan (verify kepemilikan, tolak domain studio, unik).
+- [ ] Test: subdomain wildcard resolve ke slug; domain custom (mock) resolve; deep-path `/checkout` ke `/<slug>/checkout`; draft tak tampil; domain belum verified tak render.
+- [ ] Verify e2e: set domain_custom → akses → website klien tampil + SSL.
+
+## 10. Risiko & mitigasi
+- **Rewrite loop / path bocor ke /admin /portal** → exclude eksplisit + test.
+- **Query DB tiap request** (proxy jalan di edge) → cache host→slug TTL pendek.
+- **Domain belum diarahkan** → tampilkan status "pending DNS", jangan janji aktif instan.
+- **VERCEL_TOKEN bocor** → scope token minimal (domains only), simpan di env, rotasi.
+- **Klien klaim domain orang** → wajib verify kepemilikan sebelum active.
+
+## 11. Definisi "selesai" CD
+Subdomain wildcard: klien baru langsung punya `nama.japanarena.id` tanpa setup tim. Domain sendiri: klien input domain → dapat instruksi DNS → setelah verified, situs tampil di domainnya dgn SSL, deep-path jalan, draft & area studio tak bocor. Bertahap per PR (wildcard + deep-path dulu; otomasi API belakangan).
