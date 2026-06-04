@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 2 dimulai (F2 variant gap). Sprint 1 inti SELESAI + F1 MERGED ke production (PR#46, deploy Ready 2026-06-04). P0-1 nunggu user, F1-5 ditunda.
-- **Step berikutnya:** F2-2 lanjut renderer berikutnya (klinik premium / restaurant / company / batik). sekolah ✅. Lalu F3-2 template varian.
-- **Catatan terakhir:** 2026-06-04 — F1 otomatisasi build_order LIVE (lokal verified, PR dibuka). generateContent + templates 6 industri + API route + tombol admin. e2e klinik seed sukses, idempoten, render 200. SEBELUMNYA: P0-2 & P0-3 done (deny-all RLS, advisor 3 INFO→0). Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 2 — **F2 SELESAI TUNTAS** (semua renderer + swatch + verify, LIVE production). Lanjut F3 (konten dari data nyata). P0-1 masih nunggu user, F1-5 ditunda.
+- **Step berikutnya:** F3-1 (`generateContent` isi template pakai briefing nyata) + F3-2 (template varian copy 3–4 versi/industri, nol opex). F3-3 LLM opsional ditunda.
+- **Catatan terakhir:** 2026-06-04 — F2 LENGKAP. F2-2 renderer terakhir (restaurant) LIVE: variant rustic (default, no-regression) vs modern (fine dining slate+gold), PR#52 merged deploy Ready (6e7da14). F2-3 swatch picker disinkron ke palet renderer nyata (restaurant + travel luxury + batik, commit a77fc66 Ready). F2-4 verify: e2e flip DB per renderer (restaurant kanawa: rustic 0-modern, modern 0-rustic, clean flip). SEBELUMNYA: F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -214,9 +214,9 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
   - [x] **klinik** ✅ 2026-06-04 (PR feat/f2-klinik-premium): premium dulu fallback ke warm renderer → kini distinct. warm (Warm Sanctuary sage/terracotta, default no-regression) vs premium (Luxe Clinic navy+gold di atas ivory, light luxe — hindari flip peran warna). clean tetap KlinikCleanRenderer terpisah. e2e klinik-sehat-prima: warm=sage+terra/0 navy-gold, premium=navy+gold+bronze/0 sage-terra.
   - [x] **company** ✅ 2026-06-04 (PR feat/f2-company-variants): FLIP light/dark pertama. Palet dipecah jadi peran semantik (pageBg/surfaceBg/cardBg/text/accent/onAccent/strong/onStrong/border/gridLine) karena INK/LIGHT dwiperan. editorial (Bold Editorial near-black+amber, default no-regression) vs clean (Clean Professional putih+royal blue) vs minimal (Minimal Tech putih monokrom). e2e arkana-digital: editorial=amber74/blue0, clean=blue74/amber0, minimal=mono100/blue0-amber0.
   - [x] **batik_toko** ✅ 2026-06-04 (PR feat/f2-batik-variants): file terbesar (693 baris), 3 token dwiperan (INK/CREAM/INDIGO). Palet dipecah jadi ~18 peran semantik; nilai 'batik' PERSIS original (no-regression). batik (Luxury Heritage indigo/krem/amber, default) vs modern (Contemporary Dark slate+gold refined). e2e batik-larasati: batik=indigo22+amber37+gold84/slate0; modern=slate30+modgold102+lighttext38/indigo0 (amber17 = client primary di produk, override sesuai desain).
-  - [ ] restaurant (INK dual-role bg+teks light/dark — terakhir, paling tricky).
-- [ ] **F2-3** Sinkronkan swatch `website-variants.ts` dgn palet renderer nyata (sekolah ✅).
-- [ ] **F2-4** Verify tiap variant render beda nyata (e2e flip variant di DB, restore setelah).
+  - [x] **restaurant** ✅ 2026-06-04 (PR#52 merged, deploy Ready 6e7da14): INK dwiperan dipecah jadi peran semantik (darkBg/lightBg/heading/clay/gold/onClay/...). rustic (Rustic Warm espresso/krem/terracotta, default no-regression) vs modern (Modern Dark fine dining slate gelap merata + champagne gold, Story/Galeri/Visit di-flip jadi gelap). e2e kanawa: rustic=espresso28/clay16/gold48/0-modern; modern=slate22/clay16/gold48/cream58/0-rustic.
+- [x] **F2-3** Sinkronkan swatch `website-variants.ts` dgn palet renderer nyata. ✅ 2026-06-04 (sekolah + restaurant inline; commit a77fc66: travel luxury #1C1917→#C8A24B gold, batik #DC2626→#B45309 amber, toko modern #0F172A→#0F1115). corporate/klinik sudah selaras dari awal.
+- [x] **F2-4** Verify tiap variant render beda nyata (e2e flip variant di DB, restore setelah). ✅ 2026-06-04 — terverifikasi per-renderer saat masing-masing PR (rental nusantara-drive, company arkana-digital, klinik klinik-sehat-prima, batik batik-larasati, sekolah lpk-sakura, restaurant kanawa). Tiap kasus: flip variant di DB → curl [slug] → hitung warna penanda beda nyata, restore setelah.
 
 ## Fase F3 — Konten dari Data Nyata (GAP 4.1)
 
@@ -276,3 +276,5 @@ Target skor:
 | 2026-06-04 | P0-3 | migration MCP | ✅ done | deny_public_access tenants + order_progress_logs; advisor 3 INFO→0 |
 | 2026-06-04 | P0-1 | — | ⏳ user | toggle leaked-pw protection di dashboard (tak ada MCP tool) |
 | 2026-06-04 | F1-1..F1-4 | feat/f1-build-order | ✅ done | otomatisasi build_order: generateContent+templates+API+tombol; e2e klinik verified, idempoten |
+| 2026-06-04 | F2-2 restaurant | PR#52 (6e7da14) | ✅ done | variant rustic+modern, palet semantik, e2e kanawa clean flip; **F2 TUNTAS** |
+| 2026-06-04 | F2-3 | a77fc66 (master) | ✅ done | sync swatch picker: travel luxury+batik+toko modern ke palet renderer |
