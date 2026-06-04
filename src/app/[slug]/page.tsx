@@ -105,7 +105,7 @@ export default async function PublicSitePage({
       fetchGalleryByPage(supabase, page.id),
       fetchTenantProfile(supabase, page.id),
     ])
-    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} />
+    return <RestaurantRenderer nama={page.nama_website} sections={sections} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} menuItems={menuItems} gallery={gallery} profile={profile} variant={variant} />
   }
 
   if (theme === 'rental') {
