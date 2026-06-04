@@ -9,6 +9,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 import type { BuildPlan } from './types'
+import { snapshotPage } from './versions'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Client = SupabaseClient<any>
@@ -31,6 +32,14 @@ export interface ApplyResult {
 
 export async function applyBuildPlan(client: Client, params: ApplyParams): Promise<ApplyResult> {
   const { pageId, tenantId, currentKonfigurasi, plan, publish } = params
+
+  // 0. F5-2 — snapshot state SEKARANG sebelum ditimpa (auto-versi). Skip kalau
+  //    halaman masih kosong. Best-effort: jangan gagalkan build kalau snapshot error.
+  try {
+    await snapshotPage(client, { pageId, tenantId, kind: 'pre_build', label: 'Sebelum build ulang' })
+  } catch (e) {
+    console.error('applyBuildPlan snapshot (non-fatal):', e instanceof Error ? e.message : e)
+  }
 
   // 1. Merge konfigurasi: pertahankan addons & branding lama, timpa theme/variant/
   //    primary/design_tokens + features hasil generate. (additive, tidak destruktif)
