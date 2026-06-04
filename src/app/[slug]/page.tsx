@@ -88,7 +88,7 @@ export default async function PublicSitePage({
       fetchGalleryByPage(supabase, page.id),
       fetchTenantProfile(supabase, page.id),
     ])
-    return <CompanyRenderer nama={page.nama_website} sections={sections} services={services} gallery={gallery} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} />
+    return <CompanyRenderer nama={page.nama_website} sections={sections} services={services} gallery={gallery} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} variant={variant} />
   }
 
   if (theme === 'sekolah') {

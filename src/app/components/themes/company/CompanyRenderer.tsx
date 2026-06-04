@@ -1,8 +1,12 @@
 // ============================================================
-// Tema "company" — Bold Editorial.
-// Palet near-black + electric amber. Barlow Condensed (display)
-// + IBM Plex Sans (body). Authoritative, graphic, premium.
-// Add-on: admin-dash, seo, live-chat, wa-auto, crm, blog.
+// Tema "company" — tiga variant nyata (F2):
+//  - editorial (default): Bold Editorial — near-black + electric amber (dark).
+//  - clean: Clean Professional — white + royal blue (light).
+//  - minimal: Minimal Tech — white + near-black accent (light, monokrom).
+// Karena renderer aslinya dark dengan token dwiperan (INK = bg gelap DAN
+// teks-di-atas-amber; LIGHT = teks DAN teks-di-tombol-gelap), palet dipecah
+// jadi peran semantik (pageBg/text/accent/onAccent/strong/onStrong/...) supaya
+// variant terang bisa membalik bg<->teks tanpa rusak. Barlow Condensed + IBM Plex.
 // ============================================================
 
 import { Barlow_Condensed, IBM_Plex_Sans } from 'next/font/google'
@@ -22,30 +26,65 @@ const body = IBM_Plex_Sans({
   variable: '--font-co-body',
 })
 
-// ── Palette ──────────────────────────────────────────────────
-const INK     = '#08090B'
-const SURFACE = '#111316'
-const CARD    = '#181B20'
-const AMBER   = '#F5A623'
-const AMBER_D = '#C4841A'
-const LIGHT   = '#F0F0EC'
-const MUTED   = '#7A7D84'
-const BORDER  = 'rgba(245,166,35,0.12)'
+// ── Palette per variant (peran semantik) ─────────────────────
+interface Pal {
+  pageBg: string    // latar utama (root/hero/testi/footer/navbar) — eks-INK(bg)
+  surfaceBg: string // latar section sekunder (services/contact)   — eks-SURFACE
+  cardBg: string    // latar kartu                                 — eks-CARD
+  text: string      // teks utama / heading                        — eks-LIGHT
+  muted: string     // teks sekunder                               — eks-MUTED
+  accent: string    // aksen (eyebrow, garis, stats/cta bg, btn)   — eks-AMBER
+  onAccent: string  // teks di atas accent                         — eks-INK(text)
+  strong: string    // bg tombol "gelap" (CTA solid)               — eks-INK(bg-btn)
+  onStrong: string  // teks di atas strong                         — eks-LIGHT(on-ink)
+  border: string    // garis tipis
+  gridLine: string  // warna tekstur grid hero (solid)
+  shadowAccent: string
+}
 
-const S_AMBER = `0 8px 28px rgba(245,166,35,.28), 0 2px 8px rgba(245,166,35,.14)`
-const EASE    = 'cubic-bezier(0.16,1,0.3,1)'
-const CO_CSS  = `
+const PALETTES: Record<string, Pal> = {
+  // Bold Editorial (default — identik desain lama, no regression)
+  editorial: {
+    pageBg: '#08090B', surfaceBg: '#111316', cardBg: '#181B20', text: '#F0F0EC',
+    muted: '#7A7D84', accent: '#F5A623', onAccent: '#08090B', strong: '#08090B',
+    onStrong: '#F0F0EC', border: 'rgba(245,166,35,0.12)', gridLine: 'rgba(240,240,236,1)',
+    shadowAccent: '0 8px 28px rgba(245,166,35,.28), 0 2px 8px rgba(245,166,35,.14)',
+  },
+  // Clean Professional — putih + royal blue
+  clean: {
+    pageBg: '#FFFFFF', surfaceBg: '#F5F7FA', cardBg: '#FFFFFF', text: '#0F172A',
+    muted: '#64748B', accent: '#2563EB', onAccent: '#FFFFFF', strong: '#0F172A',
+    onStrong: '#FFFFFF', border: 'rgba(37,99,235,0.16)', gridLine: 'rgba(15,23,42,1)',
+    shadowAccent: '0 8px 28px rgba(37,99,235,.20), 0 2px 8px rgba(37,99,235,.12)',
+  },
+  // Minimal Tech — putih + near-black accent (monokrom)
+  minimal: {
+    pageBg: '#FFFFFF', surfaceBg: '#FAFAFA', cardBg: '#FFFFFF', text: '#18181B',
+    muted: '#71717A', accent: '#18181B', onAccent: '#FFFFFF', strong: '#18181B',
+    onStrong: '#FFFFFF', border: 'rgba(0,0,0,0.10)', gridLine: 'rgba(24,24,27,1)',
+    shadowAccent: '0 8px 28px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06)',
+  },
+}
+
+function getPalette(variant?: string): Pal {
+  return PALETTES[variant ?? 'editorial'] ?? PALETTES.editorial
+}
+
+const EASE = 'cubic-bezier(0.16,1,0.3,1)'
+function coCss(pal: Pal): string {
+  return `
   .co-root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-variant-numeric:tabular-nums}
   .co-btn{transition:transform 200ms ${EASE},box-shadow 200ms ease,opacity 150ms ease}
   .co-btn:hover{transform:translateY(-2px)}.co-btn:active{transform:scale(0.96)}
   .co-svc{transition:background 200ms ease,border-color 200ms ease}
-  .co-svc:hover{background:rgba(245,166,35,.06)!important;border-color:rgba(245,166,35,.22)!important}
+  .co-svc:hover{background:${pal.accent}0F!important;border-color:${pal.accent}38!important}
   .co-svc:hover .co-arrow{opacity:1!important;transform:translate(2px,-2px)}
   .co-arrow{transition:opacity 150ms ease,transform 200ms ${EASE}}
   .co-testi{transition:transform 220ms ${EASE},border-color 200ms ease}
-  .co-testi:hover{transform:translateY(-4px);border-color:rgba(245,166,35,.28)!important}
+  .co-testi:hover{transform:translateY(-4px);border-color:${pal.accent}47!important}
   .co-wa{transition:transform 220ms cubic-bezier(0.34,1.56,0.64,1)}.co-wa:hover{transform:scale(1.12)}
 `
+}
 
 type Isi = Record<string, any>
 function asArray(v: unknown): any[] { return Array.isArray(v) ? v : [] }
@@ -64,22 +103,22 @@ function FloatingWA({ wa }: { wa?: string }) {
 }
 
 // ── Navbar ────────────────────────────────────────────────────
-function Navbar({ nama, wa }: { nama: string; wa?: string }) {
+function Navbar({ nama, wa, pal }: { nama: string; wa?: string; pal: Pal }) {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md" style={{ backgroundColor: `${INK}E8`, borderBottom: `1px solid ${BORDER}` }}>
+    <header className="sticky top-0 z-50 backdrop-blur-md" style={{ backgroundColor: `${pal.pageBg}E8`, borderBottom: `1px solid ${pal.border}` }}>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <span className={`${display.className} text-2xl font-700 tracking-[0.08em] uppercase`} style={{ color: LIGHT, letterSpacing: '0.06em' }}>
+        <span className={`${display.className} text-2xl font-700 tracking-[0.08em] uppercase`} style={{ color: pal.text, letterSpacing: '0.06em' }}>
           {nama}
         </span>
-        <nav className={`hidden md:flex items-center gap-8 text-[11px] font-500 uppercase tracking-[0.2em] ${body.className}`} style={{ color: MUTED }}>
+        <nav className={`hidden md:flex items-center gap-8 text-[11px] font-500 uppercase tracking-[0.2em] ${body.className}`} style={{ color: pal.muted }}>
           {['Layanan', 'Tentang', 'Portofolio', 'Kontak'].map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`} className="hover:text-amber transition-colors" style={{ '--amber': AMBER } as any}>{l}</a>
+            <a key={l} href={`#${l.toLowerCase()}`} className="transition-colors">{l}</a>
           ))}
         </nav>
         {wa && (
           <a href={`https://wa.me/${wa}`} target="_blank"
             className={`co-btn text-[11px] font-600 uppercase tracking-[0.15em] px-5 py-2.5 ${body.className}`}
-            style={{ backgroundColor: AMBER, color: INK, boxShadow: S_AMBER }}>
+            style={{ backgroundColor: pal.accent, color: pal.onAccent, boxShadow: pal.shadowAccent }}>
             Hubungi Kami
           </a>
         )}
@@ -89,13 +128,13 @@ function Navbar({ nama, wa }: { nama: string; wa?: string }) {
 }
 
 // ── Hero ──────────────────────────────────────────────────────
-function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
+function Hero({ isi, wa, pal }: { isi: Isi; wa?: string; pal: Pal }) {
   return (
-    <section className="relative min-h-[92vh] flex items-end overflow-hidden" style={{ backgroundColor: INK }}>
-      {/* Amber glow top-right */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-15" style={{ background: `radial-gradient(ellipse 60% 60% at 100% 0%, ${AMBER}, transparent)` }} />
+    <section className="relative min-h-[92vh] flex items-end overflow-hidden" style={{ backgroundColor: pal.pageBg }}>
+      {/* Accent glow top-right */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-15" style={{ background: `radial-gradient(ellipse 60% 60% at 100% 0%, ${pal.accent}, transparent)` }} />
       {/* Grid texture */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(240,240,236,1) 1px, transparent 1px), linear-gradient(90deg, rgba(240,240,236,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `linear-gradient(${pal.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${pal.gridLine} 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
       {/* Background image */}
       {isi.image_url && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -103,47 +142,47 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
       )}
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-20 pt-32">
-        {/* Large amber number */}
+        {/* Large accent number */}
         <div className={`${display.className} text-[clamp(8rem,20vw,18rem)] font-900 leading-none select-none pointer-events-none mb-4`}
-          style={{ color: AMBER, opacity: 0.06, lineHeight: 0.85, marginBottom: '-4rem' }}>
+          style={{ color: pal.accent, opacity: 0.06, lineHeight: 0.85, marginBottom: '-4rem' }}>
           01
         </div>
         {isi.eyebrow && (
           <div className={`inline-flex items-center gap-3 mb-6 ${body.className}`}>
-            <div style={{ width: 32, height: 1, backgroundColor: AMBER }} />
-            <span className="text-[11px] font-500 uppercase tracking-[0.3em]" style={{ color: AMBER }}>{isi.eyebrow}</span>
+            <div style={{ width: 32, height: 1, backgroundColor: pal.accent }} />
+            <span className="text-[11px] font-500 uppercase tracking-[0.3em]" style={{ color: pal.accent }}>{isi.eyebrow}</span>
           </div>
         )}
         <h1 className={`${display.className} font-900 uppercase leading-none mb-8`}
-          style={{ fontSize: 'clamp(3.5rem,9vw,8rem)', color: LIGHT, letterSpacing: '-0.01em' }}>
+          style={{ fontSize: 'clamp(3.5rem,9vw,8rem)', color: pal.text, letterSpacing: '-0.01em' }}>
           {(isi.title ?? 'Solusi Digital\nUntuk Bisnis\nAnda').split('\n').map((line: string, i: number) => (
             <span key={i} className="block">
-              {i === 1 ? <em style={{ color: AMBER, fontStyle: 'italic' }}>{line}</em> : line}
+              {i === 1 ? <em style={{ color: pal.accent, fontStyle: 'italic' }}>{line}</em> : line}
             </span>
           ))}
         </h1>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
-          <p className={`text-base leading-relaxed max-w-md ${body.className}`} style={{ color: MUTED, fontWeight: 300 }}>
+          <p className={`text-base leading-relaxed max-w-md ${body.className}`} style={{ color: pal.muted, fontWeight: 300 }}>
             {isi.subtitle ?? 'Strategi digital, branding, dan sistem yang membuat bisnis Anda unggul di era persaingan ketat.'}
           </p>
           <div className="flex gap-4 shrink-0">
             <a href="#kontak"
               className={`co-btn px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
-              style={{ backgroundColor: AMBER, color: INK, boxShadow: S_AMBER }}>
+              style={{ backgroundColor: pal.accent, color: pal.onAccent, boxShadow: pal.shadowAccent }}>
               Konsultasi Gratis
             </a>
             <a href="#layanan"
               className={`co-btn px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
-              style={{ border: `1px solid ${BORDER}`, color: MUTED }}>
+              style={{ border: `1px solid ${pal.border}`, color: pal.muted }}>
               Lihat Layanan
             </a>
           </div>
         </div>
-        {/* SEO badge */}
+        {/* Feature badge */}
         <div className="mt-12 flex flex-wrap gap-3">
           {['SEO Optimized', 'Dashboard Admin', 'WA Automation', 'CRM Terintegrasi', 'Live Chat'].map(b => (
             <span key={b} className={`text-[10px] font-500 uppercase tracking-widest px-3 py-1.5 ${body.className}`}
-              style={{ border: `1px solid ${BORDER}`, color: `${AMBER}80` }}>
+              style={{ border: `1px solid ${pal.border}`, color: `${pal.accent}B0` }}>
               {b}
             </span>
           ))}
@@ -154,7 +193,7 @@ function Hero({ isi, wa }: { isi: Isi; wa?: string }) {
 }
 
 // ── Services ──────────────────────────────────────────────────
-function Services({ isi }: { isi: Isi }) {
+function Services({ isi, pal }: { isi: Isi; pal: Pal }) {
   const items = asArray(isi.items ?? isi.fitur)
   const fallback = [
     { title: 'Branding & Identitas', desc: 'Logo, panduan merek, dan sistem visual yang kohesif untuk menampilkan bisnis Anda secara profesional.' },
@@ -164,39 +203,39 @@ function Services({ isi }: { isi: Isi }) {
   ]
   const data = items.length ? items : fallback
   return (
-    <section id="layanan" style={{ backgroundColor: SURFACE }}>
+    <section id="layanan" style={{ backgroundColor: pal.surfaceBg }}>
       <div className="max-w-7xl mx-auto px-6 py-28">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-20 gap-6">
           <div>
             <div className={`flex items-center gap-3 mb-4 ${body.className}`}>
-              <div style={{ width: 32, height: 1, backgroundColor: AMBER }} />
-              <span className="text-[11px] font-500 uppercase tracking-[0.3em]" style={{ color: AMBER }}>Layanan Kami</span>
+              <div style={{ width: 32, height: 1, backgroundColor: pal.accent }} />
+              <span className="text-[11px] font-500 uppercase tracking-[0.3em]" style={{ color: pal.accent }}>Layanan Kami</span>
             </div>
             <h2 className={`${display.className} font-800 uppercase leading-none`}
-              style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', color: LIGHT }}>
+              style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', color: pal.text }}>
               {isi.title ?? 'Apa yang\nKami Lakukan'}
             </h2>
           </div>
-          <p className={`text-sm max-w-xs leading-relaxed ${body.className}`} style={{ color: MUTED }}>
+          <p className={`text-sm max-w-xs leading-relaxed ${body.className}`} style={{ color: pal.muted }}>
             Setiap layanan dirancang untuk memberikan hasil nyata — bukan sekadar deliverable.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: BORDER }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: pal.border }}>
           {data.map((it: Isi, i: number) => (
-            <div key={i} className="co-svc group p-10" style={{ backgroundColor: CARD }}>
+            <div key={i} className="co-svc group p-10" style={{ backgroundColor: pal.cardBg }}>
               <div className="flex items-start justify-between mb-8">
-                <span className={`${display.className} font-700 text-5xl leading-none`} style={{ color: `${AMBER}20` }}>
+                <span className={`${display.className} font-700 text-5xl leading-none`} style={{ color: `${pal.accent}20` }}>
                   0{i + 1}
                 </span>
                 <svg className="co-arrow opacity-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" stroke={AMBER} strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M7 17L17 7M17 7H7M17 7v10" stroke={pal.accent} strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
-              <h3 className={`${display.className} font-700 text-2xl uppercase tracking-wide mb-4`} style={{ color: LIGHT }}>
+              <h3 className={`${display.className} font-700 text-2xl uppercase tracking-wide mb-4`} style={{ color: pal.text }}>
                 {it.title ?? it.judul ?? `Layanan ${i + 1}`}
               </h3>
-              <p className={`text-sm leading-relaxed ${body.className}`} style={{ color: MUTED }}>
+              <p className={`text-sm leading-relaxed ${body.className}`} style={{ color: pal.muted }}>
                 {it.desc ?? it.deskripsi ?? ''}
               </p>
             </div>
@@ -208,7 +247,7 @@ function Services({ isi }: { isi: Isi }) {
 }
 
 // ── Stats ─────────────────────────────────────────────────────
-function Stats() {
+function Stats({ pal }: { pal: Pal }) {
   const data = [
     { v: '50+', l: 'Klien Aktif' },
     { v: '8 Thn', l: 'Pengalaman' },
@@ -216,12 +255,12 @@ function Stats() {
     { v: '98%', l: 'Tingkat Kepuasan' },
   ]
   return (
-    <div style={{ backgroundColor: AMBER }}>
+    <div style={{ backgroundColor: pal.accent }}>
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {data.map(s => (
           <div key={s.l}>
-            <p className={`${display.className} font-800 text-5xl uppercase`} style={{ color: INK }}>{s.v}</p>
-            <p className={`text-[11px] font-600 uppercase tracking-[0.2em] mt-2 ${body.className}`} style={{ color: `${INK}80` }}>{s.l}</p>
+            <p className={`${display.className} font-800 text-5xl uppercase`} style={{ color: pal.onAccent }}>{s.v}</p>
+            <p className={`text-[11px] font-600 uppercase tracking-[0.2em] mt-2 ${body.className}`} style={{ color: `${pal.onAccent}B0` }}>{s.l}</p>
           </div>
         ))}
       </div>
@@ -230,7 +269,7 @@ function Stats() {
 }
 
 // ── Testimonials ──────────────────────────────────────────────
-function Testimonials({ isi }: { isi: Isi }) {
+function Testimonials({ isi, pal }: { isi: Isi; pal: Pal }) {
   const items = asArray(isi.items ?? isi.testimoni)
   const fallback = [
     { quote: 'Japan Arena merombak total sistem digital kami. Sekarang tim lebih efisien, klien lebih puas, dan revenue naik 40% dalam 6 bulan.', name: 'Budi S.', jabatan: 'CEO, PT Maju Bersama' },
@@ -238,21 +277,21 @@ function Testimonials({ isi }: { isi: Isi }) {
   ]
   const data = items.length ? items : fallback
   return (
-    <section id="portofolio" style={{ backgroundColor: INK }}>
+    <section id="portofolio" style={{ backgroundColor: pal.pageBg }}>
       <div className="max-w-7xl mx-auto px-6 py-28">
         <div className="flex items-center gap-3 mb-16">
-          <div style={{ width: 32, height: 1, backgroundColor: AMBER }} />
-          <span className={`text-[11px] font-500 uppercase tracking-[0.3em] ${body.className}`} style={{ color: AMBER }}>Kata Klien</span>
+          <div style={{ width: 32, height: 1, backgroundColor: pal.accent }} />
+          <span className={`text-[11px] font-500 uppercase tracking-[0.3em] ${body.className}`} style={{ color: pal.accent }}>Kata Klien</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {data.map((it: Isi, i: number) => (
-            <blockquote key={i} className="co-testi p-10" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
-              <p className={`${display.className} font-400 text-2xl leading-snug mb-8 italic`} style={{ color: LIGHT }}>
+            <blockquote key={i} className="co-testi p-10" style={{ border: `1px solid ${pal.border}`, backgroundColor: pal.cardBg }}>
+              <p className={`${display.className} font-400 text-2xl leading-snug mb-8 italic`} style={{ color: pal.text }}>
                 "{it.quote ?? it.isi ?? ''}"
               </p>
               <footer>
-                <p className={`font-600 text-sm uppercase tracking-wider ${body.className}`} style={{ color: AMBER }}>{it.name ?? it.nama}</p>
-                <p className={`text-[11px] mt-1 ${body.className}`} style={{ color: MUTED }}>{it.jabatan ?? it.posisi ?? ''}</p>
+                <p className={`font-600 text-sm uppercase tracking-wider ${body.className}`} style={{ color: pal.accent }}>{it.name ?? it.nama}</p>
+                <p className={`text-[11px] mt-1 ${body.className}`} style={{ color: pal.muted }}>{it.jabatan ?? it.posisi ?? ''}</p>
               </footer>
             </blockquote>
           ))}
@@ -263,26 +302,26 @@ function Testimonials({ isi }: { isi: Isi }) {
 }
 
 // ── CTA ───────────────────────────────────────────────────────
-function Cta({ isi, wa }: { isi: Isi; wa?: string }) {
+function Cta({ isi, wa, pal }: { isi: Isi; wa?: string; pal: Pal }) {
   return (
-    <section className="relative overflow-hidden py-32" style={{ backgroundColor: AMBER }}>
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(8,9,11,1) 1px, transparent 1px), linear-gradient(90deg, rgba(8,9,11,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+    <section className="relative overflow-hidden py-32" style={{ backgroundColor: pal.accent }}>
+      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `linear-gradient(${pal.onAccent} 1px, transparent 1px), linear-gradient(90deg, ${pal.onAccent} 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         <h2 className={`${display.className} font-900 uppercase leading-none mb-8`}
-          style={{ fontSize: 'clamp(3rem,8vw,7rem)', color: INK }}>
+          style={{ fontSize: 'clamp(3rem,8vw,7rem)', color: pal.onAccent }}>
           {isi.title ?? 'Siap Tumbuh\nBersama Kami?'}
         </h2>
         <div className="flex flex-col sm:flex-row gap-4">
           {wa ? (
             <a href={`https://wa.me/${wa}?text=Halo, saya ingin konsultasi`} target="_blank"
               className={`co-btn inline-flex items-center gap-2 px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] ${body.className}`}
-              style={{ backgroundColor: INK, color: LIGHT, boxShadow: '0 8px 24px rgba(8,9,11,.40)' }}>
+              style={{ backgroundColor: pal.strong, color: pal.onStrong, boxShadow: `0 8px 24px ${pal.strong}66` }}>
               Mulai Konsultasi →
             </a>
           ) : null}
           <a href="#layanan"
             className={`inline-flex items-center gap-2 px-8 py-4 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
-            style={{ border: `2px solid ${INK}30`, color: INK }}>
+            style={{ border: `2px solid ${pal.onAccent}4D`, color: pal.onAccent }}>
             Lihat Portofolio
           </a>
         </div>
@@ -292,30 +331,30 @@ function Cta({ isi, wa }: { isi: Isi; wa?: string }) {
 }
 
 // ── Contact ───────────────────────────────────────────────────
-function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null }) {
+function Contact({ isi, profile, pal }: { isi: Isi; profile?: TenantProfile | null; pal: Pal }) {
   const wa = profile?.wa ?? isi.wa
   const alamat = profile?.alamat ?? isi.alamat
   const email = profile?.email ?? isi.email
   return (
-    <section id="kontak" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${BORDER}` }}>
+    <section id="kontak" style={{ backgroundColor: pal.surfaceBg, borderTop: `1px solid ${pal.border}` }}>
       <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 md:grid-cols-2 gap-16">
         <div>
           <div className="flex items-center gap-3 mb-8">
-            <div style={{ width: 32, height: 1, backgroundColor: AMBER }} />
-            <span className={`text-[11px] font-500 uppercase tracking-[0.3em] ${body.className}`} style={{ color: AMBER }}>Kontak</span>
+            <div style={{ width: 32, height: 1, backgroundColor: pal.accent }} />
+            <span className={`text-[11px] font-500 uppercase tracking-[0.3em] ${body.className}`} style={{ color: pal.accent }}>Kontak</span>
           </div>
           <h2 className={`${display.className} font-800 uppercase leading-none mb-8`}
-            style={{ fontSize: 'clamp(2rem,4vw,3.5rem)', color: LIGHT }}>
+            style={{ fontSize: 'clamp(2rem,4vw,3.5rem)', color: pal.text }}>
             {isi.title ?? 'Bicara\nDengan Kami'}
           </h2>
-          <div className={`space-y-4 text-sm ${body.className}`} style={{ color: MUTED }}>
+          <div className={`space-y-4 text-sm ${body.className}`} style={{ color: pal.muted }}>
             {alamat && <p>📍 {alamat}</p>}
             {email && <p>✉ {email}</p>}
             {wa && <p>📱 +{wa}</p>}
           </div>
           {/* Addon highlight */}
-          <div className="mt-10 p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
-            <p className={`text-[10px] font-600 uppercase tracking-widest mb-4 ${body.className}`} style={{ color: AMBER }}>Add-On Aktif</p>
+          <div className="mt-10 p-6" style={{ border: `1px solid ${pal.border}`, backgroundColor: pal.cardBg }}>
+            <p className={`text-[10px] font-600 uppercase tracking-widest mb-4 ${body.className}`} style={{ color: pal.accent }}>Add-On Aktif</p>
             {[
               'Dashboard Admin & CMS',
               'SEO Technical Setup',
@@ -324,8 +363,8 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
               'Live Chat Support',
             ].map(f => (
               <div key={f} className="flex items-center gap-2 mb-2">
-                <span style={{ color: AMBER, fontSize: 12 }}>▸</span>
-                <span className={`text-[12px] ${body.className}`} style={{ color: MUTED }}>{f}</span>
+                <span style={{ color: pal.accent, fontSize: 12 }}>▸</span>
+                <span className={`text-[12px] ${body.className}`} style={{ color: pal.muted }}>{f}</span>
               </div>
             ))}
           </div>
@@ -334,14 +373,14 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
           {wa && (
             <a href={`https://wa.me/${wa}?text=Halo, saya ingin konsultasi project`} target="_blank"
               className={`flex justify-center items-center gap-2 py-5 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
-              style={{ backgroundColor: AMBER, color: INK }}>
+              style={{ backgroundColor: pal.accent, color: pal.onAccent }}>
               Chat via WhatsApp
             </a>
           )}
           {email && (
             <a href={`mailto:${email}`}
               className={`flex justify-center items-center py-5 font-600 text-sm uppercase tracking-[0.15em] transition-all hover:-translate-y-0.5 ${body.className}`}
-              style={{ border: `1px solid ${BORDER}`, color: MUTED }}>
+              style={{ border: `1px solid ${pal.border}`, color: pal.muted }}>
               Kirim Email
             </a>
           )}
@@ -352,12 +391,12 @@ function Contact({ isi, profile }: { isi: Isi; profile?: TenantProfile | null })
 }
 
 // ── Footer ────────────────────────────────────────────────────
-function Footer({ nama }: { nama: string }) {
+function Footer({ nama, pal }: { nama: string; pal: Pal }) {
   return (
-    <footer className="py-8 border-t" style={{ backgroundColor: INK, borderColor: BORDER }}>
+    <footer className="py-8 border-t" style={{ backgroundColor: pal.pageBg, borderColor: pal.border }}>
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <span className={`${display.className} font-700 uppercase tracking-[0.08em] text-xl`} style={{ color: `${LIGHT}40` }}>{nama}</span>
-        <p className={`text-[11px] ${body.className}`} style={{ color: MUTED }}>© {new Date().getFullYear()} {nama}. All rights reserved.</p>
+        <span className={`${display.className} font-700 uppercase tracking-[0.08em] text-xl`} style={{ color: `${pal.text}40` }}>{nama}</span>
+        <p className={`text-[11px] ${body.className}`} style={{ color: pal.muted }}>© {new Date().getFullYear()} {nama}. All rights reserved.</p>
       </div>
     </footer>
   )
@@ -365,7 +404,7 @@ function Footer({ nama }: { nama: string }) {
 
 // ── Root Renderer ─────────────────────────────────────────────
 export default function CompanyRenderer({
-  nama, sections, services = [], gallery = [], profile = null, wa, primary,
+  nama, sections, services = [], gallery = [], profile = null, wa, variant,
 }: {
   nama: string
   sections: PageSection[]
@@ -375,44 +414,47 @@ export default function CompanyRenderer({
   wa?: string
   slug?: string
   primary?: string
+  variant?: string
 }) {
+  void services; void gallery
+  const pal = getPalette(variant)
   const waContact = wa ?? profile?.wa ?? undefined
   const visible = [...sections].filter(s => s.is_visible).sort((a, b) => a.urutan - b.urutan)
 
   const renderSection = (s: PageSection) => {
     const isi = (s.isi_komponen ?? {}) as Isi
     switch (s.tipe_komponen) {
-      case 'hero_banner':  return <Hero key={s.id} isi={isi} wa={waContact} />
-      case 'features':     return <Services key={s.id} isi={isi} />
-      case 'testimonials': return <Testimonials key={s.id} isi={isi} />
-      case 'cta':          return <Cta key={s.id} isi={isi} wa={waContact} />
-      case 'contact_form': return <Contact key={s.id} isi={isi} profile={profile} />
+      case 'hero_banner':  return <Hero key={s.id} isi={isi} wa={waContact} pal={pal} />
+      case 'features':     return <Services key={s.id} isi={isi} pal={pal} />
+      case 'testimonials': return <Testimonials key={s.id} isi={isi} pal={pal} />
+      case 'cta':          return <Cta key={s.id} isi={isi} wa={waContact} pal={pal} />
+      case 'contact_form': return <Contact key={s.id} isi={isi} profile={profile} pal={pal} />
       default:             return null
     }
   }
 
   return (
-    <div className={`co-root ${display.variable} ${body.variable}`} style={{ backgroundColor: INK }}>
-      <style dangerouslySetInnerHTML={{ __html: CO_CSS }} />
-      <Navbar nama={nama} wa={waContact} />
+    <div className={`co-root ${display.variable} ${body.variable}`} style={{ backgroundColor: pal.pageBg }}>
+      <style dangerouslySetInnerHTML={{ __html: coCss(pal) }} />
+      <Navbar nama={nama} wa={waContact} pal={pal} />
       <main>
         {visible.length === 0 ? (
           <>
-            <Hero isi={{ title: nama }} wa={waContact} />
-            <Stats />
-            <Services isi={{}} />
-            <Testimonials isi={{}} />
-            <Cta isi={{}} wa={waContact} />
-            <Contact isi={{}} profile={profile} />
+            <Hero isi={{ title: nama }} wa={waContact} pal={pal} />
+            <Stats pal={pal} />
+            <Services isi={{}} pal={pal} />
+            <Testimonials isi={{}} pal={pal} />
+            <Cta isi={{}} wa={waContact} pal={pal} />
+            <Contact isi={{}} profile={profile} pal={pal} />
           </>
         ) : (
           <>
             {visible.map(renderSection)}
-            <Stats />
+            <Stats pal={pal} />
           </>
         )}
       </main>
-      <Footer nama={nama} />
+      <Footer nama={nama} pal={pal} />
       <FloatingWA wa={waContact} />
     </div>
   )
