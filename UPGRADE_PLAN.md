@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 3 — **F5 (robustness) dimulai. F5-1 (preview sebelum publish) SELESAI (PR#55, preview deploy Ready), nunggu merge ke prod.** Lanjut F5-2 (rollback/versi). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
-- **Step berikutnya:** Merge PR#55 → lanjut F5-2 (rollback/versi) → F5-3 (self-edit klien) → F5-4 (CI snapshot). P5DB hardening setelah F5.
-- **Catatan terakhir:** 2026-06-04 — F5-1 DONE (PR#55, preview deploy Ready): `SiteRenderer.tsx` ekstrak logika render tema dari `[slug]` jadi komponen server bersama (terima `client`, no-regression); `fetchPageByIdAdmin` fetch by id tanpa filter status (service role); route `/admin/preview/[pageId]` admin-gated render WYSIWYG draft + `PreviewBar` sticky (badge Draft/Live, Publish, Buka Live); `BuildButton` "Bangun Otomatis"→"Bangun Draft" (publish:false) lalu redirect Preview. Publish lewat PATCH /api/admin/pages action=publish (existing). tsc+next build clean. SEBELUMNYA: F4 LIVE (PR#54 711495a); F2+F3 jalur default LENGKAP; F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 3 — **F5 (robustness). F5-1 MERGED ke prod (PR#55, prod deploy Ready). F5-2 (rollback/versi) SELESAI (PR#56, preview deploy Ready), nunggu merge.** Lanjut F5-3 (self-edit klien). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
+- **Step berikutnya:** Merge PR#56 → lanjut F5-3 (self-edit klien) → F5-4 (CI snapshot). P5DB hardening setelah F5.
+- **Catatan terakhir:** 2026-06-04 — F5-2 DONE (PR#56, preview deploy Ready): migration `page_versions` (jsonb snapshot/page, RLS deny_public_access service-role-only, advisor bersih); `src/lib/build/versions.ts` snapshotPage(prune 15)/listPageVersions/restorePageVersion (wipe+insert add-on, update data_konten/konfigurasi, status TAK diubah, auto pre_restore safety); `persist.ts` applyBuildPlan auto-snapshot pre_build sebelum wipe (non-fatal); API `/api/admin/pages/[id]/versions` GET+POST(restore|snapshot); `PreviewBar` panel Riwayat (Pulihkan/Simpan Versi). E2e round-trip verified (temp page). SEBELUMNYA: F5-1 MERGED prod (PR#55) preview draft + SiteRenderer bersama; F4 LIVE (PR#54); F2+F3 default LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -243,7 +243,13 @@ Token-pack saat ini cuma re-skin. Tambah layout arketipe.
   - Route `/admin/preview/[pageId]`: admin-gated (cookie verify), render WYSIWYG via renderer sama; `PreviewBar` sticky top (badge Draft/Live, Publish via PATCH /api/admin/pages action=publish, link Buka Live).
   - `BuildButton`: "Bangun Otomatis"→"Bangun Draft" (publish:false) → redirect ke Preview; tombol Preview + Kelola.
   - Rollback: revert PR#55. Tidak ada perubahan DB/schema.
-- [ ] **F5-2** Rollback/versi (balik ke versi sebelum kalau build salah).
+- [x] **F5-2** Rollback/versi (balik ke versi sebelum kalau build salah). ✅ 2026-06-04 (PR#56, preview deploy Ready).
+  - Migration `page_versions` (MCP): jsonb snapshot/page, RLS `deny_public_access` (service-role-only), index (page_id, created_at desc).
+  - `src/lib/build/versions.ts`: `snapshotPage` (skip kalau kosong, prune sisakan 15), `listPageVersions`, `restorePageVersion` (wipe+insert page_sections/services/menu_items/products/gallery_images + update data_konten/konfigurasi; **status TIDAK diubah**; auto-snapshot `pre_restore` sbg jaring pengaman).
+  - `persist.ts`: `applyBuildPlan` auto-snapshot `pre_build` sebelum wipe (best-effort, non-fatal).
+  - API `/api/admin/pages/[id]/versions`: GET list, POST `restore`|`snapshot` (validasi versi milik page).
+  - `PreviewBar`: panel Riwayat (list versi + Pulihkan + Simpan Versi).
+  - Rollback: revert PR + `drop table page_versions` (additive, tak dipakai render publik).
 - [ ] **F5-3** Self-edit klien (ganti teks/gambar sendiri).
 - [ ] **F5-4** Test suite render (snapshot tiap theme+variant) di CI.
 
@@ -287,4 +293,5 @@ Target skor:
 | 2026-06-04 | F3-1 | (sejak F1-2) | ✅ done | template isi briefing nyata; fallback spesifik nama+kota, bukan Lorem |
 | 2026-06-04 | F3-2 | PR#53 (5c15e60) | ✅ done | copyVariants.ts: 3 register copy/industri, tone by variant + rotasi nama; **F3 jalur default TUNTAS** |
 | 2026-06-04 | F4-1..F4-3 | PR#54 (711495a) | ✅ done | arketipe layout TokenPack: split/fullbleed/list + centered baseline; verified SSR |
-| 2026-06-04 | F5-1 | PR#55 | ✅ done | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; preview deploy Ready |
+| 2026-06-04 | F5-1 | PR#55 | ✅ merged | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; prod deploy Ready |
+| 2026-06-04 | F5-2 | PR#56 | ✅ done | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
