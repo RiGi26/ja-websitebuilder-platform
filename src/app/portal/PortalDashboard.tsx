@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
-  FileText, Image as ImageIcon, Store,
+  FileText, Image as ImageIcon, Store, LayoutTemplate,
 } from 'lucide-react'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
+import ContentPanel, { type EditableSection } from './ContentPanel'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -62,16 +63,18 @@ type Props = {
   initialBlog: BlogPost[]
   initialGallery: GalleryImage[]
   initialProfile: TenantProfile | null
+  initialSections: EditableSection[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  type Tab = 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
-  const [tab, setTab] = useState<Tab>(hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
+  type Tab = 'konten' | 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
+  const hasContent = initialSections.length > 0
+  const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -181,6 +184,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
         <>
           {/* Tab nav */}
           <div className="flex flex-wrap gap-2 mb-6">
+            {hasContent && (
+              <button onClick={() => setTab('konten')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'konten' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <LayoutTemplate size={14} /> Konten
+              </button>
+            )}
             {hasShop && (
               <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
                 <ShoppingBag size={14} /> Produk
@@ -224,7 +232,9 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             </button>
           </div>
 
-          {tab === 'pembayaran' ? (
+          {tab === 'konten' ? (
+            <ContentPanel initial={initialSections} />
+          ) : tab === 'pembayaran' ? (
             <PaymentPanel initial={paymentStatus} />
           ) : tab === 'pesanan' ? (
             <OrdersPanel initial={initialOrders} />
