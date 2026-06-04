@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 2 — **F2 + F3 (jalur default nol-opex) SELESAI TUNTAS, LIVE production.** Lanjut Sprint 3 (F4 layout beda / F5 robustness / P5DB) ATAU F3-3 LLM opsional (kalau mau premium). P0-1 masih nunggu user, F1-5 ditunda.
-- **Step berikutnya:** pilih F4 (layout arketipe luxury/energetic/minimal, bukan re-skin) atau F5 (preview/rollback/self-edit). F3-3 (LLM polish, flag-gated default OFF, ~ribuan/order) hanya kalau mau premium.
-- **Catatan terakhir:** 2026-06-04 — F3 jalur default LENGKAP. F3-1 sudah terpenuhi sejak F1-2 (template isi briefing nyata, fallback spesifik nama+kota). F3-2 LIVE (PR#53, deploy Ready 5c15e60): modul `copyVariants.ts` — 3 register copy/industri (warm/energetic/elegant), deskripsi+CTA by TONE variant, feature trio dirotasi by hash nama (avalanche, sebaran rata). Briefing nyata tetap menang; default no-regression (verified tsx). SEBELUMNYA: F2 LENGKAP (restaurant PR#52, swatch a77fc66); F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 3 dimulai — **F4 (layout arketipe) SELESAI, LIVE production.** Lanjut F5 (robustness) / P5DB (hardening). P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
+- **Step berikutnya:** F5 (preview sebelum publish → rollback/versi → self-edit klien → CI snapshot) ATAU P5DB (rate limit + CSP + monitoring). Pilih bersama user.
+- **Catatan terakhir:** 2026-06-04 — F4 LIVE (PR#54, deploy Ready 711495a): field `layout` di TokenPack + TokenDrivenRenderer ubah SUSUNAN (hero Centered/Split/Fullbleed, features Grid/Rows/List). luxury=split+rows+airy, energetic=fullbleed, minimal=list, clean/warm=centered+grid (baseline no-regression). Verified renderToStaticMarkup. SEBELUMNYA: F2+F3 jalur default LENGKAP (F3-2 PR#53; F2 restaurant PR#52); F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -230,9 +230,10 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
 
 Token-pack saat ini cuma re-skin. Tambah layout arketipe.
 
-- [ ] **F4-1** Tambah field `layout` ke `TokenPack` (hero-style, section-order, card-grid).
-- [ ] **F4-2** `TokenDrivenRenderer` baca `layout` → ubah susunan, bukan cuma CSS var.
-- [ ] **F4-3** 2–3 layout arketipe: luxury (split hero, serif, whitespace) / energetic (fullbleed, bold) / minimal (center, tipis).
+- [x] **F4-1** Tambah field `layout` ke `TokenPack` (hero/features/pad/align). ✅ 2026-06-04 (PR#54).
+- [x] **F4-2** `TokenDrivenRenderer` baca `layout` → ubah susunan, bukan cuma CSS var. ✅ 2026-06-04 — komponen hero (Centered/Split/Fullbleed) & features (Grid/Rows/List) dipilih dari pack.layout.
+- [x] **F4-3** Layout arketipe. ✅ 2026-06-04 (PR#54, deploy Ready 711495a): luxury-navy=split hero + rows editorial + airy; bold-energetic=fullbleed hero + grid; minimal-refined=center tipis + list garis; clean-modern & warm-cafe=centered+grid (baseline no-regression). Verified renderToStaticMarkup (SSR) tiap pack layout struktural beda. Nol risiko regresi (tak ada page live pakai TokenDrivenRenderer; yg ada commerce→SectionRenderer).
+- **Catatan F4:** arketipe split (luxury-navy) & warm-cafe sekarang cuma dipetakan ke tema BESPOKE (yg tak pakai TokenDrivenRenderer). Token-driven aktif untuk personal/blog/jastip/custom → variant personal:bold→fullbleed, personal:minimal→list, custom:clean→centered. Kalau mau split tampil live, petakan variant token-driven ke luxury-navy di VARIANT_PACK.
 
 ## Fase F5 — Robustness Produk (GAP 5)
 
@@ -280,3 +281,4 @@ Target skor:
 | 2026-06-04 | F2-3 | a77fc66 (master) | ✅ done | sync swatch picker: travel luxury+batik+toko modern ke palet renderer |
 | 2026-06-04 | F3-1 | (sejak F1-2) | ✅ done | template isi briefing nyata; fallback spesifik nama+kota, bukan Lorem |
 | 2026-06-04 | F3-2 | PR#53 (5c15e60) | ✅ done | copyVariants.ts: 3 register copy/industri, tone by variant + rotasi nama; **F3 jalur default TUNTAS** |
+| 2026-06-04 | F4-1..F4-3 | PR#54 (711495a) | ✅ done | arketipe layout TokenPack: split/fullbleed/list + centered baseline; verified SSR |
