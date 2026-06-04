@@ -239,7 +239,8 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
 
 - [x] **F3-1** `generateContent` isi template pakai briefing nyata (nama bisnis, layanan, kota) — bukan placeholder generik. ✅ 2026-06-04 — sudah terpenuhi sejak F1-2: templates baca namaUsaha/kotaLayanan/layanan/dokter/menu/produk/program/keunggulan/kebijakan/sosial dari briefing nyata; fallback spesifik bisnis (nama+kota), bukan Lorem ipsum. fallbackDeskripsi/fallbackTagline = briefing menang.
 - [x] **F3-2** **Template varian** (jalan tengah, NOL OPEX). ✅ 2026-06-04 (PR#53, deploy Ready 5c15e60): modul `src/lib/build/copyVariants.ts` — 3 register copy fallback/industri (warm/energetic/elegant). deskripsi (hero+about) & CTA-subtitle dipilih by TONE variant klien (luxury/premium→elegant, bold/editorial→energetic, fresh/clean/minimal→lugas, rustic/warm/batik→hangat); feature trio dirotasi by hash nama bisnis (rolling+avalanche, sebaran rata) → tak kembar. Cakupan = body copy saja (keputusan user). Briefing nyata tetap menang; default no-regression (verified tsx: tone beda/variant, default identik, briefing override, rotasi 3 trio).
-- [ ] **F3-3** *(OPSIONAL — ADA opex ~ribuan/order, BUKAN jalur default)* LLM polish copy via Claude API server-side. **Flag-gated, default OFF.** Nyalakan cuma untuk hasil premium / klien bayar lebih. Bisa on/off tanpa ubah arsitektur — F3-1+F3-2 tetap fallback kalau flag off. **DITUNDA** (jalur default sudah layak jual).
+- [ ] **F3-3** *(OPSIONAL — BUKAN jalur default)* LLM polish copy via Claude API server-side. **Flag-gated, default OFF.** Nyalakan cuma untuk hasil premium / klien bayar lebih. Bisa on/off tanpa ubah arsitektur — F3-1+F3-2 tetap fallback kalau flag off. **DITUNDA** (jalur default sudah layak jual).
+  - 📋 **Rancangan detail siap eksekusi ada di akhir file: lihat section "F3-3 — Rancangan Detail LLM Polish".** Catatan biaya: dengan Haiku 4.5 sebenarnya pecahan sen/order (kesan "ribuan" itu skenario Opus).
 
 ## Fase F4 — Layout Beda (GAP 3)
 
@@ -478,3 +479,81 @@ Keamanan    → headers (P5DB-2) + rate limit (P5DB-1) + audit log (P5DB-3)
 - Preview/rollback: `src/app/admin/preview/[pageId]/` + `/api/admin/pages/[id]/versions`
 - Keamanan: `src/lib/{rate-limit,security-log}.ts` + `next.config.mjs`
 - Test: `*.test.ts(x)` + `.github/workflows/ci.yml`
+
+---
+
+# F3-3 — Rancangan Detail LLM Polish *(BELUM DIIMPLEMENTASI — spec untuk nanti)*
+
+> **Status:** OPSIONAL, ditunda. Jalur default (F3-1 template + F3-2 copyVariants) sudah layak jual & nol-opex. F3-3 = lapisan premium di atasnya. Dokumen ini = blueprint siap eksekusi saat user memutuskan menyalakan. **Baca dulu sebelum implement.**
+
+## 1. Tujuan & prinsip
+- **Tujuan:** Setelah draft copy template jadi, perhalus pakai Claude API → copy lebih natural, spesifik, persuasif, "ditulis khusus" untuk bisnis itu (bukan template isi-formulir).
+- **Prinsip yang TAK boleh dilanggar:**
+  1. **Flag-gated, default OFF.** Matikan flag = balik 100% ke template. Arsitektur tak berubah.
+  2. **Fallback penuh & non-fatal.** API error/timeout/JSON invalid → pakai copy template apa adanya. **Build TAK BOLEH gagal** gara-gara LLM.
+  3. **Nol halusinasi fakta.** LLM hanya boleh memoles GAYA BAHASA. Dilarang mengarang fakta (harga, alamat, no WA, nama dokter, jam buka). Fakta selalu dari briefing.
+  4. **Cakupan = body copy saja** (sama dgn F3-2): hero title/subtitle/eyebrow, about body, cta title/subtitle, feature title+desc. JANGAN sentuh data terstruktur (nama menu/layanan/produk/harga, kontak).
+  5. **Bahasa Indonesia**, panjang terjaga (jangan meluap dari batas layout).
+
+## 2. Arsitektur & titik integrasi
+```
+order → generateContent() → BuildPlan (copy template)        [F3-1/F3-2, ADA]
+                              │
+                              ├─ flag OFF → applyBuildPlan(plan)            ← jalur default
+                              │
+                              └─ flag ON  → polishBuildPlan(plan, briefing) [F3-3, BARU]
+                                              → Claude API (server) → copy halus
+                                              → merge ke plan (fallback per-field kalau gagal)
+                                              → applyBuildPlan(plan)
+```
+- **File baru:** `src/lib/build/llmPolish.ts` — fungsi `polishCopy(input): Promise<PolishResult>` (murni I/O LLM, tak sentuh DB).
+- **Titik panggil:** di `/api/admin/build-order/[id]/route.ts`, SETELAH `generateContent`, SEBELUM `applyBuildPlan`. Bungkus try/catch → fallback ke plan asli.
+- **Reuse:** sebelum tulis, F5-2 `snapshotPage` sudah auto jalan (pre_build) → hasil polish pun bisa di-rollback.
+
+## 3. Flag & kontrol (2 lapis)
+1. **Kapabilitas (global, env):** `ANTHROPIC_API_KEY` ada + `LLM_POLISH_ENABLED=true`. Kalau tak ada → fitur mati total, tombol pun tak muncul.
+2. **Per-build (pilihan admin):** body request `{ polish: true }` dari tombol baru di `BuildButton` ("Bangun + Poles AI ✨"). Default tombol "Bangun Draft" tetap tanpa polish.
+   - *(Opsional lanjutan)* per-tenant: kolom `tenants.tier = 'premium'` → polish auto untuk klien premium.
+
+## 4. Skema data (audit & idempotensi)
+- Tambah ke `konfigurasi.branding` (atau `data_konten._meta`): `{ copy_source: 'template' | 'llm', polished_at, model }` → tahu section mana sudah dipoles, dan render/preview bisa kasih badge.
+- **Catat pemakaian** ke tabel baru `llm_usage` (atau reuse `security_events` kind `llm_polish`): `{ order_id, page_id, model, input_tokens, output_tokens, est_cost_idr, ok, created_at }`. RLS deny publik (service-role-only). Buat lewat Supabase MCP (additive).
+
+## 5. Desain prompt (structured output)
+- **System (cacheable — pakai prompt caching):** peran = copywriter senior Indonesia untuk UMKM; aturan keras (jangan mengarang fakta, pertahankan semua angka/kontak/nama persis, output JSON sesuai skema, jaga panjang, bahasa Indonesia luwes non-klise — hindari "solusi terpercaya", "harga terjangkau", dst).
+- **User:** JSON berisi `{ industri, namaUsaha, kota, tone, briefingFakta, draftCopy }`.
+- **Output (JSON ketat):** mirror field `draftCopy` (hero.title, hero.subtitle, about.body, cta.title, cta.subtitle, features[].title, features[].desc). Validasi: kunci sama persis, tiap nilai string, panjang ≤ batas per-field. Pakai tool/`response_format` JSON atau parse + validasi Zod.
+- **Anti-halusinasi:** instruksi + post-check: pastikan tak ada digit/no telp/alamat BARU yang tak ada di briefing (regex sanity), kalau ada → tolak field itu, pakai template.
+
+## 6. Model & estimasi biaya
+- **Default polish:** **Haiku 4.5** (`claude-haiku-4-5-20251001`) — cepat & paling murah, cukup untuk poles gaya.
+- **Premium:** **Sonnet 4.6** (`claude-sonnet-4-6`) untuk nuansa lebih tinggi; **Opus 4.8** (`claude-opus-4-8`) untuk paket top.
+- **Estimasi token/order:** input ~1.4k (instruksi cacheable + briefing + draft), output ~0.6–1.2k. → sangat kecil. Dengan **Haiku** biayanya **pecahan sen USD per order** (jauh lebih murah dari kesan "ribuan rupiah" — itu skenario Opus). Dengan **prompt caching**, token instruksi berulang lebih murah lagi.
+- ⚠️ **Verifikasi harga terkini** di pricing Anthropic saat implement (rate bisa berubah). Simpan `est_cost_idr` per panggilan dari `usage` di respons API.
+- **Guardrail biaya:** `max_tokens` ketat (mis. 1500), timeout (mis. 8 dtk), rate-limit pakai `src/lib/rate-limit.ts` (mis. polish 30/menit), dan polish HANYA saat diminta eksplisit (bukan tiap build).
+
+## 7. Fallback & validasi (wajib)
+- Timeout/throw/JSON invalid/skema tak cocok → **return plan asli** (template). Log `llm_polish` ok=false.
+- Per-field: kalau satu field gagal validasi (kepanjangan / ada fakta baru) → field itu pakai template, sisanya boleh pakai hasil LLM (degradasi anggun).
+- Tak ada `ANTHROPIC_API_KEY` → lewati total, tak error.
+
+## 8. Langkah implementasi (checklist saat dikerjakan)
+- [ ] Tambah dep `@anthropic-ai/sdk`; pakai skill **claude-api** (wajib prompt caching).
+- [ ] Env: `ANTHROPIC_API_KEY`, `LLM_POLISH_ENABLED`, `LLM_POLISH_MODEL` (default haiku). Set via Vercel (jangan commit).
+- [ ] `src/lib/build/llmPolish.ts`: `polishCopy()` + skema Zod + validasi anti-halusinasi + caching.
+- [ ] Migration `llm_usage` (atau extend `security_events`) via MCP, RLS deny.
+- [ ] Wire di `/api/admin/build-order/[id]` (try/catch → fallback), terima `{ polish }`.
+- [ ] `BuildButton`: tombol "Bangun + Poles AI ✨" (muncul hanya kalau kapabilitas ON).
+- [ ] Badge "Dipoles AI" di PreviewBar/admin (dari `copy_source`).
+- [ ] Unit test: fallback saat API mock gagal, validasi tolak fakta-baru, skema output, flag OFF = identik template.
+- [ ] Verify e2e: 1 order dgn polish ON → bandingkan draftCopy vs hasil, cek `llm_usage` terisi, flag OFF → identik template.
+
+## 9. Risiko & mitigasi
+- **Biaya tak terkendali** → polish on-demand + rate-limit + max_tokens + log biaya.
+- **Halusinasi fakta** → aturan prompt keras + post-validasi regex + fallback per-field.
+- **Copy klise/AI-ish** → instruksi anti-klise; pertimbangkan skill **humanize** sebagai referensi gaya.
+- **Vendor lock / downtime** → fallback template bikin sistem tetap jalan walau API mati.
+- **Bahasa salah / meluap layout** → batasi panjang per-field + validasi.
+
+## 10. Definisi "selesai" F3-3
+Flag OFF = byte-identik dengan jalur template sekarang (no-regression). Flag ON + tombol = copy dipoles, fakta utuh, biaya tercatat, gagal-anggun ke template, ada badge sumber. Semua lewat CI + 1 PR (sesuai Aturan Produksi).
