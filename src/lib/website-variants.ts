@@ -33,11 +33,11 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
     },
     {
       id: 'premium',
-      nama: 'Premium Clinic',
-      deskripsi: 'Elegan, dark navy, luxury. Untuk klinik estetik & premium.',
+      nama: 'Luxe Clinic',
+      deskripsi: 'Elegan, navy & gold di atas ivory. Untuk klinik estetik & premium.',
       emoji: '✨',
       mood: '#1E3A5F',
-      bg: 'dark',
+      bg: 'light',
     },
   ],
   travel: [
