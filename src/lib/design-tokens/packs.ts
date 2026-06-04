@@ -37,6 +37,17 @@ export interface TokenPack {
   }
   radius: { sm: string; md: string; lg: string; pill: string }
   shadow: { sm: string; md: string; lg: string }
+  // F4 — arketipe LAYOUT (susunan, bukan sekadar warna/font).
+  //  hero:     centered (default) | split (2-kolom editorial) | fullbleed (full-viewport)
+  //  features: grid (kartu auto-fit) | rows (baris bernomor) | list (daftar garis tipis)
+  //  pad:      normal | airy (whitespace lebih lega)
+  //  align:    center | left (heading section & nav rhythm)
+  layout: {
+    hero: 'centered' | 'split' | 'fullbleed'
+    features: 'grid' | 'rows' | 'list'
+    pad: 'normal' | 'airy'
+    align: 'center' | 'left'
+  }
 }
 
 // ── Pack definitions ──────────────────────────────────────────
@@ -60,6 +71,7 @@ export const PACKS: Record<string, TokenPack> = {
       md: '0 4px 16px rgba(0,0,0,.08)',
       lg: '0 20px 48px rgba(0,0,0,.10)',
     },
+    layout: { hero: 'centered', features: 'grid', pad: 'normal', align: 'center' },
   },
   'luxury-navy': {
     id: 'luxury-navy', label: 'Luxury Navy', mood: 'luxury',
@@ -75,6 +87,7 @@ export const PACKS: Record<string, TokenPack> = {
       md: '0 8px 28px rgba(0,0,0,.45)',
       lg: '0 30px 60px rgba(0,0,0,.55)',
     },
+    layout: { hero: 'split', features: 'rows', pad: 'airy', align: 'left' },
   },
   'warm-cafe': {
     id: 'warm-cafe', label: 'Warm Cafe', mood: 'warm',
@@ -90,6 +103,7 @@ export const PACKS: Record<string, TokenPack> = {
       md: '0 6px 20px rgba(120,53,15,.12)',
       lg: '0 24px 50px rgba(120,53,15,.16)',
     },
+    layout: { hero: 'centered', features: 'grid', pad: 'normal', align: 'center' },
   },
   'bold-energetic': {
     id: 'bold-energetic', label: 'Bold Energetic', mood: 'bold',
@@ -105,6 +119,7 @@ export const PACKS: Record<string, TokenPack> = {
       md: '0 8px 28px rgba(234,88,12,.25)',
       lg: '0 24px 56px rgba(234,88,12,.30)',
     },
+    layout: { hero: 'fullbleed', features: 'grid', pad: 'normal', align: 'left' },
   },
   'minimal-refined': {
     id: 'minimal-refined', label: 'Minimal Refined', mood: 'minimal',
@@ -120,6 +135,7 @@ export const PACKS: Record<string, TokenPack> = {
       md: '0 2px 8px rgba(0,0,0,.05)',
       lg: '0 8px 24px rgba(0,0,0,.06)',
     },
+    layout: { hero: 'centered', features: 'list', pad: 'airy', align: 'center' },
   },
 }
 
