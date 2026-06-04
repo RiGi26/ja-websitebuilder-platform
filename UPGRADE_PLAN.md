@@ -323,3 +323,157 @@ Target skor:
 | 2026-06-04 | P5DB-2 | PR#59 | ✅ merged | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
 | 2026-06-04 | P5DB-1 | PR#60 | ✅ merged | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |
 | 2026-06-04 | P5DB-3 | PR#61 | ✅ done | monitoring: security_events + logSecurityEvent (login gagal/ratelimit, track ratelimit); persist+log tanpa channel; **P5DB TUNTAS** |
+
+---
+
+# Penjelasan Detail Fitur (referensi)
+
+> Dokumentasi tiap fitur yang sudah dibangun: **apa masalahnya, solusinya, cara kerja (file + alur), cara pakai, dan verifikasinya.** Untuk onboarding tim / mengingat kembali konteks tanpa membaca semua kode.
+
+## TRACK A — Keamanan Database
+
+### P0-2 / P0-3 — Policy RLS eksplisit (deny publik)
+- **Masalah:** 3 tabel sensitif (`tenant_payment_config`, `tenants`, `order_progress_logs`) punya RLS *aktif tapi 0 policy*. Advisor menandai sebagai risiko ("RLS enabled, no policy").
+- **Solusi:** Tambah policy `deny_public_access` (anon + authenticated → `using(false)`, `with_check(false)`). Service role tetap bypass RLS, jadi kode server (API admin) tak terdampak.
+- **Cara kerja:** Migration via Supabase MCP. Audit membuktikan render publik `[slug]` (anon) hanya membaca `landing_pages`/`page_sections`/`tenant_profile` — bukan ketiga tabel itu. Jadi deny publik = nol regresi.
+- **Verifikasi:** advisor `rls_enabled_no_policy` 3 INFO → 0. Render anon tak terpengaruh.
+- **Rollback:** `drop policy "deny_public_access" on <tabel>;`
+
+### P0-1 — Leaked password protection *(PENDING USER)*
+- Toggle di **Supabase Dashboard → Authentication → Password** ("Leaked password protection" / HaveIBeenPwned). Tidak ada MCP tool, harus diklik manual. Setelah aktif, advisor WARN `auth_leaked_password_protection` hilang.
+
+---
+
+## TRACK B — Fitur Builder
+
+### F1 — Otomatisasi build_order *(dampak terbesar)*
+- **Masalah:** Tiap order, tim harus buka Claude Code, ketik `/build-order`, generate konten manual, insert section, publish. Order banyak = macet (bottleneck "berapa sesi Claude tim sanggup jalanin").
+- **Solusi:** Pindah generasi konten dari skill `.md` manual → **kode TypeScript** yang jalan otomatis. Order → website draft jadi sendiri dalam hitungan detik.
+- **Cara kerja:**
+  - `src/lib/build/generateContent.ts` — fungsi murni: order → `BuildPlan` (sections + services/menu/products + tenant_profile + theme/variant/design_tokens).
+  - `src/lib/build/templates.ts` — registry 6 industri (travel/restaurant/corporate/klinik/sekolah/toko_online) + generic. Isi dari briefing nyata, fallback copy spesifik bisnis (nama+kota), **bukan Lorem ipsum**.
+  - `src/lib/build/persist.ts` — `applyBuildPlan` tulis ke DB. **Idempoten:** wipe baris generate lama lalu insert ulang → panggil 2× tetap sama.
+  - API `/api/admin/build-order/[id]` (guard admin) + tombol di `BuildButton.tsx`.
+- **Cara pakai:** Admin → kartu order → "Buatkan Website" (provisioning) → "Bangun Draft" → konten terisi otomatis.
+- **Verifikasi:** e2e order seed `klinik-sehat-prima` — 6 section + 3 dokter nyata + tenant_profile, design_tokens derived, render `[slug]` 200, rebuild idempoten tetap 6 section.
+
+### F2 — Variant nyata penuh *(18 variant)*
+- **Masalah:** Token-pack hanya jalan untuk tema non-bespoke. Tema bespoke (klinik/rental/company/sekolah/restaurant/batik) pakai renderer sendiri & **tidak konsumsi variant** → cuma 5/18 variant render beda nyata; sisanya identik.
+- **Solusi:** Tiap renderer bespoke "honor" variant-nya (palet/aksen/tipografi di-thread sebagai `pal`), 1 renderer per PR.
+- **Cara kerja:** Tiap renderer dapat palet per-variant. Warna dwiperan (mis. INK/CREAM/INDIGO) **dipecah jadi peran semantik** (pageBg/surfaceBg/heading/accent/onAccent/…) supaya bisa flip light↔dark tanpa pecah. Nilai default = persis warna lama (no-regression).
+  - sekolah: warm (maroon/amber) vs clean (royal blue).
+  - rental: bold (oranye/dark) / fresh (biru/light) / luxury (gold/dark).
+  - klinik: warm (sage/terracotta) / premium (navy+gold di ivory) / clean (renderer terpisah).
+  - company: editorial (near-black+amber) / clean (putih+royal blue) / minimal (monokrom).
+  - batik_toko: batik (indigo/krem/amber) / modern (slate+gold).
+  - restaurant: rustic (espresso/krem/terracotta) / modern (slate gelap+champagne gold).
+- **Verifikasi:** per renderer — flip variant di DB → `curl [slug]` → hitung warna penanda beda nyata → restore. Swatch picker (`website-variants.ts`) ikut disinkron ke palet renderer asli.
+
+### F3 — Konten dari data nyata *(nol-opex)*
+- **Masalah:** Copy generik & seragam antar bisnis.
+- **Solusi (jalur default TANPA Claude API → nol biaya LLM/order):**
+  - **F3-1** (sejak F1-2): template diisi briefing nyata (nama usaha, layanan, kota, dokter, menu, produk, program, keunggulan). Fallback spesifik nama+kota, bukan placeholder.
+  - **F3-2** `src/lib/build/copyVariants.ts`: 3 register copy/industri (warm/energetic/elegant). Deskripsi (hero+about) & subtitle CTA dipilih by **tone variant** klien (luxury/premium→elegant, bold/editorial→energetic, fresh/clean/minimal→lugas, rustic/warm/batik→hangat). Feature trio **dirotasi by hash nama bisnis** → tak kembar antar klien.
+- **Catatan:** Briefing nyata selalu **menang** atas fallback. **F3-3** (LLM polish via Claude API, ~ribuan opex/order) sengaja **DITUNDA** & flag-gated default OFF — jalur default sudah layak jual.
+
+### F4 — Layout arketipe *(bukan sekadar re-skin)*
+- **Masalah:** Token-pack cuma ganti warna/font — susunan tetap sama, jadi variant terasa mirip.
+- **Solusi:** Tambah field `layout` ke `TokenPack` (`hero` centered/split/fullbleed · `features` grid/rows/list · `pad` normal/airy · `align` center/left). `TokenDrivenRenderer` baca `layout` → **ubah susunan komponen**, bukan cuma CSS var.
+- **Pemetaan:** luxury-navy = split hero + rows editorial + airy; bold-energetic = fullbleed hero + grid; minimal-refined = center tipis + list garis; clean-modern & warm-cafe = centered + grid (baseline no-regression).
+- **Verifikasi:** `renderToStaticMarkup` (SSR) tiap pack menghasilkan struktur HTML berbeda. Scope = TokenDrivenRenderer (tema non-bespoke).
+
+### F5 — Robustness Produk *(4/4)*
+
+#### F5-1 — Preview sebelum publish
+- **Masalah:** Hasil build langsung live, tak ada cara review dulu. Tak ada "WYSIWYG" sebelum publik melihat.
+- **Solusi:** Bangun sebagai **DRAFT** → admin review di halaman Preview → klik **Publish**.
+- **Cara kerja:**
+  - `src/app/components/SiteRenderer.tsx` — logika render semua tema diekstrak jadi **komponen server bersama** `renderSite({page, slug, client})`. Dipakai dua tempat: `[slug]` publik (client anon, RLS gated `published`) **dan** preview (service role → bisa lihat draft). Satu sumber kebenaran = preview persis = hasil live.
+  - `fetchPageByIdAdmin` — fetch by id tanpa filter status.
+  - `/admin/preview/[pageId]` (admin-gated) + `PreviewBar` (badge Draft/Live, tombol Publish, Buka Live).
+  - `BuildButton`: "Bangun Otomatis" → "Bangun Draft" (publish:false) → redirect ke Preview.
+- **Cara pakai:** kartu order → Bangun Draft → Preview muncul → Publish. Publish lewat `PATCH /api/admin/pages action=publish`.
+
+#### F5-2 — Rollback / versi
+- **Masalah:** Kalau build/edit salah, tak ada cara balik ke versi sebelumnya. Rebuild menimpa konten lama permanen.
+- **Solusi:** Snapshot konten halaman tiap sebelum rebuild → bisa **Pulihkan**.
+- **Cara kerja:**
+  - Tabel `page_versions` (jsonb snapshot/page, RLS deny publik, service-role-only).
+  - `src/lib/build/versions.ts`: `snapshotPage` (skip kalau kosong, simpan **15 versi terbaru**), `restorePageVersion` (wipe+insert add-on tables + update data_konten/konfigurasi; **status live/draft TIDAK diubah**; auto bikin versi `pre_restore` sbg jaring pengaman → restore pun bisa dibatalkan).
+  - `applyBuildPlan` auto-snapshot `pre_build` sebelum wipe (best-effort, non-fatal).
+  - API `/api/admin/pages/[id]/versions` (GET list, POST restore|snapshot) + panel **Riwayat** di PreviewBar.
+- **Verifikasi:** e2e round-trip (temp page) — snapshot → hapus section + corrupt konten → restore → semua pulih + `pre_restore` terbuat.
+
+#### F5-3 — Self-edit klien
+- **Masalah:** Klien harus minta tim untuk ubah teks/gambar website. Portal sudah bisa kelola produk/layanan/menu/blog/galeri/profil, tapi **bukan copy halaman** (hero/about/heading).
+- **Solusi:** Tab **Konten** di portal — klien edit teks & gambar tiap section sendiri.
+- **Cara kerja:**
+  - API `/api/portal/sections` PATCH — verifikasi sesi portal (JWT `app_metadata.tenant_id`) + **ownership section**, tulis via service role. **Tidak melebarkan RLS `page_sections`** (pola sama dgn route portal lain).
+  - `src/app/portal/ContentPanel.tsx` — editor generik per section: field string top-level (judul/subjudul/CTA/deskripsi/gambar) + array `items` (keunggulan/testimoni/FAQ), label ramah, textarea utk teks panjang, preview thumbnail gambar, Simpan per section + badge "Belum disimpan".
+- **Cara pakai:** Klien login portal → tab **Konten** → edit → Simpan (langsung live).
+
+#### F5-4 — Test suite render + CI
+- **Masalah:** Tak ada jaring pengaman — regresi render baru ketahuan setelah live.
+- **Solusi:** Snapshot test render + CI otomatis tiap PR.
+- **Cara kerja:**
+  - **Vitest** (env node, `renderToStaticMarkup` — tanpa jsdom). Script `npm test` / `test:watch` / `typecheck`.
+  - `packs.test.ts` — VARIANT_PACK semua valid, tiap pack layout lengkap, arketipe beda nyata, `resolveTokenPack` + kontras `onPrimary`, `isTokenDrivenTheme`.
+  - `TokenDrivenRenderer.test.tsx` — render 5 pack tanpa error + snapshot markup + assert layout beda struktural.
+  - `.github/workflows/ci.yml` — PR + push master → `npm ci` → typecheck → test.
+- **Status:** 25 test pass (incl. rate-limit), CI hijau sejak PR pertama.
+
+---
+
+## P5DB — DB Hardening lanjut *(3/3)*
+
+### P5DB-2 — Security headers
+- **Apa:** `next.config.mjs` `headers()`.
+  - **Semua route:** HSTS (`max-age=31536000`, tanpa includeSubDomains), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic/geolocation off), `X-DNS-Prefetch-Control`.
+  - **/admin + /portal:** anti-clickjacking (`X-Frame-Options: DENY` + CSP `frame-ancestors 'none'`).
+- **Keputusan penting:** Situs klien `[slug]` **SENGAJA tetap bisa di-iframe** (galeri "Karya Kami" di corp-landing menampilkannya via iframe) → proteksi frame hanya di area sensitif, nol regresi galeri. HSTS tanpa includeSubDomains agar tak memaksa HTTPS ke subdomain ekosistem lain. CSP konten penuh utk situs publik **ditunda** (klien embed konten arbitrer: gambar URL bebas, video/map embed).
+- **Verifikasi:** curl lokal — `/pricing` dapat header aman tanpa frame-block; `/admin/login` dapat DENY + frame-ancestors none.
+
+### P5DB-1 — Rate limiting
+- **Apa:** `src/lib/rate-limit.ts` — limiter **in-memory fixed-window** (`rateLimit`/`clientIp`/`tooManyRequests`), lazy prune.
+- **Penerapan:** `/api/admin/login` rem brute force **8 / 10 menit per IP**; `/api/track` rem spam **60 / menit per IP**. Helper reusable utk endpoint lain (payment/briefing/shop).
+- **Catatan penting:** Vercel serverless = memori per-instance → ini **best-effort** (menaikkan bar, bukan jaminan global lintas instance). Untuk penegakan global, ganti store ke **Upstash Redis** saat env tersedia — API helper tetap sama, cuma implementasi internal yang berubah.
+
+### P5DB-3 — Monitoring peristiwa keamanan
+- **Apa:** Catat peristiwa keamanan untuk audit & deteksi lonjakan. **Persist + log, tanpa channel notifikasi keluar** (keputusan user).
+- **Cara kerja:**
+  - Tabel `security_events` (kind/ip/detail jsonb, RLS deny publik, index by kind+created_at).
+  - `src/lib/security-log.ts` `logSecurityEvent` → `console.warn` (Vercel logs) + insert. **Best-effort, NON-FATAL** (tak pernah menggagalkan request asal).
+  - `/api/admin/login` log `admin_login_failed` + `admin_login_ratelimited`; `/api/track` log `track_ratelimited`.
+- **Cara audit (SQL):**
+  ```sql
+  -- login gagal per IP, 1 jam terakhir
+  select ip, count(*) from security_events
+  where kind = 'admin_login_failed' and created_at > now() - interval '1 hour'
+  group by ip order by 2 desc;
+  ```
+- **Upgrade nanti:** sambungkan ke channel alert (WA gateway / email / Slack) untuk notifikasi real-time saat ada lonjakan.
+
+---
+
+## Ringkasan Arsitektur Setelah Upgrade
+
+```
+Order masuk → "Bangun Draft" (API generateContent, nol-opex)
+            → konten + variant + layout otomatis (F1/F2/F3/F4)
+            → DRAFT (tidak langsung live)
+Admin       → Preview WYSIWYG (F5-1) → Publish
+            → kalau salah: Riwayat → Pulihkan versi (F5-2)
+Klien       → portal tab "Konten": edit teks/gambar sendiri (F5-3)
+CI          → tiap PR: typecheck + snapshot render test (F5-4)
+Keamanan    → headers (P5DB-2) + rate limit (P5DB-1) + audit log (P5DB-3)
+            + RLS deny-all di tabel sensitif (P0)
+```
+
+**File kunci:**
+- Build: `src/lib/build/{generateContent,templates,persist,versions,copyVariants}.ts`
+- Render: `src/app/components/SiteRenderer.tsx` (bersama) + renderer per tema + `TokenDrivenRenderer`
+- Token/layout: `src/lib/design-tokens/packs.ts`
+- Portal self-edit: `src/app/portal/ContentPanel.tsx` + `/api/portal/sections`
+- Preview/rollback: `src/app/admin/preview/[pageId]/` + `/api/admin/pages/[id]/versions`
+- Keamanan: `src/lib/{rate-limit,security-log}.ts` + `next.config.mjs`
+- Test: `*.test.ts(x)` + `.github/workflows/ci.yml`
