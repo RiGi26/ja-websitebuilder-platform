@@ -209,8 +209,9 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
 
 - [x] **F2-1** Audit 18 variant vs render nyata. ✅ 2026-06-04 (lihat temuan di atas).
 - [~] **F2-2** Wire variant ke tiap renderer bespoke (palet per-variant di-thread sbg `pal`). Per renderer = 1 PR:
-  - [x] **sekolah** ✅ 2026-06-04 (PR feat/f2-sekolah-variants): warm (Academic Heritage maroon/amber, default no-regression) vs clean (Modern Institutional royal blue). e2e lpk-sakura: warm=maroon+amber/0 blue, clean=blue/0 maroon.
-  - [ ] klinik (premium kini fallback ke warm → bikin distinct), restaurant (rustic vs modern, hati2 INK dual-role light/dark), company, batik_toko, rental (sudah terima designTokens — cek cukup/belum).
+  - [x] **sekolah** ✅ 2026-06-04 (PR#47 merged): warm (Academic Heritage maroon/amber, default no-regression) vs clean (Modern Institutional royal blue). e2e lpk-sakura: warm=maroon+amber/0 blue, clean=blue/0 maroon.
+  - [x] **rental** ✅ 2026-06-04 (PR feat/f2-rental-variants): VARIANT_ACCENTS per variant (bold=oranye/dark, fresh=biru/light, luxury=gold/dark) di-thread (accent+light+lighter+dark+bg). Variant menang atas design_tokens.bg_style (build selalu 'dark'). primary klien override base. e2e nusantara-drive-test ketiga variant beda nyata.
+  - [ ] klinik (premium kini fallback ke warm → bikin distinct), restaurant (rustic vs modern, hati2 INK dual-role light/dark), company, batik_toko.
 - [ ] **F2-3** Sinkronkan swatch `website-variants.ts` dgn palet renderer nyata (sekolah ✅).
 - [ ] **F2-4** Verify tiap variant render beda nyata (e2e flip variant di DB, restore setelah).
 
