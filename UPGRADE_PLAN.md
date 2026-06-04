@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 2 — **F2 SELESAI TUNTAS** (semua renderer + swatch + verify, LIVE production). Lanjut F3 (konten dari data nyata). P0-1 masih nunggu user, F1-5 ditunda.
-- **Step berikutnya:** F3-1 (`generateContent` isi template pakai briefing nyata) + F3-2 (template varian copy 3–4 versi/industri, nol opex). F3-3 LLM opsional ditunda.
-- **Catatan terakhir:** 2026-06-04 — F2 LENGKAP. F2-2 renderer terakhir (restaurant) LIVE: variant rustic (default, no-regression) vs modern (fine dining slate+gold), PR#52 merged deploy Ready (6e7da14). F2-3 swatch picker disinkron ke palet renderer nyata (restaurant + travel luxury + batik, commit a77fc66 Ready). F2-4 verify: e2e flip DB per renderer (restaurant kanawa: rustic 0-modern, modern 0-rustic, clean flip). SEBELUMNYA: F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 2 — **F2 + F3 (jalur default nol-opex) SELESAI TUNTAS, LIVE production.** Lanjut Sprint 3 (F4 layout beda / F5 robustness / P5DB) ATAU F3-3 LLM opsional (kalau mau premium). P0-1 masih nunggu user, F1-5 ditunda.
+- **Step berikutnya:** pilih F4 (layout arketipe luxury/energetic/minimal, bukan re-skin) atau F5 (preview/rollback/self-edit). F3-3 (LLM polish, flag-gated default OFF, ~ribuan/order) hanya kalau mau premium.
+- **Catatan terakhir:** 2026-06-04 — F3 jalur default LENGKAP. F3-1 sudah terpenuhi sejak F1-2 (template isi briefing nyata, fallback spesifik nama+kota). F3-2 LIVE (PR#53, deploy Ready 5c15e60): modul `copyVariants.ts` — 3 register copy/industri (warm/energetic/elegant), deskripsi+CTA by TONE variant, feature trio dirotasi by hash nama (avalanche, sebaran rata). Briefing nyata tetap menang; default no-regression (verified tsx). SEBELUMNYA: F2 LENGKAP (restaurant PR#52, swatch a77fc66); F1 build_order LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -222,9 +222,9 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
 
 > **Jalur default = TANPA Claude API (nol opex).** F3-1 + F3-2 sudah cukup buat hasil layak jual. F3-3 (LLM) OPSIONAL, ditunda jadi upgrade premium.
 
-- [ ] **F3-1** `generateContent` isi template pakai briefing nyata (nama bisnis, layanan, kota) — bukan placeholder generik.
-- [ ] **F3-2** **Template varian** (jalan tengah, NOL OPEX): tiap industri punya 3–4 versi copy, bukan 1. Pilih berdasarkan variant klien (luxury→formal, energetic→semangat) atau rotasi. Bikin hasil terasa hidup tanpa seragam, tanpa API.
-- [ ] **F3-3** *(OPSIONAL — ADA opex ~ribuan/order, BUKAN jalur default)* LLM polish copy via Claude API server-side. **Flag-gated, default OFF.** Nyalakan cuma untuk hasil premium / klien bayar lebih. Bisa on/off tanpa ubah arsitektur — F3-1+F3-2 tetap fallback kalau flag off.
+- [x] **F3-1** `generateContent` isi template pakai briefing nyata (nama bisnis, layanan, kota) — bukan placeholder generik. ✅ 2026-06-04 — sudah terpenuhi sejak F1-2: templates baca namaUsaha/kotaLayanan/layanan/dokter/menu/produk/program/keunggulan/kebijakan/sosial dari briefing nyata; fallback spesifik bisnis (nama+kota), bukan Lorem ipsum. fallbackDeskripsi/fallbackTagline = briefing menang.
+- [x] **F3-2** **Template varian** (jalan tengah, NOL OPEX). ✅ 2026-06-04 (PR#53, deploy Ready 5c15e60): modul `src/lib/build/copyVariants.ts` — 3 register copy fallback/industri (warm/energetic/elegant). deskripsi (hero+about) & CTA-subtitle dipilih by TONE variant klien (luxury/premium→elegant, bold/editorial→energetic, fresh/clean/minimal→lugas, rustic/warm/batik→hangat); feature trio dirotasi by hash nama bisnis (rolling+avalanche, sebaran rata) → tak kembar. Cakupan = body copy saja (keputusan user). Briefing nyata tetap menang; default no-regression (verified tsx: tone beda/variant, default identik, briefing override, rotasi 3 trio).
+- [ ] **F3-3** *(OPSIONAL — ADA opex ~ribuan/order, BUKAN jalur default)* LLM polish copy via Claude API server-side. **Flag-gated, default OFF.** Nyalakan cuma untuk hasil premium / klien bayar lebih. Bisa on/off tanpa ubah arsitektur — F3-1+F3-2 tetap fallback kalau flag off. **DITUNDA** (jalur default sudah layak jual).
 
 ## Fase F4 — Layout Beda (GAP 3)
 
@@ -278,3 +278,5 @@ Target skor:
 | 2026-06-04 | F1-1..F1-4 | feat/f1-build-order | ✅ done | otomatisasi build_order: generateContent+templates+API+tombol; e2e klinik verified, idempoten |
 | 2026-06-04 | F2-2 restaurant | PR#52 (6e7da14) | ✅ done | variant rustic+modern, palet semantik, e2e kanawa clean flip; **F2 TUNTAS** |
 | 2026-06-04 | F2-3 | a77fc66 (master) | ✅ done | sync swatch picker: travel luxury+batik+toko modern ke palet renderer |
+| 2026-06-04 | F3-1 | (sejak F1-2) | ✅ done | template isi briefing nyata; fallback spesifik nama+kota, bukan Lorem |
+| 2026-06-04 | F3-2 | PR#53 (5c15e60) | ✅ done | copyVariants.ts: 3 register copy/industri, tone by variant + rotasi nama; **F3 jalur default TUNTAS** |
