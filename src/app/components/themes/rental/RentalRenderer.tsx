@@ -9,13 +9,24 @@ import type { PageSection, Service, TenantProfile, FeatureFlags, DesignTokens } 
 import type { DataKontenRental } from '@/types/websitebuilder'
 
 // ── Palette ──────────────────────────────────────────────────
-const ORG   = '#EA580C'
-const ORG_D = '#9A3412'
-const ORG_L = '#FED7AA'
 const STN   = '#1C1917'
 const MUTED = '#78716C'
 const BDR   = '#E7E5E4'
 const PAGE  = '#FFFBF7'
+
+// ── Variant accent set (F2) ───────────────────────────────────
+// Tiap variant punya keluarga aksen sendiri supaya bold/fresh/luxury
+// render beda nyata. base bisa ditimpa warna brand klien (primary);
+// light/lighter/dark tetap dari variant agar harmoni terjaga.
+interface VAccent { base: string; light: string; lighter: string; dark: string; heroBg: 'dark' | 'light' | 'warm' }
+const VARIANT_ACCENTS: Record<string, VAccent> = {
+  bold:   { base: '#EA580C', light: '#FB923C', lighter: '#FED7AA', dark: '#9A3412', heroBg: 'dark' },
+  fresh:  { base: '#0284C7', light: '#38BDF8', lighter: '#BAE6FD', dark: '#075985', heroBg: 'light' },
+  luxury: { base: '#C8A24B', light: '#E3C879', lighter: '#F0E0B8', dark: '#8A6A2E', heroBg: 'dark' },
+}
+function clampHex(hex?: string): string | null {
+  return hex && /^#([0-9a-fA-F]{6})$/.test(hex) ? hex : null
+}
 
 // ── Shadow system ─────────────────────────────────────────────
 const S_SM  = '0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)'
@@ -133,22 +144,29 @@ interface RentalRendererProps {
   konten?: DataKontenRental
   features?: FeatureFlags
   designTokens?: DesignTokens
+  variant?: string
 }
 
 // ── Main renderer ─────────────────────────────────────────────
-export default function RentalRenderer({ nama, services, profile, wa, primary = ORG, konten, features = {}, designTokens = {} }: RentalRendererProps) {
-  const accent = primary || ORG
+export default function RentalRenderer({ nama, services, profile, wa, primary, konten, features = {}, designTokens = {}, variant }: RentalRendererProps) {
+  // Aksen per variant; warna brand klien (primary) menimpa base bila valid.
+  const va = VARIANT_ACCENTS[variant ?? 'bold'] ?? VARIANT_ACCENTS.bold
+  const accent       = clampHex(primary) ?? va.base
+  const accentLight  = va.light
+  const accentLighter= va.lighter
+  const accentDark   = va.dark
   const waNum = wa ?? profile?.wa ?? null
 
-  // Design tokens — visual customization per klien
-  const bgStyle    = designTokens.bg_style ?? 'dark'
+  // bg hero ditentukan variant (sumber kebenaran visual). design_tokens.bg_style
+  // dari build selalu 'dark' untuk travel, jadi variant yang menang di sini.
+  const bgStyle    = va.heroBg
   const typoWeight = designTokens.typography_weight ?? 'black'
   const headingWeight = typoWeight === 'black' ? 900 : typoWeight === 'bold' ? 800 : typoWeight === 'regular' ? 700 : 600
   const heroBg = bgStyle === 'light'
     ? `linear-gradient(135deg, #F8FAFC, #EFF6FF, #DBEAFE)`
     : bgStyle === 'warm'
     ? `linear-gradient(135deg, #FFFBEB, #FEF3C7, #FDE68A)`
-    : `linear-gradient(135deg, #1C0A00, ${ORG_D}, #7C2D12)`
+    : `linear-gradient(135deg, #14110E, ${accentDark}, ${accentDark})`
   const heroTextColor  = bgStyle === 'dark' ? '#fff' : STN
   const heroMutedColor = bgStyle === 'dark' ? '#D6D3D1' : MUTED
 
@@ -226,13 +244,13 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
           {/* Copy */}
           <div>
             {/* Eyebrow */}
-            <div className="rd-up rd-d0" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, backgroundColor: `${accent}28`, border: `1px solid ${accent}45`, color: ORG_L, fontSize: 11, fontWeight: 900, padding: '7px 16px', borderRadius: 999, marginBottom: 24, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#FB923C', display: 'inline-block', boxShadow: '0 0 6px #FB923C80' }} />
+            <div className="rd-up rd-d0" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, backgroundColor: `${accent}28`, border: `1px solid ${accent}45`, color: accentLighter, fontSize: 11, fontWeight: 900, padding: '7px 16px', borderRadius: 999, marginBottom: 24, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: accentLight, display: 'inline-block', boxShadow: `0 0 6px ${accentLight}80` }} />
               {kota.split(',')[0]} · Rental Terpercaya
             </div>
             <h1 className="rd-up rd-d1" style={{ fontSize: 'clamp(2.8rem,5.5vw,4.2rem)', fontWeight: headingWeight, lineHeight: 0.96, letterSpacing: '-0.03em', margin: '0 0 20px' }}>
               {taglineLines.map((line, i) => (
-                <span key={i} style={{ display: 'block', color: i === 1 ? '#FB923C' : heroTextColor }}>{line}</span>
+                <span key={i} style={{ display: 'block', color: i === 1 ? accentLight : heroTextColor }}>{line}</span>
               ))}
             </h1>
             <p className="rd-up rd-d2" style={{ color: heroMutedColor, fontSize: 17, lineHeight: 1.65, marginBottom: 28, fontWeight: 400, maxWidth: 480 }}>{deskripsi}</p>
@@ -411,7 +429,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
           <section style={{ backgroundColor: '#0C0A09', padding: '80px 24px' }}>
             <div style={{ maxWidth: 1280, margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: 56 }}>
-                <p style={{ fontSize: 11, fontWeight: 900, color: '#FB923C', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>Mengapa Kami</p>
+                <p style={{ fontSize: 11, fontWeight: 900, color: accentLight, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>Mengapa Kami</p>
                 <h2 style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>
                   {customerKeunggulan.length > 0 ? `Kenapa Pilih ${nama}?` : 'Bukan Sekadar Rental Biasa'}
                 </h2>
@@ -453,7 +471,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
             ].map((s, i) => (
               <div key={s.num} className={`rd-step rd-up rd-d${i}`} style={{ textAlign: 'center', position: 'relative' }}>
                 <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24 }}>
-                  <div className="rd-step-circle" style={{ width: 96, height: 96, backgroundColor: '#fff', border: `4px solid ${ORG_L}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: `0 8px 24px ${accent}20` }}>
+                  <div className="rd-step-circle" style={{ width: 96, height: 96, backgroundColor: '#fff', border: `4px solid ${accentLighter}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: `0 8px 24px ${accent}20` }}>
                     <span style={{ fontSize: 40 }}>{s.emoji}</span>
                   </div>
                   <div style={{ position: 'absolute', top: -8, right: -8, backgroundColor: accent, color: '#fff', fontSize: 10, fontWeight: 900, padding: '4px 10px', borderRadius: 999, boxShadow: S_ORG(accent) }}>{s.num}</div>
@@ -498,7 +516,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
       </section>
 
       {/* CTA */}
-      <section style={{ background: `linear-gradient(135deg, ${ORG_D} 0%, ${accent} 50%, #D97706 100%)`, padding: '80px 24px', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ background: `linear-gradient(135deg, ${accentDark} 0%, ${accent} 50%, ${accentLight} 100%)`, padding: '80px 24px', position: 'relative', overflow: 'hidden' }}>
         {/* Atmospheric radial glows */}
         <div style={{ position: 'absolute', inset: 0, backgroundImage: [
           'radial-gradient(ellipse 60% 80% at 10% 50%, rgba(255,255,255,.14) 0%, transparent 45%)',
@@ -581,7 +599,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary = 
           </div>
           <div style={{ borderTop: '1px solid #292524', paddingTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, fontWeight: 500 }}>
             <p style={{ margin: 0 }}>© 2024 {nama}. Semua hak dilindungi.</p>
-            <p style={{ margin: 0, color: '#44403C' }}>Dibuat dengan <a href="https://japanarena.com" style={{ color: '#FB923C', textDecoration: 'none', fontWeight: 700 }}>Japan Arena Website Builder</a></p>
+            <p style={{ margin: 0, color: '#44403C' }}>Dibuat dengan <a href="https://japanarena.com" style={{ color: accentLight, textDecoration: 'none', fontWeight: 700 }}>Japan Arena Website Builder</a></p>
           </div>
         </div>
       </footer>
