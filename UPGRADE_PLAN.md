@@ -174,7 +174,11 @@ Murah, cepat, tutup risiko. Kerjain barengan awal.
 
 ## Fase P5-DB — DB Hardening lanjut (backlog, setelah fitur jalan)
 
-- [ ] **P5DB-1** Rate limiting di API publik (`/api/track`, `/api/admin/*`).
+- [x] **P5DB-1** Rate limiting di API publik (`/api/track`, `/api/admin/*`). ✅ 2026-06-04 (PR#60).
+  - `src/lib/rate-limit.ts`: limiter in-memory fixed-window (`rateLimit`/`clientIp`/`tooManyRequests`), lazy prune. Best-effort per-instance (Vercel serverless) — upgrade ke Upstash Redis saat env ada, API helper tetap sama.
+  - `/api/admin/login`: rem brute force 8 / 10 mnt per IP. `/api/track`: 60 / mnt per IP.
+  - 5 unit test (window/reset/key/clientIp). Helper reusable utk endpoint lain (payment/briefing/shop).
+  - Rollback: revert PR. Tak ada perubahan DB.
 - [x] **P5DB-2** Security headers (CSP, HSTS) di `next.config`. ✅ 2026-06-04 (PR#59).
   - Semua route: HSTS (max-age 1th, tanpa includeSubDomains), X-Content-Type-Options nosniff, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geolocation off), X-DNS-Prefetch-Control.
   - `/admin` + `/portal`: anti-clickjacking (X-Frame-Options DENY + CSP frame-ancestors none).
@@ -311,4 +315,5 @@ Target skor:
 | 2026-06-04 | F5-2 | PR#56 | ✅ merged | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
 | 2026-06-04 | F5-3 | PR#57 | ✅ merged | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; prod deploy Ready |
 | 2026-06-04 | F5-4 | PR#58 | ✅ merged | test suite render + CI: Vitest + packs/TokenDriven snapshot + GH Actions; CI hijau PR pertama; **F5 TUNTAS** |
-| 2026-06-04 | P5DB-2 | PR#59 | ✅ done | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
+| 2026-06-04 | P5DB-2 | PR#59 | ✅ merged | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
+| 2026-06-04 | P5DB-1 | PR#60 | ✅ done | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |

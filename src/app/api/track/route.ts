@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +18,10 @@ const SELECT_FIELDS =
   'id, created_at, status, progress_step, total_estimasi, selected_addons, nomor_wa, nama_usaha, domain'
 
 export async function GET(req: NextRequest) {
+  // P5DB-1 — rem spam lookup publik: maks 60 query / menit per IP.
+  const rl = rateLimit(`track:${clientIp(req)}`, 60, 60_000)
+  if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
   const q = req.nextUrl.searchParams.get('q')?.trim()
   if (!q) {
     return NextResponse.json({ error: 'missing query' }, { status: 400 })
