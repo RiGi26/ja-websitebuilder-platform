@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Globe, Loader2, PencilRuler, KeyRound, Wand2 } from 'lucide-react'
+import { Globe, Loader2, PencilRuler, KeyRound, Wand2, Eye } from 'lucide-react'
 import CredentialBox from './CredentialBox'
 
 type Props = {
@@ -23,30 +23,28 @@ export default function BuildButton({ orderId, hasTenant, pageId }: Props) {
   const [cred, setCred] = useState<Cred | null>(null)
   const [nextPageId, setNextPageId] = useState<string | null>(null)
 
-  // F1-4 — bangun konten otomatis dari briefing order (generateContent + publish).
+  // F1-4 + F5-1 — bangun konten otomatis dari briefing order sebagai DRAFT,
+  // lalu arahkan admin ke halaman Preview untuk review sebelum Publish.
   const autoBuild = async () => {
-    if (!confirm('Bangun konten website otomatis dari briefing order ini? Konten lama hasil build akan ditimpa, lalu dipublish.')) return
+    if (!confirm('Bangun konten website otomatis dari briefing order ini? Hasil dibuat sebagai DRAFT — kamu review di Preview lalu Publish. Konten lama hasil build akan ditimpa.')) return
     setBuilding(true)
     try {
       const res = await fetch(`/api/admin/build-order/${orderId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ publish: true }),
+        body: JSON.stringify({ publish: false }),
       })
       const json = await res.json()
       if (!res.ok) {
         alert(`Gagal: ${json.error ?? 'unknown'}`)
         return
       }
-      const s = json.summary ?? {}
-      const lihat = json.slug
-        ? `\n\nLihat: /${json.slug}`
-        : ''
-      alert(
-        `Website dibangun & dipublish ✅\n` +
-          `Tema: ${s.theme || '-'}${s.variant ? ` (${s.variant})` : ''}\n` +
-          `${json.nSections ?? 0} section · ${json.nServices ?? 0} layanan · ${json.nMenu ?? 0} menu · ${json.nProducts ?? 0} produk${lihat}`,
-      )
+      // Sukses → buka Preview (review hasil build, publish dari sana).
+      const pid = json.pageId ?? pageId
+      if (pid) {
+        router.push(`/admin/preview/${pid}`)
+        return
+      }
       router.refresh()
     } catch {
       alert('Error koneksi')
@@ -120,14 +118,22 @@ export default function BuildButton({ orderId, hasTenant, pageId }: Props) {
           className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-600 text-white rounded-xl text-[11px] font-bold hover:bg-emerald-700 transition-colors uppercase tracking-widest disabled:opacity-50"
         >
           {building ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
-          {building ? 'Membangun…' : 'Bangun Otomatis'}
+          {building ? 'Membangun…' : 'Bangun Draft'}
         </button>
-        <a
-          href={`/admin/build/${pageId}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-[11px] font-bold hover:bg-indigo-700 transition-colors uppercase tracking-widest"
-        >
-          <PencilRuler size={14} /> Kelola Website
-        </a>
+        <div className="flex gap-2">
+          <a
+            href={`/admin/preview/${pageId}`}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold hover:bg-gray-700 transition-colors uppercase tracking-widest"
+          >
+            <Eye size={14} /> Preview
+          </a>
+          <a
+            href={`/admin/build/${pageId}`}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-[11px] font-bold hover:bg-indigo-700 transition-colors uppercase tracking-widest"
+          >
+            <PencilRuler size={14} /> Kelola
+          </a>
+        </div>
       </div>
     )
   }
