@@ -14,6 +14,7 @@
 import type { TipeIndustri } from '@/types/websitebuilder'
 import type { BuildSection, NormalizedBriefing, TemplateFn, TemplateOutput } from './types'
 import { asArr, asNum, asObj, asStr, kotaPhrase, waLink } from './briefing'
+import { getCopy } from './copyVariants'
 
 // ── shared section builders ────────────────────────────────────
 const hero = (b: NormalizedBriefing, title: string, subtitle: string, ctaText: string): BuildSection => ({
@@ -86,15 +87,9 @@ function fallbackDeskripsi(b: NormalizedBriefing, kalimat: string): string {
 
 // ── 3A. Travel / Rental ────────────────────────────────────────
 const travelTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const keunggulan = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
-  const feat = keunggulan.length
-    ? keunggulanToFeatures(keunggulan)
-    : [
-        { title: 'Armada Terawat', desc: 'Setiap unit dicek rutin dan selalu siap jalan — bersih, prima, tanpa drama.' },
-        { title: 'Harga Transparan', desc: `Tarif jelas di depan untuk wilayah ${kota}, tanpa biaya tersembunyi.` },
-        { title: 'Respons Cepat', desc: 'Booking lewat WhatsApp, dibalas cepat, unit siap sesuai jadwal Anda.' },
-      ]
+  const feat = keunggulan.length ? keunggulanToFeatures(keunggulan) : c.features
 
   const fleet = asArr(b.konten.fleet)
   const services = (fleet.length
@@ -119,7 +114,7 @@ const travelTemplate: TemplateFn = (b) => {
   const dataKonten = {
     nama_usaha: b.namaUsaha,
     tagline: fallbackTagline(b, 'Rental kendaraan'),
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} melayani sewa kendaraan di ${kota} dengan armada terawat dan harga transparan.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     kota_layanan: b.kotaLayanan,
     wa: b.wa,
     keunggulan: keunggulan.length ? keunggulan.slice(0, 4) : feat.map((f) => f.desc).slice(0, 4),
@@ -133,7 +128,7 @@ const travelTemplate: TemplateFn = (b) => {
     features('Mengapa Memilih Kami', feat),
     serviceList('Pilihan Armada'),
     contact(b, 'Pesan Kendaraan'),
-    cta(b, 'Siap Jalan?', `Booking unit ${b.namaUsaha} sekarang lewat WhatsApp.`, 'Sewa Sekarang'),
+    cta(b, 'Siap Jalan?', c.ctaSubtitle, 'Sewa Sekarang'),
   ]
 
   return { dataKonten, sections, services }
@@ -141,7 +136,7 @@ const travelTemplate: TemplateFn = (b) => {
 
 // ── 3B. Restaurant ─────────────────────────────────────────────
 const restaurantTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const menu = asArr(b.konten.menu)
   const menuItems = (menu.length
     ? menu.map((m) => {
@@ -164,7 +159,7 @@ const restaurantTemplate: TemplateFn = (b) => {
     nama_resto: b.namaUsaha,
     nama_usaha: b.namaUsaha,
     tagline: fallbackTagline(b, 'Tempat makan'),
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} menyajikan hidangan lezat dengan bahan segar di ${kota}. Suasana nyaman untuk keluarga & teman.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     wa: b.wa,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
   }
@@ -174,7 +169,7 @@ const restaurantTemplate: TemplateFn = (b) => {
     about('Cerita Kami', dataKonten.deskripsi),
     pricingMenu('Menu Kami'),
     contact(b, 'Kunjungi Kami'),
-    cta(b, 'Lapar?', `Pesan sekarang atau kunjungi ${b.namaUsaha} hari ini.`, 'Pesan via WhatsApp'),
+    cta(b, 'Lapar?', c.ctaSubtitle, 'Pesan via WhatsApp'),
   ]
 
   return { dataKonten, sections, menuItems }
@@ -182,7 +177,7 @@ const restaurantTemplate: TemplateFn = (b) => {
 
 // ── 3C. Corporate ──────────────────────────────────────────────
 const corporateTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const layanan = asArr(b.konten.layanan)
   const services = (layanan.length
     ? layanan.map((l) => {
@@ -201,18 +196,12 @@ const corporateTemplate: TemplateFn = (b) => {
       ])
 
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
-  const features_ = feat.length
-    ? keunggulanToFeatures(feat)
-    : [
-        { title: 'Berpengalaman', desc: 'Tim profesional dengan rekam jejak menangani beragam klien.' },
-        { title: 'Solusi Terukur', desc: 'Pendekatan berbasis data, hasil yang bisa dipertanggungjawabkan.' },
-        { title: 'Mitra Jangka Panjang', desc: 'Kami tumbuh bersama klien, bukan sekadar proyek sesaat.' },
-      ]
+  const features_ = feat.length ? keunggulanToFeatures(feat) : c.features
 
   const dataKonten = {
     nama_perusahaan: b.namaUsaha,
     tagline: b.tagline || `Mitra ${b.namaUsaha} untuk pertumbuhan bisnis Anda`,
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} adalah perusahaan yang berfokus memberikan layanan profesional dan terpercaya di ${kota}.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     bidang_usaha: asStr(b.konten.bidang_usaha) || 'Layanan Profesional',
     layanan_utama: services.map((s) => s.nama),
     kontak: { email: b.email || undefined, telepon: b.wa || undefined, alamat: b.alamat || undefined },
@@ -224,7 +213,7 @@ const corporateTemplate: TemplateFn = (b) => {
     features('Mengapa Kami', features_),
     serviceList('Layanan Kami'),
     contact(b, 'Hubungi Tim Kami'),
-    cta(b, 'Mari Berkolaborasi', `Diskusikan kebutuhan Anda dengan tim ${b.namaUsaha}.`, 'Konsultasi Gratis'),
+    cta(b, 'Mari Berkolaborasi', c.ctaSubtitle, 'Konsultasi Gratis'),
   ]
 
   return { dataKonten, sections, services }
@@ -232,7 +221,7 @@ const corporateTemplate: TemplateFn = (b) => {
 
 // ── 3D. Klinik ─────────────────────────────────────────────────
 const klinikTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const dokter = asArr(b.konten.dokter)
   const fasilitas = asArr(b.konten.fasilitas).map(asStr).filter(Boolean)
   const asuransi = asArr(b.konten.asuransi).map(asStr).filter(Boolean)
@@ -256,17 +245,11 @@ const klinikTemplate: TemplateFn = (b) => {
       ])
 
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
-  const features_ = feat.length
-    ? keunggulanToFeatures(feat)
-    : [
-        { title: 'Dokter Berpengalaman', desc: 'Ditangani tenaga medis tersertifikasi yang ramah dan profesional.' },
-        { title: 'Pelayanan Cepat', desc: 'Antrean tertata, waktu tunggu singkat, proses jelas.' },
-        { title: 'Fasilitas Lengkap', desc: 'Peralatan medis modern untuk diagnosis yang akurat.' },
-      ]
+  const features_ = feat.length ? keunggulanToFeatures(feat) : c.features
 
   const dataKonten = {
     nama_klinik: b.namaUsaha,
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} melayani kesehatan keluarga di ${kota} dengan dokter berpengalaman dan fasilitas modern.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     spesialisasi: dokter.map((d) => asStr(asObj(d).spesialis)).filter(Boolean),
     dokter: dokter.map((d) => {
       const o = asObj(d)
@@ -284,7 +267,7 @@ const klinikTemplate: TemplateFn = (b) => {
     features('Mengapa Pasien Memilih Kami', features_),
     serviceList('Layanan & Dokter'),
     contact(b, 'Buat Janji Temu'),
-    cta(b, 'Jaga Kesehatan Keluarga Anda', `Buat janji dengan ${b.namaUsaha} sekarang.`, 'Buat Janji'),
+    cta(b, 'Jaga Kesehatan Keluarga Anda', c.ctaSubtitle, 'Buat Janji'),
   ]
 
   return { dataKonten, sections, services }
@@ -292,7 +275,7 @@ const klinikTemplate: TemplateFn = (b) => {
 
 // ── 3E. Sekolah ────────────────────────────────────────────────
 const sekolahTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const program = asArr(b.konten.program).length ? asArr(b.konten.program) : asArr(b.konten.program_unggulan)
   const services = (program.length
     ? program.map((p) => {
@@ -313,7 +296,7 @@ const sekolahTemplate: TemplateFn = (b) => {
   const dataKonten = {
     nama_sekolah: b.namaUsaha,
     akreditasi: asStr(b.konten.akreditasi) || undefined,
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} hadir di ${kota} dengan pendidikan berkualitas dan lingkungan belajar yang mendukung.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     visi: asStr(b.konten.visi) || undefined,
     program_unggulan: services.map((s) => s.nama),
     ppdb_aktif: true,
@@ -324,14 +307,10 @@ const sekolahTemplate: TemplateFn = (b) => {
   const sections: BuildSection[] = [
     hero(b, b.namaUsaha, dataKonten.deskripsi, 'Daftar Sekarang'),
     about('Tentang Sekolah', dataKonten.deskripsi),
-    features('Keunggulan Kami', feat.length ? keunggulanToFeatures(feat) : [
-      { title: 'Pendidik Berkualitas', desc: 'Tenaga pengajar berdedikasi yang peduli pada tiap siswa.' },
-      { title: 'Lingkungan Mendukung', desc: 'Suasana belajar aman, nyaman, dan menumbuhkan karakter.' },
-      { title: 'Prestasi Terbukti', desc: 'Rekam jejak siswa berprestasi di bidang akademik & non-akademik.' },
-    ]),
+    features('Keunggulan Kami', feat.length ? keunggulanToFeatures(feat) : c.features),
     serviceList('Program Kami'),
     contact(b, 'Informasi Pendaftaran'),
-    cta(b, 'Bergabung Bersama Kami', `Daftarkan putra-putri Anda di ${b.namaUsaha}.`, 'Daftar Sekarang'),
+    cta(b, 'Bergabung Bersama Kami', c.ctaSubtitle, 'Daftar Sekarang'),
   ]
 
   return { dataKonten, sections, services }
@@ -339,6 +318,7 @@ const sekolahTemplate: TemplateFn = (b) => {
 
 // ── 3F. Toko Online (batik) ────────────────────────────────────
 const tokoOnlineTemplate: TemplateFn = (b) => {
+  const c = getCopy(b)
   const produk = asArr(b.konten.produk_unggulan).length ? asArr(b.konten.produk_unggulan) : asArr(b.konten.produk)
   const products = (produk.length
     ? produk.map((p) => {
@@ -360,7 +340,7 @@ const tokoOnlineTemplate: TemplateFn = (b) => {
   const dataKonten = {
     nama_toko: b.namaUsaha,
     tagline: fallbackTagline(b, 'Toko'),
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} menghadirkan produk pilihan dengan kualitas terjaga. Belanja mudah, pengiriman ke seluruh Indonesia.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     kategori_produk: [...new Set(products.map((p) => p.kategori).filter(Boolean))] as string[],
     kontak: { wa: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
     sosial_media: { instagram: b.sosial.instagram, tiktok: b.sosial.tiktok, shopee: b.sosial.shopee },
@@ -369,14 +349,10 @@ const tokoOnlineTemplate: TemplateFn = (b) => {
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
   const sections: BuildSection[] = [
     hero(b, b.namaUsaha, dataKonten.deskripsi, 'Belanja Sekarang'),
-    features('Kenapa Belanja di Sini', feat.length ? keunggulanToFeatures(feat) : [
-      { title: 'Kualitas Terjaga', desc: 'Setiap produk dikurasi, dikemas rapi, sampai dengan aman.' },
-      { title: 'Pengiriman Cepat', desc: 'Diproses cepat dan dikirim ke seluruh Indonesia.' },
-      { title: 'Belanja Mudah', desc: 'Pesan langsung via WhatsApp, respons ramah dan cepat.' },
-    ]),
+    features('Kenapa Belanja di Sini', feat.length ? keunggulanToFeatures(feat) : c.features),
     productList('Produk Kami'),
     contact(b, 'Hubungi Kami'),
-    cta(b, 'Temukan Favorit Anda', `Belanja koleksi ${b.namaUsaha} sekarang.`, 'Belanja Sekarang'),
+    cta(b, 'Temukan Favorit Anda', c.ctaSubtitle, 'Belanja Sekarang'),
   ]
 
   return { dataKonten, sections, products }
@@ -384,11 +360,11 @@ const tokoOnlineTemplate: TemplateFn = (b) => {
 
 // ── 3G. Generic (personal/blog/jastip/custom) ──────────────────
 const genericTemplate: TemplateFn = (b) => {
-  const kota = kotaPhrase(b.kotaLayanan)
+  const c = getCopy(b)
   const dataKonten = {
     nama_usaha: b.namaUsaha,
     tagline: fallbackTagline(b, b.namaUsaha),
-    deskripsi: fallbackDeskripsi(b, `${b.namaUsaha} hadir untuk Anda di ${kota}.`),
+    deskripsi: fallbackDeskripsi(b, c.deskripsi),
     wa: b.wa,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
   }
@@ -396,13 +372,9 @@ const genericTemplate: TemplateFn = (b) => {
   const sections: BuildSection[] = [
     hero(b, b.namaUsaha, dataKonten.deskripsi, 'Hubungi Saya'),
     about('Tentang', dataKonten.deskripsi),
-    features('Yang Saya Tawarkan', feat.length ? keunggulanToFeatures(feat) : [
-      { title: 'Profesional', desc: 'Dikerjakan serius dengan standar yang Anda harapkan.' },
-      { title: 'Komunikatif', desc: 'Mudah dihubungi, responsif, dan transparan.' },
-      { title: 'Tepat Waktu', desc: 'Komitmen pada hasil dan tenggat yang disepakati.' },
-    ]),
+    features('Yang Saya Tawarkan', feat.length ? keunggulanToFeatures(feat) : c.features),
     contact(b, 'Hubungi Saya'),
-    cta(b, 'Mari Terhubung', `Sampaikan kebutuhan Anda ke ${b.namaUsaha}.`, 'Hubungi Saya'),
+    cta(b, 'Mari Terhubung', c.ctaSubtitle, 'Hubungi Saya'),
   ]
   return { dataKonten, sections }
 }
