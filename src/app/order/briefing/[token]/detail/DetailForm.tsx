@@ -234,7 +234,7 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
       <div className="bg-white rounded-[32px] p-6 sm:p-10 shadow-sm border border-black/[0.03] space-y-8">
 
         {/* Foto Hero */}
-        <Field label="Foto Utama / Hero" hint="Foto terbaik yang mewakili bisnis Anda — tampil paling menonjol di website.">
+        <Field label="Foto Utama / Hero (opsional)" hint="Foto terbaik yang mewakili bisnis Anda — tampil paling menonjol. Boleh dikosongkan & menyusul nanti.">
           <input className={inputCls} value={form.foto_hero} onChange={e => set('foto_hero', e.target.value)}
             placeholder="https://drive.google.com/... atau link foto lainnya" />
         </Field>
@@ -305,10 +305,10 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
         </Field>
 
         {!fotoHeroTerisi && (
-          <div className="p-4 rounded-[16px] bg-amber-50 border border-amber-100 flex items-start gap-3">
-            <span className="text-amber-500 text-lg shrink-0">⚠️</span>
-            <p className="text-sm font-bold text-amber-800">
-              Foto Utama wajib diisi sebelum bisa mengirim. Masukkan link foto hero di atas.
+          <div className="p-4 rounded-[16px] bg-blue-50/60 border border-blue-100 flex items-start gap-3">
+            <span className="text-[#0071E3] text-lg shrink-0">💡</span>
+            <p className="text-sm font-medium text-gray-600">
+              Belum punya link foto? <strong className="text-gray-800">Tidak apa-apa</strong> — kirim saja dulu, tim kami siapkan visual sementara. Anda bisa kembali ke form ini kapan saja untuk menambah foto asli.
             </p>
           </div>
         )}
@@ -319,12 +319,16 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
           </div>
         )}
 
-        <button onClick={handleSubmit} disabled={submitting || !fotoHeroTerisi}
+        <button onClick={handleSubmit} disabled={submitting}
           className="w-full py-4 rounded-2xl bg-[#0071E3] text-white font-black text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-          {submitting ? <><Loader2 size={18} className="animate-spin" /> Mengirim...</> : <><Check size={18} /> Kirim Detail Website</>}
+          {submitting ? <><Loader2 size={18} className="animate-spin" /> Mengirim...</> : <><Check size={18} /> {fotoHeroTerisi ? 'Kirim Detail Website' : 'Kirim Sekarang'}</>}
         </button>
+        <a href={`/track?id=${orderId}`}
+          className="block w-full text-center text-sm text-gray-400 hover:text-gray-700 font-medium py-2 transition-colors">
+          Lewati — lengkapi nanti kapan saja
+        </a>
         <p className="text-center text-[11px] text-gray-500 font-medium">
-          Foto pendukung dan testimoni opsional — bisa dilengkapi kapan saja.
+          Semua di tahap ini opsional. Foto & testimoni bikin website lebih meyakinkan, tapi bisa dilengkapi kapan saja lewat link yang sama.
         </p>
       </div>
     </div>
