@@ -326,7 +326,7 @@ Target skor:
 | 2026-06-04 | P5DB-2 | PR#59 | ✅ merged | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
 | 2026-06-04 | P5DB-1 | PR#60 | ✅ merged | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |
 | 2026-06-04 | P5DB-3 | PR#61 | ✅ done | monitoring: security_events + logSecurityEvent (login gagal/ratelimit, track ratelimit); persist+log tanpa channel; **P5DB TUNTAS** |
-| 2026-06-04 | UX briefing | PR#62 | 🔵 open | DetailForm tahap-2 benar-benar opsional (hapus jebakan foto hero wajib + jalan keluar "lewati"); audit form: tahap-1 sudah ramping |
+| 2026-06-04 | UX briefing | PR#62 | ✅ merged | DetailForm tahap-2 benar-benar opsional (hapus jebakan foto hero wajib + jalan keluar "lewati"); audit form: tahap-1 sudah ramping |
 
 ---
 
