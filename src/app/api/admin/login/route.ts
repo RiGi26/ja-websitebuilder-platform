@@ -4,8 +4,13 @@ import {
   ADMIN_COOKIE_MAX_AGE,
   createAdminSessionToken,
 } from '@/lib/admin-auth'
+import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
+  // P5DB-1 — rem brute force: maks 8 percobaan / 10 menit per IP.
+  const rl = rateLimit(`admin-login:${clientIp(request)}`, 8, 10 * 60_000)
+  if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
   // Tidak ada fallback password default — wajib di-set via env.
   if (!ADMIN_PASSWORD) {
