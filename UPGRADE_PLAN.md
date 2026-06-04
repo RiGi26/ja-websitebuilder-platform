@@ -9,8 +9,8 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Yang TERSISA cuma OPT-IN: P0-1 (toggle leaked-pw, butuh user di dashboard), F1-5 (webhook auto-build), F3-3 (LLM polish). P5DB-3 nunggu merge (PR#61).
-- **Step berikutnya:** Merge PR#61 → semua item kode selesai. Sisanya keputusan user: aktifkan P0-1 di dashboard Supabase; F1-5/F3-3 kalau mau. Tak ada pekerjaan kode wajib lagi.
+- **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Semua kode SELESAI & MERGED. Sisa OPT-IN: P0-1 (DEFERRED — butuh Pro plan, user aktifkan stlh upgrade), F1-5 (webhook auto-build), F3-3 (LLM polish).
+- **Step berikutnya:** Tak ada pekerjaan kode wajib. P0-1 nunggu upgrade Pro plan (2026-06-04 dicoba, gagal — fitur Pro-only). F1-5/F3-3 kalau ada kebutuhan. Builder = 10/10, DB hardening = ~9.5.
 - **Catatan terakhir:** 2026-06-04 — P5DB-3 DONE (PR#61, CI pass + Vercel Ready): migration `security_events` (kind/ip/detail jsonb, RLS deny_public_access, index); `security-log.ts` logSecurityEvent (console.warn + insert, non-fatal); login log failed+ratelimited, track log ratelimited. Persist+log tanpa channel (keputusan user). SEBELUMNYA: P5DB-1 MERGED (PR#60) rate limit login 8/10mnt+track 60/mnt; P5DB-2 MERGED (PR#59) security headers; F5 TUNTAS (F5-1..4 PR#55-58); F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
@@ -158,9 +158,10 @@ Murah, cepat, tutup risiko. Kerjain barengan awal.
 
 ## Fase P0 — DB Quick Security (target: 1–2 jam)
 
-- [!] **P0-1** Nyalakan **leaked password protection** (HaveIBeenPwned) di Supabase Auth dashboard.
-  - ⚠️ BUTUH USER: tidak ada MCP tool untuk toggle ini. Dashboard → Authentication → Policies/Password → aktifkan "Leaked password protection".
-  - Verify: jalankan `get_advisors security` → WARN `auth_leaked_password_protection` hilang.
+- [!] **P0-1** Nyalakan **leaked password protection** (HaveIBeenPwned) di Supabase Auth dashboard. **DEFERRED — butuh Pro plan.**
+  - Lokasi UI: Authentication → Providers → **Email** → bagian password → toggle **"Prevent use of leaked passwords"**.
+  - ⚠️ 2026-06-04: dicoba aktifkan, GAGAL — *"available on Pro Plans and up"*. Project masih Free plan. User akan aktifkan **setelah upgrade ke Pro**. Bukan blocker (mitigasi lain sudah jalan: min-password-length 6, rate limit login, audit log, RLS deny).
+  - Verify (nanti setelah upgrade+toggle): `get_advisors security` → WARN `auth_leaked_password_protection` hilang.
   - Rollback: matikan lagi di dashboard (gak ada risiko data).
 - [x] **P0-2** Audit akses `tenant_payment_config` (config bayar, sensitif). ✅ 2026-06-04
   - Hasil audit: service-role-only (cuma `src/lib/tenant-midtrans.ts` via supabaseAdmin). Anon tak nyentuh.
@@ -309,7 +310,7 @@ Target skor:
 | 2026-06-04 | — | — | plan dibuat | Belum ada perubahan |
 | 2026-06-04 | P0-2 | migration MCP | ✅ done | deny_public_access tenant_payment_config |
 | 2026-06-04 | P0-3 | migration MCP | ✅ done | deny_public_access tenants + order_progress_logs; advisor 3 INFO→0 |
-| 2026-06-04 | P0-1 | — | ⏳ user | toggle leaked-pw protection di dashboard (tak ada MCP tool) |
+| 2026-06-04 | P0-1 | — | ⛔ deferred | leaked-pw protection = Pro-plan only; dicoba 2026-06-04 gagal; user aktifkan stlh upgrade |
 | 2026-06-04 | F1-1..F1-4 | feat/f1-build-order | ✅ done | otomatisasi build_order: generateContent+templates+API+tombol; e2e klinik verified, idempoten |
 | 2026-06-04 | F2-2 restaurant | PR#52 (6e7da14) | ✅ done | variant rustic+modern, palet semantik, e2e kanawa clean flip; **F2 TUNTAS** |
 | 2026-06-04 | F2-3 | a77fc66 (master) | ✅ done | sync swatch picker: travel luxury+batik+toko modern ke palet renderer |
