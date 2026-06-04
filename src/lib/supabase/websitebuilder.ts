@@ -115,6 +115,34 @@ export async function fetchPageBySlug(
 }
 
 /**
+ * Fetch satu halaman by id BESERTA section visible (urut asc), TANPA filter
+ * status. Untuk preview admin (service role) — lihat draft sebelum publish.
+ * Jangan dipakai dengan anon client di jalur publik.
+ */
+export async function fetchPageByIdAdmin(
+  client: Client,
+  pageId: string
+): Promise<LandingPageWithSections | null> {
+  const { data, error } = await client
+    .from('landing_pages')
+    .select(`
+      *,
+      page_sections (
+        *
+      )
+    `)
+    .eq('id', pageId)
+    .eq('page_sections.is_visible', true)
+    .order('urutan', { referencedTable: 'page_sections', ascending: true })
+    .maybeSingle()
+
+  if (error) throw new Error(`fetchPageByIdAdmin: ${error.message}`)
+  if (!data) return null
+
+  return data as LandingPageWithSections
+}
+
+/**
  * List semua halaman milik tenant, terbaru dulu.
  * Jika tenantId diberikan, filter eksplisit; jika tidak, RLS handle isolasi.
  */
