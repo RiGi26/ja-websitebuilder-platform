@@ -78,8 +78,8 @@ export default async function PublicSitePage({
     }
     const variant = konfig.branding?.variant
     if (variant === 'clean') return <KlinikCleanRenderer {...klinikProps} />
-    // variant 'warm' (default) atau tidak di-set
-    return <KlinikRenderer {...klinikProps} />
+    // variant 'warm' (default) atau 'premium' → KlinikRenderer (variant-aware)
+    return <KlinikRenderer {...klinikProps} variant={variant} />
   }
 
   if (theme === 'company') {
