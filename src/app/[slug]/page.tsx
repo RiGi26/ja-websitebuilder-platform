@@ -96,7 +96,7 @@ export default async function PublicSitePage({
       fetchServicesByPage(supabase, page.id),
       fetchTenantProfile(supabase, page.id),
     ])
-    return <SekolahRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} />
+    return <SekolahRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} variant={variant} />
   }
 
   if (theme === 'restaurant') {
