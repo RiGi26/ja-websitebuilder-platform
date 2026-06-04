@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
+import { logSecurityEvent } from '@/lib/security-log'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,8 +20,12 @@ const SELECT_FIELDS =
 
 export async function GET(req: NextRequest) {
   // P5DB-1 — rem spam lookup publik: maks 60 query / menit per IP.
-  const rl = rateLimit(`track:${clientIp(req)}`, 60, 60_000)
-  if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+  const ip = clientIp(req)
+  const rl = rateLimit(`track:${ip}`, 60, 60_000)
+  if (!rl.allowed) {
+    await logSecurityEvent('track_ratelimited', { ip })
+    return tooManyRequests(rl.retryAfter)
+  }
 
   const q = req.nextUrl.searchParams.get('q')?.trim()
   if (!q) {

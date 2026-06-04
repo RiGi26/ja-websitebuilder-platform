@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 3 — **F5 (robustness) TUNTAS pending merge terakhir. F5-1+F5-2+F5-3 MERGED. F5-4 (test suite render + CI) SELESAI (PR#58, CI pass + preview Ready), nunggu merge.** Setelah PR#58 merged → F5 100%, skor fitur 10. Sisa backlog: P5DB hardening. P0-1 masih nunggu user. F1-5/F3-3 opsional ditunda.
-- **Step berikutnya:** Merge PR#58 → F5 TUNTAS (skor fitur 10/10). Lalu opsional: P5DB hardening (rate limit + CSP/HSTS + monitoring) atau berhenti. P0-1 (toggle leaked-pw di dashboard) masih nunggu user.
-- **Catatan terakhir:** 2026-06-04 — F5-4 DONE (PR#58, CI pass 41s + preview Ready): Vitest (env node, renderToStaticMarkup tanpa jsdom). `packs.test.ts` (VARIANT_PACK valid, layout lengkap, arketipe beda nyata, resolveTokenPack+contrast, isTokenDrivenTheme); `TokenDrivenRenderer.test.tsx` (render 5 pack + snapshot markup + layout beda struktural); `.github/workflows/ci.yml` (PR+push master → npm ci, typecheck, test). 20 test pass, 5 snapshot. CI HIJAU di PR pertama. SEBELUMNYA: F5-3 MERGED (PR#57) self-edit portal; F5-2 MERGED (PR#56) rollback; F5-1 MERGED (PR#55) preview; F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Yang TERSISA cuma OPT-IN: P0-1 (toggle leaked-pw, butuh user di dashboard), F1-5 (webhook auto-build), F3-3 (LLM polish). P5DB-3 nunggu merge (PR#61).
+- **Step berikutnya:** Merge PR#61 → semua item kode selesai. Sisanya keputusan user: aktifkan P0-1 di dashboard Supabase; F1-5/F3-3 kalau mau. Tak ada pekerjaan kode wajib lagi.
+- **Catatan terakhir:** 2026-06-04 — P5DB-3 DONE (PR#61, CI pass + Vercel Ready): migration `security_events` (kind/ip/detail jsonb, RLS deny_public_access, index); `security-log.ts` logSecurityEvent (console.warn + insert, non-fatal); login log failed+ratelimited, track log ratelimited. Persist+log tanpa channel (keputusan user). SEBELUMNYA: P5DB-1 MERGED (PR#60) rate limit login 8/10mnt+track 60/mnt; P5DB-2 MERGED (PR#59) security headers; F5 TUNTAS (F5-1..4 PR#55-58); F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -185,7 +185,12 @@ Murah, cepat, tutup risiko. Kerjain barengan awal.
   - **Situs klien `[slug]` SENGAJA tetap bisa di-iframe** (galeri corp-landing) → proteksi frame hanya di area sensitif, nol regresi galeri. HSTS tanpa includeSubDomains (jangan paksa subdomain ekosistem). CSP konten penuh utk situs publik DITUNDA (klien embed konten arbitrer).
   - Verified curl lokal (next start): /pricing dapat header aman tanpa frame-block; /admin/login dapat DENY+frame-ancestors none.
   - Rollback: revert PR (cuma next.config).
-- [ ] **P5DB-3** Monitoring/alert (login gagal beruntun, lonjakan akses).
+- [x] **P5DB-3** Monitoring/alert (login gagal beruntun, lonjakan akses). ✅ 2026-06-04 (PR#61). **Persist + log, tanpa channel keluar** (keputusan user).
+  - Migration `security_events` (MCP): kind/ip/detail jsonb, RLS `deny_public_access` (service-role-only), index (kind,created_at)+created_at.
+  - `src/lib/security-log.ts`: `logSecurityEvent` → console.warn (Vercel logs) + insert. Best-effort, NON-FATAL.
+  - `/api/admin/login`: `admin_login_failed` + `admin_login_ratelimited`. `/api/track`: `track_ratelimited`.
+  - Audit via SQL (mis. `select ip,count(*) from security_events where kind='admin_login_failed' and created_at>now()-interval '1 hour' group by ip`). Alert channel (WA/email) = upgrade lain waktu.
+  - Rollback: revert PR + `drop table security_events`.
 
 ---
 
@@ -316,4 +321,5 @@ Target skor:
 | 2026-06-04 | F5-3 | PR#57 | ✅ merged | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; prod deploy Ready |
 | 2026-06-04 | F5-4 | PR#58 | ✅ merged | test suite render + CI: Vitest + packs/TokenDriven snapshot + GH Actions; CI hijau PR pertama; **F5 TUNTAS** |
 | 2026-06-04 | P5DB-2 | PR#59 | ✅ merged | security headers: HSTS+nosniff+referrer+permissions global, anti-clickjacking di /admin+/portal; situs klien tetap framable; verified curl |
-| 2026-06-04 | P5DB-1 | PR#60 | ✅ done | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |
+| 2026-06-04 | P5DB-1 | PR#60 | ✅ merged | rate limiting in-memory: login 8/10mnt + track 60/mnt per IP; helper reusable; 5 test |
+| 2026-06-04 | P5DB-3 | PR#61 | ✅ done | monitoring: security_events + logSecurityEvent (login gagal/ratelimit, track ratelimit); persist+log tanpa channel; **P5DB TUNTAS** |
