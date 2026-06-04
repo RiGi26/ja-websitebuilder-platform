@@ -9,9 +9,9 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** Sprint 3 — **F5 (robustness). F5-1+F5-2 MERGED ke prod. F5-3 (self-edit klien) SELESAI (PR#57, preview deploy Ready), nunggu merge.** Lanjut F5-4 (CI snapshot test) = step terakhir F5. P0-1 masih nunggu user, F1-5 ditunda. F3-3 LLM opsional ditunda.
-- **Step berikutnya:** Merge PR#57 → lanjut F5-4 (test suite render snapshot di CI). Setelah F5-4: F5 TUNTAS → skor fitur 10. Lalu P5DB hardening.
-- **Catatan terakhir:** 2026-06-04 — F5-3 DONE (PR#57, preview deploy Ready): self-edit konten klien dari portal. API `/api/portal/sections` PATCH (verifikasi sesi JWT tenant_id + ownership section, tulis via service role — TAK melebarkan RLS page_sections); `ContentPanel.tsx` editor generik per section (string top-level + array items features/testi/faq, label ramah, preview gambar, Simpan per section); `portal/page.tsx` fetch sections; `PortalDashboard` tab "Konten" (default kalau ada section). Live langsung setelah simpan. tsc+build clean. SEBELUMNYA: F5-2 MERGED (PR#56) page_versions+rollback; F5-1 MERGED (PR#55) preview draft; F4 LIVE; F2+F3 default LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
+- **Fase aktif:** Sprint 3 — **F5 (robustness) TUNTAS pending merge terakhir. F5-1+F5-2+F5-3 MERGED. F5-4 (test suite render + CI) SELESAI (PR#58, CI pass + preview Ready), nunggu merge.** Setelah PR#58 merged → F5 100%, skor fitur 10. Sisa backlog: P5DB hardening. P0-1 masih nunggu user. F1-5/F3-3 opsional ditunda.
+- **Step berikutnya:** Merge PR#58 → F5 TUNTAS (skor fitur 10/10). Lalu opsional: P5DB hardening (rate limit + CSP/HSTS + monitoring) atau berhenti. P0-1 (toggle leaked-pw di dashboard) masih nunggu user.
+- **Catatan terakhir:** 2026-06-04 — F5-4 DONE (PR#58, CI pass 41s + preview Ready): Vitest (env node, renderToStaticMarkup tanpa jsdom). `packs.test.ts` (VARIANT_PACK valid, layout lengkap, arketipe beda nyata, resolveTokenPack+contrast, isTokenDrivenTheme); `TokenDrivenRenderer.test.tsx` (render 5 pack + snapshot markup + layout beda struktural); `.github/workflows/ci.yml` (PR+push master → npm ci, typecheck, test). 20 test pass, 5 snapshot. CI HIJAU di PR pertama. SEBELUMNYA: F5-3 MERGED (PR#57) self-edit portal; F5-2 MERGED (PR#56) rollback; F5-1 MERGED (PR#55) preview; F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
 
@@ -255,7 +255,12 @@ Token-pack saat ini cuma re-skin. Tambah layout arketipe.
   - `ContentPanel.tsx`: editor generik per section — field string top-level (judul/subjudul/cta/deskripsi/gambar) + array `items` (features/testimoni/faq), label ramah, textarea teks panjang, preview thumbnail gambar, Simpan per section + badge "Belum disimpan".
   - `portal/page.tsx` fetch `page_sections`; `PortalDashboard` tab "Konten" (default kalau ada section). Live langsung setelah simpan.
   - Rollback: revert PR. Tak ada perubahan DB.
-- [ ] **F5-4** Test suite render (snapshot tiap theme+variant) di CI.
+- [x] **F5-4** Test suite render (snapshot tiap theme+variant) di CI. ✅ 2026-06-04 (PR#58, CI pass + preview Ready).
+  - Vitest (env node, `renderToStaticMarkup` — tanpa jsdom). Script `test`/`test:watch`/`typecheck`; `vitest.config.ts` alias `@` + JSX automatic.
+  - `packs.test.ts`: VARIANT_PACK semua valid, tiap pack layout lengkap, arketipe beda nyata (split/rows/fullbleed/list vs baseline centered+grid), `resolveTokenPack` mapping + override primary/onPrimary kontras, `isTokenDrivenTheme`.
+  - `TokenDrivenRenderer.test.tsx`: render 5 pack tanpa error + konten inti + CSS var; snapshot markup tiap pack; assert layout beda struktural.
+  - `.github/workflows/ci.yml`: PR + push master → npm ci, typecheck, test. **CI hijau di PR pertama (41s).**
+  - 20 test pass, 5 snapshot. Rollback: revert PR (tak ada perubahan runtime/DB).
 
 ---
 
@@ -299,4 +304,5 @@ Target skor:
 | 2026-06-04 | F4-1..F4-3 | PR#54 (711495a) | ✅ done | arketipe layout TokenPack: split/fullbleed/list + centered baseline; verified SSR |
 | 2026-06-04 | F5-1 | PR#55 | ✅ merged | preview draft sebelum publish: SiteRenderer bersama + /admin/preview + PreviewBar; prod deploy Ready |
 | 2026-06-04 | F5-2 | PR#56 | ✅ merged | rollback/versi: page_versions + versions.ts + API versions + panel Riwayat; e2e round-trip verified |
-| 2026-06-04 | F5-3 | PR#57 | ✅ done | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; preview deploy Ready |
+| 2026-06-04 | F5-3 | PR#57 | ✅ merged | self-edit klien: /api/portal/sections + ContentPanel + tab Konten portal; prod deploy Ready |
+| 2026-06-04 | F5-4 | PR#58 | ✅ done | test suite render + CI: Vitest + packs/TokenDriven snapshot + GH Actions; CI hijau PR pertama; **F5 TUNTAS** |
