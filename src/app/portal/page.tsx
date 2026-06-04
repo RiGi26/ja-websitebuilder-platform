@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
+import type { EditableSection } from './ContentPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -97,6 +98,17 @@ export default async function PortalPage() {
     profile = (data ?? null) as TenantProfile | null
   }
 
+  // F5-3 — section halaman (teks/gambar) yang bisa diedit klien sendiri.
+  let sections: EditableSection[] = []
+  if (page?.id) {
+    const { data } = await supabaseAdmin
+      .from('page_sections')
+      .select('id, tipe_komponen, urutan, is_visible, isi_komponen')
+      .eq('page_id', page.id)
+      .order('urutan', { ascending: true })
+    sections = (data ?? []) as EditableSection[]
+  }
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -116,6 +128,7 @@ export default async function PortalPage() {
       initialBlog={blog}
       initialGallery={gallery}
       initialProfile={profile}
+      initialSections={sections}
     />
   )
 }
