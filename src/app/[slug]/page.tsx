@@ -131,6 +131,7 @@ export default async function PublicSitePage({
         slug={slug}
         primary={primary}
         wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa}
+        variant={variant}
       />
     )
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
