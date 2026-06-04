@@ -212,7 +212,8 @@ Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API
   - [x] **sekolah** ✅ 2026-06-04 (PR#47 merged): warm (Academic Heritage maroon/amber, default no-regression) vs clean (Modern Institutional royal blue). e2e lpk-sakura: warm=maroon+amber/0 blue, clean=blue/0 maroon.
   - [x] **rental** ✅ 2026-06-04 (PR feat/f2-rental-variants): VARIANT_ACCENTS per variant (bold=oranye/dark, fresh=biru/light, luxury=gold/dark) di-thread (accent+light+lighter+dark+bg). Variant menang atas design_tokens.bg_style (build selalu 'dark'). primary klien override base. e2e nusantara-drive-test ketiga variant beda nyata.
   - [x] **klinik** ✅ 2026-06-04 (PR feat/f2-klinik-premium): premium dulu fallback ke warm renderer → kini distinct. warm (Warm Sanctuary sage/terracotta, default no-regression) vs premium (Luxe Clinic navy+gold di atas ivory, light luxe — hindari flip peran warna). clean tetap KlinikCleanRenderer terpisah. e2e klinik-sehat-prima: warm=sage+terra/0 navy-gold, premium=navy+gold+bronze/0 sage-terra.
-  - [ ] company (editorial dark vs clean/minimal light, role split), batik_toko (light vs dark), restaurant (INK dual-role light/dark — paling tricky).
+  - [x] **company** ✅ 2026-06-04 (PR feat/f2-company-variants): FLIP light/dark pertama. Palet dipecah jadi peran semantik (pageBg/surfaceBg/cardBg/text/accent/onAccent/strong/onStrong/border/gridLine) karena INK/LIGHT dwiperan. editorial (Bold Editorial near-black+amber, default no-regression) vs clean (Clean Professional putih+royal blue) vs minimal (Minimal Tech putih monokrom). e2e arkana-digital: editorial=amber74/blue0, clean=blue74/amber0, minimal=mono100/blue0-amber0.
+  - [ ] batik_toko (light vs dark), restaurant (INK dual-role light/dark — paling tricky).
 - [ ] **F2-3** Sinkronkan swatch `website-variants.ts` dgn palet renderer nyata (sekolah ✅).
 - [ ] **F2-4** Verify tiap variant render beda nyata (e2e flip variant di DB, restore setelah).
 
