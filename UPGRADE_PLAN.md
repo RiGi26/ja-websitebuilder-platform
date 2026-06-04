@@ -9,8 +9,8 @@
 ## CURRENT STATUS
 
 - **Tanggal mulai:** 2026-06-04
-- **Fase aktif:** F1 SELESAI (Sprint 1 inti tuntas) — P0-1 nunggu user, F1-5 opsional ditunda
-- **Step berikutnya:** F2 (tutup variant gap) atau F3-1/F3-2 (konten data nyata + template varian). P0-1 toggle dashboard.
+- **Fase aktif:** Sprint 2 dimulai (F2 variant gap). Sprint 1 inti SELESAI + F1 MERGED ke production (PR#46, deploy Ready 2026-06-04). P0-1 nunggu user, F1-5 ditunda.
+- **Step berikutnya:** F2-2 lanjut renderer berikutnya (klinik premium / restaurant / company / batik). sekolah ✅. Lalu F3-2 template varian.
 - **Catatan terakhir:** 2026-06-04 — F1 otomatisasi build_order LIVE (lokal verified, PR dibuka). generateContent + templates 6 industri + API route + tombol admin. e2e klinik seed sukses, idempoten, render 200. SEBELUMNYA: P0-2 & P0-3 done (deny-all RLS, advisor 3 INFO→0). Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
@@ -202,14 +202,17 @@ Pindah generasi konten dari skill manual `.md` → API route TypeScript. Order m
 
 Verify F1: ✅ e2e di order seed `klinik-sehat-prima` (a3bc…001) — build API 200, 6 section + 3 service (3 dokter nyata) + tenant_profile, design_tokens derived (#059669→accent #76c5ad), render `[slug]` HTTP 200 41KB konten nyata, rebuild idempoten tetap 6 section.
 
-## Fase F2 — Tutup Variant Gap (GAP 2)
+## Fase F2 — Tutup Variant Gap (GAP 2) — pendekatan: VARIANT NYATA PENUH
 
-~10 dari 18 variant belum punya pack. Lengkapi.
+> **Temuan audit F2-1 (2026-06-04):** token-pack (`packs.ts`/`resolveTokenPack`) HANYA jalan untuk tema non-bespoke (personal/blog/jastip/custom). Tema bespoke (klinik/rental/company/sekolah/restaurant/batik) pakai renderer sendiri & TIDAK konsumsi pack — bahkan company/sekolah/restaurant/batik tak terima prop variant. Cuma 5/18 variant render beda nyata. Pack di VARIANT_PACK sudah distinct; gap-nya renderer tak pakai.
+> **Keputusan user:** variant nyata penuh — tiap renderer bespoke honor variant-nya (palet/aksen/tipografi), BERTAHAP 1 renderer per PR.
 
-- [ ] **F2-1** Audit `website-variants.ts`: list 18 variant, tandai re-skin vs butuh-layout.
-- [ ] **F2-2** Buat pack baru untuk variant re-skin (fresh/premium/modern/dll) di `packs.ts`.
-- [ ] **F2-3** Lengkapi `VARIANT_PACK` registry → 0 variant fallback ke default.
-- [ ] **F2-4** Verify tiap variant render beda nyata (E2E test page per variant, hapus setelah).
+- [x] **F2-1** Audit 18 variant vs render nyata. ✅ 2026-06-04 (lihat temuan di atas).
+- [~] **F2-2** Wire variant ke tiap renderer bespoke (palet per-variant di-thread sbg `pal`). Per renderer = 1 PR:
+  - [x] **sekolah** ✅ 2026-06-04 (PR feat/f2-sekolah-variants): warm (Academic Heritage maroon/amber, default no-regression) vs clean (Modern Institutional royal blue). e2e lpk-sakura: warm=maroon+amber/0 blue, clean=blue/0 maroon.
+  - [ ] klinik (premium kini fallback ke warm → bikin distinct), restaurant (rustic vs modern, hati2 INK dual-role light/dark), company, batik_toko, rental (sudah terima designTokens — cek cukup/belum).
+- [ ] **F2-3** Sinkronkan swatch `website-variants.ts` dgn palet renderer nyata (sekolah ✅).
+- [ ] **F2-4** Verify tiap variant render beda nyata (e2e flip variant di DB, restore setelah).
 
 ## Fase F3 — Konten dari Data Nyata (GAP 4.1)
 
