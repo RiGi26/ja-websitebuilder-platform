@@ -5,11 +5,16 @@ import {
   createAdminSessionToken,
 } from '@/lib/admin-auth'
 import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
+import { logSecurityEvent } from '@/lib/security-log'
 
 export async function POST(request: Request) {
+  const ip = clientIp(request)
   // P5DB-1 — rem brute force: maks 8 percobaan / 10 menit per IP.
-  const rl = rateLimit(`admin-login:${clientIp(request)}`, 8, 10 * 60_000)
-  if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+  const rl = rateLimit(`admin-login:${ip}`, 8, 10 * 60_000)
+  if (!rl.allowed) {
+    await logSecurityEvent('admin_login_ratelimited', { ip })
+    return tooManyRequests(rl.retryAfter)
+  }
 
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
   // Tidak ada fallback password default — wajib di-set via env.
@@ -23,6 +28,7 @@ export async function POST(request: Request) {
 
   const { password } = await request.json()
   if (password !== ADMIN_PASSWORD) {
+    await logSecurityEvent('admin_login_failed', { ip, detail: { remaining: rl.remaining } })
     return NextResponse.json({ success: false }, { status: 401 })
   }
 
