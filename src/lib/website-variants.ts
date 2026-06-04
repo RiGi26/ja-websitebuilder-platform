@@ -113,16 +113,16 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   sekolah: [
     {
       id: 'warm',
-      nama: 'Warm Academic',
-      deskripsi: 'Inspiratif, purple, bersemangat. Untuk LPK & sekolah swasta.',
+      nama: 'Academic Heritage',
+      deskripsi: 'Hangat, maroon & amber, berwibawa. Untuk LPK & sekolah swasta premium.',
       emoji: '📚',
-      mood: '#7C3AED',
+      mood: '#7B2D3E',
       bg: 'light',
     },
     {
       id: 'clean',
-      nama: 'Clean & Modern',
-      deskripsi: 'Bersih, biru, terpercaya. Untuk sekolah formal & institusi.',
+      nama: 'Modern Institutional',
+      deskripsi: 'Bersih, royal blue, terpercaya. Untuk sekolah formal & institusi.',
       emoji: '🎓',
       mood: '#1D4ED8',
       bg: 'light',
