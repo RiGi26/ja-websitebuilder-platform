@@ -219,3 +219,42 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | S3-infra | ✅ | **MOTIF engine** (panen batik): `MotifVariant` (kawung/tenun), `MotifOverlay` + strip footer ditint primary (parametrik), threaded via ComposableRenderer. Font ROUNDED + 16 ikon lucide baru. Nol regresi (motif default 'none'). |
 | 2026-06-05 | S3 ×6 sub-kat | ✅ | **18 tema baru** sekaligus: Kerajinan/Kecantikan/Gadget/Rumah/Kesehatan/Anak ×3. Token-pack + manifest + taxonomy (ready:true) + sample-content (konten benefit-led + foto Unsplash verified 200). Tiap sub-kat lolos VARIASI (gelap↔terang, mood beda — dijaga test). |
 | 2026-06-05 | **Sprint 3** | 🎉 **LENGKAP & LIVE** | Toko Online TUNTAS: 8 sub-kat ×3 = **24 tema**. 99/99 test, typecheck + next build bersih. Gerbang 3 skill diterapkan sbg design-review. Berikutnya: industri lain. |
+| 2026-06-06 | Sprint 3 deploy | ✅ **PROD** (PR #76 merged) | Squash-merge ke master, CI (Typecheck & Render Tests) + Vercel hijau, deploy production Ready. Verified: root 200, `/admin/theme-preview` 307 (route live). Roadmap berikutnya → §12. |
+
+---
+
+## 12. Roadmap sprint berikutnya (RENCANA — BELUM DIJALANKAN)
+> Disusun 2026-06-06 atas permintaan user: **rencanakan, jangan eksekusi**. Toko Online sudah TUNTAS (8 sub-kat ×3 = 24 tema). Dua arah ekspansi: **(A) lebar** — bawa sub-kategori+tema ke industri lain; **(B) dalam** — perkaya perpustakaan balok agar tema makin hidup & beragam. Saran urutan: Sprint 4 → 7 di bawah. Tiap sprint tetap patuh aturan produksi (1 langkah=1 PR, additive, nol regresi, VARIASI wajib #6, gerbang 3 skill §5.a) dan playbook §5.
+
+### Sprint 4 — Industri RESTAURANT ×3 sub-kategori (lebar, prioritas 🥇)
+- **Kenapa duluan:** paling dekat dengan blok Kuliner yang sudah matang (hero foto, menu-list, keunggulan) → reuse tinggi, ROI cepat. Industri `restaurant` sudah ada (punya `RestaurantRenderer` bespoke = tambang balok).
+- **Sub-kategori usulan** (jenis tempat makan): **Warung/Kedai** (rustic merakyat) · **Cafe/Coffee Shop** (modern hangat, instagrammable) · **Fine Dining/Resto Keluarga** (elegan).
+- **3 gaya/sub-kat** (taat VARIASI gelap↔terang). Contoh Cafe: terang-cozy / industrial-gelap / pastel-playful.
+- **Pekerjaan:** taksonomi `INDUSTRY_SUBKATEGORI.restaurant` + `THEMES.restaurant` · token-pack + manifest per gaya · sample-content 3 sub-kat · panen balok dari `RestaurantRenderer` (varian **menu bergambar/board**, **jam buka + lokasi/maps**, **reservasi CTA**) · aktifkan `ready:true`.
+- **Catatan teknis:** `hasSubKategori` + `getReadySubKategori` sudah generik per-industri → cukup daftarkan `restaurant`; brief form & SiteRenderer otomatis ikut. Pastikan `SubKategoriPicker` muncul untuk `tipe='restaurant'`.
+
+### Sprint 5 — Perkaya PERPUSTAKAAN BALOK (dalam, sebaiknya beriringan)
+Tema sekarang kuat di hero/features/showcase, tapi industri jasa butuh lebih. Tambah varian balok parametrik (token-driven, dipakai lintas industri):
+- **Testimoni** [quote-cards / marquee / single-spotlight] — sosial-proof, belum ada di engine composable.
+- **FAQ accordion** — tekan keraguan (CRO).
+- **Stats/angka** (mis. "5.000+ pelanggan") — kredibilitas.
+- **Galeri/Showcase varian baru**: **masonry**, **before-after** (cocok skincare/klinik/interior).
+- **Map/Lokasi + jam** — wajib F&B, klinik, toko fisik.
+- Tiap balok: 1× dibuat-tangan, parametrik via CSS var, lolos gerbang 3 skill, + test render. Ini menurunkan biaya semua sprint industri berikutnya.
+
+### Sprint 6 — Industri KLINIK & KECANTIKAN-JASA ×3 (lebar)
+- **Klinik/Estetik** sudah ada renderer (`KlinikRenderer`/`KlinikCleanRenderer` = tambang balok). Sub-kategori usulan: **Klinik Umum/Gigi** (clean-trust biru/teal) · **Skincare/Aesthetic Clinic** (lembut elegan) · **Fisio/Wellness** (natural tenang).
+- Reuse balok Sprint 5 (testimoni, FAQ, stats, booking CTA, map). VARIASI wajib.
+
+### Sprint 7 — Industri JASA/PERSONAL & SEKOLAH ×3 (lebar)
+- **personal-branding / company / sekolah** — masing-masing 2–3 sub-kategori bila relevan (mis. personal: kreator / profesional / coach). Pertimbangkan apakah sub-kategori cocok atau cukup 3 gaya langsung tanpa lapis sub-kat (untuk industri yang variannya tipis).
+- **Keputusan terbuka:** sebagian industri mungkin lebih baik **3 gaya tanpa sub-kategori** (lapis sub-kat opsional). `hasSubKategori` sudah mendukung industri tanpa sub-kat → bisa pilih per-industri.
+
+### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
+1. **Urutan industri** — apakah Restaurant dulu (saran) atau yang lain (mis. Klinik karena banyak order)?
+2. **Sub-kategori vs langsung-3-gaya** per industri — beberapa industri mungkin tak perlu lapis sub-kat.
+3. **Gerbang 3 skill** — tetap design-review batch, atau invokasi skill literal untuk gaya flagship tiap industri?
+4. **next/font asli** — saat ini font pakai stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (naikkan keotentikan, sedikit biaya bundle).
+5. **Konsolidasi `theme-packs.ts`** — sudah ~450 baris/24 pack; bila tembus ~40 pack pertimbangkan pecah per-industri (`theme-packs/kuliner.ts` dst) agar terkelola.
+
+> **Status: belum ada satu pun item §12 dikerjakan.** Mulai hanya setelah user pilih urutan + jawab keputusan terbuka di atas.
