@@ -5,10 +5,11 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🟡 PERENCANAAN — arsitektur & keputusan kunci sudah disepakati, belum mulai kode.
+- **Fase aktif:** 🟢 **Sprint 0 (infrastruktur) LENGKAP** — semua merged ke master, DORMANT (nol regresi).
 - **Pilot:** Toko Online → sub-kategori **Kuliner ×3 gaya** sebagai cetakan end-to-end.
-- **Belum ada kode** untuk sistem ini. Renderer lama (batik/restaurant/dll) masih jalan apa adanya.
-- **Step berikutnya:** Sprint 0 (infrastruktur taksonomi + mesin composable) — lihat §8.
+- **Yang sudah jalan (dormant):** taksonomi+registry, mesin ComposableRenderer+balok, mini-step brief form, resolusi build. Semua aktif HANYA saat sub-kategori ditandai `ready` — sekarang nol → produksi tak berubah, renderer lama utuh.
+- **Step berikutnya:** **Sprint 1** — bangun 3 gaya Kuliner OTENTIK (token+balok penuh) lalu **flip Kuliner `ready: true`** di `taxonomy.ts` untuk mengaktifkan. Lihat §8 + playbook §5.
+- **Keputusan standar tambahan (S0-1):** ikon = **lucide-react** (bukan emoji) — dijaga test anti-emoji. Calon isi `STANDARDS.md` saat ditulis.
 
 ### Latar masalah (kenapa ini ada)
 Order pempek (Toko Online, variant `batik`) ter-render `BatikTokoRenderer` → estetika **batik tekstil** (motif kawung, "Luxury Heritage"), mismatch untuk **makanan**. Akar: variant `toko_online` cuma 2 (`batik`, `modern`), keduanya generik & tak nyambung ke jenis toko. Customer tak bisa memilih nuansa yang pas.
@@ -184,4 +185,9 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 ## 11. Log progres (diisi sambil jalan)
 | Tanggal | Sprint/Tema | Status | Catatan |
 |---|---|---|---|
-| 2026-06-05 | — | Plan disusun | Arsitektur composable + penempatan brief form disepakati. Belum ada kode. |
+| 2026-06-05 | — | Plan disusun | Arsitektur composable + penempatan brief form disepakati. |
+| 2026-06-05 | S0-1 | ✅ merged (PR #63) | Taksonomi `taxonomy.ts` (8 sub-kat toko_online + Kuliner ×3 stub) + standar ikon lucide. |
+| 2026-06-05 | S0-2 | ✅ merged (PR #64) | Mesin `ComposableRenderer` + `ThemeManifest` (Kuliner ×3 benih) + balok (`blocks.tsx`). |
+| 2026-06-05 | S0-3 | ✅ merged (PR #65) | Mini-step "Tipe Toko" + `ThemePicker`/`SubKategoriPicker` di brief form (dormant). |
+| 2026-06-05 | S0-4 | ✅ merged (PR #66) | `normalizeBriefing` baca sub_kategori; `content-adapter`; SiteRenderer route composable. |
+| 2026-06-05 | **Sprint 0** | 🟢 **LENGKAP** | Infrastruktur dormant, nol regresi, 48/48 test hijau. Siap Sprint 1 (Kuliner otentik + flip ready). |
