@@ -11,7 +11,7 @@
 - **Tanggal mulai:** 2026-06-04
 - **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Semua kode SELESAI & MERGED. Sisa OPT-IN: P0-1 (DEFERRED — butuh Pro plan, user aktifkan stlh upgrade), F1-5 (webhook auto-build), F3-3 (LLM polish).
 - **Step berikutnya:** Tak ada pekerjaan kode wajib. P0-1 nunggu upgrade Pro plan (2026-06-04 dicoba, gagal — fitur Pro-only). F1-5/F3-3 kalau ada kebutuhan. Builder = 10/10, DB hardening = ~9.5.
-- **📋 Blueprint siap eksekusi (di akhir file) — buka saat mau jalankan:** (1) **F3-3** LLM copy (Polish→**Transform**, ada Bagian 0 strategi: trigger gating + gerbang eval), (2) **AI-2** Normalisasi input briefing / "Smart-Fill" (hulu dari F3-3; obat friksi form; WAJIB confirm-step karena sentuh fakta), (3) **F1-5** auto-build webhook, (4) **CD** custom domain (wildcard subdomain + domain klien + otomasi Vercel API). Lapis aplikasi custom domain SUDAH ada di `src/proxy.ts`. **Peta strategi AI:** #1 copy (F3-3) · #2 input (AI-2) · #3 agentic edit assistant (belum dispek).
+- **📋 Blueprint siap eksekusi (di akhir file) — buka saat mau jalankan:** (1) **F3-3** LLM copy (Polish→**Transform**, ada Bagian 0 strategi: trigger gating + gerbang eval), (2) **AI-2** Normalisasi input briefing / "Smart-Fill" (hulu dari F3-3; obat friksi form; WAJIB confirm-step karena sentuh fakta), (3) **AI-3** Agentic edit assistant / "edit lewat ngobrol" (membungkus primitive F5-1/2/3 yang sudah ada; guardrail typed-tool + snapshot-before + draft-only + fact-lock; bangun PALING AKHIR), (4) **F1-5** auto-build webhook, (5) **CD** custom domain (wildcard subdomain + domain klien + otomasi Vercel API). Lapis aplikasi custom domain SUDAH ada di `src/proxy.ts`. **Peta strategi AI (lengkap):** #1 copy (F3-3, Polish→Transform) · #2 input (AI-2, Smart-Fill) · #3 agentic edit (AI-3). Ketiganya berbagi SDK + tabel `llm_usage`; urutan nilai-vs-risiko: F3-3 dulu → AI-2 → AI-3 terakhir.
 - **Catatan terakhir:** 2026-06-04 — P5DB-3 DONE (PR#61, CI pass + Vercel Ready): migration `security_events` (kind/ip/detail jsonb, RLS deny_public_access, index); `security-log.ts` logSecurityEvent (console.warn + insert, non-fatal); login log failed+ratelimited, track log ratelimited. Persist+log tanpa channel (keputusan user). SEBELUMNYA: P5DB-1 MERGED (PR#60) rate limit login 8/10mnt+track 60/mnt; P5DB-2 MERGED (PR#59) security headers; F5 TUNTAS (F5-1..4 PR#55-58); F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
@@ -657,6 +657,69 @@ Bangun AI-2 jika: (1) data/observasi menunjukkan **friksi form** jadi penyebab d
 
 ## 10. Definisi "selesai" AI-2
 Flag OFF = form terstruktur identik sekarang (no-regression). Flag ON = kotak Smart-Fill opsional mengisi field akurat, fakta tak-disebut tetap kosong (nol fabrikasi), semua hasil **dikonfirmasi manusia** sebelum submit, biaya tercatat. Lewat CI + 1 PR.
+
+---
+
+# AI-3 — Rancangan Detail Agentic Edit Assistant ("Edit lewat ngobrol") *(BELUM DIIMPLEMENTASI — spec untuk nanti)*
+
+> **Status:** OPSIONAL, ditunda — **titik AI #3, paling kompleks/mahal/berisiko, dibangun PALING AKHIR.** Klien (atau admin) menyuruh perubahan via bahasa natural → agent mengeksekusi lewat tool aman. Ditambahkan 2026-06-05. **Baca dulu sebelum implement.**
+
+## 1. Beda dari F5-3 (self-edit manual yang SUDAH ada)
+- **F5-3 (ADA):** `ContentPanel` — klien edit field section satu-satu, manual. Sudah cukup untuk edit dasar.
+- **AI-3 (BARU):** lapisan agentic di ATAS F5-3 — klien bilang *"bikin lebih mewah, tambah testimoni, ganti judul"* → agent rencanakan & eksekusi lintas section. AI-3 = kenyamanan/wow, **bukan** pengganti F5-3.
+
+## 2. Primitive yang SUDAH ada (agent membungkus ini, bukan bikin dari nol)
+| Primitive | Status | Sumber |
+|---|---|---|
+| **APPLY** ubah `isi_komponen` (ownership-scoped) | ✅ ADA | F5-3 `PATCH /api/portal/sections` |
+| **UNDO** snapshot-before + restore | ✅ ADA | F5-2 `snapshotPage` / `restorePageVersion` |
+| **OBSERVE** render draft utk preview | ✅ ADA | F5-1 `SiteRenderer` + `/admin/preview/[pageId]` |
+
+Bagian tersulit agentic (cara membatalkan kalau AI ngaco + cegah sentuh tenant lain) **sudah selesai di F5.** Sisa = orkestrasi + beberapa tool CRUD section + UI chat.
+
+## 3. Insight inti — KLASIFIKASI dulu, jangan langsung loop
+Mayoritas permintaan = **1 aksi deterministik**, tak butuh agent:
+- *"ganti judul jadi X"*, *"sembunyikan section harga"* → **1 tool call** (murah, tanpa reasoning berlapis).
+- *"bikin lebih mewah"*, *"rapikan biar premium"* → **baru** ini agentic (palet+copy+layout+spasi lintas section, multi-langkah).
+
+**Aturan: klasifikasi intent → simple = satu tool call (jalur murah) → compound/kabur = agent loop.** Cermin filosofi nol-opex F3: LLM mahal jangan di jalur default. ~80% permintaan tak menyentuh loop.
+
+## 4. Risiko sejati — agency atas aset LIVE klien (kelas berbeda dari F3-3/AI-2)
+F3-3 sentuh copy (kosmetik), AI-2 sentuh input pre-bayar (ada confirm). **AI-3 memutasi website klien yang sungguhan:** destruktif (hapus section salah), scope-creep (disuruh ganti judul → menulis ulang seluruh halaman), korupsi fakta (ganti nomor telp saat "memperindah"), biaya loop, auto-publish tak ditinjau.
+
+## 5. Guardrail (kontrak tool typed + reversible; LLM-nya swappable)
+1. **Snapshot-before WAJIB** — tiap run agent `snapshotPage(kind:'pre_agent')` dulu → undo 1 klik (F5-2). *Sudah ada.*
+2. **Draft-only, NEVER auto-publish** — agent edit draft → klien preview (F5-1) → klien sendiri Publish. (Prinsip = F1-5.)
+3. **Whitelist tool typed** — agent HANYA panggil tool terdaftar (`update_section_text`, `set_palette`, `reorder_sections`, `add_section`, `remove_section`, `toggle_visibility`). **BUKAN SQL bebas.** Tiap tool ownership-scoped (reuse cek F5-3). Agent tak bisa sentuh tenant lain / skema DB.
+4. **Fact-lock** — data terstruktur (harga/kontak/nama di services/menu/products) **off-limits** atau butuh konfirmasi eksplisit. Agent ubah presentasi & copy, bukan fakta. (Nol-fabrikasi = AI-2.)
+5. **Budget langkah & biaya** — maks N tool-call/run, max_tokens, rate-limit; loop WAJIB terminasi.
+6. **Plan-then-confirm utk operasi destruktif** — add/remove/reorder = agent ajukan *diff*, klien setujui sebelum apply. Tweak teks boleh lebih langsung (tetap draft + undo).
+
+## 6. Tool surface (yang perlu DIBANGUN vs reuse)
+- **Reuse:** `update_section_text` → F5-3 PATCH; snapshot/restore → F5-2; preview → F5-1.
+- **BARU (endpoint CRUD section yg belum ada):** `add_section`, `remove_section`, `reorder_sections` (kolom `urutan`), `toggle_visibility` (`is_visible`), `set_palette` (tulis `konfigurasi`/token). Semua ownership-scoped service-role seperti F5-3 (TAK lebarkan RLS).
+- **File baru:** `src/lib/agent/editTools.ts` (definisi tool + skema Zod) + `src/lib/agent/runEditAgent.ts` (orkestrasi loop) + `/api/portal/agent` (entry, rate-limit, budget).
+
+## 7. Orkestrasi loop
+Tool-use loop Claude API: kirim intent + ringkasan state section (bukan seluruh isi — hemat token) + daftar tool → model panggil tool → eksekusi (ownership-checked) → balikan hasil → ulang s/d selesai atau budget habis. Catat tiap step ke `llm_usage` (reuse F3-3 §4). Akhiri dgn ringkasan perubahan + link preview.
+
+## 8. Penempatan & rollout
+- **Fase 1 (aman): admin-internal** — admin pakai agent mempercepat build/revisi. Pakar selalu in-the-loop, risiko rendah, uji guardrail di lingkungan terkendali.
+- **Fase 2 (produk): klien premium** di portal — "Edit lewat ngobrol ✨" sebagai diferensiator berbayar, setelah Fase 1 terbukti aman.
+
+## 9. Biaya & paket
+Agent loop = fitur AI **termahal** (multi-call). **Metered/credit-based** (mis. "10 edit AI / bulan") atau tier premium. Jangan unlimited. Guardrail biaya = budget langkah + rate-limit + klasifikasi (§3).
+
+## 10. Checklist & gerbang keputusan
+- [ ] Endpoint CRUD section baru (add/remove/reorder/toggle/palette) ownership-scoped + test.
+- [ ] `editTools.ts` (skema Zod) + `runEditAgent.ts` (loop + budget) + `/api/portal/agent`.
+- [ ] Snapshot-before tiap run; plan-confirm utk destruktif; fact-lock.
+- [ ] UI chat di portal (Fase 2) / panel admin (Fase 1).
+- [ ] Test: ownership (tak bisa edit tenant lain), budget terminasi, undo pulihkan, simple-intent = 1 call (bukan loop), fact-lock tolak ubah harga/kontak.
+- **Gerbang keputusan (BANGUN PALING AKHIR):** hanya jika (1) ada permintaan tier premium nyata, DAN (2) F5-3 manual terbukti tak cukup. Sampai itu, F5-3 sudah memenuhi kebutuhan edit. **Jangan bangun karena "keren" — ini paling mahal & berisiko dari ketiga titik AI.**
+
+## 11. Definisi "selesai" AI-3
+Agent hanya bisa lewat tool typed (tak ada jalan ke tenant lain/SQL), tiap run ada snapshot-before (undo jalan), draft-only (tak pernah auto-publish), fakta terkunci, operasi destruktif via plan-confirm, biaya/loop terbatas & tercatat. Fase 1 admin-internal hijau dulu sebelum Fase 2 klien. Lewat CI + PR bertahap (1 PR per tool batch + 1 PR orkestrasi).
 
 ---
 
