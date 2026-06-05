@@ -31,10 +31,18 @@ describe('ThemePicker (S0-3)', () => {
   })
 })
 
-describe('SubKategoriPicker — jaminan DORMANT (S0-3)', () => {
-  it('render kosong selama belum ada sub-kategori ready (nol regresi produksi)', () => {
+describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
+  it('menampilkan Kuliner + opsi "Lainnya" untuk toko_online', () => {
     const html = renderToStaticMarkup(
       <SubKategoriPicker tipe="toko_online" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Kuliner / Makanan')
+    expect(html).toContain('Lainnya (gaya umum)')
+  })
+
+  it('tetap dormant untuk industri tanpa sub-kategori ready (mis. klinik)', () => {
+    const html = renderToStaticMarkup(
+      <SubKategoriPicker tipe="klinik" value="" onChange={noop} />,
     )
     expect(html).toBe('')
   })
