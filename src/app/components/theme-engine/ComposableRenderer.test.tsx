@@ -13,6 +13,11 @@ const CONTENT: ComposableContent = {
     ctaText: 'Pesan via WhatsApp',
     ctaHref: '#wa',
   },
+  features: [
+    { title: 'Homemade Harian', desc: 'Dibuat segar tiap hari dari ikan tenggiri asli.' },
+    { title: 'Cuko Turun-temurun', desc: 'Racikan khas Palembang yang nampol.' },
+    { title: 'Vacuum & Frozen', desc: 'Tahan 1 bulan, aman kirim seluruh Indonesia.' },
+  ],
   showcase: {
     title: 'Menu Andalan',
     items: [
@@ -42,6 +47,8 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
       expect(html).toContain('Pempek Homemade Asli Palembang') // hero
       expect(html).toContain('Pempek Kapal Selam') // showcase item
       expect(html).toContain('Rp15.000') // harga terformat
+      expect(html).toContain('Homemade Harian') // features (keunggulan)
+      expect(html).toContain('Mengapa Kami') // heading features
       expect(html).toContain('--c-primary') // token ter-inject
       expect(html).toContain(`data-theme="${id}"`)
     })
@@ -54,6 +61,12 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
     expect(rustic).not.toBe(modern)
     expect(rustic).not.toBe(heritage)
     expect(modern).not.toBe(heritage)
+  })
+
+  it('foto hero dipakai sebagai background bila ada (S1-2)', () => {
+    const withFoto = { ...CONTENT, hero: { ...CONTENT.hero, image: 'https://x.test/pempek.jpg' } }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={withFoto} />)
+    expect(html).toContain('https://x.test/pempek.jpg')
   })
 
   it('showcase: modern pakai card-grid, rustic pakai menu-list (varian beda)', () => {

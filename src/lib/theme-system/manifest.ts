@@ -16,6 +16,7 @@ import { THEME_PACKS } from './theme-packs'
 
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
 export type ShowcaseVariant = 'menu-list' | 'card-grid'
+export type FeaturesVariant = 'grid' | 'rows'
 
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
@@ -25,6 +26,7 @@ export interface ThemeManifest {
   layoutOverrides?: Partial<TokenPack['layout']>
   blocks: {
     hero: HeroVariant
+    features?: FeaturesVariant
     showcase: ShowcaseVariant
   }
 }
@@ -38,7 +40,8 @@ export interface ShowcaseItem {
 }
 export interface ComposableContent {
   nama: string
-  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
+  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
+  features?: { title: string; desc: string }[]
   showcase?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
   about?: { title: string; body: string }
   cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
@@ -52,21 +55,21 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'kuliner-rustic',
     label: 'Rustic Hangat',
     basePackId: 'kuliner-rustic',
-    blocks: { hero: 'centered', showcase: 'menu-list' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list' },
   },
   // Modern Appetite — brand F&B kekinian. Bersih, cerah, grid kartu produk.
   'kuliner-modern': {
     id: 'kuliner-modern',
     label: 'Modern Appetite',
     basePackId: 'kuliner-modern',
-    blocks: { hero: 'split', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
   },
   // Heritage Kuliner — kuliner premium/tradisional. Gelap-hangat maroon + gold.
   'kuliner-heritage': {
     id: 'kuliner-heritage',
     label: 'Heritage Kuliner',
     basePackId: 'kuliner-heritage',
-    blocks: { hero: 'fullbleed', showcase: 'menu-list' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list' },
   },
 }
 

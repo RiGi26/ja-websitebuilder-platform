@@ -1,12 +1,11 @@
 // ============================================================
-// THEME SYSTEM — Lapis 2 perpustakaan balok (Sprint 0, S0-2).
+// THEME SYSTEM — Lapis 2 perpustakaan balok (S0-2 + S1-2).
 // Balok section parametrik via token (CSS vars dari packs.ts). Tiap section
-// punya beberapa VARIAN; manifest memilih varian per slot. Dipanen & disuling
-// dari pola TokenDrivenRenderer (hero/cta/footer) + balok BARU Showcase
-// (produk/menu) yang dibutuhkan Kuliner.
+// punya beberapa VARIAN; manifest memilih varian per slot.
+// S1-2: dukungan FOTO hero (gradient → foto + scrim) + balok Features (keunggulan).
 //
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
-// JANGAN hex hardcoded (standar ikon/token — lihat keputusan S0-1).
+// JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
 import type { ComposableContent, ShowcaseItem } from '@/lib/theme-system/manifest'
 
@@ -14,14 +13,19 @@ export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
 .ce-root h1, .ce-root h2, .ce-root h3 { font-family: var(--f-display); font-weight: var(--fw-display); letter-spacing: var(--tracking); text-wrap: balance; }
 .ce-btn { background: var(--c-primary); color: var(--c-on-primary); border-radius: var(--r-pill); box-shadow: var(--s-md); transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s ease; text-decoration: none; }
-.ce-btn:hover { transform: translateY(-2px); }
+.ce-btn:hover { transform: translateY(-2px); box-shadow: var(--s-lg); }
 .ce-btn:active { transform: scale(.97); }
 .ce-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease; overflow: hidden; }
 .ce-card:hover { transform: translateY(-4px); box-shadow: var(--s-lg); }
 .ce-eyebrow { color: var(--c-primary); text-transform: uppercase; letter-spacing: .18em; font-weight: 700; font-size: 12px; }
-.ce-menu-row { border-top: 1px solid var(--c-border); transition: padding-left .2s ease; }
-.ce-menu-row:hover { padding-left: 6px; }
+.ce-menu-row { border-top: 1px solid var(--c-border); transition: padding-left .2s ease, background-color .2s ease; }
+.ce-menu-row:hover { padding-left: 8px; background: color-mix(in srgb, var(--c-primary) 5%, transparent); }
+.ce-feat-row { border-top: 1px solid var(--c-border); transition: padding-left .2s ease; }
+.ce-feat-row:hover { padding-left: 8px; }
 `
+
+// Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
+const HERO_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)'
 
 export function formatRupiah(n?: number): string {
   if (typeof n !== 'number' || !Number.isFinite(n)) return ''
@@ -46,21 +50,33 @@ export function Nav({ content }: { content: ComposableContent }) {
   )
 }
 
-// ── HERO varian ───────────────────────────────────────────────
-export function HeroCentered({ hero }: { hero: ComposableContent['hero'] }) {
+// ── HERO varian (dukung foto opsional) ────────────────────────
+type Hero = ComposableContent['hero']
+
+// Latar hero: foto + scrim kalau ada gambar; gradient token kalau tidak.
+function heroBg(image?: string): React.CSSProperties {
+  if (image) {
+    return { backgroundImage: `${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+  }
+  return { background: `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))` }
+}
+const heroInk = (image?: string) => (image ? '#FFFFFF' : 'var(--c-hero-ink)')
+
+export function HeroCentered({ hero }: { hero: Hero }) {
+  const ink = heroInk(hero.image)
   return (
-    <section style={{ background: `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))`, color: 'var(--c-hero-ink)', padding: '96px 24px' }}>
+    <section style={{ ...heroBg(hero.image), color: ink, padding: '96px 24px' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-        {hero.eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 16 }}>{hero.eyebrow}</p>}
-        <h1 style={{ fontSize: 'clamp(36px, 6vw, 60px)', lineHeight: 1.05, margin: 0, color: 'var(--c-hero-ink)' }}>{hero.title}</h1>
-        {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, opacity: .85, lineHeight: 1.6 }}>{hero.subtitle}</p>}
+        {hero.eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 16, color: hero.image ? '#FFFFFF' : 'var(--c-primary)' }}>{hero.eyebrow}</p>}
+        <h1 style={{ fontSize: 'clamp(36px, 6vw, 60px)', lineHeight: 1.05, margin: 0, color: ink }}>{hero.title}</h1>
+        {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, opacity: .9, lineHeight: 1.6 }}>{hero.subtitle}</p>}
         {hero.ctaText && <div style={{ marginTop: 32 }}><Btn text={hero.ctaText} href={hero.ctaHref} /></div>}
       </div>
     </section>
   )
 }
 
-export function HeroSplit({ hero, nama }: { hero: ComposableContent['hero']; nama: string }) {
+export function HeroSplit({ hero, nama }: { hero: Hero; nama: string }) {
   return (
     <section style={{ background: 'var(--c-page)', padding: '112px 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 56, alignItems: 'center' }}>
@@ -75,29 +91,32 @@ export function HeroSplit({ hero, nama }: { hero: ComposableContent['hero']; nam
           {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, color: 'var(--c-muted)', lineHeight: 1.7, maxWidth: 520 }}>{hero.subtitle}</p>}
           {hero.ctaText && <div style={{ marginTop: 36 }}><Btn text={hero.ctaText} href={hero.ctaHref} /></div>}
         </div>
-        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))`, border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(120px, 18vw, 220px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: .9 }}>
-            {(nama.trim()[0] ?? 'A').toUpperCase()}
-          </span>
+        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...(hero.image ? { backgroundImage: `url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))` }) }}>
+          {!hero.image && (
+            <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(120px, 18vw, 220px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: .9 }}>
+              {(nama.trim()[0] ?? 'A').toUpperCase()}
+            </span>
+          )}
         </div>
       </div>
     </section>
   )
 }
 
-export function HeroFullbleed({ hero }: { hero: ComposableContent['hero'] }) {
+export function HeroFullbleed({ hero }: { hero: Hero }) {
+  const ink = heroInk(hero.image)
   return (
-    <section style={{ background: `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))`, color: 'var(--c-hero-ink)', minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
+    <section style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <span style={{ width: 36, height: 1, background: 'var(--c-primary)' }} />
-            <span className="ce-eyebrow">{hero.eyebrow}</span>
+            <span style={{ width: 36, height: 1, background: hero.image ? '#FFFFFF' : 'var(--c-primary)' }} />
+            <span className="ce-eyebrow" style={{ color: hero.image ? '#FFFFFF' : 'var(--c-primary)' }}>{hero.eyebrow}</span>
           </div>
         )}
-        <h1 style={{ fontSize: 'clamp(48px, 9vw, 104px)', lineHeight: .98, margin: 0, color: 'var(--c-hero-ink)' }}>{hero.title}</h1>
+        <h1 style={{ fontSize: 'clamp(48px, 9vw, 104px)', lineHeight: .98, margin: 0, color: ink }}>{hero.title}</h1>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 28, marginTop: 32 }}>
-          {hero.subtitle && <p style={{ fontSize: 18, opacity: .85, lineHeight: 1.6, maxWidth: 480, margin: 0 }}>{hero.subtitle}</p>}
+          {hero.subtitle && <p style={{ fontSize: 18, opacity: .9, lineHeight: 1.6, maxWidth: 480, margin: 0 }}>{hero.subtitle}</p>}
           {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
         </div>
       </div>
@@ -105,7 +124,55 @@ export function HeroFullbleed({ hero }: { hero: ComposableContent['hero'] }) {
   )
 }
 
-// ── SHOWCASE varian (balok BARU — produk/menu) ────────────────
+// ── FEATURES varian (keunggulan / "Mengapa Kami") ─────────────
+type Feature = { title: string; desc: string }
+
+function FeatHeading() {
+  return (
+    <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <p className="ce-eyebrow" style={{ marginBottom: 10 }}>Mengapa Kami</p>
+      <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>Yang Membuat Kami Berbeda</h2>
+    </div>
+  )
+}
+
+export function FeaturesGrid({ features }: { features: Feature[] }) {
+  return (
+    <section style={{ padding: '80px 24px', maxWidth: 1120, margin: '0 auto' }}>
+      <FeatHeading />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+        {features.map((f, i) => (
+          <div key={i} className="ce-card" style={{ padding: 32 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--c-primary)', opacity: .14, marginBottom: 18 }} />
+            <h3 style={{ fontSize: 19, margin: '0 0 8px', color: 'var(--c-ink)' }}>{f.title}</h3>
+            <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export function FeaturesRows({ features }: { features: Feature[] }) {
+  return (
+    <section style={{ padding: '88px 24px', maxWidth: 1000, margin: '0 auto' }}>
+      <FeatHeading />
+      {features.map((f, i) => (
+        <div key={i} className="ce-feat-row" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 28, alignItems: 'baseline', padding: '28px 0' }}>
+          <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 40, lineHeight: 1, color: 'var(--c-primary)', opacity: .4 }}>
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 style={{ fontSize: 22, margin: '0 0 8px', color: 'var(--c-ink)' }}>{f.title}</h3>
+            <p style={{ fontSize: 15, color: 'var(--c-muted)', lineHeight: 1.7, margin: 0, maxWidth: 620 }}>{f.desc}</p>
+          </div>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+// ── SHOWCASE varian (produk/menu) ─────────────────────────────
 function ShowHeading({ title, subtitle }: { title?: string; subtitle?: string }) {
   if (!title && !subtitle) return null
   return (
@@ -116,7 +183,6 @@ function ShowHeading({ title, subtitle }: { title?: string; subtitle?: string })
   )
 }
 
-// Menu-list: daftar bergaya menu (nama … harga, desc di bawah). Untuk rustic/heritage.
 export function ShowcaseMenuList({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   return (
     <section style={{ padding: '88px 24px', maxWidth: 820, margin: '0 auto' }}>
@@ -136,7 +202,6 @@ export function ShowcaseMenuList({ showcase }: { showcase: NonNullable<Composabl
   )
 }
 
-// Card-grid: kartu produk dengan thumbnail. Untuk modern.
 export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   return (
     <section style={{ padding: '88px 24px', maxWidth: 1120, margin: '0 auto' }}>
@@ -157,7 +222,7 @@ export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<Composabl
   )
 }
 
-// ── ABOUT / CTA / FOOTER (disuling dari TokenDrivenRenderer) ───
+// ── ABOUT / CTA / FOOTER ──────────────────────────────────────
 export function About({ about }: { about: NonNullable<ComposableContent['about']> }) {
   return (
     <section style={{ padding: '64px 24px', maxWidth: 760, margin: '0 auto' }}>
