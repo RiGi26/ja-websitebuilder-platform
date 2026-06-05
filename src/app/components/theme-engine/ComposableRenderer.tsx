@@ -14,7 +14,7 @@ import {
   resolveManifestPack,
 } from '@/lib/theme-system/manifest'
 import {
-  ENGINE_CSS, Nav, Footer, About, CTA,
+  ENGINE_CSS, Nav, Footer, About, CTA, FloatingWA,
   HeroCentered, HeroSplit, HeroFullbleed,
   FeaturesGrid, FeaturesRows,
   ShowcaseMenuList, ShowcaseCardGrid,
@@ -66,6 +66,7 @@ export default function ComposableRenderer({
       {content.cta && <CTA cta={content.cta} />}
 
       <Footer content={content} />
+      <FloatingWA wa={content.contact?.wa} />
     </div>
   )
 }
