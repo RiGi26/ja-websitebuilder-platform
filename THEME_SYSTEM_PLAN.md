@@ -5,10 +5,11 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **Sprint 1 (Kuliner) LENGKAP & LIVE** — Toko Online → Kuliner ×3 gaya aktif di produksi (PR #71 merged 2026-06-05).
-- **Yang LIVE:** brief form Toko Online menampilkan mini-step "Tipe Toko" → pilih **Kuliner** dapat 3 gaya otentik (rustic/modern/heritage, sudah lewat gerbang 3 skill); pilih **Lainnya** → variant lama (batik/modern). Renderer composable + resolusi build aktif.
-- **Aman:** industri lain tak tersentuh; toko_online non-kuliner pakai "Lainnya". Tiap gaya = token + balok food-grade (foto hero, keunggulan, menu, floating WA, gradient-mesh, stagger).
-- **Step berikutnya (replikasi):** sub-kategori Toko Online lain via playbook §5 (7 langkah, termasuk gerbang 3 skill §5.a). Urutan saran: **Fashion → Kerajinan** (panen batik) → sisanya. Lalu industri lain. **WAJIB jaga variasi** (prinsip #6) — jangan kloning heritage.
+- **Fase aktif:** 🎉 **Sprint 2 (Fashion) LENGKAP & LIVE** — Toko Online → Fashion ×3 gaya aktif di produksi (PR #74 merged 2026-06-05). Kuliner ×3 juga tetap LIVE (Sprint 1).
+- **Yang LIVE:** mini-step "Tipe Toko" menampilkan **Kuliner** (rustic/modern/heritage) + **Fashion** (editorial/minimalis/vibrant), masing-masing 3 gaya otentik ter-filter; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
+- **Fashion ×3 (verified SSR):** Editorial (charcoal mono gelap, hero fullbleed, showcase **Lookbook** baru: spread featured + kartu portrait 3/4, image zoom), Minimalis (greige lapang terang, split, card-grid), Vibrant (indigo elektrik streetwear, centered, card-grid). Distinct penuh — bukan kloning heritage.
+- **Perpustakaan balok bertambah:** varian showcase **lookbook** (Lapis 2) — siap dipakai ulang tema fashion/lainnya berikutnya.
+- **Step berikutnya (replikasi):** sub-kategori Toko Online lain via playbook §5. Urutan saran: **Kerajinan** (panen batik) → Kecantikan → sisanya. Lalu industri lain. **WAJIB jaga variasi** (prinsip #6).
 - **Standar:** ikon lucide (bukan emoji, dijaga test); gerbang 3 skill tiap tema (§5.a); variasi wajib (#6).
 
 ### Latar masalah (kenapa ini ada)
@@ -210,3 +211,8 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | S1-4 | ✅ merged (PR #70) | UX picker aman: opsi "Lainnya (gaya umum)" → toko non-kuliner jatuh ke variant lama. |
 | 2026-06-05 | S1-5 | ✅ merged (PR #71) | **AKTIVASI** Kuliner ready:true. Mini-step LIVE di Toko Online. |
 | 2026-06-05 | **Sprint 1** | 🎉 **LENGKAP & LIVE** | Kuliner ×3 otentik aktif di produksi, 53/53 test. Berikutnya: replikasi Fashion/Kerajinan via playbook. |
+| 2026-06-05 | S2-1 | ✅ merged (PR #72) | Token-pack Fashion ×3 (`theme-packs.ts`) + manifest + registry: editorial (charcoal mono gelap), minimalis (greige Scandinavian terang), vibrant (indigo elektrik). Dormant. Ikon Camera/Wind/Zap. |
+| 2026-06-05 | S2-2 | ✅ merged (PR #73) | Balok **Lookbook** (`ShowcaseLookbook`): spread featured + grid portrait 3/4, image zoom CSS-only, index editorial, harga tabular. `ShowcaseVariant`+'lookbook'; editorial pakai lookbook. |
+| 2026-06-05 | Verify | 📝 SSR screenshot | Render 3 gaya + lookbook via headless Chrome → 3 gaya distinct, lookbook editorial premium. Lolos gerbang 3 skill. |
+| 2026-06-05 | S2-3 | ✅ merged (PR #74) | **AKTIVASI** Fashion ready:true. Microcopy picker dipertajam (buang jargon, pola self-select). Mini-step Fashion LIVE. |
+| 2026-06-05 | **Sprint 2** | 🎉 **LENGKAP & LIVE** | Fashion ×3 otentik aktif di produksi, 63/63 test. Perpustakaan balok +lookbook. Berikutnya: Kerajinan (panen batik) via playbook. |
