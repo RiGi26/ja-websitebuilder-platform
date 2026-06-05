@@ -104,16 +104,27 @@ Flagship dulu, sisanya menyusul via playbook:
 ---
 
 ## 5. Playbook produksi tema (unit yang DIULANG per sub-kategori)
-Setelah Kuliner tuntas, tiap sub-kategori/industri baru = ulangi 6 langkah ini:
+Setelah Kuliner tuntas, tiap sub-kategori/industri baru = ulangi 7 langkah ini:
 ```
 1. RESEARCH  → kumpulkan referensi visual niche (mood, palet, konvensi layout 3 gaya)
 2. DEFINE    → 3 manifest (token + pilihan varian section) per gaya
 3. BUILD     → varian section BARU yang belum ada di perpustakaan (kalau perlu)
 4. SEED      → konten contoh per sub-kategori (preview langsung "hidup")
-5. WIRE      → daftarkan sub-kategori + 3 tema ke taksonomi + filter brief form
-6. VERIFY    → e2e render tiap gaya (SSR), no-regression, checklist performa UI
+5. POLISH    → GERBANG KUALITAS 3 SKILL (wajib, lihat §5.a)
+6. WIRE      → daftarkan sub-kategori + 3 tema ke taksonomi + filter brief form
+7. VERIFY    → e2e render tiap gaya (SSR), no-regression, checklist performa UI
 ```
 Makin banyak sub-kategori dibuat, makin penuh perpustakaan balok → makin cepat berikutnya.
+
+### 5.a Gerbang kualitas 3 skill (WAJIB tiap tema — keputusan 2026-06-05)
+Tiap tema harus dimaksimalkan dari **tiga sisi**; tiap sisi punya skill penjaga:
+| Skill | Aspek dijamin |
+|---|---|
+| **/ui-design** | Tampilan — struktur, hierarki, kepatuhan sistem desain, arah visual |
+| **/make-interfaces-feel-better** | Rasa — mikro-interaksi, motion, polish taktil |
+| **/website-review** | Pesan — copy, persuasi, konversi (Ogilvy/CRO) |
+Jalankan ketiganya pada tiap gaya sebelum WIRE/aktivasi. Tema tak dianggap "matang"
+sampai lolos ketiga lensa ini. (Lihat [[feedback-theme-system-skills]].)
 
 ---
 
@@ -191,3 +202,5 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | S0-3 | ✅ merged (PR #65) | Mini-step "Tipe Toko" + `ThemePicker`/`SubKategoriPicker` di brief form (dormant). |
 | 2026-06-05 | S0-4 | ✅ merged (PR #66) | `normalizeBriefing` baca sub_kategori; `content-adapter`; SiteRenderer route composable. |
 | 2026-06-05 | **Sprint 0** | 🟢 **LENGKAP** | Infrastruktur dormant, nol regresi, 48/48 test hijau. Siap Sprint 1 (Kuliner otentik + flip ready). |
+| 2026-06-05 | S1-1 | ✅ merged (PR #67) | Token-pack otentik 3 gaya Kuliner (`theme-packs.ts`): rustic cream-terracotta / modern putih-oranye / heritage maroon-gold. 51/51 test. |
+| 2026-06-05 | Review user | 📝 catatan | User preview 3 gaya pada konten pempek (via DB swap variant, draft). **Favorit: HERITAGE** (premium). Minta: foto hero + lebih cerah → masuk S1-2. Standar baru: gerbang 3 skill (§5.a). |
