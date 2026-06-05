@@ -22,6 +22,18 @@ export const ENGINE_CSS = `
 .ce-menu-row:hover { padding-left: 8px; background: color-mix(in srgb, var(--c-primary) 5%, transparent); }
 .ce-feat-row { border-top: 1px solid var(--c-border); transition: padding-left .2s ease; }
 .ce-feat-row:hover { padding-left: 8px; }
+.ce-root p { text-wrap: pretty; }
+.ce-price { font-variant-numeric: tabular-nums; }
+.ce-btn:hover { box-shadow: 0 12px 28px color-mix(in srgb, var(--c-primary) 38%, transparent); }
+/* Stagger fade-in (CSS-only, server-safe) */
+.ce-stagger > * { opacity: 0; transform: translateY(14px); animation: ceFadeUp .5s cubic-bezier(.16,1,.3,1) forwards; }
+.ce-stagger > *:nth-child(1){animation-delay:0ms}.ce-stagger > *:nth-child(2){animation-delay:80ms}.ce-stagger > *:nth-child(3){animation-delay:160ms}.ce-stagger > *:nth-child(4){animation-delay:240ms}.ce-stagger > *:nth-child(5){animation-delay:320ms}.ce-stagger > *:nth-child(6){animation-delay:400ms}.ce-stagger > *:nth-child(n+7){animation-delay:480ms}
+@keyframes ceFadeUp { to { opacity: 1; transform: translateY(0); } }
+/* Floating WhatsApp — wajib konteks Indonesia */
+.ce-wa { position: fixed; right: 20px; bottom: 20px; z-index: 999; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 22px rgba(37,211,102,.40); transition: transform .2s cubic-bezier(.16,1,.3,1); }
+.ce-wa:hover { transform: scale(1.08); }
+.ce-wa:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .ce-stagger > * { opacity: 1; transform: none; animation: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -58,7 +70,14 @@ function heroBg(image?: string): React.CSSProperties {
   if (image) {
     return { backgroundImage: `${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
   }
-  return { background: `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))` }
+  // Gradient MESH (bukan flat): 2 radial aksen + linear dasar → ada kedalaman.
+  return {
+    backgroundImage: [
+      'radial-gradient(ellipse 70% 55% at 18% 80%, color-mix(in srgb, var(--c-primary) 18%, transparent) 0%, transparent 60%)',
+      'radial-gradient(ellipse 55% 45% at 85% 18%, color-mix(in srgb, var(--c-primary) 12%, transparent) 0%, transparent 55%)',
+      'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))',
+    ].join(', '),
+  }
 }
 const heroInk = (image?: string) => (image ? '#FFFFFF' : 'var(--c-hero-ink)')
 
@@ -131,23 +150,25 @@ function FeatHeading() {
   return (
     <div style={{ textAlign: 'center', marginBottom: 40 }}>
       <p className="ce-eyebrow" style={{ marginBottom: 10 }}>Mengapa Kami</p>
-      <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>Yang Membuat Kami Berbeda</h2>
+      <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>Alasan Pelanggan Selalu Kembali</h2>
     </div>
   )
 }
 
 export function FeaturesGrid({ features }: { features: Feature[] }) {
   return (
-    <section style={{ padding: '80px 24px', maxWidth: 1120, margin: '0 auto' }}>
-      <FeatHeading />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
-        {features.map((f, i) => (
-          <div key={i} className="ce-card" style={{ padding: 32 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--c-primary)', opacity: .14, marginBottom: 18 }} />
-            <h3 style={{ fontSize: 19, margin: '0 0 8px', color: 'var(--c-ink)' }}>{f.title}</h3>
-            <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
-          </div>
-        ))}
+    <section style={{ background: 'var(--c-surface)', padding: '80px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <FeatHeading />
+        <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+          {features.map((f, i) => (
+            <div key={i} className="ce-card" style={{ padding: 32 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--c-primary)', opacity: .14, marginBottom: 18 }} />
+              <h3 style={{ fontSize: 19, margin: '0 0 8px', color: 'var(--c-ink)' }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -155,7 +176,8 @@ export function FeaturesGrid({ features }: { features: Feature[] }) {
 
 export function FeaturesRows({ features }: { features: Feature[] }) {
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 1000, margin: '0 auto' }}>
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
       <FeatHeading />
       {features.map((f, i) => (
         <div key={i} className="ce-feat-row" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 28, alignItems: 'baseline', padding: '28px 0' }}>
@@ -168,6 +190,7 @@ export function FeaturesRows({ features }: { features: Feature[] }) {
           </div>
         </div>
       ))}
+      </div>
     </section>
   )
 }
@@ -187,12 +210,12 @@ export function ShowcaseMenuList({ showcase }: { showcase: NonNullable<Composabl
   return (
     <section style={{ padding: '88px 24px', maxWidth: 820, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
-      <div>
+      <div className="ce-stagger">
         {showcase.items.map((it: ShowcaseItem, i) => (
           <div key={i} className="ce-menu-row" style={{ padding: '22px 0' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
               <h3 style={{ fontSize: 19, margin: 0, color: 'var(--c-ink)' }}>{it.nama}</h3>
-              {it.harga != null && <span style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
+              {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
             </div>
             {it.desc && <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: '6px 0 0', maxWidth: 560 }}>{it.desc}</p>}
           </div>
@@ -206,14 +229,14 @@ export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<Composabl
   return (
     <section style={{ padding: '88px 24px', maxWidth: 1120, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
+      <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
         {showcase.items.map((it: ShowcaseItem, i) => (
           <div key={i} className="ce-card">
             <div style={{ aspectRatio: '4 / 3', background: it.gambar ? `center/cover no-repeat url(${it.gambar})` : `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))` }} />
             <div style={{ padding: 20 }}>
               <h3 style={{ fontSize: 17, margin: '0 0 6px', color: 'var(--c-ink)' }}>{it.nama}</h3>
               {it.desc && <p style={{ fontSize: 13, color: 'var(--c-muted)', lineHeight: 1.55, margin: '0 0 10px' }}>{it.desc}</p>}
-              {it.harga != null && <span style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)' }}>{formatRupiah(it.harga)}</span>}
+              {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)' }}>{formatRupiah(it.harga)}</span>}
             </div>
           </div>
         ))}
@@ -234,13 +257,36 @@ export function About({ about }: { about: NonNullable<ComposableContent['about']
 
 export function CTA({ cta }: { cta: NonNullable<ComposableContent['cta']> }) {
   return (
-    <section style={{ padding: '24px 24px 88px' }}>
-      <div className="ce-card" style={{ maxWidth: 920, margin: '0 auto', padding: '56px 32px', textAlign: 'center', borderRadius: 'var(--r-lg)' }}>
-        <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', margin: '0 0 12px' }}>{cta.title}</h2>
-        {cta.subtitle && <p style={{ color: 'var(--c-muted)', margin: '0 0 28px', fontSize: 16 }}>{cta.subtitle}</p>}
+    <section style={{ padding: '32px 24px 96px' }}>
+      <div
+        style={{
+          maxWidth: 920, margin: '0 auto', padding: '64px 32px', textAlign: 'center',
+          borderRadius: 'var(--r-lg)', color: 'var(--c-hero-ink)', boxShadow: 'var(--s-lg)',
+          border: '1px solid var(--c-border)', overflow: 'hidden',
+          backgroundImage: [
+            'radial-gradient(ellipse 60% 80% at 50% 0%, color-mix(in srgb, var(--c-primary) 22%, transparent) 0%, transparent 60%)',
+            'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))',
+          ].join(', '),
+        }}
+      >
+        <h2 style={{ fontSize: 'clamp(26px, 4.5vw, 36px)', margin: '0 0 12px', color: 'var(--c-hero-ink)' }}>{cta.title}</h2>
+        {cta.subtitle && <p style={{ opacity: .85, margin: '0 0 28px', fontSize: 16 }}>{cta.subtitle}</p>}
         <Btn text={cta.ctaText ?? 'Pesan Sekarang'} href={cta.ctaHref} />
       </div>
     </section>
+  )
+}
+
+// Floating WhatsApp — komponen wajib konteks Indonesia (pesan via WA).
+export function FloatingWA({ wa }: { wa?: string }) {
+  const digits = (wa ?? '').replace(/[^\d]/g, '')
+  if (!digits) return null
+  return (
+    <a className="ce-wa" href={`https://wa.me/${digits}`} target="_blank" rel="noopener noreferrer" aria-label="Pesan via WhatsApp">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true">
+        <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.207zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+      </svg>
+    </a>
   )
 }
 
