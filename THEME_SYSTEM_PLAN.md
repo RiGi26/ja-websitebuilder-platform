@@ -32,6 +32,7 @@ Order pempek (Toko Online, variant `batik`) ter-render `BatikTokoRenderer` → e
   3. **Nol regresi.** Tema & renderer lama tetap jalan selama migrasi. Tak ada page published yang rusak.
   4. **No-rush, matang dulu.** Rilis sub-kategori hanya setelah 3 gayanya lengkap & terverifikasi.
   5. **Konten briefing tetap menang** atas seed/contoh (konsisten dgn pipeline F3 di UPGRADE_PLAN).
+  6. **VARIASI WAJIB — favorit pribadi BUKAN acuan.** Tiap sub-kategori harus merentang gaya yang benar-benar beragam (terang↔gelap, ramai↔minimal, hangat↔elegan). Selera pribadi siapa pun (mis. user suka heritage) TIDAK boleh dijadikan cetakan yang dikloning ke semua tema — itu membunuh tujuan "banyak pilihan". Tiap gaya berdiri sebagai opsi distinct.
 
 ---
 
@@ -203,4 +204,4 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | S0-4 | ✅ merged (PR #66) | `normalizeBriefing` baca sub_kategori; `content-adapter`; SiteRenderer route composable. |
 | 2026-06-05 | **Sprint 0** | 🟢 **LENGKAP** | Infrastruktur dormant, nol regresi, 48/48 test hijau. Siap Sprint 1 (Kuliner otentik + flip ready). |
 | 2026-06-05 | S1-1 | ✅ merged (PR #67) | Token-pack otentik 3 gaya Kuliner (`theme-packs.ts`): rustic cream-terracotta / modern putih-oranye / heritage maroon-gold. 51/51 test. |
-| 2026-06-05 | Review user | 📝 catatan | User preview 3 gaya pada konten pempek (via DB swap variant, draft). **Favorit: HERITAGE** (premium). Minta: foto hero + lebih cerah → masuk S1-2. Standar baru: gerbang 3 skill (§5.a). |
+| 2026-06-05 | Review user | 📝 catatan | User preview 3 gaya pada konten pempek (via DB swap variant, draft). User pribadi suka HERITAGE — **TAPI bukan acuan**: variasi WAJIB, jangan kloning heritage ke semua tema. Minta: foto hero + lebih cerah → S1-2. Standar baru: gerbang 3 skill (§5.a). |
