@@ -31,33 +31,37 @@ export default function SubKategoriPicker({
         Pilih jenis tokomu — kami tampilkan gaya yang paling cocok.
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {subs.map((s) => {
-          const active = value === s.id
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => onChange(s.id)}
-              aria-pressed={active}
-              className={`flex items-center gap-3 p-4 rounded-[16px] border-2 text-left transition-[border-color,background-color,transform] duration-200 active:scale-[0.98] ${
-                active ? 'border-[#0071E3] bg-blue-50/40' : 'border-black/[0.06] hover:border-blue-200 bg-white'
-              }`}
-            >
-              <div
-                className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
-                  active ? 'bg-[#0071E3] text-white' : 'bg-blue-50 text-[#0071E3]'
-                }`}
-              >
-                <ThemeIcon name={s.icon} size={18} strokeWidth={2.25} />
-              </div>
-              <span className={`font-bold text-sm leading-tight ${active ? 'text-[#0071E3]' : 'text-gray-900'}`}>
-                {s.nama}
-              </span>
-              {active && <Check size={15} className="text-[#0071E3] ml-auto shrink-0" strokeWidth={3} />}
-            </button>
-          )
-        })}
+        {subs.map((s) => (
+          <SubCard key={s.id} icon={s.icon} nama={s.nama} active={value === s.id} onClick={() => onChange(s.id)} />
+        ))}
+        {/* Escape hatch: toko di luar kategori kurasi → gaya umum (variant lama). */}
+        <SubCard icon="LayoutGrid" nama="Lainnya (gaya umum)" active={!value} onClick={() => onChange('')} />
       </div>
     </div>
+  )
+}
+
+function SubCard({ icon, nama, active, onClick }: { icon: string; nama: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex items-center gap-3 p-4 rounded-[16px] border-2 text-left transition-[border-color,background-color,transform] duration-200 active:scale-[0.98] ${
+        active ? 'border-[#0071E3] bg-blue-50/40' : 'border-black/[0.06] hover:border-blue-200 bg-white'
+      }`}
+    >
+      <div
+        className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
+          active ? 'bg-[#0071E3] text-white' : 'bg-blue-50 text-[#0071E3]'
+        }`}
+      >
+        <ThemeIcon name={icon} size={18} strokeWidth={2.25} />
+      </div>
+      <span className={`font-bold text-sm leading-tight ${active ? 'text-[#0071E3]' : 'text-gray-900'}`}>
+        {nama}
+      </span>
+      {active && <Check size={15} className="text-[#0071E3] ml-auto shrink-0" strokeWidth={3} />}
+    </button>
   )
 }

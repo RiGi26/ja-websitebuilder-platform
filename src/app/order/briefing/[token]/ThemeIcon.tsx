@@ -6,12 +6,12 @@
 // ============================================================
 import {
   UtensilsCrossed, Shirt, Palette, Sparkles, Smartphone, Sofa, Leaf, Baby,
-  Flame, CupSoda, Crown, Store, type LucideProps,
+  Flame, CupSoda, Crown, Store, LayoutGrid, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
   UtensilsCrossed, Shirt, Palette, Sparkles, Smartphone, Sofa, Leaf, Baby,
-  Flame, CupSoda, Crown, Store,
+  Flame, CupSoda, Crown, Store, LayoutGrid,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {
