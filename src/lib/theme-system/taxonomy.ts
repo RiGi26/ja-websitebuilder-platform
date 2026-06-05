@@ -97,6 +97,41 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         manifest: 'kuliner-heritage',
       },
     ],
+    // Fashion ×3 (Sprint 2). Token + manifest sudah ada (S2-1); sub-kategori
+    // `fashion` tetap ready:false sampai blok Lookbook + polish + verifikasi
+    // tuntas (playbook §5). Registry boleh terdaftar — UI hanya tampilkan yang ready.
+    fashion: [
+      {
+        id: 'fashion-editorial',
+        subKategori: 'fashion',
+        nama: 'Editorial',
+        deskripsi: 'Lookbook majalah, gelap & dramatis. Untuk butik, label desainer, koleksi premium.',
+        icon: 'Camera',
+        mood: '#0E0E0F',
+        bg: 'dark',
+        manifest: 'fashion-editorial',
+      },
+      {
+        id: 'fashion-minimal',
+        subKategori: 'fashion',
+        nama: 'Minimalis',
+        deskripsi: 'Lapang & kalem ala Scandinavian. Untuk basic tee, hijab polos, esensial sehari-hari.',
+        icon: 'Wind',
+        mood: '#1C1B19',
+        bg: 'light',
+        manifest: 'fashion-minimal',
+      },
+      {
+        id: 'fashion-vibrant',
+        subKategori: 'fashion',
+        nama: 'Vibrant',
+        deskripsi: 'Streetwear berani & ceria, warna pop. Untuk distro, sneakers, brand anak muda.',
+        icon: 'Zap',
+        mood: '#5B2BE8',
+        bg: 'light',
+        manifest: 'fashion-vibrant',
+      },
+    ],
   },
 }
 

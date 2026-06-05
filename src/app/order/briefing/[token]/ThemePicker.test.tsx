@@ -16,9 +16,19 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#B5532A') // swatch mood rustic ter-inject
   })
 
-  it('sub-kategori tanpa tema → render kosong (null)', () => {
+  it('render 3 gaya Fashion dengan nama + swatch (S2-1)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="fashion" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Editorial')
+    expect(html).toContain('Minimalis')
+    expect(html).toContain('Vibrant')
+    expect(html).toContain('#5B2BE8') // swatch mood vibrant ter-inject
+  })
+
+  it('sub-kategori tanpa tema → render kosong (null)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="toko_online" subKategori="kecantikan" value="" onChange={noop} />,
     )
     expect(html).toBe('')
   })
