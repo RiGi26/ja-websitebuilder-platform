@@ -71,6 +71,28 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     basePackId: 'kuliner-heritage',
     blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list' },
   },
+
+  // ── FASHION ×3 (Sprint 2). Token otentik di theme-packs.ts. DORMANT
+  // (taxonomy ready:false) sampai S2 aktivasi. Editorial pakai showcase
+  // 'card-grid' sementara → di-switch ke 'lookbook' saat blok itu ada (S2-2).
+  'fashion-editorial': {
+    id: 'fashion-editorial',
+    label: 'Fashion Editorial',
+    basePackId: 'fashion-editorial',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+  },
+  'fashion-minimal': {
+    id: 'fashion-minimal',
+    label: 'Fashion Minimalis',
+    basePackId: 'fashion-minimal',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'fashion-vibrant': {
+    id: 'fashion-vibrant',
+    label: 'Fashion Vibrant',
+    basePackId: 'fashion-vibrant',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {

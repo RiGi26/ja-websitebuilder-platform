@@ -71,6 +71,18 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(t?.nama).toBe('Heritage Kuliner')
   })
 
+  it('Fashion (S2-1): 3 gaya terdaftar tapi sub-kategori belum ready (dormant)', () => {
+    const themes = getThemes('toko_online', 'fashion')
+    expect(themes.map((t) => t.id)).toEqual([
+      'fashion-editorial',
+      'fashion-minimal',
+      'fashion-vibrant',
+    ])
+    const fashion = getSubKategori('toko_online').find((s) => s.id === 'fashion')
+    expect(fashion?.ready).toBe(false) // belum aktif sampai blok+polish+verify tuntas
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).not.toContain('fashion')
+  })
+
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
     // Heuristik anti-emoji: nama ikon lucide = ASCII PascalCase.
     const asciiPascal = /^[A-Z][A-Za-z0-9]+$/
