@@ -5,12 +5,12 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **Sprint 2 (Fashion) LENGKAP & LIVE** — Toko Online → Fashion ×3 gaya aktif di produksi (PR #74 merged 2026-06-05). Kuliner ×3 juga tetap LIVE (Sprint 1).
-- **Yang LIVE:** mini-step "Tipe Toko" menampilkan **Kuliner** (rustic/modern/heritage) + **Fashion** (editorial/minimalis/vibrant), masing-masing 3 gaya otentik ter-filter; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
-- **Fashion ×3 (verified SSR):** Editorial (charcoal mono gelap, hero fullbleed, showcase **Lookbook** baru: spread featured + kartu portrait 3/4, image zoom), Minimalis (greige lapang terang, split, card-grid), Vibrant (indigo elektrik streetwear, centered, card-grid). Distinct penuh — bukan kloning heritage.
-- **Perpustakaan balok bertambah:** varian showcase **lookbook** (Lapis 2) — siap dipakai ulang tema fashion/lainnya berikutnya.
-- **Step berikutnya (replikasi):** sub-kategori Toko Online lain via playbook §5. Urutan saran: **Kerajinan** (panen batik) → Kecantikan → sisanya. Lalu industri lain. **WAJIB jaga variasi** (prinsip #6).
-- **Standar:** ikon lucide (bukan emoji, dijaga test); gerbang 3 skill tiap tema (§5.a); variasi wajib (#6).
+- **Fase aktif:** 🎉 **TOKO ONLINE TUNTAS — ke-8 sub-kategori ×3 gaya LIVE.** Sprint 3 menambah 6 sub-kategori sekaligus (Kerajinan, Kecantikan, Gadget, Rumah, Herbal/Kesehatan, Anak) di atas Kuliner+Fashion. Total **24 tema otentik** aktif. 99/99 test hijau, typecheck + next build bersih.
+- **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
+- **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
+- **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
+- **Step berikutnya:** industri LAIN (restaurant/klinik/sekolah dll) via pola yang sama; atau perdalam blok (testimoni varian, hero baru). **WAJIB jaga variasi** (prinsip #6).
+- **Standar:** ikon lucide (bukan emoji, dijaga test); gerbang 3 skill tiap tema (§5.a, diterapkan sbg design-review pada 18 gaya baru); variasi wajib (#6, dijaga test).
 
 ### Latar masalah (kenapa ini ada)
 Order pempek (Toko Online, variant `batik`) ter-render `BatikTokoRenderer` → estetika **batik tekstil** (motif kawung, "Luxury Heritage"), mismatch untuk **makanan**. Akar: variant `toko_online` cuma 2 (`batik`, `modern`), keduanya generik & tak nyambung ke jenis toko. Customer tak bisa memilih nuansa yang pas.
@@ -216,3 +216,6 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | Verify | 📝 SSR screenshot | Render 3 gaya + lookbook via headless Chrome → 3 gaya distinct, lookbook editorial premium. Lolos gerbang 3 skill. |
 | 2026-06-05 | S2-3 | ✅ merged (PR #74) | **AKTIVASI** Fashion ready:true. Microcopy picker dipertajam (buang jargon, pola self-select). Mini-step Fashion LIVE. |
 | 2026-06-05 | **Sprint 2** | 🎉 **LENGKAP & LIVE** | Fashion ×3 otentik aktif di produksi, 63/63 test. Perpustakaan balok +lookbook. Berikutnya: Kerajinan (panen batik) via playbook. |
+| 2026-06-05 | S3-infra | ✅ | **MOTIF engine** (panen batik): `MotifVariant` (kawung/tenun), `MotifOverlay` + strip footer ditint primary (parametrik), threaded via ComposableRenderer. Font ROUNDED + 16 ikon lucide baru. Nol regresi (motif default 'none'). |
+| 2026-06-05 | S3 ×6 sub-kat | ✅ | **18 tema baru** sekaligus: Kerajinan/Kecantikan/Gadget/Rumah/Kesehatan/Anak ×3. Token-pack + manifest + taxonomy (ready:true) + sample-content (konten benefit-led + foto Unsplash verified 200). Tiap sub-kat lolos VARIASI (gelap↔terang, mood beda — dijaga test). |
+| 2026-06-05 | **Sprint 3** | 🎉 **LENGKAP & LIVE** | Toko Online TUNTAS: 8 sub-kat ×3 = **24 tema**. 99/99 test, typecheck + next build bersih. Gerbang 3 skill diterapkan sbg design-review. Berikutnya: industri lain. |

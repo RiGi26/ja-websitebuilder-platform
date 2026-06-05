@@ -17,6 +17,10 @@ import { THEME_PACKS } from './theme-packs'
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
 export type ShowcaseVariant = 'menu-list' | 'card-grid' | 'lookbook'
 export type FeaturesVariant = 'grid' | 'rows'
+// Motif/tekstur otentik — dipanen dari BatikTokoRenderer (S-Kerajinan). Overlay
+// halus di hero + strip footer, ditint warna primary tema. 'none' = polos
+// (default semua tema lama → nol regresi).
+export type MotifVariant = 'none' | 'kawung' | 'tenun'
 
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
@@ -24,6 +28,7 @@ export interface ThemeManifest {
   basePackId: string // id TokenPack dasar dari packs.ts
   colorOverrides?: Partial<TokenPack['color']>
   layoutOverrides?: Partial<TokenPack['layout']>
+  motif?: MotifVariant // default 'none'
   blocks: {
     hero: HeroVariant
     features?: FeaturesVariant
@@ -90,6 +95,92 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'fashion-vibrant',
     label: 'Fashion Vibrant',
     basePackId: 'fashion-vibrant',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+
+  // ── KERAJINAN ×3 (flagship) — motif/tekstur panen batik ───────
+  'kerajinan-pusaka': {
+    id: 'kerajinan-pusaka', label: 'Kerajinan Pusaka', basePackId: 'kerajinan-pusaka',
+    motif: 'kawung',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+  },
+  'kerajinan-tenun': {
+    id: 'kerajinan-tenun', label: 'Kerajinan Tenun', basePackId: 'kerajinan-tenun',
+    motif: 'tenun',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'kerajinan-galeri': {
+    id: 'kerajinan-galeri', label: 'Kerajinan Galeri', basePackId: 'kerajinan-galeri',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'lookbook' },
+  },
+
+  // ── KECANTIKAN ×3 — lembut/elegan/pastel ──────────────────────
+  'kecantikan-blush': {
+    id: 'kecantikan-blush', label: 'Kecantikan Blush', basePackId: 'kecantikan-blush',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+  'kecantikan-glow': {
+    id: 'kecantikan-glow', label: 'Kecantikan Glow', basePackId: 'kecantikan-glow',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'kecantikan-noir': {
+    id: 'kecantikan-noir', label: 'Kecantikan Noir', basePackId: 'kecantikan-noir',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook' },
+  },
+
+  // ── GADGET ×3 — modern/gelap/tech ─────────────────────────────
+  'gadget-onyx': {
+    id: 'gadget-onyx', label: 'Gadget Onyx', basePackId: 'gadget-onyx',
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid' },
+  },
+  'gadget-studio': {
+    id: 'gadget-studio', label: 'Gadget Studio', basePackId: 'gadget-studio',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'gadget-neon': {
+    id: 'gadget-neon', label: 'Gadget Neon', basePackId: 'gadget-neon',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+
+  // ── RUMAH ×3 — natural/lapang ─────────────────────────────────
+  'rumah-natural': {
+    id: 'rumah-natural', label: 'Rumah Natural', basePackId: 'rumah-natural',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'rumah-japandi': {
+    id: 'rumah-japandi', label: 'Rumah Japandi', basePackId: 'rumah-japandi',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+  'rumah-walnut': {
+    id: 'rumah-walnut', label: 'Rumah Walnut', basePackId: 'rumah-walnut',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+  },
+
+  // ── HERBAL ×3 — natural/hijau/trust ───────────────────────────
+  'herbal-daun': {
+    id: 'herbal-daun', label: 'Herbal Daun', basePackId: 'herbal-daun',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'herbal-jamu': {
+    id: 'herbal-jamu', label: 'Herbal Jamu', basePackId: 'herbal-jamu',
+    blocks: { hero: 'centered', features: 'rows', showcase: 'menu-list' },
+  },
+  'herbal-botani': {
+    id: 'herbal-botani', label: 'Herbal Botani', basePackId: 'herbal-botani',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+  },
+
+  // ── ANAK ×3 — playful/ramah ───────────────────────────────────
+  'anak-pastel': {
+    id: 'anak-pastel', label: 'Anak Pastel', basePackId: 'anak-pastel',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+  'anak-ceria': {
+    id: 'anak-ceria', label: 'Anak Ceria', basePackId: 'anak-ceria',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+  },
+  'anak-pop': {
+    id: 'anak-pop', label: 'Anak Pop', basePackId: 'anak-pop',
     blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
   },
 }

@@ -6,12 +6,17 @@
 // ============================================================
 import {
   UtensilsCrossed, Shirt, Palette, Sparkles, Smartphone, Sofa, Leaf, Baby,
-  Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap, type LucideProps,
+  Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap,
+  // Kerajinan / Kecantikan / Gadget / Rumah / Herbal / Anak (S-replikasi 6 sub-kat)
+  Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
+  Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
   UtensilsCrossed, Shirt, Palette, Sparkles, Smartphone, Sofa, Leaf, Baby,
   Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap,
+  Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
+  Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {

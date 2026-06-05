@@ -52,3 +52,40 @@ describe('theme-packs Fashion (S2-1)', () => {
     expect(e.color.primary).not.toBe(resolveManifestPack(MANIFESTS['kuliner-heritage']).color.primary)
   })
 })
+
+// ── Replikasi 6 sub-kategori (Kerajinan…Anak) ────────────────
+const SUBKAT_PACKS: Record<string, string[]> = {
+  kerajinan: ['kerajinan-pusaka', 'kerajinan-tenun', 'kerajinan-galeri'],
+  kecantikan: ['kecantikan-blush', 'kecantikan-glow', 'kecantikan-noir'],
+  gadget: ['gadget-onyx', 'gadget-studio', 'gadget-neon'],
+  rumah: ['rumah-natural', 'rumah-japandi', 'rumah-walnut'],
+  herbal: ['herbal-daun', 'herbal-jamu', 'herbal-botani'],
+  anak: ['anak-pastel', 'anak-ceria', 'anak-pop'],
+}
+
+describe('theme-packs replikasi 6 sub-kategori', () => {
+  for (const [sub, ids] of Object.entries(SUBKAT_PACKS)) {
+    it(`${sub}: 3 pack ada + resolve ke pack-nya sendiri`, () => {
+      for (const id of ids) {
+        expect(Object.keys(THEME_PACKS)).toContain(id)
+        // manifest dgn id sama resolve ke pack otentik (bukan fallback generik)
+        expect(resolveManifestPack(MANIFESTS[id]).id).toBe(id)
+      }
+    })
+
+    it(`${sub}: VARIASI WAJIB — page bg & mood ke-3 gaya tak seragam`, () => {
+      const packs = ids.map((id) => resolveManifestPack(MANIFESTS[id]))
+      expect(new Set(packs.map((p) => p.color.page)).size).toBe(3)
+      expect(new Set(packs.map((p) => p.mood)).size).toBe(3)
+    })
+  }
+
+  it('rentang gelap↔terang: Kerajinan/Kecantikan/Gadget/Rumah/Herbal punya min. 1 gaya gelap', () => {
+    const darkPages = ['kerajinan-pusaka', 'kecantikan-noir', 'gadget-onyx', 'rumah-walnut', 'herbal-botani']
+    for (const id of darkPages) {
+      const page = resolveManifestPack(MANIFESTS[id]).color.page.toLowerCase()
+      // gelap = komponen pertama hex rendah (mis. #0..#2..)
+      expect(['#0', '#1', '#2'].some((p) => page.startsWith(p))).toBe(true)
+    }
+  })
+})
