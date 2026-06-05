@@ -59,11 +59,20 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('getReadySubKategori: Kuliner (S1-5) + Fashion (S2-3) aktif, sisanya belum', () => {
+  it('getReadySubKategori: ke-8 sub-kategori Toko Online aktif (replikasi tuntas)', () => {
     const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual(['kuliner', 'fashion'])
-    // sub-kategori lain masih ready:false sampai dibangun via playbook
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(2)
+    expect(ready.map((s) => s.id)).toEqual([
+      'kuliner', 'fashion', 'kerajinan', 'kecantikan', 'gadget', 'rumah', 'kesehatan', 'anak',
+    ])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(8)
+  })
+
+  it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
+    for (const sub of ['kerajinan', 'kecantikan', 'gadget', 'rumah', 'kesehatan', 'anak']) {
+      const themes = getThemes('toko_online', sub)
+      expect(themes).toHaveLength(3)
+      expect(themes.every((t) => t.subKategori === sub)).toBe(true)
+    }
   })
 
   it('getTheme menemukan tema lintas sub-kategori', () => {

@@ -30,6 +30,9 @@ export default function ComposableRenderer({
   const pack = resolveManifestPack(manifest)
   const vars = packToCssVars(pack) as CSSProperties
   const B = manifest.blocks
+  // Motif/tekstur otentik (Kerajinan) — ditint warna primary tema final.
+  const motif = manifest.motif
+  const motifColor = pack.color.primary
 
   return (
     <div className="ce-root" style={vars} data-theme={manifest.id}>
@@ -39,11 +42,11 @@ export default function ComposableRenderer({
 
       {/* Hero — varian dari manifest */}
       {B.hero === 'split' ? (
-        <HeroSplit hero={content.hero} nama={content.nama} />
+        <HeroSplit hero={content.hero} nama={content.nama} motif={motif} motifColor={motifColor} />
       ) : B.hero === 'fullbleed' ? (
-        <HeroFullbleed hero={content.hero} />
+        <HeroFullbleed hero={content.hero} motif={motif} motifColor={motifColor} />
       ) : (
-        <HeroCentered hero={content.hero} />
+        <HeroCentered hero={content.hero} motif={motif} motifColor={motifColor} />
       )}
 
       {/* Features (keunggulan / "Mengapa Kami") — varian dari manifest */}
@@ -67,7 +70,7 @@ export default function ComposableRenderer({
       {content.about && <About about={content.about} />}
       {content.cta && <CTA cta={content.cta} />}
 
-      <Footer content={content} />
+      <Footer content={content} motif={motif} motifColor={motifColor} />
       <FloatingWA wa={content.contact?.wa} />
     </div>
   )

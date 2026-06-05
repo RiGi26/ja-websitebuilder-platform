@@ -83,6 +83,25 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
     expect(html).toContain('ce-look-idx') // index editorial khas lookbook
   })
 
+  it('Kerajinan Pusaka: motif kawung ter-render (panen batik), ditint primary', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kerajinan-pusaka']} content={CONTENT} />)
+    // tile SVG motif (kawung) hadir sebagai data-uri di overlay hero/footer
+    expect(html).toContain('data:image/svg+xml')
+    expect(html).toContain('ellipse') // kawung = elips
+    // ditint warna primary pusaka (emas #C8922A → tanpa # di data-uri)
+    expect(html).toContain('C8922A')
+  })
+
+  it('Kerajinan Galeri (motif none) tak menyuntik tile motif', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kerajinan-galeri']} content={CONTENT} />)
+    expect(html).not.toContain('data:image/svg+xml')
+  })
+
+  it('tema lama tetap polos (nol regresi): kuliner-rustic tanpa motif tile', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={CONTENT} />)
+    expect(html).not.toContain('data:image/svg+xml')
+  })
+
   it('lookbook: pakai <img> zoom bila item punya gambar', () => {
     const withImg = {
       ...CONTENT,
