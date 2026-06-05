@@ -12,6 +12,7 @@
 // Sprint 1 (THEME_SYSTEM_PLAN §8). Lihat juga taxonomy.ts (id tema cocok).
 // ============================================================
 import { PACKS, type TokenPack } from '@/lib/design-tokens/packs'
+import { THEME_PACKS } from './theme-packs'
 
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
 export type ShowcaseVariant = 'menu-list' | 'card-grid'
@@ -46,33 +47,25 @@ export interface ComposableContent {
 
 // ── Registry manifest (pilot Kuliner ×3) ──────────────────────
 export const MANIFESTS: Record<string, ThemeManifest> = {
-  // Rustic Hangat — warung homemade (pempek). Hangat, terracotta, menu daftar.
+  // Rustic Hangat — warung homemade (pempek). Token otentik di theme-packs.ts.
   'kuliner-rustic': {
     id: 'kuliner-rustic',
     label: 'Rustic Hangat',
-    basePackId: 'warm-cafe',
-    colorOverrides: { primary: '#B5532A', onPrimary: '#FFFFFF' },
+    basePackId: 'kuliner-rustic',
     blocks: { hero: 'centered', showcase: 'menu-list' },
   },
   // Modern Appetite — brand F&B kekinian. Bersih, cerah, grid kartu produk.
   'kuliner-modern': {
     id: 'kuliner-modern',
     label: 'Modern Appetite',
-    basePackId: 'clean-modern',
-    colorOverrides: { primary: '#E2582B', onPrimary: '#FFFFFF', heroTo: '#FFE4D6' },
-    layoutOverrides: { hero: 'split' },
+    basePackId: 'kuliner-modern',
     blocks: { hero: 'split', showcase: 'card-grid' },
   },
   // Heritage Kuliner — kuliner premium/tradisional. Gelap-hangat maroon + gold.
   'kuliner-heritage': {
     id: 'kuliner-heritage',
     label: 'Heritage Kuliner',
-    basePackId: 'luxury-navy',
-    colorOverrides: {
-      page: '#1A1011', surface: '#241619', ink: '#F4E9DE', muted: '#B9A89B',
-      primary: '#C8A24B', onPrimary: '#1A1011',
-      heroFrom: '#1A1011', heroTo: '#3D1F23', heroInk: '#FDF6EC',
-    },
+    basePackId: 'kuliner-heritage',
     blocks: { hero: 'fullbleed', showcase: 'menu-list' },
   },
 }
@@ -82,9 +75,10 @@ export function getManifest(id?: string): ThemeManifest | undefined {
   return MANIFESTS[id]
 }
 
-// Resolve TokenPack final dari manifest: base pack + override warna/layout.
+// Resolve TokenPack final dari manifest. Cari pack otentik theme-system dulu
+// (THEME_PACKS), fallback ke pack generik (PACKS), lalu terapkan override.
 export function resolveManifestPack(m: ThemeManifest): TokenPack {
-  const base = PACKS[m.basePackId] ?? PACKS['clean-modern']
+  const base = THEME_PACKS[m.basePackId] ?? PACKS[m.basePackId] ?? PACKS['clean-modern']
   return {
     ...base,
     color: { ...base.color, ...(m.colorOverrides ?? {}) },
