@@ -73,6 +73,7 @@ export function normalizeBriefing(order: OrderLike): NormalizedBriefing {
     kotaLayanan: asArr(identitas.kota_layanan).map(asStr).filter(Boolean),
     primary: asStr(branding.primary_color) || undefined,
     variant: asStr(branding.variant) || undefined,
+    subKategori: asStr(branding.sub_kategori) || undefined,
     logoUrl: asStr(branding.logo_url) || undefined,
     referensi: asStr(branding.referensi_website) || undefined,
     sosial: {
