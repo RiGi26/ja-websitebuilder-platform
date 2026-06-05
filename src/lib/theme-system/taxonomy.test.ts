@@ -59,11 +59,11 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('getReadySubKategori: Kuliner aktif (S1-5), sisanya belum', () => {
+  it('getReadySubKategori: Kuliner (S1-5) + Fashion (S2-3) aktif, sisanya belum', () => {
     const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual(['kuliner'])
+    expect(ready.map((s) => s.id)).toEqual(['kuliner', 'fashion'])
     // sub-kategori lain masih ready:false sampai dibangun via playbook
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(2)
   })
 
   it('getTheme menemukan tema lintas sub-kategori', () => {
@@ -71,7 +71,7 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(t?.nama).toBe('Heritage Kuliner')
   })
 
-  it('Fashion (S2-1): 3 gaya terdaftar tapi sub-kategori belum ready (dormant)', () => {
+  it('Fashion (S2): 3 gaya terdaftar & sub-kategori AKTIF (S2-3)', () => {
     const themes = getThemes('toko_online', 'fashion')
     expect(themes.map((t) => t.id)).toEqual([
       'fashion-editorial',
@@ -79,8 +79,8 @@ describe('theme-system taxonomy (S0-1)', () => {
       'fashion-vibrant',
     ])
     const fashion = getSubKategori('toko_online').find((s) => s.id === 'fashion')
-    expect(fashion?.ready).toBe(false) // belum aktif sampai blok+polish+verify tuntas
-    expect(getReadySubKategori('toko_online').map((s) => s.id)).not.toContain('fashion')
+    expect(fashion?.ready).toBe(true) // aktif: blok+polish+verify tuntas
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
