@@ -92,6 +92,35 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 
+  it('Restaurant (S4): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+    expect(hasSubKategori('restaurant')).toBe(true)
+    const subs = getSubKategori('restaurant')
+    expect(subs.map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
+    // Aktif: gerbang 3 skill + verify SSR tuntas → muncul di brief form.
+    expect(getReadySubKategori('restaurant').map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
+  })
+
+  it('Restaurant (S4): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
+    for (const sub of ['warung', 'cafe', 'finedining']) {
+      const themes = getThemes('restaurant', sub)
+      expect(themes).toHaveLength(3)
+      expect(themes.every((t) => t.subKategori === sub)).toBe(true)
+      // tiap sub-kat wajib punya minimal 1 gaya gelap & 1 terang (prinsip #6)
+      const bgs = new Set(themes.map((t) => t.bg))
+      expect(bgs.has('dark')).toBe(true)
+      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
+  it('Restaurant (S4): id tema unik & manifest === id', () => {
+    const all = getThemes('restaurant', 'warung')
+      .concat(getThemes('restaurant', 'cafe'), getThemes('restaurant', 'finedining'))
+    const ids = all.map((t) => t.id)
+    expect(new Set(ids).size).toBe(9)
+    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    expect(getTheme('restaurant', 'cafe-roastery')?.nama).toBe('Roastery')
+  })
+
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
     // Heuristik anti-emoji: nama ikon lucide = ASCII PascalCase.
     const asciiPascal = /^[A-Z][A-Za-z0-9]+$/
