@@ -5,11 +5,11 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🟢 **Sprint 0 (infrastruktur) LENGKAP** — semua merged ke master, DORMANT (nol regresi).
-- **Pilot:** Toko Online → sub-kategori **Kuliner ×3 gaya** sebagai cetakan end-to-end.
-- **Yang sudah jalan (dormant):** taksonomi+registry, mesin ComposableRenderer+balok, mini-step brief form, resolusi build. Semua aktif HANYA saat sub-kategori ditandai `ready` — sekarang nol → produksi tak berubah, renderer lama utuh.
-- **Step berikutnya:** **Sprint 1** — bangun 3 gaya Kuliner OTENTIK (token+balok penuh) lalu **flip Kuliner `ready: true`** di `taxonomy.ts` untuk mengaktifkan. Lihat §8 + playbook §5.
-- **Keputusan standar tambahan (S0-1):** ikon = **lucide-react** (bukan emoji) — dijaga test anti-emoji. Calon isi `STANDARDS.md` saat ditulis.
+- **Fase aktif:** 🎉 **Sprint 1 (Kuliner) LENGKAP & LIVE** — Toko Online → Kuliner ×3 gaya aktif di produksi (PR #71 merged 2026-06-05).
+- **Yang LIVE:** brief form Toko Online menampilkan mini-step "Tipe Toko" → pilih **Kuliner** dapat 3 gaya otentik (rustic/modern/heritage, sudah lewat gerbang 3 skill); pilih **Lainnya** → variant lama (batik/modern). Renderer composable + resolusi build aktif.
+- **Aman:** industri lain tak tersentuh; toko_online non-kuliner pakai "Lainnya". Tiap gaya = token + balok food-grade (foto hero, keunggulan, menu, floating WA, gradient-mesh, stagger).
+- **Step berikutnya (replikasi):** sub-kategori Toko Online lain via playbook §5 (7 langkah, termasuk gerbang 3 skill §5.a). Urutan saran: **Fashion → Kerajinan** (panen batik) → sisanya. Lalu industri lain. **WAJIB jaga variasi** (prinsip #6) — jangan kloning heritage.
+- **Standar:** ikon lucide (bukan emoji, dijaga test); gerbang 3 skill tiap tema (§5.a); variasi wajib (#6).
 
 ### Latar masalah (kenapa ini ada)
 Order pempek (Toko Online, variant `batik`) ter-render `BatikTokoRenderer` → estetika **batik tekstil** (motif kawung, "Luxury Heritage"), mismatch untuk **makanan**. Akar: variant `toko_online` cuma 2 (`batik`, `modern`), keduanya generik & tak nyambung ke jenis toko. Customer tak bisa memilih nuansa yang pas.
@@ -205,3 +205,8 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-05 | **Sprint 0** | 🟢 **LENGKAP** | Infrastruktur dormant, nol regresi, 48/48 test hijau. Siap Sprint 1 (Kuliner otentik + flip ready). |
 | 2026-06-05 | S1-1 | ✅ merged (PR #67) | Token-pack otentik 3 gaya Kuliner (`theme-packs.ts`): rustic cream-terracotta / modern putih-oranye / heritage maroon-gold. 51/51 test. |
 | 2026-06-05 | Review user | 📝 catatan | User preview 3 gaya pada konten pempek (via DB swap variant, draft). User pribadi suka HERITAGE — **TAPI bukan acuan**: variasi WAJIB, jangan kloning heritage ke semua tema. Minta: foto hero + lebih cerah → S1-2. Standar baru: gerbang 3 skill (§5.a). |
+| 2026-06-05 | S1-2 | ✅ merged (PR #68) | Balok food-grade: dukungan foto hero (scrim) + section keunggulan "Mengapa Kami" (grid/rows per gaya). |
+| 2026-06-05 | S1-3 | ✅ merged (PR #69) | Gerbang 3 skill: hero gradient-mesh, ritme section, tabular-nums, stagger, glow tombol, CTA bergradien, floating WhatsApp; copy keunggulan diperbaiki. |
+| 2026-06-05 | S1-4 | ✅ merged (PR #70) | UX picker aman: opsi "Lainnya (gaya umum)" → toko non-kuliner jatuh ke variant lama. |
+| 2026-06-05 | S1-5 | ✅ merged (PR #71) | **AKTIVASI** Kuliner ready:true. Mini-step LIVE di Toko Online. |
+| 2026-06-05 | **Sprint 1** | 🎉 **LENGKAP & LIVE** | Kuliner ×3 otentik aktif di produksi, 53/53 test. Berikutnya: replikasi Fashion/Kerajinan via playbook. |
