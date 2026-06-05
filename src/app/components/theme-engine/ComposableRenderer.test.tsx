@@ -32,12 +32,11 @@ const CONTENT: ComposableContent = {
 }
 
 describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
-  it('registry punya 3 gaya Kuliner', () => {
-    expect(Object.keys(MANIFESTS)).toEqual([
-      'kuliner-rustic',
-      'kuliner-modern',
-      'kuliner-heritage',
-    ])
+  it('registry memuat 3 gaya Kuliner + Fashion', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of ['kuliner-rustic', 'kuliner-modern', 'kuliner-heritage', 'fashion-editorial', 'fashion-minimal', 'fashion-vibrant']) {
+      expect(keys).toContain(id)
+    }
   })
 
   for (const [id, manifest] of Object.entries(MANIFESTS)) {
