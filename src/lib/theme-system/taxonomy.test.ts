@@ -59,8 +59,11 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('getReadySubKategori menyaring yang belum siap (semua false di S0-1)', () => {
-    expect(getReadySubKategori('toko_online')).toEqual([])
+  it('getReadySubKategori: Kuliner aktif (S1-5), sisanya belum', () => {
+    const ready = getReadySubKategori('toko_online')
+    expect(ready.map((s) => s.id)).toEqual(['kuliner'])
+    // sub-kategori lain masih ready:false sampai dibangun via playbook
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
   })
 
   it('getTheme menemukan tema lintas sub-kategori', () => {
