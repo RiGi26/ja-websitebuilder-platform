@@ -74,4 +74,23 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
     expect(modern).toContain('ce-card')
     expect(rustic).toContain('ce-menu-row')
   })
+
+  it('Fashion Editorial pakai showcase lookbook (S2-2) — spread + kartu portrait', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['fashion-editorial']} content={CONTENT} />)
+    expect(html).toContain('ce-look-card') // varian lookbook ter-render
+    expect(html).toContain('ce-look-frame')
+    expect(html).toContain('Pempek Kapal Selam') // item pertama (featured)
+    expect(html).toContain('ce-look-idx') // index editorial khas lookbook
+  })
+
+  it('lookbook: pakai <img> zoom bila item punya gambar', () => {
+    const withImg = {
+      ...CONTENT,
+      showcase: { title: 'Koleksi', items: [{ nama: 'Look 01', gambar: 'https://x.test/look.jpg', harga: 250000 }] },
+    }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['fashion-editorial']} content={withImg} />)
+    expect(html).toContain('ce-look-img')
+    expect(html).toContain('https://x.test/look.jpg')
+    expect(html).toContain('Rp250.000')
+  })
 })

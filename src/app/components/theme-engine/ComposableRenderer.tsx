@@ -17,7 +17,7 @@ import {
   ENGINE_CSS, Nav, Footer, About, CTA, FloatingWA,
   HeroCentered, HeroSplit, HeroFullbleed,
   FeaturesGrid, FeaturesRows,
-  ShowcaseMenuList, ShowcaseCardGrid,
+  ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -55,7 +55,9 @@ export default function ComposableRenderer({
 
       {/* Showcase produk/menu — varian dari manifest */}
       {content.showcase && content.showcase.items.length > 0 && (
-        B.showcase === 'card-grid' ? (
+        B.showcase === 'lookbook' ? (
+          <ShowcaseLookbook showcase={content.showcase} />
+        ) : B.showcase === 'card-grid' ? (
           <ShowcaseCardGrid showcase={content.showcase} />
         ) : (
           <ShowcaseMenuList showcase={content.showcase} />

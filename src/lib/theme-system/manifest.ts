@@ -15,7 +15,7 @@ import { PACKS, type TokenPack } from '@/lib/design-tokens/packs'
 import { THEME_PACKS } from './theme-packs'
 
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
-export type ShowcaseVariant = 'menu-list' | 'card-grid'
+export type ShowcaseVariant = 'menu-list' | 'card-grid' | 'lookbook'
 export type FeaturesVariant = 'grid' | 'rows'
 
 export interface ThemeManifest {
@@ -73,13 +73,12 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
 
   // ── FASHION ×3 (Sprint 2). Token otentik di theme-packs.ts. DORMANT
-  // (taxonomy ready:false) sampai S2 aktivasi. Editorial pakai showcase
-  // 'card-grid' sementara → di-switch ke 'lookbook' saat blok itu ada (S2-2).
+  // (taxonomy ready:false) sampai S2 aktivasi.
   'fashion-editorial': {
     id: 'fashion-editorial',
     label: 'Fashion Editorial',
     basePackId: 'fashion-editorial',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook' },
   },
   'fashion-minimal': {
     id: 'fashion-minimal',
