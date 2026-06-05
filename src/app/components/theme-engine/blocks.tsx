@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -43,6 +43,37 @@ export const ENGINE_CSS = `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
 const HERO_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)'
+
+// ── MOTIF / TEKSTUR (panen dari BatikTokoRenderer) ────────────
+// Tile SVG data-uri, ditint warna primary tema. Dipakai sebagai overlay halus
+// di hero + strip footer untuk tema Kerajinan/Heritage. Parametrik: warna &
+// opacity dari pemanggil, BUKAN hardcode → satu set motif melayani semua gaya.
+function hexBody(hex?: string): string {
+  return (hex ?? '#C8922A').replace('#', '')
+}
+// Kawung — motif batik Jawa klasik (4 elips + inti). Dipanen verbatim.
+function motifKawung(color: string, opacity: number): string {
+  const c = hexBody(color)
+  return `url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${c}' fill-opacity='${opacity}'%3E%3Cellipse cx='32' cy='8' rx='10' ry='7'/%3E%3Cellipse cx='32' cy='56' rx='10' ry='7'/%3E%3Cellipse cx='8' cy='32' rx='7' ry='10'/%3E%3Cellipse cx='56' cy='32' rx='7' ry='10'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3C/g%3E%3C/svg%3E")`
+}
+// Tenun — anyaman silang (garis diagonal dua arah), nuansa wastra tenun.
+function motifTenun(color: string, opacity: number): string {
+  const c = hexBody(color)
+  return `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23${c}' stroke-opacity='${opacity}' stroke-width='2'%3E%3Cpath d='M0 10 L40 10 M0 30 L40 30'/%3E%3Cpath d='M10 0 L10 40 M30 0 L30 40' stroke-opacity='${opacity * 0.55}'/%3E%3C/g%3E%3C/svg%3E")`
+}
+function motifTile(variant: MotifVariant | undefined, color: string, opacity: number): string | null {
+  if (variant === 'kawung') return motifKawung(color, opacity)
+  if (variant === 'tenun') return motifTenun(color, opacity)
+  return null
+}
+const motifSize = (v?: MotifVariant) => (v === 'tenun' ? '40px 40px' : '64px 64px')
+
+// Overlay motif penuh (absolute) — dipakai di dalam hero. Subtil, di bawah konten.
+function MotifOverlay({ motif, color, opacity = 0.08 }: { motif?: MotifVariant; color: string; opacity?: number }) {
+  const tile = motifTile(motif, color, opacity)
+  if (!tile) return null
+  return <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: tile, backgroundSize: motifSize(motif) }} />
+}
 
 export function formatRupiah(n?: number): string {
   if (typeof n !== 'number' || !Number.isFinite(n)) return ''
@@ -86,11 +117,12 @@ function heroBg(image?: string): React.CSSProperties {
 }
 const heroInk = (image?: string) => (image ? '#FFFFFF' : 'var(--c-hero-ink)')
 
-export function HeroCentered({ hero }: { hero: Hero }) {
+export function HeroCentered({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
-    <section style={{ ...heroBg(hero.image), color: ink, padding: '96px 24px' }}>
-      <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+    <section style={{ ...heroBg(hero.image), color: ink, padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+      <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} />
+      <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 16, color: hero.image ? '#FFFFFF' : 'var(--c-primary)' }}>{hero.eyebrow}</p>}
         <h1 style={{ fontSize: 'clamp(36px, 6vw, 60px)', lineHeight: 1.05, margin: 0, color: ink }}>{hero.title}</h1>
         {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, opacity: .9, lineHeight: 1.6 }}>{hero.subtitle}</p>}
@@ -100,10 +132,11 @@ export function HeroCentered({ hero }: { hero: Hero }) {
   )
 }
 
-export function HeroSplit({ hero, nama }: { hero: Hero; nama: string }) {
+export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama: string; motif?: MotifVariant; motifColor?: string }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '112px 24px' }}>
-      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 56, alignItems: 'center' }}>
+    <section style={{ background: 'var(--c-page)', padding: '112px 24px', position: 'relative', overflow: 'hidden' }}>
+      <MotifOverlay motif={motif} color={motifColor ?? '#C8922A'} opacity={0.05} />
+      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 56, alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <div>
           {hero.eyebrow && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -127,10 +160,11 @@ export function HeroSplit({ hero, nama }: { hero: Hero; nama: string }) {
   )
 }
 
-export function HeroFullbleed({ hero }: { hero: Hero }) {
+export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
     <section style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
+      <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} opacity={0.07} />
       <div style={{ maxWidth: 1120, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -362,9 +396,12 @@ export function FloatingWA({ wa }: { wa?: string }) {
   )
 }
 
-export function Footer({ content }: { content: ComposableContent }) {
+export function Footer({ content, motif, motifColor }: { content: ComposableContent; motif?: MotifVariant; motifColor?: string }) {
+  const strip = motifTile(motif, motifColor ?? '#C8922A', 0.5)
   return (
-    <footer style={{ borderTop: '1px solid var(--c-border)', padding: '32px 24px', maxWidth: 1120, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
+    <>
+    {strip && <div aria-hidden style={{ height: 28, opacity: 0.25, backgroundImage: strip, backgroundSize: motifSize(motif), borderTop: '1px solid var(--c-border)' }} />}
+    <footer style={{ borderTop: strip ? 'none' : '1px solid var(--c-border)', padding: '32px 24px', maxWidth: 1120, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
       <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number }}>{content.nama}</span>
       <div style={{ display: 'flex', gap: 16, fontSize: 14, color: 'var(--c-muted)' }}>
         {content.contact?.wa && <a href={`https://wa.me/${content.contact.wa}`} style={{ color: 'var(--c-primary)', textDecoration: 'none', fontWeight: 700 }}>WhatsApp</a>}
@@ -372,5 +409,6 @@ export function Footer({ content }: { content: ComposableContent }) {
         {content.contact?.alamat && <span>{content.contact.alamat}</span>}
       </div>
     </footer>
+    </>
   )
 }
