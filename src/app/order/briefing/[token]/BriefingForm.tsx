@@ -6,6 +6,9 @@ import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { getVariants } from '@/lib/website-variants'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2, Clock, Sparkles } from 'lucide-react'
 import BrandingPreview from './BrandingPreview'
+import SubKategoriPicker from './SubKategoriPicker'
+import ThemePicker from './ThemePicker'
+import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
@@ -48,6 +51,7 @@ interface FormState {
   keunggulan: [string, string, string]
   syarat_sewa: string
   // Step 2 — Branding
+  sub_kategori: string // Theme System: jenis toko (mem-filter tema). Kosong = jalur lama.
   variant: string
   primary_color: string
   logo_url: string
@@ -72,6 +76,7 @@ const INIT: FormState = {
   bio: '', topik: '',
   keunggulan: ['', '', ''],
   syarat_sewa: '',
+  sub_kategori: '',
   variant: '',
   primary_color: '#0071E3', logo_url: '', referensi_website: '',
   instagram: '', tiktok: '', shopee: '',
@@ -138,6 +143,15 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const [editKontak, setEditKontak] = useState(false)
 
   const selectedVariant = variants.find(v => v.id === form.variant) ?? variants[0]
+
+  // Theme System (S0-3): saat sub-kategori dipilih, selector tema menggantikan
+  // grid variant lama. Dormant sampai ada sub-kategori `ready` (lihat picker).
+  const themeMode = !!form.sub_kategori && getThemes(tipe, form.sub_kategori).length > 0
+  const selectedTheme = themeMode
+    ? getThemes(tipe, form.sub_kategori).find(t => t.id === form.variant)
+    : undefined
+  const previewBg = selectedTheme?.bg ?? selectedVariant?.bg ?? 'light'
+  const previewNama = selectedTheme?.nama ?? selectedVariant?.nama ?? ''
 
   const set = (key: keyof FormState, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
@@ -213,6 +227,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         kota_layanan: form.kota_layanan.split(',').map(s => s.trim()).filter(Boolean),
       },
       branding: {
+        sub_kategori: form.sub_kategori,
         variant: form.variant,
         primary_color: form.primary_color,
         logo_url: form.logo_url,
@@ -649,51 +664,78 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 Preview Tampilan Website
               </p>
               <BrandingPreview
-                bg={selectedVariant?.bg ?? 'light'}
+                bg={previewBg}
                 primaryColor={form.primary_color}
                 namaUsaha={form.nama_usaha}
                 tagline={form.tagline}
                 emoji={selectedVariant?.emoji ?? '⚡'}
-                variantNama={selectedVariant?.nama ?? ''}
+                variantNama={previewNama}
               />
             </div>
 
-            {/* Variant selector */}
+            {/* Theme System (S0-3): mini-step "Tipe Toko" — dormant sampai sub-kategori ready */}
+            <SubKategoriPicker
+              tipe={tipe}
+              value={form.sub_kategori}
+              onChange={(id) => {
+                set('sub_kategori', id)
+                const first = getThemes(tipe, id)[0]
+                if (first) {
+                  set('variant', first.id)
+                  set('primary_color', first.mood)
+                }
+              }}
+            />
+
+            {/* Variant / Tema selector */}
             <div>
               <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3">
                 Gaya Visual Website
               </label>
-              <div className="grid grid-cols-1 gap-3">
-                {variants.map(v => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => {
-                      set('variant', v.id)
-                      set('primary_color', v.mood)
-                    }}
-                    className={`flex items-center gap-4 p-4 rounded-[16px] border-2 text-left transition-all ${
-                      form.variant === v.id
-                        ? 'border-[#0071E3] bg-blue-50/40'
-                        : 'border-black/[0.06] hover:border-blue-200 bg-white'
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-lg"
-                      style={{ backgroundColor: v.mood + '20', border: `2px solid ${v.mood}` }}>
-                      {v.emoji}
-                    </div>
-                    <div className="flex-1">
-                      <p className={`font-bold text-sm ${form.variant === v.id ? 'text-[#0071E3]' : 'text-gray-900'}`}>
-                        {v.nama}
-                      </p>
-                      <p className="text-xs text-gray-400 font-medium mt-0.5">{v.deskripsi}</p>
-                    </div>
-                    {form.variant === v.id && (
-                      <Check size={16} className="text-[#0071E3] shrink-0" strokeWidth={3} />
-                    )}
-                  </button>
-                ))}
-              </div>
+              {themeMode ? (
+                <ThemePicker
+                  tipe={tipe}
+                  subKategori={form.sub_kategori}
+                  value={form.variant}
+                  onChange={(id) => {
+                    set('variant', id)
+                    const t = getThemes(tipe, form.sub_kategori).find(x => x.id === id)
+                    if (t) set('primary_color', t.mood)
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {variants.map(v => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => {
+                        set('variant', v.id)
+                        set('primary_color', v.mood)
+                      }}
+                      className={`flex items-center gap-4 p-4 rounded-[16px] border-2 text-left transition-[border-color,background-color,transform] duration-200 active:scale-[0.98] ${
+                        form.variant === v.id
+                          ? 'border-[#0071E3] bg-blue-50/40'
+                          : 'border-black/[0.06] hover:border-blue-200 bg-white'
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-lg"
+                        style={{ backgroundColor: v.mood + '20', border: `2px solid ${v.mood}` }}>
+                        {v.emoji}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-bold text-sm ${form.variant === v.id ? 'text-[#0071E3]' : 'text-gray-900'}`}>
+                          {v.nama}
+                        </p>
+                        <p className="text-xs text-gray-400 font-medium mt-0.5">{v.deskripsi}</p>
+                      </div>
+                      {form.variant === v.id && (
+                        <Check size={16} className="text-[#0071E3] shrink-0" strokeWidth={3} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Field label="URL Logo (jika sudah punya)">
