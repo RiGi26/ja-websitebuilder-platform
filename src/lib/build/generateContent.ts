@@ -9,6 +9,7 @@ import { normalizeBriefing } from './briefing'
 import { runTemplate } from './templates'
 import { deriveDesignTokens, defaultVariant } from './designTokens'
 import { industryToTheme, addonsToFeatures } from '@/lib/websitebuilder-mapping'
+import { getManifest } from '@/lib/theme-system/manifest'
 
 type OrderLike = {
   industri?: string | null
@@ -24,8 +25,11 @@ export function generateContent(order: OrderLike): BuildPlan {
   const b = normalizeBriefing(order)
   const out = runTemplate(b)
 
-  const theme = industryToTheme(b.tipe)
   const variant = b.variant || defaultVariant(b.tipe)
+  // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
+  // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
+  // Selain itu jalur lama (theme per industri). Dormant sampai sub-kategori ready.
+  const theme = getManifest(variant) ? 'composable' : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
 

@@ -17,6 +17,9 @@ import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
 import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
 import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
 import TokenDrivenRenderer from '@/app/components/themes/universal/TokenDrivenRenderer'
+import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
+import { getManifest } from '@/lib/theme-system/manifest'
+import { composableContentFromSections } from '@/lib/theme-system/content-adapter'
 import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
@@ -46,6 +49,23 @@ export async function renderSite({
   const hasBooking = !!konfig.features?.hasBooking
   const tawkId = konfig.features?.hasLiveChat ? (konfig.addons?.tawk_property_id ?? null) : null
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
+
+  // ── Theme System (composable) ───────────────────────────────
+  // Bila variant = id manifest composable (mis. 'kuliner-rustic'), render via
+  // ComposableRenderer. Dicek SEBELUM cabang bespoke/token-driven. DORMANT:
+  // tak ada page existing memakai id manifest → cabang ini tak terambil (nol regresi).
+  const manifest = getManifest(variant)
+  if (manifest) {
+    const [products, profile] = await Promise.all([
+      fetchProductsByPage(client, page.id),
+      fetchTenantProfile(client, page.id),
+    ])
+    const content = composableContentFromSections(
+      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>,
+    )
+    const renderer = <ComposableRenderer manifest={manifest} content={content} />
+    return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
+  }
 
   // ── Tema visual bespoke per industri ────────────────────────
   if (theme === 'klinik') {

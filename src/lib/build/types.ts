@@ -19,6 +19,7 @@ export interface NormalizedBriefing {
   kotaLayanan: string[]
   primary?: string
   variant?: string
+  subKategori?: string // Theme System: jenis toko (mem-filter tema). Kosong = jalur lama.
   logoUrl?: string
   referensi?: string
   sosial: {
