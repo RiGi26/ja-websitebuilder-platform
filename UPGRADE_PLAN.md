@@ -11,7 +11,7 @@
 - **Tanggal mulai:** 2026-06-04
 - **Fase aktif:** 🎉 **SELURUH UPGRADE_PLAN INTI TUNTAS.** F1–F5 LENGKAP (skor fitur 10/10). P5DB-1/2/3 LENGKAP (DB hardening ~9.5). Semua kode SELESAI & MERGED. Sisa OPT-IN: P0-1 (DEFERRED — butuh Pro plan, user aktifkan stlh upgrade), F1-5 (webhook auto-build), F3-3 (LLM polish).
 - **Step berikutnya:** Tak ada pekerjaan kode wajib. P0-1 nunggu upgrade Pro plan (2026-06-04 dicoba, gagal — fitur Pro-only). F1-5/F3-3 kalau ada kebutuhan. Builder = 10/10, DB hardening = ~9.5.
-- **📋 Blueprint siap eksekusi (di akhir file) — buka saat mau jalankan:** (1) **F3-3** LLM polish copy, (2) **F1-5** auto-build webhook, (3) **CD** custom domain (wildcard subdomain + domain klien + otomasi Vercel API). Lapis aplikasi custom domain SUDAH ada di `src/proxy.ts`; sisanya wildcard/DNS + deep-path + otomasi.
+- **📋 Blueprint siap eksekusi (di akhir file) — buka saat mau jalankan:** (1) **F3-3** LLM copy (Polish→**Transform**, ada Bagian 0 strategi: trigger gating + gerbang eval), (2) **AI-2** Normalisasi input briefing / "Smart-Fill" (hulu dari F3-3; obat friksi form; WAJIB confirm-step karena sentuh fakta), (3) **F1-5** auto-build webhook, (4) **CD** custom domain (wildcard subdomain + domain klien + otomasi Vercel API). Lapis aplikasi custom domain SUDAH ada di `src/proxy.ts`. **Peta strategi AI:** #1 copy (F3-3) · #2 input (AI-2) · #3 agentic edit assistant (belum dispek).
 - **Catatan terakhir:** 2026-06-04 — P5DB-3 DONE (PR#61, CI pass + Vercel Ready): migration `security_events` (kind/ip/detail jsonb, RLS deny_public_access, index); `security-log.ts` logSecurityEvent (console.warn + insert, non-fatal); login log failed+ratelimited, track log ratelimited. Persist+log tanpa channel (keputusan user). SEBELUMNYA: P5DB-1 MERGED (PR#60) rate limit login 8/10mnt+track 60/mnt; P5DB-2 MERGED (PR#59) security headers; F5 TUNTAS (F5-1..4 PR#55-58); F4 LIVE; F2+F3 LENGKAP; F1 LIVE; P0-2/P0-3 done. Sisa P0-1 (WARN password, butuh dashboard).
 
 > Update baris di atas tiap selesai 1 step. Ini yang dibaca pertama saat resume.
@@ -595,6 +595,68 @@ order → generateContent() → BuildPlan (copy template)        [F3-1/F3-2, ADA
 
 ## 10. Definisi "selesai" F3-3
 Flag OFF = byte-identik dengan jalur template sekarang (no-regression). Flag ON + tombol = copy dipoles, fakta utuh, biaya tercatat, gagal-anggun ke template, ada badge sumber. Semua lewat CI + 1 PR (sesuai Aturan Produksi).
+
+---
+
+# AI-2 — Rancangan Detail Normalisasi Input Briefing / "Smart-Fill" *(BELUM DIIMPLEMENTASI — spec untuk nanti)*
+
+> **Status:** OPSIONAL, ditunda. Titik AI #3 dari peta strategi (F3-3=#1 copy, ini=#2 input, agentic edit=#3). Ditambahkan 2026-06-05. **Baca dulu sebelum implement.**
+
+## 1. Beda dengan normalisasi yang SUDAH ada (penting)
+- **`normalizeBriefing()` (ADA, deterministik, nol-opex):** trim string, parse "Rp 350.000"→angka, bentuk objek. **JANGAN diganti/dihapus** — tetap jadi lapisan akhir.
+- **AI-2 (BARU, LLM):** **normalisasi SEMANTIK** — input manusia berantakan (kotak teks bebas) → **fakta terstruktur** (daftar produk/layanan, jam, harga, kontak, kota). Yang `asStr/asNum` tak bisa: ekstraksi & strukturisasi dari prosa bebas. Output AI-2 → tetap lewat `normalizeBriefing()` sesudahnya.
+
+## 2. Posisi dalam pipa (HULU dari F3-3)
+```
+Input mentah klien ─► [AI-2 NORMALISASI] ─► fakta terstruktur ─► normalizeBriefing() ─► template/[F3-3 Transform] ─► copy
+   (kotak bebas)         ekstrak DATA          (pre-fill form)      (struktural, ADA)        hasilkan PROSA
+```
+- **AI-2 mengubah DATA** (fakta, angka, daftar) — di **form-time**, sebelum bayar.
+- **F3-3 mengubah PROSA** (body copy) — di **build-time**.
+- Shippable terpisah; kalau dibangun bareng, berbagi SDK + infra `llm_usage`/validasi.
+
+## 3. Prinsip yang TAK boleh dilanggar (beda dari F3-3!)
+1. **Assistive + confirmable, TIDAK PERNAH silent.** LLM hanya **mengusulkan** isi field. Klien/admin **wajib review & koreksi** sebelum jadi kebenaran. **Dilarang auto-commit fakta hasil ekstrak.** (Beda dari F3-3: di sana fallback diam-diam aman; di sini fakta salah = tayang salah.)
+2. **Augmentasi, bukan substitusi.** Field terstruktur tetap ADA & tetap sumber kebenaran. Smart-Fill cuma **pre-fill** untuk mempercepat. Form tetap jalan penuh tanpa fitur ini (flag OFF = form biasa).
+3. **Nol fabrikasi.** Field yang tak disebut klien → biarkan KOSONG, jangan ditebak. Angka/kontak harus berasal dari teks; kalau ragu → kosong (bukan tebakan).
+4. **Flag-gated, default OFF.** OFF = form terstruktur biasa (perilaku sekarang, PR#62 UX). 
+
+## 4. Bentuk UX (menjawab kekhawatiran "form kebanyakan")
+- Di atas form terstruktur (BriefingForm/DetailForm): kotak besar **opsional** — *"Males ngisi satu-satu? Ceritakan bisnismu bebas di sini, nanti kami rapikan ✨"*.
+- Klien nulis bebas → tombol "Rapikan" → LLM ekstrak → **pre-fill** field di bawah (yang tetap editable, ada highlight "diisi otomatis, cek ya").
+- Klien koreksi → submit seperti biasa. Friksi turun, kontrol tetap di tangan manusia.
+- *(Varian admin-side, lebih aman tapi tak kurangi friksi klien):* admin lihat briefing tipis → "Rapikan" → konfirmasi. Bisa jadi fase 1 sebelum buka ke klien.
+
+## 5. Arsitektur & titik integrasi
+- **File baru:** `src/lib/build/normalizeInput.ts` — `extractBriefing(rawText, { tipe }): Promise<ExtractResult>` (murni I/O LLM, tak sentuh DB). Output = parsial `briefing_data` (subset field yang ditemukan) + skor keyakinan per field.
+- **API:** `/api/order/smart-fill` (POST `{ rawText, tipe }`) → balikan usulan field. **Rate-limit** (`src/lib/rate-limit.ts`) ketat — ini form-time, sebelum bayar, rawan abuse. Mis. 10/menit per IP.
+- **Reuse:** SDK `@anthropic-ai/sdk`, skema Zod, log `llm_usage` (sama dgn F3-3 §4). Output divalidasi Zod ketat sebelum dikirim ke klien.
+
+## 6. Prompt (structured extraction)
+- **System (cacheable):** peran = asisten yang MENGEKSTRAK fakta, bukan mengarang. Aturan keras: hanya isi yang tersurat; ragu → null; jangan normalisasi angka secara kreatif (250rb→250000 boleh, tapi jangan tebak yang tak ada); output JSON sesuai skema field briefing per industri.
+- **User:** `{ tipe, rawText }`.
+- **Output (JSON ketat):** mirror subset `briefing_data` (identitas.deskripsi, jam, alamat, kota_layanan[], wa, email, konten.<bucket>[], dst) + `_confidence` per field. Field tak ditemukan → null/absen.
+
+## 7. Risiko & mitigasi (fokus FAKTA)
+- **Salah ekstrak angka/kontak** → **confirm-step wajib** (prinsip #1) + highlight "diisi otomatis" + skor keyakinan rendah ditandai. Manusia penangkap terakhir.
+- **Fabrikasi field** → prompt "ragu=null" + validasi: tolak nilai yang regex-nya tak muncul di rawText (mis. nomor telp harus substring teks).
+- **Biaya form-time sebelum bayar** → opsional (klien klik sendiri) + rate-limit + max_tokens. Bukan jalan tiap submit.
+- **Privasi** → teks bisnis klien dikirim ke Anthropic; sama dgn F3-3 — catat di kebijakan, jangan kirim data sensitif tak perlu.
+
+## 8. Langkah implementasi (checklist)
+- [ ] (kalau F3-3 belum) tambah `@anthropic-ai/sdk` + skill **claude-api** (prompt caching).
+- [ ] `src/lib/build/normalizeInput.ts`: `extractBriefing()` + Zod + anti-fabrikasi.
+- [ ] API `/api/order/smart-fill` + rate-limit + log `llm_usage`.
+- [ ] UI: kotak "Smart-Fill" opsional di BriefingForm/DetailForm + pre-fill + highlight "diisi otomatis" + tetap editable.
+- [ ] Flag `SMART_FILL_ENABLED` (default OFF) — OFF = form biasa.
+- [ ] Test: flag OFF = form identik sekarang; mock LLM → pre-fill benar; field tak disebut = kosong; nilai non-substring ditolak.
+- [ ] Verify e2e: tulis paragraf bebas → cek field ter-prefill akurat & yang tak disebut tetap kosong; cek confirm-step jalan.
+
+## 9. Gerbang keputusan (kapan mulai ngoding)
+Bangun AI-2 jika: (1) data/observasi menunjukkan **friksi form** jadi penyebab drop-off briefing, ATAU (2) admin sering harus merapikan briefing berantakan manual. Sampai itu: PR#62 (skip aman + opsional + autosave) sudah cukup menurunkan friksi tanpa opex. Pertimbangkan bangun **berbarengan F3-3 Transform** (berbagi pipeline & SDK).
+
+## 10. Definisi "selesai" AI-2
+Flag OFF = form terstruktur identik sekarang (no-regression). Flag ON = kotak Smart-Fill opsional mengisi field akurat, fakta tak-disebut tetap kosong (nol fabrikasi), semua hasil **dikonfirmasi manusia** sebelum submit, biaya tercatat. Lewat CI + 1 PR.
 
 ---
 
