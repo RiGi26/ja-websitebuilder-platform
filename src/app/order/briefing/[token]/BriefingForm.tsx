@@ -679,10 +679,19 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               value={form.sub_kategori}
               onChange={(id) => {
                 set('sub_kategori', id)
-                const first = getThemes(tipe, id)[0]
-                if (first) {
-                  set('variant', first.id)
-                  set('primary_color', first.mood)
+                if (id) {
+                  const first = getThemes(tipe, id)[0]
+                  if (first) {
+                    set('variant', first.id)
+                    set('primary_color', first.mood)
+                  }
+                } else {
+                  // "Lainnya" → kembali ke gaya umum (variant lama).
+                  const v = variants[0]
+                  if (v) {
+                    set('variant', v.id)
+                    set('primary_color', v.mood)
+                  }
                 }
               }}
             />
