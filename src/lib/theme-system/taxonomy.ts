@@ -18,23 +18,25 @@ export interface SubKategoriOption {
   id: string
   nama: string
   deskripsi: string
-  emoji: string
+  // STANDAR IKON: nama ikon lucide-react (mis. 'UtensilsCrossed'), BUKAN emoji.
+  // Emoji render beda-beda per OS → tak terkontrol untuk produk yang menjual
+  // desain. lucide = konsisten lintas platform + bisa diwarnai. UI (S0-3)
+  // memetakan nama ini ke komponen + mewarnainya dgn `mood` tema.
+  icon: string
   // true bila 3 gaya temanya sudah lengkap & render. UI hanya menampilkan
   // sub-kategori yang `ready` (lihat getReadySubKategori). Default false sampai
   // playbook produksi tema (THEME_SYSTEM_PLAN §5) selesai untuk sub-kategori itu.
   ready: boolean
 }
 
-// Tema = 1 gaya otentik untuk satu sub-kategori. Bentuk field selaras dengan
-// VariantOption (website-variants.ts) supaya selector + preview brief form yang
-// sudah ada bisa mengonsumsinya tanpa perombakan UI.
+// Tema = 1 gaya otentik untuk satu sub-kategori.
 export interface ThemeOption {
   id: string // unik global, mis. 'kuliner-rustic' — disimpan di branding.variant
   subKategori: string
   nama: string
   deskripsi: string
-  emoji: string
-  mood: string // warna swatch preview (hex)
+  icon: string // nama ikon lucide-react (lihat catatan STANDAR IKON di atas)
+  mood: string // warna swatch preview (hex) — juga dipakai mewarnai ikon
   bg: ThemeBg
   // id manifest yang dibaca ComposableRenderer (S0-2). Untuk sekarang = id.
   manifest: string
@@ -46,14 +48,14 @@ export interface ThemeOption {
 // menyusul via playbook.
 export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOption[]>> = {
   toko_online: [
-    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', emoji: '🍜', ready: false },
-    { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', emoji: '👗', ready: false },
-    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', emoji: '🌺', ready: false },
-    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', emoji: '💄', ready: false },
-    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', emoji: '📱', ready: false },
-    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', emoji: '🪴', ready: false },
-    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', emoji: '🍯', ready: false },
-    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', emoji: '🧸', ready: false },
+    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: false },
+    { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: false },
+    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: false },
+    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
+    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
+    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
+    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
+    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
   ],
 }
 
@@ -69,7 +71,7 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         subKategori: 'kuliner',
         nama: 'Rustic Hangat',
         deskripsi: 'Warung homemade, hangat & menggugah. Cocok untuk pempek, kue, masakan rumahan.',
-        emoji: '🍂',
+        icon: 'Flame',
         mood: '#B5532A',
         bg: 'warm',
         manifest: 'kuliner-rustic',
@@ -79,7 +81,7 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         subKategori: 'kuliner',
         nama: 'Modern Appetite',
         deskripsi: 'Brand F&B kekinian, bersih & cerah. Untuk kopi, dessert, snack modern.',
-        emoji: '🥤',
+        icon: 'CupSoda',
         mood: '#E2582B',
         bg: 'light',
         manifest: 'kuliner-modern',
@@ -89,7 +91,7 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         subKategori: 'kuliner',
         nama: 'Heritage Kuliner',
         deskripsi: 'Kuliner premium/tradisional, elegan & berkelas. Untuk oleh-oleh khas & signature dish.',
-        emoji: '🏮',
+        icon: 'Crown',
         mood: '#7B2D3E',
         bg: 'dark',
         manifest: 'kuliner-heritage',

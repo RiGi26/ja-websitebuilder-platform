@@ -67,4 +67,19 @@ describe('theme-system taxonomy (S0-1)', () => {
     const t = getTheme('toko_online', 'kuliner-heritage')
     expect(t?.nama).toBe('Heritage Kuliner')
   })
+
+  it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
+    // Heuristik anti-emoji: nama ikon lucide = ASCII PascalCase.
+    const asciiPascal = /^[A-Z][A-Za-z0-9]+$/
+    for (const list of Object.values(INDUSTRY_SUBKATEGORI)) {
+      for (const s of list ?? []) {
+        expect(s.icon).toMatch(asciiPascal)
+      }
+    }
+    for (const byCat of Object.values(THEMES)) {
+      for (const t of Object.values(byCat ?? {}).flat()) {
+        expect(t.icon).toMatch(asciiPascal)
+      }
+    }
+  })
 })
