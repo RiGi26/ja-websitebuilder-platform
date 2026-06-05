@@ -49,7 +49,7 @@ export interface ThemeOption {
 export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOption[]>> = {
   toko_online: [
     { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: true },
-    { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: false },
+    { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
     { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: false },
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
@@ -97,15 +97,15 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         manifest: 'kuliner-heritage',
       },
     ],
-    // Fashion ×3 (Sprint 2). Token + manifest sudah ada (S2-1); sub-kategori
-    // `fashion` tetap ready:false sampai blok Lookbook + polish + verifikasi
-    // tuntas (playbook §5). Registry boleh terdaftar — UI hanya tampilkan yang ready.
+    // Fashion ×3 (Sprint 2) — AKTIF (S2-3). 3 gaya otentik beragam, verified
+    // SSR + lolos gerbang 3 skill (§5.a). Deskripsi = microcopy self-select:
+    // [sifat visual] + "Untuk [jenis toko]" → pemilik cepat memilih yang pas.
     fashion: [
       {
         id: 'fashion-editorial',
         subKategori: 'fashion',
         nama: 'Editorial',
-        deskripsi: 'Lookbook majalah, gelap & dramatis. Untuk butik, label desainer, koleksi premium.',
+        deskripsi: 'Gelap, dramatis, serasa majalah mode. Untuk butik, label desainer, koleksi premium.',
         icon: 'Camera',
         mood: '#0E0E0F',
         bg: 'dark',
@@ -115,7 +115,7 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'fashion-minimal',
         subKategori: 'fashion',
         nama: 'Minimalis',
-        deskripsi: 'Lapang & kalem ala Scandinavian. Untuk basic tee, hijab polos, esensial sehari-hari.',
+        deskripsi: 'Bersih & lapang, banyak ruang kosong. Untuk basic tee, hijab polos, esensial harian.',
         icon: 'Wind',
         mood: '#1C1B19',
         bg: 'light',
@@ -125,7 +125,7 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'fashion-vibrant',
         subKategori: 'fashion',
         nama: 'Vibrant',
-        deskripsi: 'Streetwear berani & ceria, warna pop. Untuk distro, sneakers, brand anak muda.',
+        deskripsi: 'Berani & ceria, penuh warna. Untuk distro, sneakers, brand anak muda.',
         icon: 'Zap',
         mood: '#5B2BE8',
         bg: 'light',
