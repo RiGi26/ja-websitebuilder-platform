@@ -29,9 +29,15 @@ export function composableContentFromSections(
 
   const showcase = items.length ? { title: 'Produk Kami', items } : undefined
 
+  // Foto hero opsional dari "Lengkapi Website" (data_konten.foto_hero).
+  const fotoHero = typeof konten.foto_hero === 'string' && konten.foto_hero.trim()
+    ? konten.foto_hero.trim()
+    : undefined
+
   return {
     nama: base.nama,
-    hero: base.hero,
+    hero: { ...base.hero, image: fotoHero },
+    features: base.features,
     showcase,
     about: base.about,
     cta: base.cta,
