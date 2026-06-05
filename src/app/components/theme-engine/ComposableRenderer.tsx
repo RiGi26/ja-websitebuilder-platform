@@ -16,6 +16,7 @@ import {
 import {
   ENGINE_CSS, Nav, Footer, About, CTA,
   HeroCentered, HeroSplit, HeroFullbleed,
+  FeaturesGrid, FeaturesRows,
   ShowcaseMenuList, ShowcaseCardGrid,
 } from './blocks'
 
@@ -43,6 +44,13 @@ export default function ComposableRenderer({
         <HeroFullbleed hero={content.hero} />
       ) : (
         <HeroCentered hero={content.hero} />
+      )}
+
+      {/* Features (keunggulan / "Mengapa Kami") — varian dari manifest */}
+      {content.features && content.features.length > 0 && (
+        B.features === 'rows'
+          ? <FeaturesRows features={content.features} />
+          : <FeaturesGrid features={content.features} />
       )}
 
       {/* Showcase produk/menu — varian dari manifest */}
