@@ -29,6 +29,11 @@ export const ENGINE_CSS = `
 .ce-stagger > * { opacity: 0; transform: translateY(14px); animation: ceFadeUp .5s cubic-bezier(.16,1,.3,1) forwards; }
 .ce-stagger > *:nth-child(1){animation-delay:0ms}.ce-stagger > *:nth-child(2){animation-delay:80ms}.ce-stagger > *:nth-child(3){animation-delay:160ms}.ce-stagger > *:nth-child(4){animation-delay:240ms}.ce-stagger > *:nth-child(5){animation-delay:320ms}.ce-stagger > *:nth-child(6){animation-delay:400ms}.ce-stagger > *:nth-child(n+7){animation-delay:480ms}
 @keyframes ceFadeUp { to { opacity: 1; transform: translateY(0); } }
+/* Lookbook (editorial fashion) — image zoom halus saat hover, tanpa JS */
+.ce-look-frame { overflow: hidden; border-radius: var(--r-lg); border: 1px solid var(--c-border); background: linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to)); }
+.ce-look-img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.001); transition: transform .6s cubic-bezier(.16,1,.3,1); }
+.ce-look-card:hover .ce-look-img { transform: scale(1.05); }
+.ce-look-idx { font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); opacity: .55; font-variant-numeric: tabular-nums; }
 /* Floating WhatsApp — wajib konteks Indonesia */
 .ce-wa { position: fixed; right: 20px; bottom: 20px; z-index: 999; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 22px rgba(37,211,102,.40); transition: transform .2s cubic-bezier(.16,1,.3,1); }
 .ce-wa:hover { transform: scale(1.08); }
@@ -240,6 +245,73 @@ export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<Composabl
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+// Bingkai gambar lookbook: <img> dgn zoom kalau ada foto; placeholder bermartabat
+// (inisial di atas gradient token) kalau belum. ratio = aspect-ratio CSS.
+function LookFrame({ it, ratio }: { it: ShowcaseItem; ratio: string }) {
+  return (
+    <div className="ce-look-frame" style={{ aspectRatio: ratio }}>
+      {it.gambar ? (
+        <img className="ce-look-img" src={it.gambar} alt={it.nama} loading="lazy" />
+      ) : (
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(56px, 10vw, 120px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: .85 }}>
+            {(it.nama.trim()[0] ?? 'A').toUpperCase()}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LookCaption({ idx, it }: { idx: number; it: ShowcaseItem }) {
+  return (
+    <div style={{ marginTop: 16, display: 'flex', alignItems: 'baseline', gap: 14 }}>
+      <span className="ce-look-idx" style={{ fontSize: 15 }}>{String(idx + 1).padStart(2, '0')}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 style={{ fontSize: 19, margin: 0, color: 'var(--c-ink)' }}>{it.nama}</h3>
+        {it.desc && <p style={{ fontSize: 13, color: 'var(--c-muted)', lineHeight: 1.55, margin: '4px 0 0' }}>{it.desc}</p>}
+      </div>
+      {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
+    </div>
+  )
+}
+
+// Lookbook — showcase editorial fashion: 1 spread featured + grid portrait 3/4.
+export function ShowcaseLookbook({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
+  const items = showcase.items
+  const [featured, ...rest] = items
+  return (
+    <section style={{ padding: '96px 24px', maxWidth: 1120, margin: '0 auto' }}>
+      <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      <div className="ce-stagger">
+        {/* Spread featured — landscape besar + kaption editorial di samping */}
+        {featured && (
+          <div className="ce-look-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 36, alignItems: 'center', marginBottom: 56 }}>
+            <LookFrame it={featured} ratio="4 / 5" />
+            <div>
+              <span className="ce-look-idx" style={{ fontSize: 'clamp(40px, 6vw, 64px)', display: 'block', marginBottom: 12 }}>01</span>
+              <h3 style={{ fontSize: 'clamp(26px, 4vw, 38px)', margin: '0 0 12px', color: 'var(--c-ink)', lineHeight: 1.1 }}>{featured.nama}</h3>
+              {featured.desc && <p style={{ fontSize: 16, color: 'var(--c-muted)', lineHeight: 1.7, margin: '0 0 16px', maxWidth: 460 }}>{featured.desc}</p>}
+              {featured.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, fontSize: 22, color: 'var(--c-primary)' }}>{formatRupiah(featured.harga)}</span>}
+            </div>
+          </div>
+        )}
+        {/* Sisanya — grid kartu portrait */}
+        {rest.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
+            {rest.map((it, i) => (
+              <div key={i} className="ce-look-card">
+                <LookFrame it={it} ratio="3 / 4" />
+                <LookCaption idx={i + 1} it={it} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )
