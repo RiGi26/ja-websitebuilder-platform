@@ -745,6 +745,229 @@ const KLINIK_WELLNESS: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@terapihasta.id', alamat: 'Surabaya, Jawa Timur' },
 }
 
+// ── SEKOLAH · Reguler (SD/SMP/SMA) ─────────────────────────────
+const SEKOLAH_REGULER: ComposableContent = {
+  nama: 'SMA Bina Bangsa',
+  hero: {
+    eyebrow: 'Penerimaan Siswa Baru 2026/2027',
+    title: 'Tempat Tumbuh Generasi Berprestasi',
+    subtitle:
+      'Kurikulum modern, guru berdedikasi, dan lingkungan yang menumbuhkan karakter. Siapkan masa depan anak Anda di sini.',
+    ctaText: 'Daftar PPDB',
+    ctaHref: '#ppdb',
+    image: IMG('photo-1571260899304-425eee4c7efc'),
+  },
+  features: [
+    { title: 'Guru Berkompeten', desc: 'Pengajar bersertifikat dengan pendampingan personal tiap siswa.' },
+    { title: 'Fasilitas Lengkap', desc: 'Laboratorium, perpustakaan, dan ruang kelas ber-AC yang nyaman.' },
+    { title: 'Karakter & Akademik', desc: 'Seimbang membangun nilai akademik dan budi pekerti.' },
+  ],
+  showcase: {
+    title: 'Program Unggulan',
+    subtitle: 'Jurusan dan kegiatan yang menyiapkan masa depan.',
+    items: [
+      { nama: 'Jurusan IPA', desc: 'Fokus sains, persiapan kuliah kedokteran & teknik.', gambar: IMG('photo-1503676260728-1c00da094a0b', 800) },
+      { nama: 'Jurusan IPS', desc: 'Ekonomi, sosial, persiapan hukum & bisnis.', gambar: IMG('photo-1427504494785-3a9ca7044f45', 800) },
+      { nama: 'Kelas Bahasa', desc: 'Inggris, Jepang, Mandarin dengan native speaker.', gambar: IMG('photo-1546410531-bb4caa6b424d', 800) },
+      { nama: 'Ekstrakurikuler', desc: 'Robotik, olahraga, seni, dan kepemimpinan.', gambar: IMG('photo-1509062522246-3755977927d7', 800) },
+    ],
+  },
+  stats: [
+    { angka: 'A', label: 'Akreditasi BAN-S/M' },
+    { angka: '1.200', label: 'Siswa aktif' },
+    { angka: '92%', label: 'Lulus PTN' },
+    { angka: '85', label: 'Guru & staf' },
+  ],
+  testimonials: [
+    { quote: 'Anak saya berkembang pesat, bukan hanya nilainya tapi juga kepercayaan dirinya. Gurunya benar-benar peduli.', nama: 'Ibu Ratna', peran: 'Orang tua siswa' },
+    { quote: 'Bekal dari sini membuat saya siap kuliah di ITB. Pembelajarannya menantang tapi menyenangkan.', nama: 'Fauzan', peran: 'Alumni 2024' },
+    { quote: 'Fasilitasnya lengkap dan lingkungannya positif. Saya tenang menyekolahkan anak di sini.', nama: 'Pak Bambang', peran: 'Orang tua siswa' },
+  ],
+  gallery: {
+    title: 'Kegiatan Sekolah',
+    subtitle: 'Momen belajar, berkarya, dan berprestasi.',
+    images: [
+      { src: IMG('photo-1577896851231-70ef18881754', 700), caption: 'Suasana kelas' },
+      { src: IMG('photo-1509062522246-3755977927d7', 700), caption: 'Kegiatan siswa' },
+      { src: IMG('photo-1513258496099-48168024aec0', 700), caption: 'Wisuda angkatan' },
+      { src: IMG('photo-1503676260728-1c00da094a0b', 700), caption: 'Belajar kelompok' },
+      { src: IMG('photo-1571260899304-425eee4c7efc', 700), caption: 'Kebersamaan' },
+    ],
+  },
+  faq: [
+    { q: 'Kapan jadwal PPDB dibuka?', a: 'Pendaftaran gelombang 1 dibuka Januari sampai Maret. Kuota terbatas, daftar lebih awal lebih baik.' },
+    { q: 'Apakah ada beasiswa?', a: 'Ya, tersedia beasiswa prestasi akademik dan beasiswa untuk keluarga kurang mampu. Tanyakan saat pendaftaran.' },
+    { q: 'Bagaimana sistem seleksinya?', a: 'Seleksi meliputi tes akademik dasar dan wawancara. Detail jadwal diberikan setelah pendaftaran.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '07.00 – 16.00' },
+      { hari: 'Sabtu', jam: '07.00 – 12.00' },
+    ],
+    alamat: 'Jl. Pendidikan No. 10, Bandung',
+    mapsQuery: 'Jl. Pendidikan Bandung',
+    telp: '081296917963',
+    reservasiText: 'Daftar PPDB via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang SMA Bina Bangsa',
+    body: 'Berdiri sejak 1995, kami berkomitmen mencetak lulusan yang cerdas, berkarakter, dan siap berkontribusi. Ribuan alumni kami kini berkarya di berbagai bidang di dalam dan luar negeri.',
+  },
+  cta: {
+    title: 'Wujudkan Masa Depan Cerah Anak Anda',
+    subtitle: 'Kuota PPDB terbatas. Amankan kursi sekarang.',
+    ctaText: 'Daftar via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'ppdb@binabangsa.sch.id', alamat: 'Bandung, Jawa Barat' },
+}
+
+// ── SEKOLAH · Islami / Pesantren ───────────────────────────────
+const SEKOLAH_ISLAMI: ComposableContent = {
+  nama: 'Pesantren Modern Al-Hikmah',
+  hero: {
+    eyebrow: 'Penerimaan Santri Baru 1448 H',
+    title: 'Menjaga Iman, Meraih Ilmu, Meraih Dunia',
+    subtitle:
+      'Memadukan pendidikan agama yang kokoh dengan sains modern. Mencetak generasi Qurani yang siap menghadapi zaman.',
+    ctaText: 'Daftar Santri Baru',
+    ctaHref: '#daftar',
+    image: IMG('photo-1564769662533-4f00a87b4056'),
+  },
+  features: [
+    { title: 'Tahfidz Terbimbing', desc: 'Program hafalan Al-Qur’an dengan musyrif berpengalaman.' },
+    { title: 'Kurikulum Terpadu', desc: 'Ilmu agama dan umum berjalan seimbang, terakreditasi.' },
+    { title: 'Asrama Nyaman', desc: 'Lingkungan tertib dan aman, membentuk kemandirian santri.' },
+  ],
+  showcase: {
+    title: 'Program Pendidikan',
+    subtitle: 'Membentuk santri yang berilmu dan berakhlak.',
+    items: [
+      { nama: 'Tahfidz Al-Qur’an', desc: 'Target hafalan terukur dengan metode talaqqi.', gambar: IMG('photo-1585036156171-384164a8c675', 800) },
+      { nama: 'Kajian Kitab Kuning', desc: 'Memahami turats dengan bimbingan asatidz.', gambar: IMG('photo-1542816417-0983c9c9ad53', 800) },
+      { nama: 'Sains & Teknologi', desc: 'Laboratorium dan literasi digital modern.', gambar: IMG('photo-1503676260728-1c00da094a0b', 800) },
+      { nama: 'Asrama 24 Jam', desc: 'Pembinaan ibadah dan adab sepanjang hari.', gambar: IMG('photo-1609599006353-e629aaabfeae', 800) },
+    ],
+  },
+  stats: [
+    { angka: '800', label: 'Santri mukim' },
+    { angka: '50', label: 'Ustadz & ustadzah' },
+    { angka: '30+', label: 'Hafidz per tahun' },
+    { angka: 'A', label: 'Akreditasi madrasah' },
+  ],
+  testimonials: [
+    { quote: 'Anak saya menjadi lebih mandiri dan rajin ibadah. Hafalannya terus bertambah dengan bimbingan yang sabar.', nama: 'Ibu Halimah', peran: 'Wali santri' },
+    { quote: 'Di sini saya belajar agama sekaligus sains. Bekal yang membuat saya percaya diri melanjutkan ke universitas.', nama: 'Yusuf', peran: 'Alumni' },
+    { quote: 'Lingkungannya menjaga adab dan akhlak. Saya tenang menitipkan pendidikan anak di sini.', nama: 'Pak Idris', peran: 'Wali santri' },
+  ],
+  gallery: {
+    title: 'Kehidupan Pesantren',
+    subtitle: 'Belajar, beribadah, dan tumbuh bersama.',
+    images: [
+      { src: IMG('photo-1564769662533-4f00a87b4056', 700), caption: 'Masjid pesantren' },
+      { src: IMG('photo-1585036156171-384164a8c675', 700), caption: 'Halaqah tahfidz' },
+      { src: IMG('photo-1609599006353-e629aaabfeae', 700), caption: 'Suasana ibadah' },
+      { src: IMG('photo-1542816417-0983c9c9ad53', 700), caption: 'Kajian kitab' },
+      { src: IMG('photo-1577896851231-70ef18881754', 700), caption: 'Kelas santri' },
+    ],
+  },
+  faq: [
+    { q: 'Apakah menerima santri dari luar kota?', a: 'Ya, kami pesantren mukim dengan asrama. Santri dari seluruh Indonesia kami terima.' },
+    { q: 'Apakah ada program tahfidz intensif?', a: 'Ada. Tersedia kelas reguler dan kelas tahfidz intensif dengan target hafalan khusus.' },
+    { q: 'Bagaimana biaya dan keringanannya?', a: 'Rincian biaya diberikan saat pendaftaran. Tersedia beasiswa untuk santri berprestasi dan yatim.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Sabtu', jam: '08.00 – 16.00' },
+      { hari: 'Ahad', jam: 'Kunjungan dengan perjanjian' },
+    ],
+    alamat: 'Jl. Pesantren No. 7, Bogor',
+    mapsQuery: 'Pesantren Bogor',
+    telp: '081296917963',
+    reservasiText: 'Daftar via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Al-Hikmah',
+    body: 'Sejak 1990 kami mendidik generasi yang menyeimbangkan iman, ilmu, dan amal. Alumni kami tersebar sebagai hafidz, akademisi, dan profesional yang menjaga nilai-nilai Islam.',
+  },
+  cta: {
+    title: 'Daftarkan Putra-Putri Anda',
+    subtitle: 'Kuota santri baru terbatas tiap tahun ajaran.',
+    ctaText: 'Daftar via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'psb@alhikmah.sch.id', alamat: 'Bogor, Jawa Barat' },
+}
+
+// ── SEKOLAH · Kursus / Bimbel ──────────────────────────────────
+const SEKOLAH_KURSUS: ComposableContent = {
+  nama: 'Bimbel Cerdas Juara',
+  hero: {
+    eyebrow: 'Bimbingan Belajar & Persiapan Ujian',
+    title: 'Dari Bingung Jadi Juara',
+    subtitle:
+      'Tutor ahli, metode terbukti, dan kelas kecil yang fokus. Naikkan nilai dan tembus kampus impian.',
+    ctaText: 'Coba Kelas Gratis',
+    ctaHref: '#trial',
+    image: IMG('photo-1522202176988-66273c2fd55f'),
+  },
+  features: [
+    { title: 'Tutor Berpengalaman', desc: 'Pengajar lulusan PTN top dengan metode yang mudah dipahami.' },
+    { title: 'Kelas Kecil', desc: 'Maksimal 10 siswa per kelas, perhatian lebih personal.' },
+    { title: 'Garansi Naik Nilai', desc: 'Pendampingan sampai target tercapai, atau ulang gratis.' },
+  ],
+  showcase: {
+    title: 'Pilihan Program',
+    subtitle: 'Kelas yang dirancang sesuai kebutuhanmu.',
+    items: [
+      { nama: 'Bimbel SD – SMP', desc: 'Penguatan konsep dasar semua mata pelajaran.', gambar: IMG('photo-1503676260728-1c00da094a0b', 800) },
+      { nama: 'Persiapan UTBK', desc: 'Drilling soal & strategi tembus PTN favorit.', gambar: IMG('photo-1546410531-bb4caa6b424d', 800) },
+      { nama: 'English Course', desc: 'Speaking & TOEFL bersama tutor profesional.', gambar: IMG('photo-1516321318423-f06f85e504b3', 800) },
+      { nama: 'Coding Bootcamp', desc: 'Belajar ngoding dari nol sampai bikin aplikasi.', gambar: IMG('photo-1531545514256-b1400bc00f31', 800) },
+    ],
+  },
+  stats: [
+    { angka: '5.000+', label: 'Alumni' },
+    { angka: '95%', label: 'Lulus PTN' },
+    { angka: '40', label: 'Tutor ahli' },
+    { angka: '12', label: 'Cabang' },
+  ],
+  testimonials: [
+    { quote: 'Nilai matematika saya naik drastis dalam 3 bulan. Tutornya sabar menjelaskan sampai paham.', nama: 'Salsa', peran: 'Siswa SMA' },
+    { quote: 'Berkat persiapan UTBK di sini, saya lolos di UGM. Strategi mengerjakan soalnya sangat membantu.', nama: 'Rangga', peran: 'Alumni, kini di UGM' },
+    { quote: 'Anak saya jadi semangat belajar. Laporannya rutin, jadi saya tahu perkembangannya.', nama: 'Ibu Yanti', peran: 'Orang tua siswa' },
+  ],
+  faq: [
+    { q: 'Apakah ada kelas coba gratis?', a: 'Ada. Kamu bisa ikut satu sesi coba gratis untuk merasakan metode belajar kami sebelum mendaftar.' },
+    { q: 'Apakah kelas tersedia online?', a: 'Ya, tersedia kelas tatap muka di cabang maupun kelas online interaktif. Pilih sesuai kebutuhanmu.' },
+    { q: 'Bagaimana garansi naik nilainya?', a: 'Jika target nilai belum tercapai di akhir program, kamu berhak mengulang kelas terkait tanpa biaya tambahan.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '13.00 – 21.00' },
+      { hari: 'Sabtu – Minggu', jam: '09.00 – 17.00' },
+    ],
+    alamat: 'Jl. Sudirman No. 99, Jakarta Pusat',
+    mapsQuery: 'Jl. Sudirman Jakarta Pusat',
+    telp: '081296917963',
+    reservasiText: 'Daftar Kelas Gratis',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Cerdas Juara',
+    body: 'Kami percaya setiap anak bisa juara dengan metode dan pendampingan yang tepat. Sejak 2014, ribuan siswa kami antar menuju kampus impian dan nilai yang membanggakan.',
+  },
+  cta: {
+    title: 'Mulai Perjalanan Juaramu',
+    subtitle: 'Ikuti kelas coba gratis minggu ini.',
+    ctaText: 'Coba Gratis via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@cerdasjuara.id', alamat: 'Jakarta Pusat' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -765,6 +988,10 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   umum: KLINIK_UMUM,
   estetik: KLINIK_ESTETIK,
   wellness: KLINIK_WELLNESS,
+  // Sekolah (Sprint 7): prefix id tema 'reguler-' / 'islami-' / 'kursus-'
+  reguler: SEKOLAH_REGULER,
+  islami: SEKOLAH_ISLAMI,
+  kursus: SEKOLAH_KURSUS,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

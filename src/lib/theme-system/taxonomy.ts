@@ -73,6 +73,14 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
     { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
   ],
+  // ── SEKOLAH (Sprint 7) — jenis institusi pendidikan. AKTIF (ready:true):
+  // pipeline visual (ui-ux-pro-max DB + Playwright scorecard) + gerbang 3 skill
+  // pada flagship tuntas.
+  sekolah: [
+    { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: true },
+    { id: 'islami', nama: 'Sekolah Islami / Pesantren', deskripsi: 'Madrasah, pesantren, sekolah Islam terpadu.', icon: 'BookOpen', ready: true },
+    { id: 'kursus', nama: 'Kursus / Bimbel', deskripsi: 'Bimbel, kursus bahasa, skill, course online.', icon: 'PencilRuler', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -376,6 +384,64 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'wellness-forest', subKategori: 'wellness', nama: 'Forest',
         deskripsi: 'Hijau hutan gelap & menyembuhkan. Untuk wellness center, retreat, terapi premium.',
         icon: 'TreePine', mood: '#5FB389', bg: 'dark', manifest: 'wellness-forest',
+      },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // SEKOLAH (Sprint 7). 3 sub-kategori × 3 gaya. Palet dari ui-ux-pro-max DB.
+  // Deskripsi = microcopy self-select: [sifat visual] + "Untuk [jenis sekolah]".
+  // ════════════════════════════════════════════════════════════
+  sekolah: {
+    reguler: [
+      {
+        id: 'reguler-cerdas', subKategori: 'reguler', nama: 'Cerdas',
+        deskripsi: 'Biru akademik bersih & terpercaya. Untuk SMP/SMA, sekolah negeri, sekolah modern.',
+        icon: 'GraduationCap', mood: '#2563EB', bg: 'light', manifest: 'reguler-cerdas',
+      },
+      {
+        id: 'reguler-ceria', subKategori: 'reguler', nama: 'Ceria',
+        deskripsi: 'Hangat & ramah anak, penuh semangat. Untuk TK, PAUD, SD, sekolah dasar.',
+        icon: 'Backpack', mood: '#C2680C', bg: 'warm', manifest: 'reguler-ceria',
+      },
+      {
+        id: 'reguler-prestasi', subKategori: 'reguler', nama: 'Prestasi',
+        deskripsi: 'Navy emas gelap & berwibawa. Untuk SMA unggulan, sekolah favorit, boarding school.',
+        icon: 'Trophy', mood: '#C9A24A', bg: 'dark', manifest: 'reguler-prestasi',
+      },
+    ],
+    islami: [
+      {
+        id: 'islami-hijau', subKategori: 'islami', nama: 'Hijau',
+        deskripsi: 'Emerald segar & menenangkan. Untuk sekolah Islam terpadu, madrasah, TPQ.',
+        icon: 'BookOpen', mood: '#0F7A4E', bg: 'light', manifest: 'islami-hijau',
+      },
+      {
+        id: 'islami-emas', subKategori: 'islami', nama: 'Emas',
+        deskripsi: 'Krem emas elegan & berkelas. Untuk pesantren modern, sekolah tahfidz premium.',
+        icon: 'Sparkles', mood: '#936A1A', bg: 'warm', manifest: 'islami-emas',
+      },
+      {
+        id: 'islami-malam', subKategori: 'islami', nama: 'Malam',
+        deskripsi: 'Emerald gelap & emas, khusyuk. Untuk pesantren, ma’had, lembaga dakwah.',
+        icon: 'Star', mood: '#CBA35A', bg: 'dark', manifest: 'islami-malam',
+      },
+    ],
+    kursus: [
+      {
+        id: 'kursus-fokus', subKategori: 'kursus', nama: 'Fokus',
+        deskripsi: 'Indigo modern & rapi. Untuk bimbel, kursus bahasa, lembaga sertifikasi.',
+        icon: 'Target', mood: '#4F46E5', bg: 'light', manifest: 'kursus-fokus',
+      },
+      {
+        id: 'kursus-energi', subKategori: 'kursus', nama: 'Energi',
+        deskripsi: 'Coral semangat & berani. Untuk kursus skill, coding bootcamp, pelatihan kerja.',
+        icon: 'Zap', mood: '#DC4220', bg: 'light', manifest: 'kursus-energi',
+      },
+      {
+        id: 'kursus-malam', subKategori: 'kursus', nama: 'Malam',
+        deskripsi: 'Violet gelap premium. Untuk course online, kelas digital, platform e-learning.',
+        icon: 'Rocket', mood: '#A855F7', bg: 'dark', manifest: 'kursus-malam',
       },
     ],
   },

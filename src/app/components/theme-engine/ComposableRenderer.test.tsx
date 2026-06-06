@@ -268,3 +268,37 @@ describe('Sprint 5b galeri + Sprint 6 klinik', () => {
     }
   })
 })
+
+describe('Sprint 7 — sekolah', () => {
+  it('registry memuat 9 manifest sekolah', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of [
+      'reguler-cerdas', 'reguler-ceria', 'reguler-prestasi',
+      'islami-hijau', 'islami-emas', 'islami-malam',
+      'kursus-fokus', 'kursus-energi', 'kursus-malam',
+    ]) {
+      expect(keys).toContain(id)
+    }
+  })
+
+  it('9 gaya sekolah render tanpa error + data-theme + balok aktif', () => {
+    for (const id of [
+      'reguler-cerdas', 'reguler-ceria', 'reguler-prestasi',
+      'islami-hijau', 'islami-emas', 'islami-malam',
+      'kursus-fokus', 'kursus-energi', 'kursus-malam',
+    ]) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_GALLERY} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
+  })
+
+  it('reguler-cerdas: showcase+stats+testimoni+gallery+info+faq dari konten', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['reguler-cerdas']} content={CONTENT_GALLERY} />)
+    expect(html).toContain('Tahun melayani') // stats label dari CONTENT_FULL
+    expect(html).toContain('Dipercaya Pelanggan Kami') // testimoni cards
+    expect(html).toContain('ce-masonry') // gallery masonry aktif (manifest gallery:'masonry')
+    expect(html).toContain('output=embed') // info-lokasi
+    expect(html).toContain('Jam berapa buka?') // FAQ
+  })
+})

@@ -308,6 +308,48 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'wellness-forest', label: 'Wellness Forest', basePackId: 'wellness-forest',
     blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
+
+  // ── SEKOLAH (Sprint 7) — showcase=program/jurusan, stats=akreditasi,
+  // info=PPDB CTA + lokasi, gallery masonry=kegiatan/fasilitas. ──
+  // SEKOLAH REGULER (SD/SMP/SMA)
+  'reguler-cerdas': {
+    id: 'reguler-cerdas', label: 'Sekolah Cerdas', basePackId: 'reguler-cerdas',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true },
+  },
+  'reguler-ceria': {
+    id: 'reguler-ceria', label: 'Sekolah Ceria', basePackId: 'reguler-ceria',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', gallery: 'masonry', info: true },
+  },
+  'reguler-prestasi': {
+    id: 'reguler-prestasi', label: 'Sekolah Prestasi', basePackId: 'reguler-prestasi',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  // SEKOLAH ISLAMI / PESANTREN
+  'islami-hijau': {
+    id: 'islami-hijau', label: 'Islami Hijau', basePackId: 'islami-hijau',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  'islami-emas': {
+    id: 'islami-emas', label: 'Islami Emas', basePackId: 'islami-emas',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'cards', gallery: 'masonry', info: true, faq: true },
+  },
+  'islami-malam': {
+    id: 'islami-malam', label: 'Islami Malam', basePackId: 'islami-malam',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  // KURSUS / BIMBEL
+  'kursus-fokus': {
+    id: 'kursus-fokus', label: 'Kursus Fokus', basePackId: 'kursus-fokus',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true, info: true },
+  },
+  'kursus-energi': {
+    id: 'kursus-energi', label: 'Kursus Energi', basePackId: 'kursus-energi',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+  },
+  'kursus-malam': {
+    id: 'kursus-malam', label: 'Kursus Malam', basePackId: 'kursus-malam',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true, info: true },
+  },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {

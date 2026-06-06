@@ -155,8 +155,14 @@ invoked at its two steps, then done.
 - [x] Smoke test on `umum-bluecare` — 3 PNGs generated, content/images render correctly.
 
 **Prasyarat DONE (2026-06-07).** Pipeline ready to apply inside playbook §5 from Sprint 7.
-Only the §3.1 "remaining seam" (HTML generator for brand-new themes) is left — wire it when
-S7 begins.
+
+- [x] §3.1 seam — HTML generator for brand-new themes: `src/lib/theme-system/gen-samples.test.tsx`
+  (env-gated `GEN_SAMPLES`, SSR `ComposableRenderer` → `theme-samples/<id>.html` + index).
+  `GEN_SAMPLES=all npx vitest run src/lib/theme-system/gen-samples.test.tsx`. Done 2026-06-07.
+
+**PIPELINE HIDUP — pertama dipakai penuh di Sprint 7 (Sekolah, 2026-06-07).** Front: ui-ux-pro-max
+DB → palet/pairing 9 gaya (kontras ≥4.5:1). Back: shoot 6 gaya ×3 viewport → scorecard PASS
+(semua CRITICAL/HIGH hijau, no iterate). Berlaku di playbook §5 tiap sprint berikutnya.
 
 ---
 
