@@ -60,7 +60,7 @@ export async function renderSite({
     // restaurant→menu_items, jasa (klinik/sekolah/corporate/travel)→services,
     // selain itu→products. Semua punya {nama,deskripsi,harga,gambar_url}.
     const tipe = (page as { tipe_industri?: string }).tipe_industri ?? ''
-    const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel']
+    const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel', 'personal']
     const fetchSource =
       tipe === 'restaurant' ? fetchMenuItemsByPage(client, page.id)
         : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
@@ -68,8 +68,9 @@ export async function renderSite({
     const showcaseTitle =
       tipe === 'restaurant' ? 'Menu Kami'
         : tipe === 'sekolah' ? 'Program Kami'
-          : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
-            : 'Produk Kami'
+          : tipe === 'personal' ? 'Layanan Saya'
+            : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
+              : 'Produk Kami'
     const [source, profile] = await Promise.all([
       fetchSource,
       fetchTenantProfile(client, page.id),

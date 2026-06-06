@@ -968,6 +968,205 @@ const SEKOLAH_KURSUS: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@cerdasjuara.id', alamat: 'Jakarta Pusat' },
 }
 
+// ── PERSONAL · Kreator / Influencer ────────────────────────────
+const PERSONAL_KREATOR: ComposableContent = {
+  nama: 'Rara Creative',
+  hero: {
+    eyebrow: 'Content Creator & Storyteller',
+    title: 'Cerita yang Menggerakkan, Konten yang Dikenang',
+    subtitle:
+      'Bantu brand bicara ke audiens lewat konten yang jujur dan relatable. Sudah dipercaya puluhan brand lokal & nasional.',
+    ctaText: 'Ajak Kolaborasi',
+    ctaHref: '#kolaborasi',
+    image: IMG('photo-1517841905240-472988babdf9'),
+  },
+  features: [
+    { title: 'Audiens Loyal', desc: 'Komunitas aktif yang benar-benar mendengar, bukan sekadar angka.' },
+    { title: 'Konsep Orisinal', desc: 'Tiap konten dirancang khusus, bukan template pasaran.' },
+    { title: 'Hasil Terukur', desc: 'Laporan performa transparan tiap kampanye selesai.' },
+  ],
+  showcase: {
+    title: 'Layanan Saya',
+    subtitle: 'Cara kita bisa bekerja bareng.',
+    items: [
+      { nama: 'Paid Promote', desc: 'Konten promosi yang nyatu dengan gaya feed.', gambar: IMG('photo-1554151228-14d9def656e4', 800) },
+      { nama: 'Brand Ambassador', desc: 'Kerja sama jangka panjang membangun brand.', gambar: IMG('photo-1600486913747-55e5470d6f40', 800) },
+      { nama: 'Kelas Konten', desc: 'Belajar bikin konten dari nol sampai jadi.', gambar: IMG('photo-1542744173-8e7e53415bb0', 800) },
+      { nama: 'Konten Custom', desc: 'Video & foto produk siap pakai untuk brand.', gambar: IMG('photo-1522071820081-009f0129c71c', 800) },
+    ],
+  },
+  stats: [
+    { angka: '250rb', label: 'Pengikut' },
+    { angka: '8jt+', label: 'Tayangan/bulan' },
+    { angka: '60+', label: 'Brand partner' },
+    { angka: '4.9', label: 'Rating klien' },
+  ],
+  testimonials: [
+    { quote: 'Kontennya natural dan engagement-nya nyata. Penjualan kami naik signifikan setelah kampanye.', nama: 'Dina', peran: 'Owner brand fashion' },
+    { quote: 'Profesional, tepat waktu, dan hasilnya melebihi ekspektasi. Pasti repeat order.', nama: 'Yoga', peran: 'Marketing manager' },
+    { quote: 'Bukan cuma cantik, tapi paham audiens. Itu yang bikin beda.', nama: 'Putri', peran: 'Brand owner' },
+  ],
+  gallery: {
+    title: 'Portofolio',
+    subtitle: 'Beberapa karya pilihan.',
+    images: [
+      { src: IMG('photo-1492691527719-9d1e07e534b4', 700), caption: 'Campaign produk' },
+      { src: IMG('photo-1539571696357-5a69c17a67c6', 700), caption: 'Sesi foto brand' },
+      { src: IMG('photo-1494790108377-be9c29b29330', 700), caption: 'Konten lifestyle' },
+      { src: IMG('photo-1600880292203-757bb62b4baf', 700), caption: 'Behind the scene' },
+      { src: IMG('photo-1559523161-0fc0d8b38a7a', 700), caption: 'Event & talkshow' },
+    ],
+  },
+  info: {
+    jam: [{ hari: 'Respon DM/Email', jam: 'Senin – Jumat, 09.00 – 18.00' }],
+    alamat: 'Jakarta, Indonesia (open remote)',
+    telp: '081296917963',
+    reservasiText: 'Ajak Kolaborasi via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Halo, Saya Rara',
+    body: 'Saya percaya konten terbaik lahir dari cerita yang jujur. Sejak 2018 saya membantu brand terhubung dengan audiens lewat konten yang terasa manusiawi, bukan iklan yang dipaksakan.',
+  },
+  cta: {
+    title: 'Punya Brand yang Ingin Bersinar?',
+    subtitle: 'Ceritakan idemu, kita wujudkan bareng.',
+    ctaText: 'Hubungi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'hello@raracreative.id', alamat: 'Jakarta' },
+}
+
+// ── PERSONAL · Profesional / Expert ────────────────────────────
+const PERSONAL_PROFESIONAL: ComposableContent = {
+  nama: 'Andi Pratama, S.H., M.H.',
+  hero: {
+    eyebrow: 'Konsultan Hukum Bisnis',
+    title: 'Solusi Hukum yang Jernih untuk Bisnis Anda',
+    subtitle:
+      'Pendampingan hukum yang mudah dipahami, bukan jargon membingungkan. Lindungi bisnis Anda sejak langkah pertama.',
+    ctaText: 'Jadwalkan Konsultasi',
+    ctaHref: '#konsultasi',
+    image: IMG('photo-1560250097-0b93528c311a'),
+  },
+  features: [
+    { title: '15 Tahun Pengalaman', desc: 'Menangani ratusan kasus korporasi dan kontrak bisnis.' },
+    { title: 'Bahasa yang Jelas', desc: 'Menjelaskan hukum dengan bahasa yang Anda mengerti.' },
+    { title: 'Respons Cepat', desc: 'Tanggap menangani urgensi hukum bisnis Anda.' },
+  ],
+  showcase: {
+    title: 'Layanan Saya',
+    subtitle: 'Pendampingan hukum untuk setiap kebutuhan.',
+    items: [
+      { nama: 'Konsultasi Hukum', desc: 'Sesi 1-on-1 membahas masalah hukum Anda.', gambar: IMG('photo-1551836022-d5d88e9218df', 800) },
+      { nama: 'Drafting Kontrak', desc: 'Penyusunan & review perjanjian yang aman.', gambar: IMG('photo-1573497019940-1c28c88b4f3e', 800) },
+      { nama: 'Pendirian Badan Usaha', desc: 'Urus legalitas PT/CV dari awal sampai sah.', gambar: IMG('photo-1542744173-8e7e53415bb0', 800) },
+      { nama: 'Pendampingan Sengketa', desc: 'Mediasi & litigasi melindungi hak Anda.', gambar: IMG('photo-1600880292203-757bb62b4baf', 800) },
+    ],
+  },
+  stats: [
+    { angka: '15', label: 'Tahun praktik' },
+    { angka: '400+', label: 'Klien terbantu' },
+    { angka: '95%', label: 'Kasus selesai baik' },
+    { angka: '24 jam', label: 'Respons konsultasi' },
+  ],
+  testimonials: [
+    { quote: 'Penjelasannya jelas dan menenangkan. Kontrak bisnis kami jadi jauh lebih aman.', nama: 'Bp. Hartono', peran: 'Direktur PT' },
+    { quote: 'Responsif dan teliti. Membantu kami menghindari masalah hukum sejak awal.', nama: 'Ibu Vina', peran: 'Founder startup' },
+    { quote: 'Profesional dan jujur soal peluang. Saya merasa benar-benar didampingi.', nama: 'Rudi', peran: 'Pengusaha' },
+  ],
+  faq: [
+    { q: 'Bagaimana cara konsultasi pertama?', a: 'Jadwalkan lewat WhatsApp. Konsultasi awal 30 menit untuk memahami kebutuhan Anda sebelum melangkah.' },
+    { q: 'Apakah melayani konsultasi online?', a: 'Ya, tersedia sesi online via video call maupun tatap muka di kantor.' },
+    { q: 'Bagaimana sistem biayanya?', a: 'Transparan sejak awal. Biaya disampaikan jelas setelah memahami lingkup kebutuhan Anda.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '09.00 – 17.00' },
+      { hari: 'Sabtu', jam: 'Dengan perjanjian' },
+    ],
+    alamat: 'Gedung Graha Hukum Lt. 5, Jl. Sudirman, Jakarta',
+    mapsQuery: 'Jl. Sudirman Jakarta',
+    telp: '081296917963',
+    reservasiText: 'Jadwalkan via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Saya',
+    body: 'Saya mendampingi pelaku usaha agar bisa fokus mengembangkan bisnis tanpa khawatir soal hukum. Bagi saya, hukum yang baik adalah hukum yang bisa dipahami dan melindungi, bukan menakuti.',
+  },
+  cta: {
+    title: 'Lindungi Bisnis Anda Sekarang',
+    subtitle: 'Konsultasi awal untuk memahami kebutuhan Anda.',
+    ctaText: 'Konsultasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'andi@pratamalegal.id', alamat: 'Jakarta' },
+}
+
+// ── PERSONAL · Coach / Mentor ──────────────────────────────────
+const PERSONAL_COACH: ComposableContent = {
+  nama: 'Coach Maya',
+  hero: {
+    eyebrow: 'Business & Life Coach',
+    title: 'Bantu Kamu Bertumbuh, Bukan Sekadar Bermimpi',
+    subtitle:
+      'Pendampingan personal untuk membuka potensi dan mencapai target nyata. Ratusan klien sudah membuktikan.',
+    ctaText: 'Mulai Sesi Pertama',
+    ctaHref: '#sesi',
+    image: IMG('photo-1573496359142-b8d87734a5a2'),
+  },
+  features: [
+    { title: 'Tersertifikasi', desc: 'Coach bersertifikat dengan metode yang teruji.' },
+    { title: 'Program Personal', desc: 'Rencana disusun sesuai tujuan dan ritme kamu.' },
+    { title: 'Pendampingan Nyata', desc: 'Bukan motivasi sesaat, tapi langkah konkret tiap minggu.' },
+  ],
+  showcase: {
+    title: 'Layanan Saya',
+    subtitle: 'Pilih cara bertumbuh yang paling pas.',
+    items: [
+      { nama: '1-on-1 Coaching', desc: 'Sesi privat fokus pada tujuanmu.', gambar: IMG('photo-1556761175-5973dc0f32e7', 800) },
+      { nama: 'Group Class', desc: 'Bertumbuh bareng komunitas yang sevisi.', gambar: IMG('photo-1522071820081-009f0129c71c', 800) },
+      { nama: 'Workshop', desc: 'Sesi intensif untuk skill spesifik.', gambar: IMG('photo-1542744173-8e7e53415bb0', 800) },
+      { nama: 'Webinar', desc: 'Belajar dari mana saja, materi terstruktur.', gambar: IMG('photo-1600486913747-55e5470d6f40', 800) },
+    ],
+  },
+  stats: [
+    { angka: '1.500+', label: 'Klien terbantu' },
+    { angka: '4.9', label: 'Rating peserta' },
+    { angka: '50+', label: 'Workshop digelar' },
+    { angka: '8', label: 'Tahun mendampingi' },
+  ],
+  testimonials: [
+    { quote: 'Setelah 3 bulan coaching, saya akhirnya berani memulai bisnis sendiri. Arahnya jelas dan terukur.', nama: 'Sandra', peran: 'Klien coaching' },
+    { quote: 'Coach Maya jujur dan menantang cara berpikir saya. Hasilnya nyata di karier saya.', nama: 'Bayu', peran: 'Profesional' },
+    { quote: 'Bukan sekadar motivasi, tapi langkah yang bisa langsung dijalankan. Worth it.', nama: 'Lia', peran: 'Peserta workshop' },
+  ],
+  faq: [
+    { q: 'Apakah cocok untuk pemula?', a: 'Sangat cocok. Program disesuaikan dengan titik awal kamu, tanpa perlu pengalaman sebelumnya.' },
+    { q: 'Sesinya online atau offline?', a: 'Keduanya tersedia. Sesi 1-on-1 fleksibel via video call atau tatap muka sesuai kesepakatan.' },
+    { q: 'Berapa lama satu program?', a: 'Umumnya 3 bulan dengan sesi mingguan, namun bisa disesuaikan dengan tujuanmu.' },
+  ],
+  info: {
+    jam: [{ hari: 'Sesi & konsultasi', jam: 'Senin – Sabtu, 09.00 – 20.00' }],
+    alamat: 'Bandung, Indonesia (online & offline)',
+    telp: '081296917963',
+    reservasiText: 'Booking Sesi via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Kenalan dengan Coach Maya',
+    body: 'Saya percaya setiap orang punya potensi besar yang sering terhalang keraguan. Tugas saya menemani kamu menemukan arah, menyusun langkah, dan bertanggung jawab atas pertumbuhanmu sendiri.',
+  },
+  cta: {
+    title: 'Saatnya Bertumbuh Serius',
+    subtitle: 'Booking sesi pertama dan rasakan bedanya.',
+    ctaText: 'Booking via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@coachmaya.id', alamat: 'Bandung' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -992,6 +1191,10 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   reguler: SEKOLAH_REGULER,
   islami: SEKOLAH_ISLAMI,
   kursus: SEKOLAH_KURSUS,
+  // Personal (Sprint 8a): prefix id tema 'kreator-' / 'profesional-' / 'coach-'
+  kreator: PERSONAL_KREATOR,
+  profesional: PERSONAL_PROFESIONAL,
+  coach: PERSONAL_COACH,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
