@@ -331,6 +331,196 @@ const ANAK: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@cilukbakids.id', alamat: 'Surabaya, Jawa Timur' },
 }
 
+// ── RESTAURANT · Warung / Kedai (masakan rumahan) ──────────────
+const WARUNG: ComposableContent = {
+  nama: 'Warung Bu Tatik',
+  hero: {
+    eyebrow: 'Masakan Rumahan Sejak 1998',
+    title: 'Masakan Rumahan yang Bikin Kangen Rumah',
+    subtitle:
+      'Dimasak dadakan tiap pagi pakai resep nenek. Porsi mengenyangkan, harga kaki lima, rasa bintang lima.',
+    ctaText: 'Lihat Menu',
+    ctaHref: '#menu',
+    image: IMG('photo-1555126634-323283e090fa'),
+  },
+  features: [
+    { title: 'Dimasak Dadakan', desc: 'Bukan masakan kemarin. Kami masak segar tiap pagi sebelum buka.' },
+    { title: 'Porsi Mengenyangkan', desc: 'Nasi boleh nambah. Kami tak hitung sendok, kami hitung kenyang.' },
+    { title: 'Harga Bersahabat', desc: 'Makan lengkap mulai 15 ribu. Cocok untuk kantong harian.' },
+  ],
+  showcase: {
+    title: 'Menu Andalan',
+    subtitle: 'Yang paling dicari pelanggan tiap hari.',
+    items: [
+      { nama: 'Ayam Goreng Lengkuas + Nasi', harga: 18000, desc: 'Ayam ungkep bumbu meresap, kremes gurih.' },
+      { nama: 'Soto Daging Bening', harga: 20000, desc: 'Kuah kaldu rebus 4 jam, segar tak bikin enek.' },
+      { nama: 'Sayur Lodeh Komplit', harga: 13000, desc: 'Santan segar, sayur dari pasar pagi.' },
+      { nama: 'Es Teh Poci Gula Batu', harga: 5000, desc: 'Teh tubruk wangi, manis pas.' },
+    ],
+  },
+  stats: [
+    { angka: '25+', label: 'Tahun melayani' },
+    { angka: '300', label: 'Porsi terjual/hari' },
+    { angka: '15rb', label: 'Mulai dari' },
+    { angka: '4.8', label: 'Rating Google' },
+  ],
+  testimonials: [
+    { quote: 'Rasanya persis masakan ibu saya dulu. Tiap pulang kampung pasti mampir ke sini.', nama: 'Pak Hendra', peran: 'Pelanggan sejak 2005' },
+    { quote: 'Porsinya jujur, harganya jujur. Anak kos terselamatkan tiap akhir bulan.', nama: 'Rina', peran: 'Mahasiswa' },
+    { quote: 'Sotonya juara. Kuahnya bening tapi rasanya dalam. Langganan kantor kami.', nama: 'Bu Sari', peran: 'Karyawan' },
+  ],
+  faq: [
+    { q: 'Jam berapa buka?', a: 'Setiap hari pukul 07.00 sampai habis, biasanya sekitar 16.00. Datang lebih awal agar menu masih lengkap.' },
+    { q: 'Bisa pesan untuk acara atau kantor?', a: 'Bisa. Untuk nasi kotak dan prasmanan, pesan minimal H-1 lewat WhatsApp.' },
+    { q: 'Terima pesan antar?', a: 'Ya, lewat GoFood dan GrabFood, atau WhatsApp untuk antar sekitar warung.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '07.00 – 16.00' },
+      { hari: 'Sabtu – Minggu', jam: '07.00 – 17.00' },
+    ],
+    alamat: 'Jl. Kaliurang KM 5 No. 12, Sleman, Yogyakarta',
+    mapsQuery: 'Jl. Kaliurang KM 5 Sleman Yogyakarta',
+    telp: '081296917963',
+    reservasiText: 'Pesan via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Dari Dapur Bu Tatik',
+    body: 'Berawal dari gerobak kecil tahun 1998, kini Warung Bu Tatik sudah menemani tiga generasi pelanggan. Yang tak pernah berubah: resep, takaran, dan niat menyuguhkan makanan seperti untuk keluarga sendiri.',
+  },
+  cta: {
+    title: 'Lapar? Mampir Sekarang',
+    subtitle: 'Pesan antar atau makan di tempat, sama enaknya.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@warungbutatik.id', alamat: 'Sleman, Yogyakarta' },
+}
+
+// ── RESTAURANT · Cafe / Coffee Shop ───────────────────────────
+const CAFE: ComposableContent = {
+  nama: 'Kopi Senja',
+  hero: {
+    eyebrow: 'Specialty Coffee & Ruang Nyaman',
+    title: 'Tempat Kopimu Bertemu Cerita',
+    subtitle:
+      'Biji single-origin dari petani lokal, diseduh barista bersertifikat. Ruang yang dibuat untuk berlama-lama.',
+    ctaText: 'Lihat Menu',
+    ctaHref: '#menu',
+    image: IMG('photo-1554118811-1e0d58224f24'),
+  },
+  features: [
+    { title: 'Biji Single-Origin', desc: 'Dipanggang mingguan dari petani Gayo, Kintamani, dan Toraja.' },
+    { title: 'Barista Bersertifikat', desc: 'Setiap cangkir diseduh tangan yang paham takaran dan suhu.' },
+    { title: 'WiFi Kencang & Stop Kontak', desc: 'Banyak colokan, internet stabil. Nyaman kerja seharian.' },
+  ],
+  showcase: {
+    title: 'Menu Favorit',
+    subtitle: 'Yang paling sering dipesan tamu.',
+    items: [
+      { nama: 'Es Kopi Susu Senja', harga: 22000, desc: 'Signature kami. Manis gula aren, kopi tebal.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800) },
+      { nama: 'Caffe Latte', harga: 28000, desc: 'Espresso lembut, susu segar steamed.', gambar: IMG('photo-1572442388796-11668a67e53d', 800) },
+      { nama: 'Butter Croissant', harga: 25000, desc: 'Dipanggang tiap pagi, renyah berlapis.', gambar: IMG('photo-1555507036-ab1f4038808a', 800) },
+      { nama: 'Manual Brew V60', harga: 30000, desc: 'Pilih bijimu, kami seduh di depanmu.', gambar: IMG('photo-1495474472287-4d71bcdd2085', 800) },
+    ],
+  },
+  testimonials: [
+    { quote: 'Kopi susunya nagih, tempatnya tenang buat kerja. Sudah jadi kantor kedua saya.', nama: 'Dimas', peran: 'Freelancer' },
+    { quote: 'Baristanya ramah dan tahu betul soal kopi. Direkomendasikan untuk yang mau belajar manual brew.', nama: 'Anita', peran: 'Pengunjung' },
+    { quote: 'Estetik tanpa bikin kantong jebol. Croissant-nya wajib coba.', nama: 'Bella', peran: 'Mahasiswa' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '08.00 – 22.00' },
+      { hari: 'Sabtu – Minggu', jam: '09.00 – 23.00' },
+    ],
+    alamat: 'Jl. Cihampelas No. 88, Bandung',
+    mapsQuery: 'Jl. Cihampelas Bandung',
+    telp: '081296917963',
+    reservasiText: 'Reservasi Meja',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Kopi Senja',
+    body: 'Kami percaya kopi terbaik lahir dari kedekatan: dekat dengan petani, dekat dengan tamu. Sejak 2019 kami menyeduh dengan biji yang kami kenal asalnya, di ruang yang sengaja dibuat untuk memperlambat hari.',
+  },
+  cta: {
+    title: 'Ngopi Dulu, Yuk',
+    subtitle: 'Pesan di tempat atau bungkus untuk jalan.',
+    ctaText: 'Reservasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@kopisenja.id', alamat: 'Bandung, Jawa Barat' },
+}
+
+// ── RESTAURANT · Fine Dining / Resto Keluarga ─────────────────
+const FINEDINING: ComposableContent = {
+  nama: 'Meja Nusantara',
+  hero: {
+    eyebrow: 'Fine Dining Cita Rasa Indonesia',
+    title: 'Hidangan Nusantara, Disajikan Istimewa',
+    subtitle:
+      'Resep warisan diolah chef berpengalaman, bahan terbaik dari penjuru negeri. Untuk momen yang pantas dirayakan.',
+    ctaText: 'Reservasi Meja',
+    ctaHref: '#reservasi',
+    image: IMG('photo-1414235077428-338989a2e8c0'),
+  },
+  features: [
+    { title: 'Chef Berpengalaman', desc: 'Dipimpin chef dengan 20 tahun mengolah masakan Nusantara.' },
+    { title: 'Bahan Pilihan', desc: 'Rempah segar dan bahan premium, dipilih langsung tiap hari.' },
+    { title: 'Suasana Berkelas', desc: 'Ruang elegan untuk rapat, ulang tahun, dan jamuan spesial.' },
+  ],
+  showcase: {
+    title: 'Signature Menu',
+    subtitle: 'Hidangan kebanggaan dapur kami.',
+    items: [
+      { nama: 'Iga Bakar Madu Kecombrang', harga: 145000, desc: 'Iga empuk, bumbu meresap, aroma kecombrang.' },
+      { nama: 'Bebek Betutu Bali', harga: 165000, desc: 'Diungkep 6 jam dengan base genep otentik.' },
+      { nama: 'Gurame Bakar Rica', harga: 135000, desc: 'Gurame segar, sambal rica pedas menggugah.' },
+      { nama: 'Es Selendang Mayang', harga: 35000, desc: 'Pencuci mulut klasik Betawi, segar dan legit.' },
+    ],
+  },
+  stats: [
+    { angka: '20', label: 'Tahun pengalaman chef' },
+    { angka: '50rb+', label: 'Tamu terlayani' },
+    { angka: '4.9', label: 'Rating Google' },
+    { angka: '120', label: 'Kapasitas kursi' },
+  ],
+  testimonials: [
+    { quote: 'Tempat favorit keluarga untuk merayakan ulang tahun. Pelayanannya hangat, masakannya tak pernah mengecewakan.', nama: 'Keluarga Wijaya', peran: 'Pelanggan setia' },
+    { quote: 'Kami adakan jamuan klien di sini. Suasananya pas, hidangannya membanggakan untuk disuguhkan.', nama: 'Bp. Surya', peran: 'Direktur perusahaan' },
+    { quote: 'Bebek betutu-nya terbaik yang pernah saya cicipi di luar Bali.', nama: 'Maria', peran: 'Food blogger' },
+  ],
+  faq: [
+    { q: 'Apakah perlu reservasi?', a: 'Untuk akhir pekan dan jam makan malam, kami sangat menyarankan reservasi agar meja terjamin.' },
+    { q: 'Bisa untuk acara ulang tahun atau jamuan kantor?', a: 'Tentu. Kami menyediakan ruang semi-privat dan paket jamuan. Hubungi kami untuk pengaturan.' },
+    { q: 'Apakah ada pilihan menu tanpa daging?', a: 'Ada beberapa hidangan sayur dan seafood. Beri tahu kami pantangan Anda saat memesan.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Selasa – Minggu', jam: '11.00 – 22.00' },
+      { hari: 'Senin', jam: 'Tutup' },
+    ],
+    alamat: 'Jl. Senopati No. 45, Jakarta Selatan',
+    mapsQuery: 'Jl. Senopati Jakarta Selatan',
+    telp: '081296917963',
+    reservasiText: 'Reservasi Sekarang',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Filosofi Meja Nusantara',
+    body: 'Kami menghadirkan kekayaan rasa Nusantara dengan penyajian yang layak dirayakan. Setiap hidangan adalah penghormatan pada resep warisan, diolah dengan ketelitian dan bahan terbaik yang bisa kami dapatkan.',
+  },
+  cta: {
+    title: 'Rayakan Momen Anda Bersama Kami',
+    subtitle: 'Meja terbatas tiap malam. Pastikan tempat Anda.',
+    ctaText: 'Reservasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'reservasi@mejanusantara.id', alamat: 'Jakarta Selatan' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -343,6 +533,10 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   rumah: RUMAH,
   herbal: HERBAL,
   anak: ANAK,
+  // Restaurant (Sprint 4): prefix id tema 'warung-' / 'cafe-' / 'finedining-'
+  warung: WARUNG,
+  cafe: CAFE,
+  finedining: FINEDINING,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

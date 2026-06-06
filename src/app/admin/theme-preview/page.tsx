@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
-import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
+import { INDUSTRY_SUBKATEGORI, getThemes } from '@/lib/theme-system/taxonomy'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +20,10 @@ export default async function ThemePreviewIndex() {
   const isAuth = verifyAdminSessionToken(cookieStore.get(ADMIN_COOKIE_NAME)?.value)
   if (!isAuth) redirect('/admin/login')
 
-  const subs = getReadySubKategori('toko_online')
+  // Iterasi semua industri yang punya lapis sub-kategori. Tampilkan SEMUA
+  // sub-kat (termasuk yang belum `ready`) — surface ini internal/UAT, jadi
+  // berguna untuk meninjau tema dormant sebelum aktivasi.
+  const industries = Object.entries(INDUSTRY_SUBKATEGORI) as [string, NonNullable<typeof INDUSTRY_SUBKATEGORI[keyof typeof INDUSTRY_SUBKATEGORI]>][]
 
   return (
     <main className="min-h-screen bg-[#0B0B0C] text-white px-6 py-12">
@@ -34,36 +37,51 @@ export default async function ThemePreviewIndex() {
           sama dengan situs jadi — bukan mockup. Klik untuk melihat tampilan penuh dengan konten contoh.
         </p>
 
-        <div className="space-y-10">
-          {subs.map((sub) => {
-            const themes = getThemes('toko_online', sub.id)
-            return (
-              <section key={sub.id}>
-                <h2 className="text-sm font-black uppercase tracking-widest text-white/60 mb-4">
-                  {sub.nama}
-                </h2>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  {themes.map((t) => (
-                    <Link
-                      key={t.id}
-                      href={`/admin/theme-preview/${t.id}`}
-                      className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06] hover:border-white/20 transition-colors"
-                    >
-                      <span
-                        className="inline-block w-8 h-8 rounded-lg mb-3"
-                        style={{ background: t.mood }}
-                      />
-                      <div className="font-black text-[15px] mb-1">{t.nama}</div>
-                      <div className="text-[12px] text-white/45 leading-relaxed mb-3">{t.deskripsi}</div>
-                      <span className="text-[11px] font-bold text-white/40 group-hover:text-white/70 transition-colors">
-                        Buka render →
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )
-          })}
+        <div className="space-y-14">
+          {industries.map(([tipe, subs]) => (
+            <div key={tipe}>
+              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white/35 mb-6 border-b border-white/10 pb-2">
+                {tipe.replace('_', ' ')}
+              </h2>
+              <div className="space-y-10">
+                {subs.map((sub) => {
+                  const themes = getThemes(tipe, sub.id)
+                  if (themes.length === 0) return null
+                  return (
+                    <section key={sub.id}>
+                      <h3 className="text-sm font-black uppercase tracking-widest text-white/60 mb-4 flex items-center gap-2">
+                        {sub.nama}
+                        {!sub.ready && (
+                          <span className="text-[10px] font-bold text-amber-300/80 bg-amber-400/10 px-2 py-0.5 rounded-full normal-case tracking-normal">
+                            dormant
+                          </span>
+                        )}
+                      </h3>
+                      <div className="grid sm:grid-cols-3 gap-4">
+                        {themes.map((t) => (
+                          <Link
+                            key={t.id}
+                            href={`/admin/theme-preview/${t.id}`}
+                            className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06] hover:border-white/20 transition-colors"
+                          >
+                            <span
+                              className="inline-block w-8 h-8 rounded-lg mb-3"
+                              style={{ background: t.mood }}
+                            />
+                            <div className="font-black text-[15px] mb-1">{t.nama}</div>
+                            <div className="text-[12px] text-white/45 leading-relaxed mb-3">{t.deskripsi}</div>
+                            <span className="text-[11px] font-bold text-white/40 group-hover:text-white/70 transition-colors">
+                              Buka render →
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </section>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </main>

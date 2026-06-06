@@ -18,6 +18,8 @@ import {
   HeroCentered, HeroSplit, HeroFullbleed,
   FeaturesGrid, FeaturesRows,
   ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
+  Stats, TestimoniCards, TestimoniSpotlight, TestimoniMarquee,
+  FAQ, InfoLokasiBlock,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -67,7 +69,31 @@ export default function ComposableRenderer({
         )
       )}
 
+      {/* ── Balok Sprint 5 — hanya bila manifest mengaktifkan & konten ada ── */}
+      {B.stats && content.stats && content.stats.length > 0 && (
+        <Stats stats={content.stats} />
+      )}
+
+      {B.testimoni && content.testimonials && content.testimonials.length > 0 && (
+        B.testimoni === 'spotlight' ? (
+          <TestimoniSpotlight testimonials={content.testimonials} />
+        ) : B.testimoni === 'marquee' ? (
+          <TestimoniMarquee testimonials={content.testimonials} />
+        ) : (
+          <TestimoniCards testimonials={content.testimonials} />
+        )
+      )}
+
+      {B.info && content.info && (
+        <InfoLokasiBlock info={content.info} />
+      )}
+
       {content.about && <About about={content.about} />}
+
+      {B.faq && content.faq && content.faq.length > 0 && (
+        <FAQ faq={content.faq} />
+      )}
+
       {content.cta && <CTA cta={content.cta} />}
 
       <Footer content={content} motif={motif} motifColor={motifColor} />

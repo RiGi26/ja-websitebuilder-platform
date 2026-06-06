@@ -57,6 +57,14 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
   ],
+  // ── RESTAURANT (Sprint 4) — jenis tempat makan. AKTIF (ready:true):
+  // gerbang 3 skill + verify SSR (3 flagship: warung-rakyat/cafe-latte/
+  // finedining-aurum) tuntas, 127/127 test + build bersih.
+  restaurant: [
+    { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: true },
+    { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: true },
+    { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -244,6 +252,64 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'anak-pop', subKategori: 'anak', nama: 'Pop',
         deskripsi: 'Candy lantang & ceria, penuh energi. Untuk mainan seru, snack anak, brand playful.',
         icon: 'Candy', mood: '#E5318F', bg: 'light', manifest: 'anak-pop',
+      },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // RESTAURANT (Sprint 4). 3 sub-kategori × 3 gaya. Deskripsi =
+  // microcopy self-select: [sifat visual] + "Untuk [jenis tempat]".
+  // ════════════════════════════════════════════════════════════
+  restaurant: {
+    warung: [
+      {
+        id: 'warung-rakyat', subKategori: 'warung', nama: 'Rakyat',
+        deskripsi: 'Hangat & merakyat, terasa rumahan. Untuk warung makan, masakan padang, soto, nasi.',
+        icon: 'Soup', mood: '#C24E2C', bg: 'warm', manifest: 'warung-rakyat',
+      },
+      {
+        id: 'warung-sambal', subKategori: 'warung', nama: 'Sambal',
+        deskripsi: 'Berani & menggugah, merah membara. Untuk ayam geprek, seblak, pedasan, lalapan.',
+        icon: 'Flame', mood: '#D62828', bg: 'light', manifest: 'warung-sambal',
+      },
+      {
+        id: 'warung-angkringan', subKategori: 'warung', nama: 'Angkringan',
+        deskripsi: 'Gelap hangat bercahaya lampu, suasana malam. Untuk angkringan, kedai kopi tubruk, wedangan.',
+        icon: 'Moon', mood: '#E8A23D', bg: 'dark', manifest: 'warung-angkringan',
+      },
+    ],
+    cafe: [
+      {
+        id: 'cafe-latte', subKategori: 'cafe', nama: 'Latte',
+        deskripsi: 'Cream lembut & cozy, nyaman berlama-lama. Untuk coffee shop, brunch, bakery cafe.',
+        icon: 'Coffee', mood: '#9C6B4A', bg: 'light', manifest: 'cafe-latte',
+      },
+      {
+        id: 'cafe-roastery', subKategori: 'cafe', nama: 'Roastery',
+        deskripsi: 'Gelap espresso & industrial, untuk pecinta kopi serius. Untuk roastery, specialty coffee, manual brew.',
+        icon: 'Bean', mood: '#C98A3E', bg: 'dark', manifest: 'cafe-roastery',
+      },
+      {
+        id: 'cafe-bloom', subKategori: 'cafe', nama: 'Bloom',
+        deskripsi: 'Pastel ceria & instagrammable, manis. Untuk dessert cafe, matcha, boba, tempat foto.',
+        icon: 'Cherry', mood: '#E08CA0', bg: 'light', manifest: 'cafe-bloom',
+      },
+    ],
+    finedining: [
+      {
+        id: 'finedining-aurum', subKategori: 'finedining', nama: 'Aurum',
+        deskripsi: 'Gelap emas mewah, kesan eksklusif. Untuk fine dining, steakhouse, restoran premium.',
+        icon: 'Crown', mood: '#C7A24A', bg: 'dark', manifest: 'finedining-aurum',
+      },
+      {
+        id: 'finedining-hearth', subKategori: 'finedining', nama: 'Hearth',
+        deskripsi: 'Hangat terang & ramah keluarga. Untuk resto keluarga, rumah makan besar, katering acara.',
+        icon: 'Utensils', mood: '#B5532A', bg: 'warm', manifest: 'finedining-hearth',
+      },
+      {
+        id: 'finedining-nordic', subKategori: 'finedining', nama: 'Nordic',
+        deskripsi: 'Bersih sage & kontemporer, plating modern. Untuk bistro modern, healthy resto, farm-to-table.',
+        icon: 'Salad', mood: '#3E4A42', bg: 'light', manifest: 'finedining-nordic',
       },
     ],
   },
