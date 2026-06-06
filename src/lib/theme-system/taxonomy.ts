@@ -65,6 +65,14 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: true },
     { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: true },
   ],
+  // ── KLINIK (Sprint 6) — jenis layanan kesehatan. AKTIF (ready:true):
+  // gerbang 3 skill + verify SSR (flagship umum-bluecare/estetik-rosegold/
+  // wellness-sage) tuntas, test + build bersih.
+  klinik: [
+    { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
+    { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
+    { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -310,6 +318,64 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'finedining-nordic', subKategori: 'finedining', nama: 'Nordic',
         deskripsi: 'Bersih sage & kontemporer, plating modern. Untuk bistro modern, healthy resto, farm-to-table.',
         icon: 'Salad', mood: '#3E4A42', bg: 'light', manifest: 'finedining-nordic',
+      },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // KLINIK (Sprint 6). 3 sub-kategori × 3 gaya. Deskripsi = microcopy
+  // self-select: [sifat visual] + "Untuk [jenis klinik]".
+  // ════════════════════════════════════════════════════════════
+  klinik: {
+    umum: [
+      {
+        id: 'umum-bluecare', subKategori: 'umum', nama: 'Bluecare',
+        deskripsi: 'Biru klinis bersih & menenangkan. Untuk klinik umum, poli, layanan keluarga.',
+        icon: 'Stethoscope', mood: '#1E6FE0', bg: 'light', manifest: 'umum-bluecare',
+      },
+      {
+        id: 'umum-freshteal', subKategori: 'umum', nama: 'Freshteal',
+        deskripsi: 'Teal segar & ramah, kesan higienis. Untuk klinik gigi, anak, laboratorium.',
+        icon: 'Activity', mood: '#0E9E96', bg: 'light', manifest: 'umum-freshteal',
+      },
+      {
+        id: 'umum-trustnavy', subKategori: 'umum', nama: 'Trustnavy',
+        deskripsi: 'Navy gelap profesional & mantap. Untuk klinik spesialis, medical center premium.',
+        icon: 'Shield', mood: '#4FA3F0', bg: 'dark', manifest: 'umum-trustnavy',
+      },
+    ],
+    estetik: [
+      {
+        id: 'estetik-rosegold', subKategori: 'estetik', nama: 'Rosegold',
+        deskripsi: 'Rose-gold hangat & elegan. Untuk klinik kecantikan, beauty clinic, perawatan wajah.',
+        icon: 'Flower2', mood: '#C58B6B', bg: 'warm', manifest: 'estetik-rosegold',
+      },
+      {
+        id: 'estetik-derma', subKategori: 'estetik', nama: 'Derma',
+        deskripsi: 'Putih klinis & pink lembut, ilmiah. Untuk dermatologi, skincare clinic, dokter kulit.',
+        icon: 'Droplet', mood: '#E0789C', bg: 'light', manifest: 'estetik-derma',
+      },
+      {
+        id: 'estetik-noir', subKategori: 'estetik', nama: 'Noir',
+        deskripsi: 'Plum gelap mewah, kesan eksklusif. Untuk aesthetic clinic premium, anti-aging, laser.',
+        icon: 'Gem', mood: '#D6A4B6', bg: 'dark', manifest: 'estetik-noir',
+      },
+    ],
+    wellness: [
+      {
+        id: 'wellness-sage', subKategori: 'wellness', nama: 'Sage',
+        deskripsi: 'Sage hijau lembut & tenang. Untuk fisioterapi, klinik tumbuh kembang, holistik.',
+        icon: 'Leaf', mood: '#6E8B5A', bg: 'light', manifest: 'wellness-sage',
+      },
+      {
+        id: 'wellness-terra', subKategori: 'wellness', nama: 'Terra',
+        deskripsi: 'Earth terracotta hangat & membumi. Untuk spa medis, terapi pijat, pusat relaksasi.',
+        icon: 'Sprout', mood: '#B07A4E', bg: 'warm', manifest: 'wellness-terra',
+      },
+      {
+        id: 'wellness-forest', subKategori: 'wellness', nama: 'Forest',
+        deskripsi: 'Hijau hutan gelap & menyembuhkan. Untuk wellness center, retreat, terapi premium.',
+        icon: 'TreePine', mood: '#5FB389', bg: 'dark', manifest: 'wellness-forest',
       },
     ],
   },

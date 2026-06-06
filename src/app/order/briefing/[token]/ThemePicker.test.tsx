@@ -59,9 +59,18 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
-  it('tetap dormant untuk industri tanpa sub-kategori ready (mis. klinik)', () => {
+  it('menampilkan sub-kategori Klinik untuk tipe klinik (S6)', () => {
     const html = renderToStaticMarkup(
       <SubKategoriPicker tipe="klinik" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Klinik Umum / Gigi')
+    expect(html).toContain('Skincare / Estetik')
+    expect(html).toContain('Fisio / Wellness')
+  })
+
+  it('tetap dormant untuk industri tanpa sub-kategori ready (mis. sekolah)', () => {
+    const html = renderToStaticMarkup(
+      <SubKategoriPicker tipe="sekolah" value="" onChange={noop} />,
     )
     expect(html).toBe('')
   })

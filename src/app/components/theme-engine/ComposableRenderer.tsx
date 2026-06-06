@@ -19,7 +19,7 @@ import {
   FeaturesGrid, FeaturesRows,
   ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
   Stats, TestimoniCards, TestimoniSpotlight, TestimoniMarquee,
-  FAQ, InfoLokasiBlock,
+  FAQ, InfoLokasiBlock, MasonryGallery, BeforeAfterGallery,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -82,6 +82,14 @@ export default function ComposableRenderer({
         ) : (
           <TestimoniCards testimonials={content.testimonials} />
         )
+      )}
+
+      {/* Galeri (Sprint 5b) — masonry fasilitas / before-after */}
+      {B.gallery === 'before-after' && content.gallery?.pairs && content.gallery.pairs.length > 0 && (
+        <BeforeAfterGallery gallery={content.gallery} />
+      )}
+      {B.gallery === 'masonry' && content.gallery?.images && content.gallery.images.length > 0 && (
+        <MasonryGallery gallery={content.gallery} />
       )}
 
       {B.info && content.info && (

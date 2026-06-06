@@ -16,10 +16,11 @@ describe('theme-system taxonomy (S0-1)', () => {
   })
 
   it('industri tanpa registri → kosong, tidak error', () => {
-    expect(hasSubKategori('klinik')).toBe(false)
-    expect(getSubKategori('klinik')).toEqual([])
-    expect(getThemes('klinik', 'apapun')).toEqual([])
-    expect(getTheme('klinik', 'apapun')).toBeUndefined()
+    // sekolah belum punya lapis sub-kategori (klinik kini sudah, S6).
+    expect(hasSubKategori('sekolah')).toBe(false)
+    expect(getSubKategori('sekolah')).toEqual([])
+    expect(getThemes('sekolah', 'apapun')).toEqual([])
+    expect(getTheme('sekolah', 'apapun')).toBeUndefined()
   })
 
   it('Kuliner = pilot dengan 3 gaya', () => {
@@ -119,6 +120,32 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(new Set(ids).size).toBe(9)
     expect(all.every((t) => t.manifest === t.id)).toBe(true)
     expect(getTheme('restaurant', 'cafe-roastery')?.nama).toBe('Roastery')
+  })
+
+  it('Klinik (S6): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+    expect(hasSubKategori('klinik')).toBe(true)
+    const subs = getSubKategori('klinik')
+    expect(subs.map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
+    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
+  })
+
+  it('Klinik (S6): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
+    for (const sub of ['umum', 'estetik', 'wellness']) {
+      const themes = getThemes('klinik', sub)
+      expect(themes).toHaveLength(3)
+      expect(themes.every((t) => t.subKategori === sub)).toBe(true)
+      const bgs = new Set(themes.map((t) => t.bg))
+      expect(bgs.has('dark')).toBe(true)
+      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
+  it('Klinik (S6): id tema unik (9) & manifest === id', () => {
+    const all = getThemes('klinik', 'umum')
+      .concat(getThemes('klinik', 'estetik'), getThemes('klinik', 'wellness'))
+    expect(new Set(all.map((t) => t.id)).size).toBe(9)
+    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    expect(getTheme('klinik', 'estetik-noir')?.nama).toBe('Noir')
   })
 
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {

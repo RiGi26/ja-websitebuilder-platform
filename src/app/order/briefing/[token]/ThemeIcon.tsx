@@ -11,7 +11,9 @@ import {
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
   // Restaurant (Sprint 4): Warung / Cafe / Fine Dining
-  Coffee, ChefHat, Bean, Cherry, Utensils, Salad, type LucideProps,
+  Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
+  // Klinik (Sprint 6): Umum / Estetik / Wellness
+  Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
@@ -20,6 +22,7 @@ const MAP = {
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
   Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
+  Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {
