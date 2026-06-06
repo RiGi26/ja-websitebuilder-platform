@@ -13,6 +13,9 @@ out/
 # Vite
 *.local
 
+# Visual-pipeline screenshots (local UAT artifacts, THEME_VISUAL_PIPELINE.md)
+theme-samples/*.png
+
 # Editor
 .vscode/
 .idea/
