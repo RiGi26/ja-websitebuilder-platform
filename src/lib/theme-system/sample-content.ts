@@ -521,6 +521,230 @@ const FINEDINING: ComposableContent = {
   contact: { wa: '6281296917963', email: 'reservasi@mejanusantara.id', alamat: 'Jakarta Selatan' },
 }
 
+// ── KLINIK · Umum / Gigi ───────────────────────────────────────
+const KLINIK_UMUM: ComposableContent = {
+  nama: 'Klinik Sehat Sentosa',
+  hero: {
+    eyebrow: 'Klinik Keluarga Terpercaya',
+    title: 'Layanan Kesehatan yang Mengutamakan Anda',
+    subtitle:
+      'Dokter berpengalaman, antrean online, dan suasana yang menenangkan. Sehat tak perlu menunggu lama.',
+    ctaText: 'Buat Janji',
+    ctaHref: '#janji',
+    image: IMG('photo-1519494026892-80bbd2d6fd0d'),
+  },
+  features: [
+    { title: 'Dokter Berpengalaman', desc: 'Ditangani dokter umum dan spesialis berlisensi resmi.' },
+    { title: 'Antrean Online', desc: 'Daftar dari rumah, datang tepat giliran. Tanpa antre lama.' },
+    { title: 'Terima BPJS & Asuransi', desc: 'Bekerja sama dengan BPJS dan asuransi swasta utama.' },
+  ],
+  showcase: {
+    title: 'Layanan Kami',
+    subtitle: 'Perawatan lengkap untuk seluruh keluarga.',
+    items: [
+      { nama: 'Pemeriksaan Umum', harga: 50000, desc: 'Konsultasi dokter umum, diagnosa & resep.', gambar: IMG('photo-1579684385127-1ef15d508118', 800) },
+      { nama: 'Perawatan Gigi', harga: 150000, desc: 'Scaling, tambal, cabut oleh dokter gigi.', gambar: IMG('photo-1606811841689-23dfddce3e95', 800) },
+      { nama: 'Vaksinasi', harga: 200000, desc: 'Imunisasi anak & dewasa, stok lengkap.', gambar: IMG('photo-1612277795421-9bc7706a4a34', 800) },
+      { nama: 'Cek Laboratorium', harga: 100000, desc: 'Tes darah, gula, kolesterol. Hasil cepat.', gambar: IMG('photo-1582719508461-905c673771fd', 800) },
+    ],
+  },
+  stats: [
+    { angka: '15rb+', label: 'Pasien terlayani' },
+    { angka: '12', label: 'Dokter & spesialis' },
+    { angka: '4.9', label: 'Rating Google' },
+    { angka: '7', label: 'Hari buka/minggu' },
+  ],
+  testimonials: [
+    { quote: 'Dokternya sabar menjelaskan, antreannya rapi. Sekarang seluruh keluarga periksa di sini.', nama: 'Ibu Dewi', peran: 'Pasien keluarga' },
+    { quote: 'Daftar online benar-benar hemat waktu. Datang langsung dipanggil.', nama: 'Pak Anton', peran: 'Pasien' },
+    { quote: 'Klinik bersih, ramah, dan terima BPJS. Sangat membantu.', nama: 'Sari', peran: 'Pasien BPJS' },
+  ],
+  gallery: {
+    title: 'Fasilitas Kami',
+    subtitle: 'Ruang yang bersih dan nyaman untuk pemulihan Anda.',
+    images: [
+      { src: IMG('photo-1538108149393-fbbd81895907', 700), caption: 'Ruang tunggu nyaman' },
+      { src: IMG('photo-1629909613654-28e377c37b09', 700), caption: 'Ruang periksa' },
+      { src: IMG('photo-1631217868264-e5b90bb7e133', 700), caption: 'Tim medis' },
+      { src: IMG('photo-1666214280557-f1b5022eb634', 700), caption: 'Laboratorium' },
+      { src: IMG('photo-1516549655169-df83a0774514', 700), caption: 'Apotek internal' },
+    ],
+  },
+  faq: [
+    { q: 'Apakah perlu daftar dulu?', a: 'Disarankan daftar online agar tak menunggu lama, tapi pasien walk-in tetap kami layani sesuai antrean.' },
+    { q: 'Apakah menerima BPJS?', a: 'Ya, kami melayani BPJS Kesehatan dan beberapa asuransi swasta. Bawa kartu saat berkunjung.' },
+    { q: 'Jam berapa klinik buka?', a: 'Senin sampai Sabtu pukul 08.00 hingga 21.00, Minggu 08.00 hingga 14.00.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Sabtu', jam: '08.00 – 21.00' },
+      { hari: 'Minggu', jam: '08.00 – 14.00' },
+    ],
+    alamat: 'Jl. Diponegoro No. 21, Semarang',
+    mapsQuery: 'Jl. Diponegoro Semarang',
+    telp: '081296917963',
+    reservasiText: 'Buat Janji via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Klinik Sehat Sentosa',
+    body: 'Sejak 2010 kami hadir sebagai klinik keluarga di jantung kota. Filosofi kami sederhana: setiap pasien dilayani seperti keluarga sendiri, dengan waktu yang cukup untuk mendengar dan menjelaskan.',
+  },
+  cta: {
+    title: 'Jaga Kesehatan Keluarga Anda',
+    subtitle: 'Buat janji hari ini, kami siap melayani.',
+    ctaText: 'Buat Janji via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@kliniksehatsentosa.id', alamat: 'Semarang, Jawa Tengah' },
+}
+
+// ── KLINIK · Estetik / Skincare (before-after) ─────────────────
+const KLINIK_ESTETIK: ComposableContent = {
+  nama: 'Klinik Estetika Luna',
+  hero: {
+    eyebrow: 'Klinik Kecantikan & Dermatologi',
+    title: 'Kulit Sehat Bercahaya, Ditangani Ahlinya',
+    subtitle:
+      'Perawatan berbasis ilmu dermatologi oleh dokter bersertifikat. Hasil nyata, aman, tanpa janji berlebihan.',
+    ctaText: 'Konsultasi Gratis',
+    ctaHref: '#konsultasi',
+    image: IMG('photo-1570172619644-dfd03ed5d881'),
+  },
+  features: [
+    { title: 'Dokter Bersertifikat', desc: 'Ditangani dokter estetika berpengalaman, bukan terapis biasa.' },
+    { title: 'Alat Berteknologi', desc: 'Laser dan perangkat modern berstandar medis internasional.' },
+    { title: 'Konsultasi Personal', desc: 'Program perawatan disesuaikan dengan kondisi kulit Anda.' },
+  ],
+  showcase: {
+    title: 'Perawatan Unggulan',
+    subtitle: 'Pilihan perawatan favorit pasien kami.',
+    items: [
+      { nama: 'Facial Brightening', harga: 250000, desc: 'Mencerahkan & melembapkan, kulit segar.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800) },
+      { nama: 'Chemical Peeling', harga: 450000, desc: 'Mengangkat sel mati, samarkan noda.', gambar: IMG('photo-1596462502278-27bfdc403348', 800) },
+      { nama: 'Laser Rejuvenation', harga: 850000, desc: 'Meremajakan kulit, pori mengecil.', gambar: IMG('photo-1620916566398-39f1143ab7be', 800) },
+      { nama: 'Acne Treatment', harga: 350000, desc: 'Program tuntas atasi jerawat membandel.', gambar: IMG('photo-1556228720-195a672e8a03', 800) },
+    ],
+  },
+  testimonials: [
+    { quote: 'Jerawat saya yang bertahun-tahun akhirnya membaik. Dokternya jujur soal ekspektasi.', nama: 'Nadia', peran: 'Pasien acne treatment' },
+    { quote: 'Wajah terasa lebih cerah setelah beberapa sesi. Tempatnya nyaman dan higienis.', nama: 'Tika', peran: 'Pasien facial' },
+    { quote: 'Konsultasinya detail, tidak menjual paket yang tak perlu. Saya percaya di sini.', nama: 'Rani', peran: 'Pasien' },
+  ],
+  gallery: {
+    title: 'Hasil Perawatan',
+    subtitle: 'Foto asli pasien, dipublikasikan atas persetujuan.',
+    pairs: [
+      { before: IMG('photo-1556228578-8c89e6adf883', 600), after: IMG('photo-1556228720-195a672e8a03', 600), label: 'Acne Treatment — 8 minggu' },
+      { before: IMG('photo-1612349317150-e413f6a5b16d', 600), after: IMG('photo-1570172619644-dfd03ed5d881', 600), label: 'Brightening — 6 sesi' },
+    ],
+  },
+  faq: [
+    { q: 'Apakah aman untuk kulit sensitif?', a: 'Setiap perawatan diawali konsultasi dan analisa kulit. Dokter menyesuaikan tindakan dengan kondisi Anda.' },
+    { q: 'Berapa kali perawatan untuk hasil terlihat?', a: 'Bergantung kondisi kulit. Umumnya hasil mulai terlihat setelah 3 sampai 6 sesi, dijelaskan saat konsultasi.' },
+    { q: 'Apakah konsultasi berbayar?', a: 'Konsultasi awal gratis. Anda baru memutuskan perawatan setelah memahami pilihan dan biayanya.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Sabtu', jam: '10.00 – 20.00' },
+      { hari: 'Minggu', jam: 'Dengan perjanjian' },
+    ],
+    alamat: 'Jl. Kemang Raya No. 8, Jakarta Selatan',
+    mapsQuery: 'Jl. Kemang Raya Jakarta Selatan',
+    telp: '081296917963',
+    reservasiText: 'Konsultasi via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Filosofi Klinik Luna',
+    body: 'Kami percaya kecantikan sejati lahir dari kulit yang sehat. Pendekatan kami berbasis bukti ilmiah, mengutamakan keamanan dan kenyamanan, bukan sekadar hasil instan yang tak bertahan.',
+  },
+  cta: {
+    title: 'Mulai Perjalanan Kulit Sehat Anda',
+    subtitle: 'Konsultasi gratis dengan dokter kami hari ini.',
+    ctaText: 'Konsultasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@klinikluna.id', alamat: 'Jakarta Selatan' },
+}
+
+// ── KLINIK · Fisio / Wellness ──────────────────────────────────
+const KLINIK_WELLNESS: ComposableContent = {
+  nama: 'Rumah Terapi Hasta',
+  hero: {
+    eyebrow: 'Fisioterapi & Pusat Wellness',
+    title: 'Pulih Lebih Cepat, Bergerak Tanpa Nyeri',
+    subtitle:
+      'Terapis tersertifikasi membantu Anda pulih dari cedera dan nyeri kronis, dengan program yang ramah dan terukur.',
+    ctaText: 'Jadwalkan Terapi',
+    ctaHref: '#jadwal',
+    image: IMG('photo-1600334129128-685c5582fd35'),
+  },
+  features: [
+    { title: 'Terapis Tersertifikasi', desc: 'Ditangani fisioterapis berlisensi, bukan pijat biasa.' },
+    { title: 'Program Terukur', desc: 'Rencana terapi bertahap dengan evaluasi tiap sesi.' },
+    { title: 'Suasana Menenangkan', desc: 'Ruang terapi tenang yang mendukung pemulihan tubuh & pikiran.' },
+  ],
+  showcase: {
+    title: 'Layanan Terapi',
+    subtitle: 'Penanganan menyeluruh untuk tubuh yang sehat.',
+    items: [
+      { nama: 'Fisioterapi', harga: 200000, desc: 'Pemulihan cedera otot, sendi, pascaoperasi.', gambar: IMG('photo-1571019613454-1cb2f99b2d8b', 800) },
+      { nama: 'Pijat Terapi', harga: 175000, desc: 'Meredakan nyeri otot & ketegangan.', gambar: IMG('photo-1600334129128-685c5582fd35', 800) },
+      { nama: 'Akupunktur', harga: 250000, desc: 'Terapi titik tubuh untuk keseimbangan.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800) },
+      { nama: 'Konsultasi Postur', harga: 150000, desc: 'Analisa postur & saran latihan harian.', gambar: IMG('photo-1544161515-4ab6ce6db874', 800) },
+    ],
+  },
+  stats: [
+    { angka: '8rb+', label: 'Sesi terapi' },
+    { angka: '95%', label: 'Pasien membaik' },
+    { angka: '4.9', label: 'Rating Google' },
+    { angka: '6', label: 'Terapis ahli' },
+  ],
+  testimonials: [
+    { quote: 'Setelah cedera lutut, terapi di sini membuat saya bisa jalan normal lagi. Terapisnya telaten.', nama: 'Pak Joko', peran: 'Pasien pascaoperasi' },
+    { quote: 'Nyeri punggung saya jauh berkurang. Programnya jelas dan ada evaluasi tiap minggu.', nama: 'Bu Lina', peran: 'Pasien nyeri kronis' },
+    { quote: 'Tempatnya tenang, bikin rileks. Pulang badan terasa enteng.', nama: 'Adit', peran: 'Pasien' },
+  ],
+  gallery: {
+    title: 'Ruang Terapi Kami',
+    subtitle: 'Tempat yang dirancang untuk ketenangan dan pemulihan.',
+    images: [
+      { src: IMG('photo-1540555700478-4be289fbecef', 700), caption: 'Ruang terapi' },
+      { src: IMG('photo-1571019613454-1cb2f99b2d8b', 700), caption: 'Sesi fisioterapi' },
+      { src: IMG('photo-1544161515-4ab6ce6db874', 700), caption: 'Ruang pijat' },
+      { src: IMG('photo-1571019614242-c5c5dee9f50b', 700), caption: 'Area latihan' },
+      { src: IMG('photo-1545205597-3d9d02c29597', 700), caption: 'Ruang relaksasi' },
+    ],
+  },
+  faq: [
+    { q: 'Apakah perlu rujukan dokter?', a: 'Tidak wajib. Anda bisa langsung datang untuk konsultasi awal, kami akan menilai kebutuhan terapi Anda.' },
+    { q: 'Berapa lama satu sesi terapi?', a: 'Umumnya 45 sampai 60 menit per sesi, tergantung program yang disusun untuk Anda.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '08.00 – 20.00' },
+      { hari: 'Sabtu', jam: '08.00 – 16.00' },
+    ],
+    alamat: 'Jl. Ahmad Yani No. 17, Surabaya',
+    mapsQuery: 'Jl. Ahmad Yani Surabaya',
+    telp: '081296917963',
+    reservasiText: 'Jadwalkan via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Rumah Terapi Hasta',
+    body: 'Kami percaya pemulihan terbaik datang dari kombinasi keahlian dan kesabaran. Setiap pasien mendapat program yang disusun khusus, dengan terapis yang menemani sampai Anda benar-benar pulih.',
+  },
+  cta: {
+    title: 'Saatnya Bebas dari Nyeri',
+    subtitle: 'Jadwalkan sesi pertama Anda bersama terapis kami.',
+    ctaText: 'Jadwalkan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@terapihasta.id', alamat: 'Surabaya, Jawa Timur' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -537,6 +761,10 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   warung: WARUNG,
   cafe: CAFE,
   finedining: FINEDINING,
+  // Klinik (Sprint 6): prefix id tema 'umum-' / 'estetik-' / 'wellness-'
+  umum: KLINIK_UMUM,
+  estetik: KLINIK_ESTETIK,
+  wellness: KLINIK_WELLNESS,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
