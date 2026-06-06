@@ -12,6 +12,7 @@ import { RESTAURANT_PACKS } from './restaurant'
 import { KLINIK_PACKS } from './klinik'
 import { SEKOLAH_PACKS } from './sekolah'
 import { PERSONAL_PACKS } from './personal'
+import { COMPANY_PACKS } from './company'
 
 export const THEME_PACKS: Record<string, TokenPack> = {
   ...TOKO_PACKS,
@@ -19,4 +20,5 @@ export const THEME_PACKS: Record<string, TokenPack> = {
   ...KLINIK_PACKS,
   ...SEKOLAH_PACKS,
   ...PERSONAL_PACKS,
+  ...COMPANY_PACKS,
 }

@@ -1167,6 +1167,207 @@ const PERSONAL_COACH: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@coachmaya.id', alamat: 'Bandung' },
 }
 
+// ── COMPANY · Startup / Tech / SaaS ────────────────────────────
+const COMPANY_STARTUP: ComposableContent = {
+  nama: 'TechFlow',
+  hero: {
+    eyebrow: 'Platform Manajemen Bisnis',
+    title: 'Kelola Bisnis Lebih Cepat, Tanpa Ribet',
+    subtitle:
+      'Satu dashboard untuk operasional, tim, dan laporan. Dipakai 2.000+ bisnis untuk tumbuh lebih efisien.',
+    ctaText: 'Coba Gratis',
+    ctaHref: '#trial',
+    image: IMG('photo-1551434678-e076c223a692'),
+  },
+  features: [
+    { title: 'Hemat Waktu', desc: 'Otomatiskan tugas berulang, fokus ke hal yang penting.' },
+    { title: 'Data Real-time', desc: 'Pantau performa bisnis kapan saja, dari mana saja.' },
+    { title: 'Aman & Andal', desc: 'Enkripsi standar industri, uptime 99,9% terjamin.' },
+  ],
+  showcase: {
+    title: 'Fitur Unggulan',
+    subtitle: 'Semua yang bisnismu butuhkan dalam satu tempat.',
+    items: [
+      { nama: 'Dashboard Analitik', desc: 'Laporan visual yang mudah dipahami.', gambar: IMG('photo-1551434678-e076c223a692', 800) },
+      { nama: 'Manajemen Tim', desc: 'Atur peran & tugas tim dengan rapi.', gambar: IMG('photo-1522071820081-009f0129c71c', 800) },
+      { nama: 'Integrasi API', desc: 'Hubungkan dengan tools yang sudah kamu pakai.', gambar: IMG('photo-1581091226825-a6a2a5aee158', 800) },
+      { nama: 'Support 24/7', desc: 'Tim kami siap membantu kapan pun.', gambar: IMG('photo-1556761175-b413da4baf72', 800) },
+    ],
+  },
+  stats: [
+    { angka: '2.000+', label: 'Bisnis pengguna' },
+    { angka: '99,9%', label: 'Uptime' },
+    { angka: '40%', label: 'Hemat waktu rata-rata' },
+    { angka: '4.8', label: 'Rating pengguna' },
+  ],
+  testimonials: [
+    { quote: 'Operasional kami jadi jauh lebih rapi. Laporan yang dulu seharian, kini hitungan menit.', nama: 'Reza', peran: 'COO, retail' },
+    { quote: 'Onboarding-nya mudah dan support-nya responsif. Tim langsung nyaman pakai.', nama: 'Maya', peran: 'Ops manager' },
+    { quote: 'ROI-nya terasa dalam sebulan. Worth setiap rupiah.', nama: 'Bagus', peran: 'Founder' },
+  ],
+  faq: [
+    { q: 'Apakah ada masa coba gratis?', a: 'Ya, 14 hari gratis tanpa kartu kredit. Bisa upgrade kapan saja.' },
+    { q: 'Apakah data kami aman?', a: 'Data dienkripsi dan disimpan di server berstandar keamanan industri, dengan backup rutin.' },
+    { q: 'Bisa integrasi dengan tools lain?', a: 'Bisa. Kami menyediakan API dan integrasi siap pakai dengan layanan populer.' },
+  ],
+  info: {
+    jam: [{ hari: 'Support', jam: '24/7 via chat & email' }],
+    alamat: 'Cyber 2 Tower, Jl. HR Rasuna Said, Jakarta',
+    mapsQuery: 'Cyber 2 Tower Jakarta',
+    telp: '081296917963',
+    reservasiText: 'Coba Gratis via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang TechFlow',
+    body: 'Kami membangun TechFlow karena percaya bisnis kecil pun berhak punya alat sekelas korporasi. Sejak 2020, misi kami sederhana: bikin teknologi yang benar-benar memudahkan, bukan menambah ribet.',
+  },
+  cta: {
+    title: 'Siap Bikin Bisnis Lebih Efisien?',
+    subtitle: 'Mulai gratis hari ini, rasakan bedanya.',
+    ctaText: 'Mulai via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'halo@techflow.id', alamat: 'Jakarta' },
+}
+
+// ── COMPANY · Agency / Kreatif ─────────────────────────────────
+const COMPANY_AGENCY: ComposableContent = {
+  nama: 'Loop Studio',
+  hero: {
+    eyebrow: 'Creative & Digital Agency',
+    title: 'Ide Berani untuk Brand yang Berani',
+    subtitle:
+      'Kami merancang brand dan kampanye yang diingat. Dari strategi sampai eksekusi, semua dalam satu tim.',
+    ctaText: 'Mulai Proyek',
+    ctaHref: '#proyek',
+    image: IMG('photo-1552581234-26160f608093'),
+  },
+  features: [
+    { title: 'Strategi Dulu', desc: 'Setiap karya berangkat dari riset dan tujuan yang jelas.' },
+    { title: 'Tim Multidisiplin', desc: 'Desainer, copywriter, dan strategist dalam satu atap.' },
+    { title: 'Hasil Terukur', desc: 'Kreativitas yang kami buat untuk mencapai angka nyata.' },
+  ],
+  showcase: {
+    title: 'Layanan Kami',
+    subtitle: 'Solusi kreatif menyeluruh untuk brand.',
+    items: [
+      { nama: 'Branding & Identity', desc: 'Logo, visual, dan panduan brand lengkap.', gambar: IMG('photo-1600880292089-90a7e086ee0c', 800) },
+      { nama: 'Social Media', desc: 'Strategi & konten yang bikin brand hidup.', gambar: IMG('photo-1542744173-8e7e53415bb0', 800) },
+      { nama: 'Web & App Design', desc: 'Desain digital yang cantik dan fungsional.', gambar: IMG('photo-1581091226825-a6a2a5aee158', 800) },
+      { nama: 'Video Production', desc: 'Dari konsep sampai produksi video yang memikat.', gambar: IMG('photo-1486406146926-c627a92ad1ab', 800) },
+    ],
+  },
+  stats: [
+    { angka: '320+', label: 'Proyek selesai' },
+    { angka: '120', label: 'Brand klien' },
+    { angka: '18', label: 'Penghargaan' },
+    { angka: '9', label: 'Tahun berkarya' },
+  ],
+  testimonials: [
+    { quote: 'Mereka paham brand kami lebih dari kami sendiri. Hasilnya tajam dan tepat sasaran.', nama: 'Tari', peran: 'Brand manager' },
+    { quote: 'Prosesnya kolaboratif dan transparan. Kampanye kami viral berkat ide mereka.', nama: 'Eka', peran: 'Marketing lead' },
+    { quote: 'Tim paling kreatif yang pernah kami ajak kerja sama. Sangat direkomendasikan.', nama: 'Dimas', peran: 'CEO' },
+  ],
+  gallery: {
+    title: 'Karya Pilihan',
+    subtitle: 'Sebagian proyek yang kami banggakan.',
+    images: [
+      { src: IMG('photo-1600880292089-90a7e086ee0c', 700), caption: 'Rebranding korporat' },
+      { src: IMG('photo-1486406146926-c627a92ad1ab', 700), caption: 'Produksi video' },
+      { src: IMG('photo-1454165804606-c3d57bc86b40', 700), caption: 'Kampanye sosial' },
+      { src: IMG('photo-1517245386807-bb43f82c33c4', 700), caption: 'Web design' },
+      { src: IMG('photo-1542744173-8e7e53415bb0', 700), caption: 'Sesi brainstorming' },
+    ],
+  },
+  info: {
+    jam: [{ hari: 'Senin – Jumat', jam: '09.00 – 18.00' }],
+    alamat: 'Jl. Kemang Selatan No. 12, Jakarta',
+    mapsQuery: 'Jl. Kemang Selatan Jakarta',
+    telp: '081296917963',
+    reservasiText: 'Mulai Proyek via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Loop Studio',
+    body: 'Kami sekelompok orang yang percaya ide baik bisa mengubah bisnis. Sejak 2016 kami membantu brand lokal dan nasional bicara dengan cara yang jujur, berani, dan diingat.',
+  },
+  cta: {
+    title: 'Punya Brand yang Mau Naik Level?',
+    subtitle: 'Ceritakan tantanganmu, kami racik solusinya.',
+    ctaText: 'Diskusi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'hello@loopstudio.id', alamat: 'Jakarta' },
+}
+
+// ── COMPANY · Korporat / Manufaktur / B2B ──────────────────────
+const COMPANY_KORPORAT: ComposableContent = {
+  nama: 'PT Maju Bersama',
+  hero: {
+    eyebrow: 'Mitra Industri Terpercaya',
+    title: 'Membangun Masa Depan Industri Indonesia',
+    subtitle:
+      'Lebih dari tiga dekade melayani mitra di seluruh nusantara dengan produk berkualitas dan layanan tepat waktu.',
+    ctaText: 'Hubungi Kami',
+    ctaHref: '#kontak',
+    image: IMG('photo-1497366754035-f200968a6e72'),
+  },
+  features: [
+    { title: 'Kualitas Tersertifikasi', desc: 'Standar ISO dan kontrol mutu di setiap tahap produksi.' },
+    { title: 'Jaringan Luas', desc: 'Distribusi ke seluruh Indonesia, tepat waktu dan andal.' },
+    { title: 'Tim Profesional', desc: 'Didukung tenaga ahli berpengalaman di bidangnya.' },
+  ],
+  showcase: {
+    title: 'Layanan Kami',
+    subtitle: 'Solusi menyeluruh untuk kebutuhan industri Anda.',
+    items: [
+      { nama: 'Manufaktur', desc: 'Produksi presisi dengan kapasitas besar.', gambar: IMG('photo-1581091226825-a6a2a5aee158', 800) },
+      { nama: 'Distribusi', desc: 'Logistik andal ke seluruh penjuru negeri.', gambar: IMG('photo-1556761175-b413da4baf72', 800) },
+      { nama: 'Konsultasi B2B', desc: 'Pendampingan solusi sesuai kebutuhan mitra.', gambar: IMG('photo-1497366754035-f200968a6e72', 800) },
+      { nama: 'Purna Jual', desc: 'Dukungan teknis dan garansi yang terjamin.', gambar: IMG('photo-1521737604893-d14cc237f11d', 800) },
+    ],
+  },
+  stats: [
+    { angka: '32', label: 'Tahun pengalaman' },
+    { angka: '1.500+', label: 'Mitra bisnis' },
+    { angka: '24', label: 'Cabang nasional' },
+    { angka: 'ISO', label: 'Tersertifikasi 9001' },
+  ],
+  testimonials: [
+    { quote: 'Mitra yang konsisten menjaga mutu dan ketepatan waktu. Sudah belasan tahun kami bekerja sama.', nama: 'Bp. Wijaya', peran: 'Direktur distributor' },
+    { quote: 'Pelayanan profesional dan komunikatif. Solusi mereka membantu efisiensi pabrik kami.', nama: 'Ibu Sri', peran: 'Procurement manager' },
+    { quote: 'Kualitas produk stabil dan after-sales-nya bagus. Mitra yang bisa diandalkan.', nama: 'Bp. Hadi', peran: 'Pemilik usaha' },
+  ],
+  faq: [
+    { q: 'Apakah melayani pesanan dalam jumlah besar?', a: 'Ya, kami berpengalaman menangani pesanan skala industri dengan kapasitas produksi besar.' },
+    { q: 'Bagaimana jangkauan distribusinya?', a: 'Kami memiliki 24 cabang dan jaringan logistik yang menjangkau seluruh Indonesia.' },
+    { q: 'Apakah bisa kerja sama jangka panjang?', a: 'Tentu. Kami terbuka untuk kemitraan strategis jangka panjang dengan skema yang fleksibel.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Jumat', jam: '08.00 – 17.00' },
+      { hari: 'Sabtu', jam: '08.00 – 13.00' },
+    ],
+    alamat: 'Kawasan Industri MM2100, Bekasi, Jawa Barat',
+    mapsQuery: 'Kawasan Industri MM2100 Bekasi',
+    telp: '081296917963',
+    reservasiText: 'Hubungi via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang PT Maju Bersama',
+    body: 'Berdiri sejak 1992, kami tumbuh bersama industri Indonesia. Komitmen kami tidak berubah: kualitas yang konsisten, layanan yang tepat waktu, dan kemitraan yang saling menumbuhkan.',
+  },
+  cta: {
+    title: 'Mari Bertumbuh Bersama',
+    subtitle: 'Diskusikan kebutuhan industri Anda dengan tim kami.',
+    ctaText: 'Hubungi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281296917963', email: 'corporate@majubersama.co.id', alamat: 'Bekasi, Jawa Barat' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -1195,6 +1396,10 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   kreator: PERSONAL_KREATOR,
   profesional: PERSONAL_PROFESIONAL,
   coach: PERSONAL_COACH,
+  // Company (Sprint 8b): prefix id tema 'startup-' / 'agency-' / 'korporat-'
+  startup: COMPANY_STARTUP,
+  agency: COMPANY_AGENCY,
+  korporat: COMPANY_KORPORAT,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

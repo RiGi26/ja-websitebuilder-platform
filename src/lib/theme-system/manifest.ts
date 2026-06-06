@@ -392,6 +392,48 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'coach-prestige', label: 'Coach Prestige', basePackId: 'coach-prestige',
     blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
   },
+
+  // ── COMPANY / CORPORATE (Sprint 8b) — showcase=layanan, stats=angka
+  // perusahaan, gallery masonry=klien/proyek, info=kontak kantor. ──
+  // STARTUP / TECH / SAAS
+  'startup-aurora': {
+    id: 'startup-aurora', label: 'Startup Aurora', basePackId: 'startup-aurora',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  'startup-midnight': {
+    id: 'startup-midnight', label: 'Startup Midnight', basePackId: 'startup-midnight',
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  'startup-mint': {
+    id: 'startup-mint', label: 'Startup Mint', basePackId: 'startup-mint',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+  },
+  // AGENCY / KREATIF
+  'agency-bold': {
+    id: 'agency-bold', label: 'Agency Bold', basePackId: 'agency-bold',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true },
+  },
+  'agency-noir': {
+    id: 'agency-noir', label: 'Agency Noir', basePackId: 'agency-noir',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'masonry', info: true },
+  },
+  'agency-prisma': {
+    id: 'agency-prisma', label: 'Agency Prisma', basePackId: 'agency-prisma',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', gallery: 'masonry', info: true },
+  },
+  // KORPORAT / MANUFAKTUR / B2B
+  'korporat-biru': {
+    id: 'korporat-biru', label: 'Korporat Biru', basePackId: 'korporat-biru',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  'korporat-slate': {
+    id: 'korporat-slate', label: 'Korporat Slate', basePackId: 'korporat-slate',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  'korporat-netral': {
+    id: 'korporat-netral', label: 'Korporat Netral', basePackId: 'korporat-netral',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {

@@ -190,6 +190,22 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
+  it('Company (S8b): 3 sub-kategori AKTIF + 9 tema, VARIASI bg gelap↔terang', () => {
+    expect(hasSubKategori('corporate')).toBe(true)
+    expect(getReadySubKategori('corporate').map((s) => s.id)).toEqual(['startup', 'agency', 'korporat'])
+    const all = getThemes('corporate', 'startup')
+      .concat(getThemes('corporate', 'agency'), getThemes('corporate', 'korporat'))
+    expect(new Set(all.map((t) => t.id)).size).toBe(9)
+    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    for (const sub of ['startup', 'agency', 'korporat']) {
+      const themes = getThemes('corporate', sub)
+      expect(themes).toHaveLength(3)
+      const bgs = new Set(themes.map((t) => t.bg))
+      expect(bgs.has('dark')).toBe(true)
+      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
     // Heuristik anti-emoji: nama ikon lucide = ASCII PascalCase.
     const asciiPascal = /^[A-Z][A-Za-z0-9]+$/
