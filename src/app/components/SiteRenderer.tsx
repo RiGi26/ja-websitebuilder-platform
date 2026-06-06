@@ -56,12 +56,26 @@ export async function renderSite({
   // tak ada page existing memakai id manifest → cabang ini tak terambil (nol regresi).
   const manifest = getManifest(variant)
   if (manifest) {
-    const [products, profile] = await Promise.all([
-      fetchProductsByPage(client, page.id),
+    // Showcase di-isi dari SOURCE yang benar per industri (bukan selalu products):
+    // restaurant→menu_items, jasa (klinik/sekolah/corporate/travel)→services,
+    // selain itu→products. Semua punya {nama,deskripsi,harga,gambar_url}.
+    const tipe = (page as { tipe_industri?: string }).tipe_industri ?? ''
+    const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel']
+    const fetchSource =
+      tipe === 'restaurant' ? fetchMenuItemsByPage(client, page.id)
+        : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
+          : fetchProductsByPage(client, page.id)
+    const showcaseTitle =
+      tipe === 'restaurant' ? 'Menu Kami'
+        : tipe === 'sekolah' ? 'Program Kami'
+          : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
+            : 'Produk Kami'
+    const [source, profile] = await Promise.all([
+      fetchSource,
       fetchTenantProfile(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>,
+      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, showcaseTitle,
     )
     const renderer = <ComposableRenderer manifest={manifest} content={content} />
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer

@@ -26,6 +26,15 @@ describe('composableContentFromSections (S0-4)', () => {
     const c = composableContentFromSections('Toko', sections, [], null)
     expect(c.showcase).toBeUndefined()
   })
+
+  it('showcaseTitle custom + source generik (services) → judul & item benar (FU#1)', () => {
+    const services = [
+      { nama: 'Fisioterapi', harga: 200000, deskripsi: 'pemulihan cedera', gambar_url: null },
+    ] as unknown as Product[]
+    const c = composableContentFromSections('Klinik', sections, services, null, {}, 'Layanan Kami')
+    expect(c.showcase?.title).toBe('Layanan Kami')
+    expect(c.showcase?.items[0]).toMatchObject({ nama: 'Fisioterapi', harga: 200000 })
+  })
 })
 
 describe('generateContent — routing tema composable (S0-4)', () => {

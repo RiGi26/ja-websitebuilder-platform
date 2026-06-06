@@ -276,8 +276,8 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 2. **Sub-kategori vs langsung-3-gaya** per industri — untuk S7 (personal/company/sekolah varian tipis) pertimbangkan 3-gaya-tanpa-sub-kat.
 3. ~~**Gerbang 3 skill**~~ — DIPUTUSKAN: invokasi skill literal pada gaya flagship (dipakai S4 & S6).
 4. **next/font asli** — masih stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (BELUM).
-5. **Konsolidasi `theme-packs.ts`** — sekarang **51 pack** (>1000 baris). **Pecah per-industri** (`theme-packs/kuliner.ts` dst) PENTING sebelum Sprint 8 agar terkelola (BELUM).
-6. **(PENTING) Services→showcase utk industri jasa** — composable route SiteRenderer baru fetch products; klinik/sekolah/company butuh services agar showcase produksi terisi. BELUM digarap — garap sebelum/saat Sprint 8.
+5. ~~**Konsolidasi `theme-packs.ts`**~~ — ✅ DONE (2026-06-07, FU#2). Dipecah jadi `theme-packs/{toko,restaurant,klinik,sekolah}.ts` + `_fonts.ts` + `index.ts` (gabung THEME_PACKS). Tambah industri = +1 file + daftar di index.
+6. ~~**Services→showcase utk industri jasa**~~ — ✅ DONE (2026-06-07, FU#1). Composable route SiteRenderer fetch source per `tipe_industri`: toko_online→products, restaurant→menu_items, jasa(klinik/sekolah/corporate/travel)→services. content-adapter map generik + judul kontekstual ("Produk/Menu/Layanan/Program Kami").
 7. ~~**Visual pipeline (lensa pixel)**~~ — ✅ HIDUP sejak S7. ui-ux-pro-max DB (front) + Playwright shoot + scorecard (back) + generator HTML (`gen-samples.test.tsx`). Dipakai di playbook §5 tiap sprint berikutnya.
 
-> **Status: S4–S7 SELESAI & LIVE (51 tema, 5 industri).** Berikutnya Sprint 8 (Personal/Company) — sebelum mulai garap **#6 services mapping** + **#5 pecah theme-packs.ts**.
+> **Status: S4–S7 + FU#1 + FU#2 SELESAI & LIVE (51 tema, 5 industri).** Berikutnya Sprint 8 (Personal/Company ×3 sub-kat).
