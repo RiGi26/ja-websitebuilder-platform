@@ -5,8 +5,8 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **KLINIK TUNTAS + galeri masonry/before-after.** Sprint 6 menambah industri **Klinik** (3 sub-kat: Umum/Estetik/Wellness ×3 = **9 tema**, AKTIF) memakai balok S5 + balok baru S5b (**galeri masonry fasilitas + before-after estetik**). Total tema otentik kini **42** (24 Toko Online + 9 Restaurant + 9 Klinik). 155/155 test hijau, typecheck + next build bersih, flagship verified SSR (umum-bluecare/estetik-rosegold/wellness-forest/umum-trustnavy).
-- **Sebelumnya:** RESTAURANT TUNTAS (Sprint 4, 9 tema) + perpustakaan balok Sprint 5 (testimoni/stats/FAQ/info). TOKO ONLINE TUNTAS (Sprint 1-3, 24 tema).
+- **Fase aktif:** 🎉 **SEKOLAH TUNTAS + pipeline visual hidup.** Sprint 7 menambah industri **Sekolah** (3 sub-kat: Reguler/Islami/Kursus ×3 = **9 tema**, AKTIF). Pertama kali pakai **pipeline visual penuh** (THEME_VISUAL_PIPELINE.md): palet/font dari **ui-ux-pro-max DB** (front) + **Playwright shoot 3 viewport** + **scorecard pixel** (back). Generator HTML sample (`gen-samples.test.tsx`, env-gated) di-wire. Total tema otentik kini **51** (24 Toko Online + 9 Restaurant + 9 Klinik + 9 Sekolah). 181/181 test hijau (+1 skip generator), typecheck + next build bersih, 6 flagship verified pixel (reguler-cerdas/prestasi · islami-hijau/malam · kursus-fokus/malam, scorecard PASS).
+- **Sebelumnya:** KLINIK (Sprint 6, 9 tema) + galeri S5b. RESTAURANT (Sprint 4, 9 tema) + balok S5. TOKO ONLINE (Sprint 1-3, 24 tema).
 - **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
@@ -236,6 +236,10 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-07 | **Sprint 5b** | 🎉 **LENGKAP** | Balok **Galeri**: `masonry` (foto fasilitas, CSS columns + caption overlay) + `before-after` (pasangan Sebelum/Sesudah, label, lift hover). `GalleryVariant` + `ThemeManifest.blocks.gallery` + `ComposableContent.gallery{images,pairs}`. Parametrik, default off, nol regresi. |
 | 2026-06-07 | **Sprint 6** | 🎉 **LENGKAP & LIVE** | Industri **Klinik** ×3 sub-kat (Umum/Estetik/Wellness) ×3 gaya = **9 tema** AKTIF. Umum(bluecare biru/freshteal teal/trustnavy navy-gelap) · Estetik(rosegold/derma/noir-gelap, pakai before-after) · Wellness(sage/terra/forest-gelap, masonry). VARIASI gelap↔terang tiap sub-kat. theme-packs 9 + manifest 9 (booking via info CTA "Buat Janji") + sample-content 3 sub-kat (copy medis spesifik + foto Unsplash verified 200). ThemeIcon +6 ikon medis. |
 | 2026-06-07 | Gerbang 3 skill + verify | 📝 SSR screenshot | Prinsip 3 skill diterapkan saat build. Flagship (umum-bluecare/estetik-rosegold/wellness-forest/umum-trustnavy) di-render headless Chrome → distinct, profesional, light↔dark + before-after/masonry terbukti. 155/155 test, typecheck + next build bersih. HTML contoh 9 gaya di `theme-samples/` (lokal, tak di-commit). |
+| 2026-06-07 | Sprint 6 deploy | ✅ **PROD** (PR #78 merged) | Squash-merge ke master, CI + Vercel hijau. Klinik + galeri S5b live. |
+| 2026-06-07 | Pipeline seam | ✅ | Generator HTML tema baru: `src/lib/theme-system/gen-samples.test.tsx` (env-gated `GEN_SAMPLES`, SSR ComposableRenderer → `theme-samples/<id>.html`+index). `.gitignore` += `theme-samples/` penuh. Wire seam §3.1 THEME_VISUAL_PIPELINE.md. |
+| 2026-06-07 | **Sprint 7** | 🎉 **LENGKAP & LIVE** | Industri **Sekolah** ×3 sub-kat (Reguler/Islami/Kursus) ×3 gaya = **9 tema** AKTIF. Reguler(cerdas biru/ceria amber/prestasi navy-emas-gelap) · Islami(hijau emerald/emas krem/malam emerald-gelap) · Kursus(fokus indigo/energi coral/malam violet-gelap). VARIASI gelap↔terang tiap sub-kat. **Palet+font dari ui-ux-pro-max DB** (bukan invent). showcase=program, stats=akreditasi, info=PPDB CTA, gallery masonry=kegiatan. ThemeIcon +8 ikon. sample-content 3 sub-kat (copy edukasi spesifik + foto Unsplash verified 200). |
+| 2026-06-07 | **Pipeline visual** (front+back) | 📝 scorecard PASS | **Pertama kali pipeline penuh.** Front: ui-ux-pro-max DB → palet/pairing per sub-kat (kontras ≥4.5:1). Back: `scripts/shoot-themes.mjs` shoot 6 gaya ×3 viewport (375/768/1440) → scorecard ui-ux-pro-max pada pixel → semua CRITICAL/HIGH hijau, no iterate. 181/181 test, tsc + build bersih. HTML 51 tema di `theme-samples/index.html` (lokal). |
 
 ---
 
@@ -257,17 +261,23 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 - **Dikerjakan:** taksonomi `klinik` + 9 token-pack + 9 manifest + sample-content 3 sub-kat + 6 ikon medis. Booking = balok `info` "Buat Janji"/"Konsultasi"/"Jadwalkan". Routing otomatis via `getManifest` (komposable dicek sebelum cabang bespoke `theme==='klinik'` → coexist, nol regresi).
 - **Belum (opsi lanjut, PENTING):** composable route di SiteRenderer hanya fetch **products** → klinik produksi nyata pakai **services** (fetchServicesByPage), jadi showcase kosong sampai adapter/route klinik memetakan services→showcase. Preview pakai sample-content (lengkap). Hero/features/testimoni/info/galeri tetap jalan. **Follow-up:** extend composable branch SiteRenderer fetch services utk industri jasa (klinik/sekolah/company).
 
-### Sprint 7 — Industri JASA/PERSONAL & SEKOLAH ×3 (lebar) — BERIKUTNYA
-- **personal-branding / company / sekolah** — masing-masing 2–3 sub-kategori bila relevan (mis. personal: kreator / profesional / coach). Pertimbangkan apakah sub-kategori cocok atau cukup 3 gaya langsung tanpa lapis sub-kat (untuk industri yang variannya tipis).
-- **Keputusan terbuka:** sebagian industri mungkin lebih baik **3 gaya tanpa sub-kategori** (lapis sub-kat opsional). `hasSubKategori` sudah mendukung industri tanpa sub-kat → bisa pilih per-industri.
+### Sprint 7 — Industri SEKOLAH ×3 sub-kategori — ✅ SELESAI (2026-06-07)
+- **Hasil:** 9 tema AKTIF. **Reguler (SD/SMP/SMA)** (cerdas·ceria·prestasi) · **Islami/Pesantren** (hijau·emas·malam) · **Kursus/Bimbel** (fokus·energi·malam). VARIASI gelap↔terang tiap sub-kat. Struktur = sub-kategori (bukan 3-gaya-langsung) — keputusan user.
+- **Dikerjakan:** taksonomi `sekolah` + 9 token-pack (palet/font dari **ui-ux-pro-max DB**) + 9 manifest + sample-content 3 sub-kat + 8 ikon (GraduationCap/Backpack/Trophy/BookOpen/Star/Target/Rocket/PencilRuler). info=PPDB/daftar CTA. **Pipeline visual penuh dipakai** (front DB + back Playwright scorecard).
+- **PERTAMA:** generator HTML tema baru di-wire (`gen-samples.test.tsx`) → bisa shoot tema apa pun.
+- **Belum (sama spt Klinik):** showcase produksi butuh services→mapping (composable route fetch products saja). Preview lengkap via sample-content.
+
+### Sprint 8+ — Industri berikutnya — BERIKUTNYA
+- **Personal/Portfolio** (kreator/profesional/coach) · **Company/Corporate** (startup/agency/korporat). Pola sama, pakai pipeline visual penuh.
+- **Keputusan terbuka:** industri varian tipis mungkin lebih baik **3 gaya tanpa sub-kategori** — TAPI brief form belum dukung (perlu plumbing ThemePicker tanpa SubKategoriPicker). Sekolah (S7) pakai sub-kategori.
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
 1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).
 2. **Sub-kategori vs langsung-3-gaya** per industri — untuk S7 (personal/company/sekolah varian tipis) pertimbangkan 3-gaya-tanpa-sub-kat.
 3. ~~**Gerbang 3 skill**~~ — DIPUTUSKAN: invokasi skill literal pada gaya flagship (dipakai S4 & S6).
 4. **next/font asli** — masih stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (BELUM).
-5. **Konsolidasi `theme-packs.ts`** — sekarang **42 pack** (sudah >40). **Pertimbangkan pecah per-industri** (`theme-packs/kuliner.ts` dst) sebelum S7 agar terkelola.
-6. **(BARU) Services→showcase utk industri jasa** — composable route SiteRenderer baru fetch products; klinik/sekolah/company butuh services. Garap sebelum/saat S7.
-7. **(BARU) Visual pipeline (lensa pixel)** — `THEME_VISUAL_PIPELINE.md` (skema ui-ux-pro-max + Playwright untuk fix "kurang menarik"). **Prasyarat ✅ DONE (2026-06-07):** Playwright+chromium installed, `ui-ux-pro-max` aktif, `scripts/shoot-themes.mjs` jalan (smoke test OK). Sisa: generator HTML tema baru (SSR ComposableRenderer→static HTML) — garap saat mulai S7 biar tema baru bisa di-shoot.
+5. **Konsolidasi `theme-packs.ts`** — sekarang **51 pack** (>1000 baris). **Pecah per-industri** (`theme-packs/kuliner.ts` dst) PENTING sebelum Sprint 8 agar terkelola (BELUM).
+6. **(PENTING) Services→showcase utk industri jasa** — composable route SiteRenderer baru fetch products; klinik/sekolah/company butuh services agar showcase produksi terisi. BELUM digarap — garap sebelum/saat Sprint 8.
+7. ~~**Visual pipeline (lensa pixel)**~~ — ✅ HIDUP sejak S7. ui-ux-pro-max DB (front) + Playwright shoot + scorecard (back) + generator HTML (`gen-samples.test.tsx`). Dipakai di playbook §5 tiap sprint berikutnya.
 
-> **Status: S4, S5, S5b, S6 SELESAI & LIVE.** Berikutnya Sprint 7 (Jasa/Personal/Sekolah) — putuskan #2 (sub-kat vs 3-gaya) + pertimbangkan #5 (pecah theme-packs) & #6 (services mapping) dulu.
+> **Status: S4–S7 SELESAI & LIVE (51 tema, 5 industri).** Berikutnya Sprint 8 (Personal/Company) — sebelum mulai garap **#6 services mapping** + **#5 pecah theme-packs.ts**.

@@ -13,8 +13,8 @@ out/
 # Vite
 *.local
 
-# Visual-pipeline screenshots (local UAT artifacts, THEME_VISUAL_PIPELINE.md)
-theme-samples/*.png
+# Visual-pipeline artifacts (local UAT, THEME_VISUAL_PIPELINE.md) — HTML + PNG
+theme-samples/
 
 # Editor
 .vscode/

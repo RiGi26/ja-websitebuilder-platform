@@ -16,11 +16,11 @@ describe('theme-system taxonomy (S0-1)', () => {
   })
 
   it('industri tanpa registri → kosong, tidak error', () => {
-    // sekolah belum punya lapis sub-kategori (klinik kini sudah, S6).
-    expect(hasSubKategori('sekolah')).toBe(false)
-    expect(getSubKategori('sekolah')).toEqual([])
-    expect(getThemes('sekolah', 'apapun')).toEqual([])
-    expect(getTheme('sekolah', 'apapun')).toBeUndefined()
+    // blog belum punya lapis sub-kategori (sekolah kini sudah, S7).
+    expect(hasSubKategori('blog')).toBe(false)
+    expect(getSubKategori('blog')).toEqual([])
+    expect(getThemes('blog', 'apapun')).toEqual([])
+    expect(getTheme('blog', 'apapun')).toBeUndefined()
   })
 
   it('Kuliner = pilot dengan 3 gaya', () => {
@@ -146,6 +146,32 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(new Set(all.map((t) => t.id)).size).toBe(9)
     expect(all.every((t) => t.manifest === t.id)).toBe(true)
     expect(getTheme('klinik', 'estetik-noir')?.nama).toBe('Noir')
+  })
+
+  it('Sekolah (S7): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+    expect(hasSubKategori('sekolah')).toBe(true)
+    const subs = getSubKategori('sekolah')
+    expect(subs.map((s) => s.id)).toEqual(['reguler', 'islami', 'kursus'])
+    expect(getReadySubKategori('sekolah').map((s) => s.id)).toEqual(['reguler', 'islami', 'kursus'])
+  })
+
+  it('Sekolah (S7): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
+    for (const sub of ['reguler', 'islami', 'kursus']) {
+      const themes = getThemes('sekolah', sub)
+      expect(themes).toHaveLength(3)
+      expect(themes.every((t) => t.subKategori === sub)).toBe(true)
+      const bgs = new Set(themes.map((t) => t.bg))
+      expect(bgs.has('dark')).toBe(true)
+      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
+  it('Sekolah (S7): id tema unik (9) & manifest === id', () => {
+    const all = getThemes('sekolah', 'reguler')
+      .concat(getThemes('sekolah', 'islami'), getThemes('sekolah', 'kursus'))
+    expect(new Set(all.map((t) => t.id)).size).toBe(9)
+    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    expect(getTheme('sekolah', 'kursus-malam')?.nama).toBe('Malam')
   })
 
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {

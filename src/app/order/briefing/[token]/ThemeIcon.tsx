@@ -13,7 +13,9 @@ import {
   // Restaurant (Sprint 4): Warung / Cafe / Fine Dining
   Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
   // Klinik (Sprint 6): Umum / Estetik / Wellness
-  Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine, type LucideProps,
+  Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
+  // Sekolah (Sprint 7): Reguler / Islami / Kursus
+  GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
@@ -23,6 +25,7 @@ const MAP = {
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
   Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
   Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
+  GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {
