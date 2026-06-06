@@ -174,6 +174,22 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('sekolah', 'kursus-malam')?.nama).toBe('Malam')
   })
 
+  it('Personal (S8a): 3 sub-kategori AKTIF + 9 tema, VARIASI bg gelap↔terang', () => {
+    expect(hasSubKategori('personal')).toBe(true)
+    expect(getReadySubKategori('personal').map((s) => s.id)).toEqual(['kreator', 'profesional', 'coach'])
+    const all = getThemes('personal', 'kreator')
+      .concat(getThemes('personal', 'profesional'), getThemes('personal', 'coach'))
+    expect(new Set(all.map((t) => t.id)).size).toBe(9)
+    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    for (const sub of ['kreator', 'profesional', 'coach']) {
+      const themes = getThemes('personal', sub)
+      expect(themes).toHaveLength(3)
+      const bgs = new Set(themes.map((t) => t.bg))
+      expect(bgs.has('dark')).toBe(true)
+      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
   it('STANDAR IKON: setiap sub-kategori & tema punya icon (nama lucide) non-kosong, bukan emoji', () => {
     // Heuristik anti-emoji: nama ikon lucide = ASCII PascalCase.
     const asciiPascal = /^[A-Z][A-Za-z0-9]+$/

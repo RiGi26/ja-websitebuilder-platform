@@ -350,6 +350,48 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'kursus-malam', label: 'Kursus Malam', basePackId: 'kursus-malam',
     blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true, info: true },
   },
+
+  // ── PERSONAL / PORTFOLIO (Sprint 8a) — showcase=karya/layanan,
+  // stats=angka pencapaian, gallery masonry=portofolio, info=kontak/booking. ──
+  // KREATOR
+  'kreator-spotlight': {
+    id: 'kreator-spotlight', label: 'Kreator Spotlight', basePackId: 'kreator-spotlight',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true },
+  },
+  'kreator-pop': {
+    id: 'kreator-pop', label: 'Kreator Pop', basePackId: 'kreator-pop',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', gallery: 'masonry', info: true },
+  },
+  'kreator-clean': {
+    id: 'kreator-clean', label: 'Kreator Clean', basePackId: 'kreator-clean',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', gallery: 'masonry', info: true },
+  },
+  // PROFESIONAL
+  'profesional-korporat': {
+    id: 'profesional-korporat', label: 'Profesional Korporat', basePackId: 'profesional-korporat',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  'profesional-mono': {
+    id: 'profesional-mono', label: 'Profesional Mono', basePackId: 'profesional-mono',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true },
+  },
+  'profesional-warm': {
+    id: 'profesional-warm', label: 'Profesional Warm', basePackId: 'profesional-warm',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  // COACH
+  'coach-energi': {
+    id: 'coach-energi', label: 'Coach Energi', basePackId: 'coach-energi',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true, faq: true },
+  },
+  'coach-tenang': {
+    id: 'coach-tenang', label: 'Coach Tenang', basePackId: 'coach-tenang',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', info: true, faq: true },
+  },
+  'coach-prestige': {
+    id: 'coach-prestige', label: 'Coach Prestige', basePackId: 'coach-prestige',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {
