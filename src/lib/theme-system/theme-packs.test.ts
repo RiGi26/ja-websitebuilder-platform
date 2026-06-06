@@ -218,3 +218,36 @@ describe('theme-packs sekolah (S7)', () => {
     }
   })
 })
+
+// ── Personal (Sprint 8a) — 3 sub-kategori × 3 gaya ───────────
+const PERSONAL_PACKS_T: Record<string, string[]> = {
+  kreator: ['kreator-spotlight', 'kreator-pop', 'kreator-clean'],
+  profesional: ['profesional-korporat', 'profesional-mono', 'profesional-warm'],
+  coach: ['coach-energi', 'coach-tenang', 'coach-prestige'],
+}
+
+describe('theme-packs personal (S8a)', () => {
+  for (const [sub, ids] of Object.entries(PERSONAL_PACKS_T)) {
+    it(`${sub}: 3 pack resolve + VARIASI (page & mood tak seragam) + min 1 gelap`, () => {
+      const packs = ids.map((id) => {
+        expect(Object.keys(THEME_PACKS)).toContain(id)
+        return resolveManifestPack(MANIFESTS[id])
+      })
+      expect(packs.every((p, i) => p.id === ids[i])).toBe(true)
+      expect(new Set(packs.map((p) => p.color.page)).size).toBe(3)
+      expect(new Set(packs.map((p) => p.mood)).size).toBe(3)
+      expect(packs.some((p) => ['#0', '#1', '#2'].some((x) => p.color.page.toLowerCase().startsWith(x)))).toBe(true)
+    })
+  }
+
+  it('semua hex valid 6-digit (anti-typo)', () => {
+    for (const ids of Object.values(PERSONAL_PACKS_T)) {
+      for (const id of ids) {
+        const c = resolveManifestPack(MANIFESTS[id]).color
+        for (const hex of [c.page, c.surface, c.primary, c.heroFrom, c.heroTo, c.heroInk]) {
+          expect(hex).toMatch(/^#[0-9a-fA-F]{6}$/)
+        }
+      }
+    }
+  })
+})

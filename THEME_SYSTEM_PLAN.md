@@ -5,8 +5,8 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **SEKOLAH TUNTAS + pipeline visual hidup.** Sprint 7 menambah industri **Sekolah** (3 sub-kat: Reguler/Islami/Kursus ×3 = **9 tema**, AKTIF). Pertama kali pakai **pipeline visual penuh** (THEME_VISUAL_PIPELINE.md): palet/font dari **ui-ux-pro-max DB** (front) + **Playwright shoot 3 viewport** + **scorecard pixel** (back). Generator HTML sample (`gen-samples.test.tsx`, env-gated) di-wire. Total tema otentik kini **51** (24 Toko Online + 9 Restaurant + 9 Klinik + 9 Sekolah). 181/181 test hijau (+1 skip generator), typecheck + next build bersih, 6 flagship verified pixel (reguler-cerdas/prestasi · islami-hijau/malam · kursus-fokus/malam, scorecard PASS).
-- **Sebelumnya:** KLINIK (Sprint 6, 9 tema) + galeri S5b. RESTAURANT (Sprint 4, 9 tema) + balok S5. TOKO ONLINE (Sprint 1-3, 24 tema).
+- **Fase aktif:** 🎉 **PERSONAL TUNTAS (Sprint 8a) + FU#1/FU#2 selesai.** Industri **Personal/Portfolio** (3 sub-kat: Kreator/Profesional/Coach ×3 = **9 tema**, AKTIF), pakai pipeline visual penuh. Total tema otentik kini **60** (24 Toko + 9 Resto + 9 Klinik + 9 Sekolah + 9 Personal), 6 industri. **FU#1** (showcase per-industri source: products/menu/services) + **FU#2** (theme-packs dipecah per-industri) sudah merged (PR #81). 198/198 test (+1 skip), tsc + build bersih.
+- **Sebelumnya:** SEKOLAH (S7, 9, pipeline visual). KLINIK (S6, 9) + galeri S5b. RESTAURANT (S4, 9) + balok S5. TOKO ONLINE (S1-3, 24).
 - **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
@@ -267,9 +267,12 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 - **PERTAMA:** generator HTML tema baru di-wire (`gen-samples.test.tsx`) → bisa shoot tema apa pun.
 - **Belum (sama spt Klinik):** showcase produksi butuh services→mapping (composable route fetch products saja). Preview lengkap via sample-content.
 
-### Sprint 8+ — Industri berikutnya — BERIKUTNYA
-- **Personal/Portfolio** (kreator/profesional/coach) · **Company/Corporate** (startup/agency/korporat). Pola sama, pakai pipeline visual penuh.
-- **Keputusan terbuka:** industri varian tipis mungkin lebih baik **3 gaya tanpa sub-kategori** — TAPI brief form belum dukung (perlu plumbing ThemePicker tanpa SubKategoriPicker). Sekolah (S7) pakai sub-kategori.
+### Sprint 8a — Industri PERSONAL / PORTFOLIO — ✅ SELESAI (2026-06-07)
+- **Hasil:** 9 tema AKTIF. **Kreator** (spotlight dark/pop light/clean light) · **Profesional** (korporat light/mono dark/warm) · **Coach** (energi light/tenang light/prestige dark). VARIASI gelap↔terang. Pipeline visual penuh (DB front + scorecard back, PASS).
+- **Dikerjakan:** `theme-packs/personal.ts` + 9 manifest + sample-content 3 sub-kat + 8 ikon (Video/Briefcase/Compass/Mic/Heart/Aperture/PenTool/Award). SiteRenderer: `personal`→services, judul "Layanan Saya".
+
+### Sprint 8b — Industri COMPANY / CORPORATE — BERIKUTNYA
+- **startup/agency/korporat** ×3 gaya. Pola sama + pipeline visual. corporate sudah di SERVICE_INDUSTRI (showcase=services).
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
 1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).

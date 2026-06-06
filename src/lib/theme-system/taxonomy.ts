@@ -81,6 +81,12 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'islami', nama: 'Sekolah Islami / Pesantren', deskripsi: 'Madrasah, pesantren, sekolah Islam terpadu.', icon: 'BookOpen', ready: true },
     { id: 'kursus', nama: 'Kursus / Bimbel', deskripsi: 'Bimbel, kursus bahasa, skill, course online.', icon: 'PencilRuler', ready: true },
   ],
+  // ── PERSONAL / PORTFOLIO (Sprint 8a) — personal branding. AKTIF.
+  personal: [
+    { id: 'kreator', nama: 'Kreator / Influencer', deskripsi: 'Content creator, YouTuber, selebgram, seniman.', icon: 'Video', ready: true },
+    { id: 'profesional', nama: 'Profesional / Expert', deskripsi: 'Konsultan, freelancer, dokter, pengacara, portofolio.', icon: 'Briefcase', ready: true },
+    { id: 'coach', nama: 'Coach / Mentor', deskripsi: 'Coach, trainer, pembicara, mentor bisnis.', icon: 'Compass', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -442,6 +448,63 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'kursus-malam', subKategori: 'kursus', nama: 'Malam',
         deskripsi: 'Violet gelap premium. Untuk course online, kelas digital, platform e-learning.',
         icon: 'Rocket', mood: '#A855F7', bg: 'dark', manifest: 'kursus-malam',
+      },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // PERSONAL / PORTFOLIO (Sprint 8a). 3 sub-kategori × 3 gaya. Palet ui-ux-pro-max DB.
+  // ════════════════════════════════════════════════════════════
+  personal: {
+    kreator: [
+      {
+        id: 'kreator-spotlight', subKategori: 'kreator', nama: 'Spotlight',
+        deskripsi: 'Gelap violet bak panggung, dramatis. Untuk YouTuber, musisi, seniman panggung.',
+        icon: 'Mic', mood: '#C084FC', bg: 'dark', manifest: 'kreator-spotlight',
+      },
+      {
+        id: 'kreator-pop', subKategori: 'kreator', nama: 'Pop',
+        deskripsi: 'Pink terang & playful, energik. Untuk selebgram, TikToker, kreator gaya hidup.',
+        icon: 'Heart', mood: '#D6206A', bg: 'light', manifest: 'kreator-pop',
+      },
+      {
+        id: 'kreator-clean', subKategori: 'kreator', nama: 'Clean',
+        deskripsi: 'Mono minimal & rapi, fokus karya. Untuk fotografer, desainer, videografer.',
+        icon: 'Aperture', mood: '#111111', bg: 'light', manifest: 'kreator-clean',
+      },
+    ],
+    profesional: [
+      {
+        id: 'profesional-korporat', subKategori: 'profesional', nama: 'Korporat',
+        deskripsi: 'Biru bersih & terpercaya. Untuk konsultan, analis, profesional korporat.',
+        icon: 'Briefcase', mood: '#1E40AF', bg: 'light', manifest: 'profesional-korporat',
+      },
+      {
+        id: 'profesional-mono', subKategori: 'profesional', nama: 'Mono',
+        deskripsi: 'Editorial gelap & elegan. Untuk arsitek, penulis, desainer, portofolio premium.',
+        icon: 'PenTool', mood: '#E8E6E1', bg: 'dark', manifest: 'profesional-mono',
+      },
+      {
+        id: 'profesional-warm', subKategori: 'profesional', nama: 'Warm',
+        deskripsi: 'Cokelat hangat & ramah. Untuk dokter, terapis, pengacara, konsultan personal.',
+        icon: 'Coffee', mood: '#B45309', bg: 'warm', manifest: 'profesional-warm',
+      },
+    ],
+    coach: [
+      {
+        id: 'coach-energi', subKategori: 'coach', nama: 'Energi',
+        deskripsi: 'Oranye semangat & memotivasi. Untuk life coach, motivator, trainer kebugaran.',
+        icon: 'Flame', mood: '#C2410C', bg: 'light', manifest: 'coach-energi',
+      },
+      {
+        id: 'coach-tenang', subKategori: 'coach', nama: 'Tenang',
+        deskripsi: 'Teal kalem & menenangkan. Untuk mindfulness coach, terapis, mentor wellness.',
+        icon: 'Leaf', mood: '#0C7A70', bg: 'light', manifest: 'coach-tenang',
+      },
+      {
+        id: 'coach-prestige', subKategori: 'coach', nama: 'Prestige',
+        deskripsi: 'Emas gelap & berkelas. Untuk business coach, mentor eksekutif, pembicara premium.',
+        icon: 'Award', mood: '#C9A24A', bg: 'dark', manifest: 'coach-prestige',
       },
     ],
   },

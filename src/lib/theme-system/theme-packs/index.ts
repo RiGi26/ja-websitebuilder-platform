@@ -11,10 +11,12 @@ import { TOKO_PACKS } from './toko'
 import { RESTAURANT_PACKS } from './restaurant'
 import { KLINIK_PACKS } from './klinik'
 import { SEKOLAH_PACKS } from './sekolah'
+import { PERSONAL_PACKS } from './personal'
 
 export const THEME_PACKS: Record<string, TokenPack> = {
   ...TOKO_PACKS,
   ...RESTAURANT_PACKS,
   ...KLINIK_PACKS,
   ...SEKOLAH_PACKS,
+  ...PERSONAL_PACKS,
 }
