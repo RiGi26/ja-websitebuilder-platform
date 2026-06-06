@@ -9,6 +9,10 @@ jobs:
   test:
     name: Typecheck & Render Tests
     runs-on: ubuntu-latest
+    env:
+      # playwright is a local-only UAT tool (scripts/shoot-themes.mjs); CI never
+      # launches a browser, so skip the ~100MB chromium download on npm ci.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
       - uses: actions/checkout@v4
 

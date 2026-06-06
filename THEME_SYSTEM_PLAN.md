@@ -129,6 +129,14 @@ Tiap tema harus dimaksimalkan dari **tiga sisi**; tiap sisi punya skill penjaga:
 Jalankan ketiganya pada tiap gaya sebelum WIRE/aktivasi. Tema tak dianggap "matang"
 sampai lolos ketiga lensa ini. (Lihat [[feedback-theme-system-skills]].)
 
+**Lensa ke-4 (pixel) — "terbukti":** ketiga skill di atas menilai *kode*. Untuk menutup
+celah "kurang menarik", tambah lensa ke-4 yang menilai *hasil render*: `ui-ux-pro-max`
+(palet/font dari DB di Step DEFINE + scorecard di Step VERIFY) + **Playwright** (screenshot
+3 viewport). Pipeline lengkap + budget token + setup di **`THEME_VISUAL_PIPELINE.md`**.
+Ini bukan sprint baru — alat yang dipakai *di dalam* playbook §5, mulai Sprint 7.
+**Prasyarat:** ✅ DONE (2026-06-07) — Playwright+chromium installed, `ui-ux-pro-max` aktif,
+`scripts/shoot-themes.mjs` jalan (smoke test umum-bluecare OK). Sisa: generator HTML tema baru (garap saat S7).
+
 ---
 
 ## 6. Penempatan input sub-kategori (KEPUTUSAN FINAL)
@@ -260,5 +268,6 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 4. **next/font asli** — masih stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (BELUM).
 5. **Konsolidasi `theme-packs.ts`** — sekarang **42 pack** (sudah >40). **Pertimbangkan pecah per-industri** (`theme-packs/kuliner.ts` dst) sebelum S7 agar terkelola.
 6. **(BARU) Services→showcase utk industri jasa** — composable route SiteRenderer baru fetch products; klinik/sekolah/company butuh services. Garap sebelum/saat S7.
+7. **(BARU) Visual pipeline (lensa pixel)** — `THEME_VISUAL_PIPELINE.md` (skema ui-ux-pro-max + Playwright untuk fix "kurang menarik"). **Prasyarat ✅ DONE (2026-06-07):** Playwright+chromium installed, `ui-ux-pro-max` aktif, `scripts/shoot-themes.mjs` jalan (smoke test OK). Sisa: generator HTML tema baru (SSR ComposableRenderer→static HTML) — garap saat mulai S7 biar tema baru bisa di-shoot.
 
 > **Status: S4, S5, S5b, S6 SELESAI & LIVE.** Berikutnya Sprint 7 (Jasa/Personal/Sekolah) — putuskan #2 (sub-kat vs 3-gaya) + pertimbangkan #5 (pecah theme-packs) & #6 (services mapping) dulu.
