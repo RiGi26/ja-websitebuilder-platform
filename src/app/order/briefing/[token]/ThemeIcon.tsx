@@ -17,7 +17,9 @@ import {
   // Sekolah (Sprint 7): Reguler / Islami / Kursus
   GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler,
   // Personal (Sprint 8a): Kreator / Profesional / Coach
-  Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award, type LucideProps,
+  Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award,
+  // Company (Sprint 8b): Startup / Agency / Korporat
+  Megaphone, Building2, Building, Gauge, Boxes, Layers, Landmark, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
@@ -29,6 +31,7 @@ const MAP = {
   Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
   GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler,
   Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award,
+  Megaphone, Building2, Building, Gauge, Boxes, Layers, Landmark,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {

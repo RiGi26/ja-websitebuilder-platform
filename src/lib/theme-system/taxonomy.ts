@@ -87,6 +87,12 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'profesional', nama: 'Profesional / Expert', deskripsi: 'Konsultan, freelancer, dokter, pengacara, portofolio.', icon: 'Briefcase', ready: true },
     { id: 'coach', nama: 'Coach / Mentor', deskripsi: 'Coach, trainer, pembicara, mentor bisnis.', icon: 'Compass', ready: true },
   ],
+  // ── COMPANY / CORPORATE (Sprint 8b) — profil perusahaan. AKTIF.
+  corporate: [
+    { id: 'startup', nama: 'Startup / Tech', deskripsi: 'Startup, SaaS, aplikasi, perusahaan teknologi.', icon: 'Rocket', ready: true },
+    { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: true },
+    { id: 'korporat', nama: 'Korporat / Manufaktur', deskripsi: 'Perusahaan mapan, manufaktur, distributor, B2B.', icon: 'Building2', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -505,6 +511,63 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'coach-prestige', subKategori: 'coach', nama: 'Prestige',
         deskripsi: 'Emas gelap & berkelas. Untuk business coach, mentor eksekutif, pembicara premium.',
         icon: 'Award', mood: '#C9A24A', bg: 'dark', manifest: 'coach-prestige',
+      },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // COMPANY / CORPORATE (Sprint 8b). 3 sub-kategori × 3 gaya. Palet ui-ux-pro-max DB.
+  // ════════════════════════════════════════════════════════════
+  corporate: {
+    startup: [
+      {
+        id: 'startup-aurora', subKategori: 'startup', nama: 'Aurora',
+        deskripsi: 'Gradien indigo-cyan terang & modern. Untuk SaaS, aplikasi, produk digital.',
+        icon: 'Rocket', mood: '#4F46E5', bg: 'light', manifest: 'startup-aurora',
+      },
+      {
+        id: 'startup-midnight', subKategori: 'startup', nama: 'Midnight',
+        deskripsi: 'Gelap tech dengan aksen biru langit. Untuk startup AI, fintech, platform data.',
+        icon: 'Gauge', mood: '#38BDF8', bg: 'dark', manifest: 'startup-midnight',
+      },
+      {
+        id: 'startup-mint', subKategori: 'startup', nama: 'Mint',
+        deskripsi: 'Emerald bersih & segar terang. Untuk green-tech, health-tech, produk ramah.',
+        icon: 'Boxes', mood: '#0C7A52', bg: 'light', manifest: 'startup-mint',
+      },
+    ],
+    agency: [
+      {
+        id: 'agency-bold', subKategori: 'agency', nama: 'Bold',
+        deskripsi: 'Hitam-lime tegas & berani. Untuk agensi digital, branding, marketing.',
+        icon: 'Megaphone', mood: '#4D7C0F', bg: 'light', manifest: 'agency-bold',
+      },
+      {
+        id: 'agency-noir', subKategori: 'agency', nama: 'Noir',
+        deskripsi: 'Editorial gelap & artistik. Untuk creative studio, production house, portofolio agensi.',
+        icon: 'Layers', mood: '#F2F0EA', bg: 'dark', manifest: 'agency-noir',
+      },
+      {
+        id: 'agency-prisma', subKategori: 'agency', nama: 'Prisma',
+        deskripsi: 'Pink-peach vibrant & ceria. Untuk social media agency, event organizer, kreatif muda.',
+        icon: 'Palette', mood: '#DB2777', bg: 'light', manifest: 'agency-prisma',
+      },
+    ],
+    korporat: [
+      {
+        id: 'korporat-biru', subKategori: 'korporat', nama: 'Biru',
+        deskripsi: 'Biru korporat bersih & terpercaya. Untuk perusahaan jasa, konsultan, B2B.',
+        icon: 'Building2', mood: '#1D4ED8', bg: 'light', manifest: 'korporat-biru',
+      },
+      {
+        id: 'korporat-slate', subKategori: 'korporat', nama: 'Slate',
+        deskripsi: 'Slate gelap & premium. Untuk korporasi besar, holding, perusahaan energi.',
+        icon: 'Landmark', mood: '#7DB8FF', bg: 'dark', manifest: 'korporat-slate',
+      },
+      {
+        id: 'korporat-netral', subKategori: 'korporat', nama: 'Netral',
+        deskripsi: 'Taupe hangat & mapan. Untuk manufaktur, distributor, perusahaan keluarga.',
+        icon: 'Building', mood: '#5C5347', bg: 'warm', manifest: 'korporat-netral',
       },
     ],
   },
