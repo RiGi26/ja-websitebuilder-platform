@@ -5,8 +5,8 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **RESTAURANT TUNTAS + perpustakaan balok diperluas.** Sprint 4 menambah industri **Restaurant** (3 sub-kat: Warung/Cafe/Fine Dining ×3 = **9 tema**, AKTIF) memakai balok baru Sprint 5 (**testimoni 3 varian, stats, FAQ accordion, info jam+lokasi+maps**). Total tema otentik kini **33** (24 Toko Online + 9 Restaurant). 127/127 test hijau, typecheck + next build bersih, 3 flagship (warung-rakyat/cafe-latte/finedining-aurum) verified SSR via headless Chrome.
-- **Sebelumnya:** TOKO ONLINE TUNTAS — ke-8 sub-kategori ×3 gaya LIVE. Sprint 3 menambah 6 sub-kategori sekaligus (Kerajinan, Kecantikan, Gadget, Rumah, Herbal/Kesehatan, Anak) di atas Kuliner+Fashion. Total **24 tema otentik** aktif.
+- **Fase aktif:** 🎉 **KLINIK TUNTAS + galeri masonry/before-after.** Sprint 6 menambah industri **Klinik** (3 sub-kat: Umum/Estetik/Wellness ×3 = **9 tema**, AKTIF) memakai balok S5 + balok baru S5b (**galeri masonry fasilitas + before-after estetik**). Total tema otentik kini **42** (24 Toko Online + 9 Restaurant + 9 Klinik). 155/155 test hijau, typecheck + next build bersih, flagship verified SSR (umum-bluecare/estetik-rosegold/wellness-forest/umum-trustnavy).
+- **Sebelumnya:** RESTAURANT TUNTAS (Sprint 4, 9 tema) + perpustakaan balok Sprint 5 (testimoni/stats/FAQ/info). TOKO ONLINE TUNTAS (Sprint 1-3, 24 tema).
 - **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
@@ -224,6 +224,10 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-06 | **Sprint 5** | 🎉 **LENGKAP** | Perpustakaan balok diperluas: **Testimoni** (cards/spotlight/marquee), **Stats**, **FAQ accordion** (CSS-only `<details>`), **Info/Lokasi** (jam buka + peta embed Google Maps tanpa API key + reservasi). Semua parametrik via token, default off (nol regresi), reduced-motion guard. Types `ComposableContent`+`ThemeManifest.blocks` diperluas; ComposableRenderer di-wire; content-adapter isi `info` dari profil bisnis (jam/alamat/wa). |
 | 2026-06-06 | **Sprint 4** | 🎉 **LENGKAP & LIVE** | Industri **Restaurant** ×3 sub-kat (Warung/Cafe/Fine Dining) ×3 gaya = **9 tema** AKTIF (ready:true). Token-pack VARIASI gelap↔terang tiap sub-kat (warung: rakyat·sambal·angkringan / cafe: latte·roastery·bloom / finedining: aurum·hearth·nordic); manifest pakai balok S5; sample-content 3 sub-kat (copy F&B spesifik + testimoni atribut + foto Unsplash verified 200). Admin preview di-generalisasi lintas industri. Arsitektur generik → routing otomatis via `getManifest`. |
 | 2026-06-06 | Gerbang 3 skill + verify | 📝 SSR screenshot | /ui-design + /make-interfaces-feel-better + /website-review diinvokasi; prinsip diterapkan saat build. 3 flagship (warung-rakyat/cafe-latte/finedining-aurum) di-render headless Chrome → distinct, premium, light↔dark span terbukti. 127/127 test, typecheck + next build bersih. |
+| 2026-06-07 | Sprint 4+5 deploy | ✅ **PROD** (PR #77 merged) | Squash-merge ke master, CI Typecheck&Render + Vercel hijau. Restaurant + balok S5 live. |
+| 2026-06-07 | **Sprint 5b** | 🎉 **LENGKAP** | Balok **Galeri**: `masonry` (foto fasilitas, CSS columns + caption overlay) + `before-after` (pasangan Sebelum/Sesudah, label, lift hover). `GalleryVariant` + `ThemeManifest.blocks.gallery` + `ComposableContent.gallery{images,pairs}`. Parametrik, default off, nol regresi. |
+| 2026-06-07 | **Sprint 6** | 🎉 **LENGKAP & LIVE** | Industri **Klinik** ×3 sub-kat (Umum/Estetik/Wellness) ×3 gaya = **9 tema** AKTIF. Umum(bluecare biru/freshteal teal/trustnavy navy-gelap) · Estetik(rosegold/derma/noir-gelap, pakai before-after) · Wellness(sage/terra/forest-gelap, masonry). VARIASI gelap↔terang tiap sub-kat. theme-packs 9 + manifest 9 (booking via info CTA "Buat Janji") + sample-content 3 sub-kat (copy medis spesifik + foto Unsplash verified 200). ThemeIcon +6 ikon medis. |
+| 2026-06-07 | Gerbang 3 skill + verify | 📝 SSR screenshot | Prinsip 3 skill diterapkan saat build. Flagship (umum-bluecare/estetik-rosegold/wellness-forest/umum-trustnavy) di-render headless Chrome → distinct, profesional, light↔dark + before-after/masonry terbukti. 155/155 test, typecheck + next build bersih. HTML contoh 9 gaya di `theme-samples/` (lokal, tak di-commit). |
 
 ---
 
@@ -236,23 +240,25 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 - **Terbukti:** arsitektur generik per-industri → brief form & SiteRenderer otomatis ikut via `getManifest`. Tak perlu kode khusus restaurant di jalur render.
 - **Belum (opsi lanjut):** balok showcase **menu bergambar/board** & **galeri masonry** belum dipanen dari `RestaurantRenderer`; briefing belum punya field testimoni/stats/faq (jadi di produksi hanya balok **info** yang terisi otomatis dari profil — sisanya muncul saat konten tersedia).
 
-### Sprint 5 — Perkaya PERPUSTAKAAN BALOK — ✅ SEBAGIAN (2026-06-06, beriringan S4)
-- **Selesai:** **Testimoni** [cards / spotlight / marquee] · **Stats/angka** · **FAQ accordion** (CSS-only `<details>`) · **Map/Lokasi + jam** (embed Google Maps tanpa API key + reservasi CTA). Semua parametrik via token, default off, reduced-motion guard, + test render.
-- **Belum:** **Galeri showcase varian baru** (masonry, before-after — cocok skincare/klinik/interior). Garap saat industri yang membutuhkannya (Sprint 6 Klinik).
+### Sprint 5 — Perkaya PERPUSTAKAAN BALOK — ✅ SELESAI (2026-06-06/07)
+- **Selesai S5:** **Testimoni** [cards / spotlight / marquee] · **Stats/angka** · **FAQ accordion** (CSS-only `<details>`) · **Map/Lokasi + jam** (embed Google Maps tanpa API key + reservasi CTA).
+- **Selesai S5b (2026-06-07):** **Galeri** [masonry / before-after]. Semua parametrik via token, default off, reduced-motion guard, + test render.
 
-### Sprint 6 — Industri KLINIK & KECANTIKAN-JASA ×3 (lebar)
-- **Klinik/Estetik** sudah ada renderer (`KlinikRenderer`/`KlinikCleanRenderer` = tambang balok). Sub-kategori usulan: **Klinik Umum/Gigi** (clean-trust biru/teal) · **Skincare/Aesthetic Clinic** (lembut elegan) · **Fisio/Wellness** (natural tenang).
-- Reuse balok Sprint 5 (testimoni, FAQ, stats, booking CTA, map). VARIASI wajib.
+### Sprint 6 — Industri KLINIK ×3 sub-kategori — ✅ SELESAI (2026-06-07)
+- **Hasil:** 9 tema AKTIF. **Umum/Gigi** (bluecare·freshteal·trustnavy) · **Estetik/Skincare** (rosegold·derma·noir, pakai before-after) · **Fisio/Wellness** (sage·terra·forest, pakai masonry). VARIASI gelap↔terang tiap sub-kat.
+- **Dikerjakan:** taksonomi `klinik` + 9 token-pack + 9 manifest + sample-content 3 sub-kat + 6 ikon medis. Booking = balok `info` "Buat Janji"/"Konsultasi"/"Jadwalkan". Routing otomatis via `getManifest` (komposable dicek sebelum cabang bespoke `theme==='klinik'` → coexist, nol regresi).
+- **Belum (opsi lanjut, PENTING):** composable route di SiteRenderer hanya fetch **products** → klinik produksi nyata pakai **services** (fetchServicesByPage), jadi showcase kosong sampai adapter/route klinik memetakan services→showcase. Preview pakai sample-content (lengkap). Hero/features/testimoni/info/galeri tetap jalan. **Follow-up:** extend composable branch SiteRenderer fetch services utk industri jasa (klinik/sekolah/company).
 
-### Sprint 7 — Industri JASA/PERSONAL & SEKOLAH ×3 (lebar)
+### Sprint 7 — Industri JASA/PERSONAL & SEKOLAH ×3 (lebar) — BERIKUTNYA
 - **personal-branding / company / sekolah** — masing-masing 2–3 sub-kategori bila relevan (mis. personal: kreator / profesional / coach). Pertimbangkan apakah sub-kategori cocok atau cukup 3 gaya langsung tanpa lapis sub-kat (untuk industri yang variannya tipis).
 - **Keputusan terbuka:** sebagian industri mungkin lebih baik **3 gaya tanpa sub-kategori** (lapis sub-kat opsional). `hasSubKategori` sudah mendukung industri tanpa sub-kat → bisa pilih per-industri.
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
-1. **Urutan industri** — apakah Restaurant dulu (saran) atau yang lain (mis. Klinik karena banyak order)?
-2. **Sub-kategori vs langsung-3-gaya** per industri — beberapa industri mungkin tak perlu lapis sub-kat.
-3. **Gerbang 3 skill** — tetap design-review batch, atau invokasi skill literal untuk gaya flagship tiap industri?
-4. **next/font asli** — saat ini font pakai stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (naikkan keotentikan, sedikit biaya bundle).
-5. **Konsolidasi `theme-packs.ts`** — sudah ~450 baris/24 pack; bila tembus ~40 pack pertimbangkan pecah per-industri (`theme-packs/kuliner.ts` dst) agar terkelola.
+1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).
+2. **Sub-kategori vs langsung-3-gaya** per industri — untuk S7 (personal/company/sekolah varian tipis) pertimbangkan 3-gaya-tanpa-sub-kat.
+3. ~~**Gerbang 3 skill**~~ — DIPUTUSKAN: invokasi skill literal pada gaya flagship (dipakai S4 & S6).
+4. **next/font asli** — masih stack sistem (SANS/SERIF/GROTESK/ROUNDED). Upgrade ke `next/font` per gaya = polish lintas-sprint (BELUM).
+5. **Konsolidasi `theme-packs.ts`** — sekarang **42 pack** (sudah >40). **Pertimbangkan pecah per-industri** (`theme-packs/kuliner.ts` dst) sebelum S7 agar terkelola.
+6. **(BARU) Services→showcase utk industri jasa** — composable route SiteRenderer baru fetch products; klinik/sekolah/company butuh services. Garap sebelum/saat S7.
 
-> **Status: belum ada satu pun item §12 dikerjakan.** Mulai hanya setelah user pilih urutan + jawab keputusan terbuka di atas.
+> **Status: S4, S5, S5b, S6 SELESAI & LIVE.** Berikutnya Sprint 7 (Jasa/Personal/Sekolah) — putuskan #2 (sub-kat vs 3-gaya) + pertimbangkan #5 (pecah theme-packs) & #6 (services mapping) dulu.

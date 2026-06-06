@@ -132,3 +132,46 @@ describe('theme-packs restaurant (S4)', () => {
     }
   })
 })
+
+// ── Klinik (Sprint 6) — 3 sub-kategori × 3 gaya ──────────────
+const KLINIK_PACKS: Record<string, string[]> = {
+  umum: ['umum-bluecare', 'umum-freshteal', 'umum-trustnavy'],
+  estetik: ['estetik-rosegold', 'estetik-derma', 'estetik-noir'],
+  wellness: ['wellness-sage', 'wellness-terra', 'wellness-forest'],
+}
+
+describe('theme-packs klinik (S6)', () => {
+  for (const [sub, ids] of Object.entries(KLINIK_PACKS)) {
+    it(`${sub}: 3 pack ada + manifest resolve ke pack otentiknya`, () => {
+      for (const id of ids) {
+        expect(Object.keys(THEME_PACKS)).toContain(id)
+        expect(resolveManifestPack(MANIFESTS[id]).id).toBe(id)
+      }
+    })
+
+    it(`${sub}: VARIASI WAJIB — page bg & mood ke-3 gaya tak seragam`, () => {
+      const packs = ids.map((id) => resolveManifestPack(MANIFESTS[id]))
+      expect(new Set(packs.map((p) => p.color.page)).size).toBe(3)
+      expect(new Set(packs.map((p) => p.mood)).size).toBe(3)
+    })
+
+    it(`${sub}: punya minimal 1 gaya gelap`, () => {
+      const hasDark = ids.some((id) => {
+        const page = resolveManifestPack(MANIFESTS[id]).color.page.toLowerCase()
+        return ['#0', '#1', '#2'].some((p) => page.startsWith(p))
+      })
+      expect(hasDark).toBe(true)
+    })
+  }
+
+  it('semua hex page valid 6-digit (anti-typo)', () => {
+    for (const ids of Object.values(KLINIK_PACKS)) {
+      for (const id of ids) {
+        const c = resolveManifestPack(MANIFESTS[id]).color
+        for (const hex of [c.page, c.surface, c.primary, c.heroFrom, c.heroTo, c.heroInk]) {
+          expect(hex).toMatch(/^#[0-9a-fA-F]{6}$/)
+        }
+      }
+    }
+  })
+})

@@ -21,6 +21,9 @@ export type FeaturesVariant = 'grid' | 'rows'
 // 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
 // 'marquee' = strip bergerak (CSS-only) untuk banyak testimoni ringkas.
 export type TestimoniVariant = 'cards' | 'spotlight' | 'marquee'
+// Galeri (Sprint 5b) — 'masonry' = grid foto fasilitas tinggi-rendah;
+// 'before-after' = pasangan sebelum/sesudah (cocok estetik/skincare/interior).
+export type GalleryVariant = 'masonry' | 'before-after'
 // Motif/tekstur otentik — dipanen dari BatikTokoRenderer (S-Kerajinan). Overlay
 // halus di hero + strip footer, ditint warna primary tema. 'none' = polos
 // (default semua tema lama → nol regresi).
@@ -42,6 +45,7 @@ export interface ThemeManifest {
     stats?: boolean // strip angka kredibilitas (mis. "5.000+ pelanggan")
     faq?: boolean // accordion objection-handling (CSS-only <details>)
     info?: boolean // jam buka + lokasi/maps + reservasi (wajib F&B/toko fisik)
+    gallery?: GalleryVariant // masonry fasilitas / before-after (Sprint 5b)
   }
 }
 
@@ -65,6 +69,15 @@ export interface InfoLokasi {
   reservasiText?: string
   reservasiHref?: string
 }
+// Galeri (Sprint 5b). `images` dipakai varian masonry; `pairs` varian before-after.
+export interface GalleryImage { src: string; caption?: string }
+export interface BeforeAfterPair { before: string; after: string; label?: string }
+export interface GalleryContent {
+  title?: string
+  subtitle?: string
+  images?: GalleryImage[]
+  pairs?: BeforeAfterPair[]
+}
 export interface ComposableContent {
   nama: string
   hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
@@ -75,6 +88,7 @@ export interface ComposableContent {
   stats?: StatItem[]
   faq?: FaqItem[]
   info?: InfoLokasi
+  gallery?: GalleryContent
   about?: { title: string; body: string }
   cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
   contact?: { wa?: string; email?: string; alamat?: string }
@@ -251,6 +265,48 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   'finedining-nordic': {
     id: 'finedining-nordic', label: 'Fine Dining Nordic', basePackId: 'finedining-nordic',
     blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true },
+  },
+
+  // ── KLINIK (Sprint 6) — pakai balok S5 (stats/testimoni/faq/info
+  // jam praktek+booking) + galeri S5b (masonry fasilitas / before-after). ──
+  // KLINIK UMUM / GIGI
+  'umum-bluecare': {
+    id: 'umum-bluecare', label: 'Klinik Bluecare', basePackId: 'umum-bluecare',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true },
+  },
+  'umum-freshteal': {
+    id: 'umum-freshteal', label: 'Klinik Freshteal', basePackId: 'umum-freshteal',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true, faq: true },
+  },
+  'umum-trustnavy': {
+    id: 'umum-trustnavy', label: 'Klinik Trustnavy', basePackId: 'umum-trustnavy',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  // KLINIK ESTETIK / SKINCARE (before-after)
+  'estetik-rosegold': {
+    id: 'estetik-rosegold', label: 'Estetik Rosegold', basePackId: 'estetik-rosegold',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', gallery: 'before-after', info: true, faq: true },
+  },
+  'estetik-derma': {
+    id: 'estetik-derma', label: 'Estetik Derma', basePackId: 'estetik-derma',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'before-after', info: true },
+  },
+  'estetik-noir': {
+    id: 'estetik-noir', label: 'Estetik Noir', basePackId: 'estetik-noir',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'before-after', info: true, faq: true },
+  },
+  // FISIO / WELLNESS
+  'wellness-sage': {
+    id: 'wellness-sage', label: 'Wellness Sage', basePackId: 'wellness-sage',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', info: true, faq: true },
+  },
+  'wellness-terra': {
+    id: 'wellness-terra', label: 'Wellness Terra', basePackId: 'wellness-terra',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+  },
+  'wellness-forest': {
+    id: 'wellness-forest', label: 'Wellness Forest', basePackId: 'wellness-forest',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
 }
 

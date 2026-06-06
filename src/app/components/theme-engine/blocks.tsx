@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -62,6 +62,21 @@ export const ENGINE_CSS = `
 .ce-map { border: 0; width: 100%; height: 100%; min-height: 280px; display: block; filter: grayscale(.15); }
 .ce-jam-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid var(--c-border); }
 .ce-jam-row:first-child { border-top: 0; }
+/* ── Sprint 5b galeri ─────────────────────────────────────── */
+/* Masonry — kolom CSS, foto mengalir tinggi-rendah */
+.ce-masonry { columns: 3 260px; column-gap: 16px; }
+.ce-masonry > figure { break-inside: avoid; margin: 0 0 16px; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--c-border); box-shadow: var(--s-sm); position: relative; }
+.ce-masonry img { width: 100%; display: block; transition: transform .5s cubic-bezier(.16,1,.3,1); }
+.ce-masonry figure:hover img { transform: scale(1.05); }
+.ce-masonry figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 14px 10px; font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(180deg, transparent, rgba(0,0,0,.6)); }
+/* Before/After — pasangan gambar, label di pojok, lift saat hover */
+.ce-ba-card { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--c-border); box-shadow: var(--s-sm); background: var(--c-surface); transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease; }
+.ce-ba-card:hover { transform: translateY(-4px); box-shadow: var(--s-lg); }
+.ce-ba-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.ce-ba-pane { position: relative; aspect-ratio: 3 / 4; background: linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to)); }
+.ce-ba-pane img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ce-ba-tag { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; background: rgba(0,0,0,.62); color: #fff; }
+.ce-ba-tag.after { background: var(--c-primary); color: var(--c-on-primary); }
 @media (prefers-reduced-motion: reduce) { .ce-stagger > * { opacity: 1; transform: none; animation: none; } .ce-marquee-track { animation: none; } }
 `
 
@@ -537,6 +552,56 @@ export function FAQ({ faq }: { faq: FaqItem[] }) {
               </summary>
               <div className="ce-faq-body" style={{ fontSize: 15 }}>{f.a}</div>
             </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── GALERI — masonry fasilitas / before-after (Sprint 5b) ─────
+export function MasonryGallery({ gallery }: { gallery: GalleryContent }) {
+  const images = gallery.images ?? []
+  if (images.length === 0) return null
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow={gallery.subtitle ? undefined : 'Galeri'} title={gallery.title ?? 'Galeri'} subtitle={gallery.subtitle} />
+        <div className="ce-masonry">
+          {images.map((img, i) => (
+            <figure key={i}>
+              <img src={img.src} alt={img.caption ?? `Galeri ${i + 1}`} loading="lazy" />
+              {img.caption && <figcaption>{img.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function BeforeAfterGallery({ gallery }: { gallery: GalleryContent }) {
+  const pairs = gallery.pairs ?? []
+  if (pairs.length === 0) return null
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <SectionHead eyebrow="Hasil Nyata" title={gallery.title ?? 'Sebelum & Sesudah'} subtitle={gallery.subtitle ?? 'Foto asli pasien kami, atas persetujuan.'} />
+        <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          {pairs.map((p, i) => (
+            <figure key={i} className="ce-ba-card" style={{ margin: 0 }}>
+              <div className="ce-ba-pair">
+                <div className="ce-ba-pane">
+                  <img src={p.before} alt={`Sebelum${p.label ? ` — ${p.label}` : ''}`} loading="lazy" />
+                  <span className="ce-ba-tag">Sebelum</span>
+                </div>
+                <div className="ce-ba-pane">
+                  <img src={p.after} alt={`Sesudah${p.label ? ` — ${p.label}` : ''}`} loading="lazy" />
+                  <span className="ce-ba-tag after">Sesudah</span>
+                </div>
+              </div>
+              {p.label && <figcaption style={{ padding: '14px 18px', fontSize: 14, fontWeight: 600, color: 'var(--c-ink)' }}>{p.label}</figcaption>}
+            </figure>
           ))}
         </div>
       </div>

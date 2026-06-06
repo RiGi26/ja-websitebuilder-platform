@@ -202,3 +202,69 @@ describe('Sprint 5 balok — stats / testimoni / FAQ / info-lokasi', () => {
     }
   })
 })
+
+// ── Sprint 5b galeri + Sprint 6 klinik ───────────────────────
+const CONTENT_GALLERY: ComposableContent = {
+  ...CONTENT_FULL,
+  gallery: {
+    title: 'Galeri',
+    images: [
+      { src: 'https://x.test/fasilitas1.jpg', caption: 'Ruang tunggu' },
+      { src: 'https://x.test/fasilitas2.jpg', caption: 'Ruang periksa' },
+    ],
+    pairs: [
+      { before: 'https://x.test/before1.jpg', after: 'https://x.test/after1.jpg', label: 'Acne — 8 minggu' },
+    ],
+  },
+}
+
+describe('Sprint 5b galeri + Sprint 6 klinik', () => {
+  it('registry memuat 9 manifest klinik', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of [
+      'umum-bluecare', 'umum-freshteal', 'umum-trustnavy',
+      'estetik-rosegold', 'estetik-derma', 'estetik-noir',
+      'wellness-sage', 'wellness-terra', 'wellness-forest',
+    ]) {
+      expect(keys).toContain(id)
+    }
+  })
+
+  it('gallery masonry: render foto + caption (umum-bluecare)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['umum-bluecare']} content={CONTENT_GALLERY} />)
+    expect(html).toContain('ce-masonry')
+    expect(html).toContain('https://x.test/fasilitas1.jpg')
+    expect(html).toContain('Ruang tunggu')
+    // bukan before-after
+    expect(html).not.toContain('https://x.test/before1.jpg')
+  })
+
+  it('gallery before-after: render pasangan + label (estetik-rosegold)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['estetik-rosegold']} content={CONTENT_GALLERY} />)
+    expect(html).toContain('ce-ba-pair')
+    expect(html).toContain('https://x.test/before1.jpg')
+    expect(html).toContain('https://x.test/after1.jpg')
+    expect(html).toContain('Sebelum')
+    expect(html).toContain('Sesudah')
+    // bukan masonry
+    expect(html).not.toContain('https://x.test/fasilitas1.jpg')
+  })
+
+  it('galeri TAK dirender bila manifest tak punya slot gallery (nol regresi)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={CONTENT_GALLERY} />)
+    expect(html).not.toContain('https://x.test/fasilitas1.jpg')
+    expect(html).not.toContain('https://x.test/before1.jpg')
+  })
+
+  it('9 gaya klinik render tanpa error + data-theme benar', () => {
+    for (const id of [
+      'umum-bluecare', 'umum-freshteal', 'umum-trustnavy',
+      'estetik-rosegold', 'estetik-derma', 'estetik-noir',
+      'wellness-sage', 'wellness-terra', 'wellness-forest',
+    ]) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_GALLERY} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
+  })
+})
