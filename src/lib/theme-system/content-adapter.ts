@@ -4,20 +4,30 @@
 // `showcase` (produk/menu) — bagian yang khas Theme System. Dipakai SiteRenderer
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
-import type { PageSection, TenantProfile, Product } from '@/types/websitebuilder'
+import type { PageSection, TenantProfile } from '@/types/websitebuilder'
 import type { ComposableContent, ShowcaseItem, InfoLokasi } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
+
+// Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
+// ini). Composable showcase generik → satu mapper untuk semua industri.
+export interface ShowcaseSourceItem {
+  nama: string
+  deskripsi?: string | null
+  harga?: number | null
+  gambar_url?: string | null
+}
 
 export function composableContentFromSections(
   nama: string,
   sections: PageSection[],
-  products: Product[],
+  showcaseSource: ShowcaseSourceItem[],
   profile: TenantProfile | null,
   konten: Record<string, unknown> = {},
+  showcaseTitle = 'Produk Kami',
 ): ComposableContent {
   const base = sectionsToSiteContent(nama, sections, profile, konten)
 
-  const items: ShowcaseItem[] = (products ?? [])
+  const items: ShowcaseItem[] = (showcaseSource ?? [])
     .filter((p) => p?.nama)
     .slice(0, 12)
     .map((p) => ({
@@ -27,7 +37,7 @@ export function composableContentFromSections(
       gambar: p.gambar_url ?? undefined,
     }))
 
-  const showcase = items.length ? { title: 'Produk Kami', items } : undefined
+  const showcase = items.length ? { title: showcaseTitle, items } : undefined
 
   // Foto hero opsional dari "Lengkapi Website" (data_konten.foto_hero).
   const fotoHero = typeof konten.foto_hero === 'string' && konten.foto_hero.trim()
