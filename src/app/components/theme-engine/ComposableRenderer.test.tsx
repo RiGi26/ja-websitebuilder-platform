@@ -113,3 +113,92 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
     expect(html).toContain('Rp250.000')
   })
 })
+
+// ── Sprint 5 balok + Sprint 4 restaurant ─────────────────────
+const CONTENT_FULL: ComposableContent = {
+  ...CONTENT,
+  stats: [
+    { angka: '25+', label: 'Tahun melayani' },
+    { angka: '300', label: 'Porsi/hari' },
+  ],
+  testimonials: [
+    { quote: 'Rasanya seperti masakan rumah.', nama: 'Pak Hendra', peran: 'Pelanggan' },
+    { quote: 'Porsinya jujur, harganya jujur.', nama: 'Rina', peran: 'Mahasiswa' },
+  ],
+  faq: [
+    { q: 'Jam berapa buka?', a: 'Tiap hari pukul 07.00 sampai habis.' },
+  ],
+  info: {
+    jam: [{ hari: 'Senin – Jumat', jam: '07.00 – 16.00' }],
+    alamat: 'Jl. Kaliurang KM 5, Sleman',
+    mapsQuery: 'Jl. Kaliurang KM 5 Sleman',
+    telp: '081296917963',
+    reservasiText: 'Pesan via WhatsApp',
+    reservasiHref: '#wa',
+  },
+}
+
+describe('Sprint 5 balok — stats / testimoni / FAQ / info-lokasi', () => {
+  it('registry memuat 9 manifest restaurant', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of [
+      'warung-rakyat', 'warung-sambal', 'warung-angkringan',
+      'cafe-latte', 'cafe-roastery', 'cafe-bloom',
+      'finedining-aurum', 'finedining-hearth', 'finedining-nordic',
+    ]) {
+      expect(keys).toContain(id)
+    }
+  })
+
+  // Catatan: kelas CSS (ce-quote dll) SELALU ada di <style>; assertion pakai
+  // teks konten yang hanya muncul saat balok benar-benar dirender.
+  it('warung-rakyat (stats+cards+info+faq aktif) merender keempat balok', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT_FULL} />)
+    expect(html).toContain('Tahun melayani') // stats label
+    expect(html).toContain('Dipercaya Pelanggan Kami') // judul testimoni cards
+    expect(html).toContain('Pak Hendra') // nama testimoni
+    expect(html).toContain('Jam berapa buka?') // FAQ
+    expect(html).toContain('output=embed') // peta embed tanpa API key
+    expect(html).toContain('Jam Operasional') // info-lokasi
+  })
+
+  it('testimoni varian beda: spotlight vs marquee vs cards (judul section unik)', () => {
+    const spot = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-angkringan']} content={CONTENT_FULL} />)
+    const marquee = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-sambal']} content={CONTENT_FULL} />)
+    const cards = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT_FULL} />)
+    expect(marquee).toContain('Ribuan Pelanggan Puas') // judul khas marquee
+    expect(cards).toContain('Dipercaya Pelanggan Kami') // judul khas cards
+    // spotlight: tanpa judul, hanya kutipan pertama besar
+    expect(spot).not.toContain('Ribuan Pelanggan Puas')
+    expect(spot).not.toContain('Dipercaya Pelanggan Kami')
+    expect(spot).toContain('Rasanya seperti masakan rumah.')
+  })
+
+  it('balok Sprint 5 TAK dirender bila manifest tak mengaktifkan (nol regresi)', () => {
+    // kuliner-rustic tak punya stats/testimoni/faq/info di blocks
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={CONTENT_FULL} />)
+    expect(html).not.toContain('Dipercaya Pelanggan Kami') // testimoni
+    expect(html).not.toContain('output=embed') // info-lokasi
+    expect(html).not.toContain('Tahun melayani') // stats
+    expect(html).not.toContain('Jam berapa buka?') // FAQ
+  })
+
+  it('balok TAK dirender bila konten kosong walau manifest aktif', () => {
+    // warung-rakyat aktifkan stats/testimoni/faq/info, tapi CONTENT polos (tanpa field itu)
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT} />)
+    expect(html).not.toContain('Dipercaya Pelanggan Kami')
+    expect(html).not.toContain('output=embed')
+  })
+
+  it('9 gaya restaurant render tanpa error + data-theme benar', () => {
+    for (const id of [
+      'warung-rakyat', 'warung-sambal', 'warung-angkringan',
+      'cafe-latte', 'cafe-roastery', 'cafe-bloom',
+      'finedining-aurum', 'finedining-hearth', 'finedining-nordic',
+    ]) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_FULL} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
+  })
+})

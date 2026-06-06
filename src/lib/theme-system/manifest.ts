@@ -17,6 +17,10 @@ import { THEME_PACKS } from './theme-packs'
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
 export type ShowcaseVariant = 'menu-list' | 'card-grid' | 'lookbook'
 export type FeaturesVariant = 'grid' | 'rows'
+// Testimoni (Sprint 5) — sosial-proof. 3 varian parametrik via token.
+// 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
+// 'marquee' = strip bergerak (CSS-only) untuk banyak testimoni ringkas.
+export type TestimoniVariant = 'cards' | 'spotlight' | 'marquee'
 // Motif/tekstur otentik — dipanen dari BatikTokoRenderer (S-Kerajinan). Overlay
 // halus di hero + strip footer, ditint warna primary tema. 'none' = polos
 // (default semua tema lama → nol regresi).
@@ -33,6 +37,11 @@ export interface ThemeManifest {
     hero: HeroVariant
     features?: FeaturesVariant
     showcase: ShowcaseVariant
+    // ── Balok Sprint 5 (semua opsional → tema lama nol regresi) ──
+    testimoni?: TestimoniVariant // sosial-proof; absen = tak dirender
+    stats?: boolean // strip angka kredibilitas (mis. "5.000+ pelanggan")
+    faq?: boolean // accordion objection-handling (CSS-only <details>)
+    info?: boolean // jam buka + lokasi/maps + reservasi (wajib F&B/toko fisik)
   }
 }
 
@@ -43,11 +52,29 @@ export interface ShowcaseItem {
   desc?: string
   gambar?: string
 }
+// ── Konten balok Sprint 5 ─────────────────────────────────────
+export interface Testimonial { quote: string; nama: string; peran?: string }
+export interface StatItem { angka: string; label: string }
+export interface FaqItem { q: string; a: string }
+export interface JamBuka { hari: string; jam: string }
+export interface InfoLokasi {
+  jam?: JamBuka[]
+  alamat?: string
+  mapsQuery?: string // dipakai embed Google Maps tanpa API key (output=embed)
+  telp?: string
+  reservasiText?: string
+  reservasiHref?: string
+}
 export interface ComposableContent {
   nama: string
   hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
   features?: { title: string; desc: string }[]
   showcase?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
+  // Sprint 5 — semua opsional; absen + manifest off = tak dirender (nol regresi)
+  testimonials?: Testimonial[]
+  stats?: StatItem[]
+  faq?: FaqItem[]
+  info?: InfoLokasi
   about?: { title: string; body: string }
   cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
   contact?: { wa?: string; email?: string; alamat?: string }
@@ -182,6 +209,48 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   'anak-pop': {
     id: 'anak-pop', label: 'Anak Pop', basePackId: 'anak-pop',
     blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+  },
+
+  // ── RESTAURANT (Sprint 4) — pakai balok Sprint 5 (info/stats/
+  // testimoni/faq). Tiap gaya kombinasi balok berbeda untuk variasi. ──
+  // WARUNG / KEDAI
+  'warung-rakyat': {
+    id: 'warung-rakyat', label: 'Warung Rakyat', basePackId: 'warung-rakyat',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list', stats: true, testimoni: 'cards', info: true, faq: true },
+  },
+  'warung-sambal': {
+    id: 'warung-sambal', label: 'Warung Sambal', basePackId: 'warung-sambal',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+  },
+  'warung-angkringan': {
+    id: 'warung-angkringan', label: 'Warung Angkringan', basePackId: 'warung-angkringan',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', testimoni: 'spotlight', info: true },
+  },
+  // CAFE / COFFEE SHOP
+  'cafe-latte': {
+    id: 'cafe-latte', label: 'Cafe Latte', basePackId: 'cafe-latte',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true },
+  },
+  'cafe-roastery': {
+    id: 'cafe-roastery', label: 'Cafe Roastery', basePackId: 'cafe-roastery',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', testimoni: 'spotlight', info: true, faq: true },
+  },
+  'cafe-bloom': {
+    id: 'cafe-bloom', label: 'Cafe Bloom', basePackId: 'cafe-bloom',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'marquee', info: true },
+  },
+  // FINE DINING / RESTO KELUARGA
+  'finedining-aurum': {
+    id: 'finedining-aurum', label: 'Fine Dining Aurum', basePackId: 'finedining-aurum',
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', stats: true, testimoni: 'spotlight', info: true, faq: true },
+  },
+  'finedining-hearth': {
+    id: 'finedining-hearth', label: 'Fine Dining Hearth', basePackId: 'finedining-hearth',
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true },
+  },
+  'finedining-nordic': {
+    id: 'finedining-nordic', label: 'Fine Dining Nordic', basePackId: 'finedining-nordic',
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true },
   },
 }
 

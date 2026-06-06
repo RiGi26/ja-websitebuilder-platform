@@ -9,7 +9,9 @@ import {
   Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap,
   // Kerajinan / Kecantikan / Gadget / Rumah / Herbal / Anak (S-replikasi 6 sub-kat)
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
-  Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy, type LucideProps,
+  Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
+  // Restaurant (Sprint 4): Warung / Cafe / Fine Dining
+  Coffee, ChefHat, Bean, Cherry, Utensils, Salad, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
@@ -17,6 +19,7 @@ const MAP = {
   Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap,
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
+  Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {
