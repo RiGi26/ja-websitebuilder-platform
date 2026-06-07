@@ -7,7 +7,7 @@
 ## 0. CURRENT STATUS (baca dulu)
 - **Fase aktif:** 🎉 **SEMUA INDUSTRI TUNTAS (Sprint 9) — 9 INDUSTRI, 96 TEMA.** Sprint 9 menambah **Travel/Rental** (kendaraan/wisata/akomodasi), **Blog/Media** (jurnal/media/niche), **Jastip** (luar/lokal/preorder) — 27 tema, AKTIF. Total **96 tema** otentik di **9 industri** (semua `TipeIndustri` kecuali `custom`). Composable showcase kini per-industri benar (products/menu/services/blog_posts). 253/253 test (+1 skip), tsc + build bersih, S9 flagship verified pixel (scorecard PASS).
 - **Sebelumnya:** COMPANY (S8b, 9) · PERSONAL (S8a, 9) · FU#1/FU#2 · SEKOLAH (S7, 9) · KLINIK (S6, 9)+galeri S5b · RESTAURANT (S4, 9)+S5 · TOKO ONLINE (S1-3, 24).
-- **Berikutnya:** POLISH lintas-sprint — **next/font asli** per gaya (#4, sekarang masih stack sistem).
+- **Polish #4 (next/font) ✅ SELESAI (2026-06-07):** 4 font asli (Jakarta/Fraunces/Space Grotesk/Nunito) dimuat di `src/app/[slug]/layout.tsx` (subtree situs published saja). `_fonts.ts` pakai `var(--font-x, <fallback sistem>)` → produksi dapat font asli, UAT/test/admin jatuh ke sistem (nol regresi). Build compile next/font bersih.
 - **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
@@ -281,8 +281,9 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 - **Dikerjakan:** theme-packs/{travel,blog,jastip}.ts + 27 manifest + sample-content 9 sub-kat + 21 ikon. **blog→blog_posts** mapping di SiteRenderer (judul→nama, ringkasan→deskripsi, cover→gambar, "Artikel Terbaru"); travel→"Pilihan Kami"; jastip→"Katalog Titipan".
 - **SEMUA `TipeIndustri` (kecuali `custom`) kini punya tema composable.** Coverage industri tuntas.
 
-### Polish lintas-sprint — BERIKUTNYA
-- **#4 next/font asli** per gaya (sekarang stack sistem SANS/SERIF/GROTESK/ROUNDED). Naikkan keotentikan tipografi.
+### Polish lintas-sprint
+- ~~**#4 next/font asli**~~ — ✅ SELESAI (2026-06-07). Jakarta/Fraunces/Space Grotesk/Nunito via `[slug]/layout.tsx`, `_fonts.ts` var()+fallback. Ganti font per-keluarga di sini bila mau variasi tipografi lebih jauh.
+- **Opsi lanjut:** perdalam balok (hero/showcase varian baru), pecah `theme-packs.ts` lebih granular bila perlu, atau industri `custom` (saat ini fallback variant lama).
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
 1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).
@@ -293,4 +294,4 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 6. ~~**Services→showcase utk industri jasa**~~ — ✅ DONE (2026-06-07, FU#1). Composable route SiteRenderer fetch source per `tipe_industri`: toko_online→products, restaurant→menu_items, jasa(klinik/sekolah/corporate/travel)→services. content-adapter map generik + judul kontekstual ("Produk/Menu/Layanan/Program Kami").
 7. ~~**Visual pipeline (lensa pixel)**~~ — ✅ HIDUP sejak S7. ui-ux-pro-max DB (front) + Playwright shoot + scorecard (back) + generator HTML (`gen-samples.test.tsx`). Dipakai di playbook §5 tiap sprint berikutnya.
 
-> **Status: S4–S9 + FU#1 + FU#2 SELESAI & LIVE — 96 tema, 9 industri (coverage TipeIndustri tuntas kecuali `custom`).** Berikutnya: POLISH next/font (#4); opsional perdalam balok/varian.
+> **Status: S4–S9 + FU#1/FU#2 + Polish next/font SELESAI & LIVE — 96 tema, 9 industri (coverage TipeIndustri tuntas kecuali `custom`), font asli aktif.** Program tema dasar TUNTAS. Opsional: perdalam balok/varian, font alternatif, industri custom.
