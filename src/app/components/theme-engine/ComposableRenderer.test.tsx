@@ -636,6 +636,83 @@ describe('Sprint B — Pricing / Process / CTA varian', () => {
   })
 })
 
+// ── Sprint C — Partners / Social ─────────────────────────────
+const SOCIAL_CONTENT: ComposableContent = {
+  ...CONTENT,
+  partners: {
+    title: 'Dipercaya Oleh',
+    logos: [
+      { nama: 'Tokopedia', href: 'https://tokopedia.com' },
+      { nama: 'Gojek' },
+      { nama: 'BrandLogo', logo: 'https://x.test/logo.png' },
+    ],
+  },
+  social: {
+    title: 'Ikuti Kami',
+    links: [
+      { platform: 'instagram', href: 'https://ig.test/akun', label: '@akun' },
+      { platform: 'tiktok', href: 'https://tiktok.test/akun' },
+      { platform: 'shopee', href: 'https://shopee.test/toko' },
+    ],
+  },
+}
+
+describe('Sprint C — Partners / Social', () => {
+  const withBlocks = (id: string, extra: Partial<ThemeManifest['blocks']>): ThemeManifest => ({
+    ...MANIFESTS[id],
+    blocks: { ...MANIFESTS[id].blocks, ...extra },
+  })
+  const render = (m: ThemeManifest, c: ComposableContent) =>
+    renderToStaticMarkup(<ComposableRenderer manifest={m} content={c} />)
+
+  it('partners grid: render nama logo + link + <img> utk yg punya logo URL', () => {
+    const html = render(withBlocks('kuliner-rustic', { partners: 'grid' }), SOCIAL_CONTENT)
+    expect(html).toContain('Dipercaya Oleh')           // judul partners
+    expect(html).toContain('Tokopedia')
+    expect(html).toContain('Gojek')
+    expect(html).toContain('https://tokopedia.com')     // href
+    expect(html).toContain('https://x.test/logo.png')   // <img> utk yg punya logo
+  })
+
+  it('partners marquee: logo digandakan untuk loop mulus', () => {
+    const html = render(withBlocks('kuliner-rustic', { partners: 'marquee' }), SOCIAL_CONTENT)
+    expect(html).toContain('Dipercaya Oleh')
+    // marquee menggandakan daftar → src logo muncul 2× (src hanya di <img>, bukan aria-label)
+    expect(html.split('https://x.test/logo.png').length - 1).toBe(2)
+  })
+
+  it('social: render label tiap platform; pakai label custom bila ada', () => {
+    const html = render(withBlocks('kuliner-rustic', { social: true }), SOCIAL_CONTENT)
+    expect(html).toContain('Ikuti Kami')   // judul social
+    expect(html).toContain('@akun')        // label custom instagram
+    expect(html).toContain('TikTok')       // label default
+    expect(html).toContain('Shopee')
+    expect(html).toContain('https://ig.test/akun')
+  })
+
+  it('partners TAK dirender bila manifest tak punya slot (nol regresi)', () => {
+    const html = render(MANIFESTS['kuliner-modern'], SOCIAL_CONTENT) // kuliner-modern tanpa partners
+    expect(html).not.toContain('Dipercaya Oleh')
+  })
+
+  it('social TAK dirender bila content.social kosong walau manifest aktif', () => {
+    const html = render(withBlocks('kuliner-rustic', { social: true }), CONTENT) // CONTENT tanpa social
+    expect(html).not.toContain('Ikuti Kami')
+  })
+
+  it('kuliner-rustic (updated): social aktif saat ada data', () => {
+    const html = render(MANIFESTS['kuliner-rustic'], SOCIAL_CONTENT)
+    expect(html).toContain('Ikuti Kami')
+    expect(html).toContain('@akun')
+  })
+
+  it('startup-aurora (updated): partners grid aktif', () => {
+    const html = render(MANIFESTS['startup-aurora'], SOCIAL_CONTENT)
+    expect(html).toContain('Dipercaya Oleh')
+    expect(html).toContain('Tokopedia')
+  })
+})
+
 describe('Sprint 9 — travel / blog / jastip', () => {
   const ALL_S9 = [
     'kendaraan-asphalt', 'kendaraan-bersih', 'kendaraan-kuning',
