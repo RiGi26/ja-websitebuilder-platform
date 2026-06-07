@@ -10,17 +10,23 @@
 ## 0. The problem this solves
 
 The §5.a gate (`/ui-design` · `/make-interfaces-feel-better` · `/website-review`) runs on
-**code** — principles applied while building. Two leaks let "kurang menarik" through:
+**code** — principles applied while building. Three leaks let "kurang menarik" (and its
+quieter cousin "inconsistent") through:
 
 1. **Input leak (DEFINE):** palettes + font pairings are invented ad-hoc → drift to generic.
 2. **Feedback leak (VERIFY):** screenshots reviewed *by eye*, not scored → no objective bar.
+3. **Constraint leak (DEFINE→POLISH):** "principles applied while building" has no
+   *written, mood-specific* form to check against — each theme re-derives "what does
+   warm/luxury/bold look like" from memory, which is exactly how drift creeps in
+   (see `THEME_SYSTEM_PLAN.md` S1 log: "User pribadi suka HERITAGE — TAPI bukan acuan").
 
-Two tools, plugged into exactly those two leaks (nowhere else):
+Three tools/artifacts, plugged into exactly those leaks (nowhere else):
 
 | Tool | Role | Where it plugs in |
 |---|---|---|
 | **ui-ux-pro-max** | Curated DB (161 palettes · 57 font pairings · 50+ styles) **+** a scorecard | Step 1–2 (front) **and** Step 7 (back) |
 | **Playwright** | The eyes — auto-screenshot 3 viewports | Step 7 only (feeds the scorecard) |
+| **`design-rules/<mood>.md`** | Written must/should constraint doc per mood (TypeUI-anatomy adoption — tokens + layout + states + a11y, anchored to real production data, see `src/lib/theme-system/design-rules/`) | Step 2 (front, cross-check) **and** Step 5+7 (back, concrete checklist) |
 
 > This does **not** replace the 3-skill gate. The gate scores *code* across 3 lenses
 > (tampilan·rasa·pesan). This pipeline adds a **4th lens applied to pixels: "terbukti"** —
@@ -36,17 +42,25 @@ PLAYBOOK STEP          BASE (unchanged)            + NEW THIS PIPELINE
 1. RESEARCH    visual refs for niche       → ui-ux-pro-max: pull STYLE + PALETTE
                                               + FONT-PAIRING per gaya (front lookup)
 2. DEFINE      3 manifests (token+variant) → lock tokens FROM the DB, not invented
+                                              → cross-check against design-rules/<mood>.md
+                                              (must-rules non-negotiable, should-rules guide pick)
 3. BUILD       new section variants         (unchanged)
 4. SEED        sample content               (unchanged)
-5. POLISH      3-skill gate §5.a            (unchanged — code-level)
+5. POLISH      3-skill gate §5.a            → grade against design-rules/<mood>.md
+                                              §4 States + §5 A11y as a concrete checklist
 6. WIRE        register taxonomy + filter   (unchanged)
 7. VERIFY      SSR render + perf checklist  → Playwright SHOOT 3 viewports
                                               → ui-ux-pro-max SCORECARD on pixels
+                                              → each bar traces to a numbered "must" in
+                                                design-rules/<mood>.md §2/§5
                                               → iterate until pass (the loop)
 ```
 
 ui-ux-pro-max appears **twice** (choose at front, score at back). Playwright appears
-**once** (capture for the back loop). Everything else stays as-is.
+**once** (capture for the back loop). `design-rules/<mood>.md` appears **twice** too —
+front as a cross-check at DEFINE, back as the checklist POLISH/VERIFY grade against —
+closing the loop between "what we said we'd build" and "what we shipped". Everything
+else stays as-is.
 
 ---
 
@@ -64,9 +78,15 @@ in a sub-kategori is distinct *by construction* (serves VARIASI #6).
    personal-favorite heritage (prinsip #6).
 3. Translate the chosen palette + pairing into the existing `theme-packs.ts` token shape.
    The DB is the **source**, `theme-packs.ts` stays the **store**. No new files.
+4. **Cross-check against `design-rules/<mood>.md` §2–3** before locking the pack: does
+   the picked palette/pairing/layout violate any **must**-rule (e.g. luxury page must
+   stay dark, warm page must stay cream, bold display-weight must hit 800–900)? A DB
+   pick that clears ui-ux-pro-max but breaks a mood's must-rule still needs a swap —
+   the DB supplies *candidates*, the design-rules file supplies the *mood contract*.
 
-**Output of front half:** 3 token-packs whose colors + fonts came from a curated DB,
-not memory. This is where most of the "menarik" lift comes from — good raw palettes.
+**Output of front half:** 3 token-packs whose colors + fonts came from a curated DB
+*and* passed the mood's written contract — not memory, and not "looks fine to me".
+This is where most of the "menarik" lift comes from — good raw palettes, mood-true.
 
 ---
 
@@ -100,16 +120,18 @@ settled state, and uses `deviceScaleFactor: 1` to keep file/token size down.
 ### 3.2 Scorecard (ui-ux-pro-max, applied to the screenshots)
 
 Score each flagship against ui-ux-pro-max's priority categories — but **on the rendered
-pixels**, not the code. Pass bar = all CRITICAL/HIGH green, ≤1 MEDIUM amber.
+pixels**, not the code. Pass bar = all CRITICAL/HIGH green, ≤1 MEDIUM amber. Each row
+now traces back to a numbered **must**-rule in `design-rules/<mood>.md` — the scorecard
+isn't a separate opinion, it's the same contract checked on pixels instead of tokens.
 
-| # | Category | What to check in the screenshot | Bar |
-|---|---|---|---|
-| 1 | Accessibility | text/bg contrast reads ≥4.5:1; focus rings visible | CRITICAL |
-| 2 | Touch & interaction | CTAs look ≥44px; clear primary vs secondary | CRITICAL |
-| 4 | **Style match** | does it *look* like the niche + chosen style? distinct from the other 2 gaya? | HIGH |
-| 5 | Layout & responsive | no overflow/clipping at 375; container sane at 1440 | HIGH |
-| 6 | Typography & color | hierarchy by size/weight (not color); pairing reads on-brand | MEDIUM |
-| — | **Signature moment** | is there ONE memorable beat? (Phase 2.5) or is it a flat stack? | the "menarik" gate |
+| # | Category | What to check in the screenshot | Bar | Traces to `design-rules/<mood>.md` |
+|---|---|---|---|---|
+| 1 | Accessibility | text/bg contrast reads ≥4.5:1; focus rings visible | CRITICAL | §5 a11y checklist + §2 onPrimary/primary floor |
+| 2 | Touch & interaction | CTAs look ≥44px; clear primary vs secondary | CRITICAL | §5 a11y checklist (touch targets) |
+| 4 | **Style match** | does it *look* like the niche + chosen style? distinct from the other 2 gaya? | HIGH | §1 Mission + §3 layout-archetype rules (e.g. luxury must be `fullbleed`+`left`) |
+| 5 | Layout & responsive | no overflow/clipping at 375; container sane at 1440 | HIGH | §3 layout guidance (hero/features/pad/align "must" defaults) |
+| 6 | Typography & color | hierarchy by size/weight (not color); pairing reads on-brand | MEDIUM | §2 style-foundations rules (display weight, tracking, page-color family) |
+| — | **Signature moment** | is there ONE memorable beat? (Phase 2.5) or is it a flat stack? | the "menarik" gate | §4 States (hover/focus "should" rules — where the memorable beat usually lives) |
 
 Output findings in the §Output-Format buckets (Critical/High/Medium/Quick-Win) with the
 viewport + what to change. Feed fixes back into tokens/blocks → re-shoot → re-score.

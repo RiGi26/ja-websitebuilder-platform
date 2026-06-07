@@ -12,6 +12,12 @@
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
 - **Step berikutnya:** industri LAIN (restaurant/klinik/sekolah dll) via pola yang sama; atau perdalam blok (testimoni varian, hero baru). **WAJIB jaga variasi** (prinsip #6).
+- **Lapis baru (2026-06-07): `design-rules/<mood>.md`** — 5 file constraint ala TypeUI
+  `skill.md` (must/should anchored ke data nyata 96 tema), satu per mood (clean/luxury/
+  warm/bold/minimal), di `src/lib/theme-system/design-rules/`. Dipakai mulai **sprint
+  berikutnya setelah S9** (S10+, atau kapan pun "perdalam blok"/industri `custom` digarap)
+  — di-cross-check saat DEFINE & jadi checklist konkret saat POLISH/VERIFY. Lihat §5/§5.a
+  & `THEME_VISUAL_PIPELINE.md` §1/§2/§3.2 utk cara pakai.
 - **Standar:** ikon lucide (bukan emoji, dijaga test); gerbang 3 skill tiap tema (§5.a, diterapkan sbg design-review pada 18 gaya baru); variasi wajib (#6, dijaga test).
 
 ### Latar masalah (kenapa ini ada)
@@ -112,13 +118,26 @@ Setelah Kuliner tuntas, tiap sub-kategori/industri baru = ulangi 7 langkah ini:
 ```
 1. RESEARCH  → kumpulkan referensi visual niche (mood, palet, konvensi layout 3 gaya)
 2. DEFINE    → 3 manifest (token + pilihan varian section) per gaya
+               + cross-check token/layout terhadap design-rules/<mood>.md §2-3
+               (rule "must" non-negotiable, rule "should" memandu pilihan)
 3. BUILD     → varian section BARU yang belum ada di perpustakaan (kalau perlu)
 4. SEED      → konten contoh per sub-kategori (preview langsung "hidup")
 5. POLISH    → GERBANG KUALITAS 3 SKILL (wajib, lihat §5.a)
+               + grade thd checklist konkret design-rules/<mood>.md §4 (states) & §5 (a11y)
 6. WIRE      → daftarkan sub-kategori + 3 tema ke taksonomi + filter brief form
 7. VERIFY    → e2e render tiap gaya (SSR), no-regression, checklist performa UI
+               + scorecard pixel (THEME_VISUAL_PIPELINE.md §3.2) — tiap bar kini
+               menelusuri balik ke rule "must" bernomor di design-rules/<mood>.md
 ```
 Makin banyak sub-kategori dibuat, makin penuh perpustakaan balok → makin cepat berikutnya.
+
+> **`design-rules/<mood>.md`** (5 file, `src/lib/theme-system/design-rules/`, ditulis
+> 2026-06-07, format ala TypeUI `skill.md` — must/should anchored ke data 96 tema
+> produksi nyata, bukan dikira-kira) menutup celah "tiap tema re-derive dari memori
+> apa itu warm/luxury/bold" — sumber kebenaran tunggal yang dipakai DEFINE (front,
+> cross-check) **dan** POLISH/VERIFY (back, checklist+scorecard). Generator skeleton:
+> `gen-design-rules.test.ts` (`GEN_DESIGN_RULES=1`, skip-if-exists — tak menimpa hasil
+> authored). Berlaku mulai sprint setelah S9 (S10+).
 
 ### 5.a Gerbang kualitas 3 skill (WAJIB tiap tema — keputusan 2026-06-05)
 Tiap tema harus dimaksimalkan dari **tiga sisi**; tiap sisi punya skill penjaga:
@@ -129,6 +148,12 @@ Tiap tema harus dimaksimalkan dari **tiga sisi**; tiap sisi punya skill penjaga:
 | **/website-review** | Pesan — copy, persuasi, konversi (Ogilvy/CRO) |
 Jalankan ketiganya pada tiap gaya sebelum WIRE/aktivasi. Tema tak dianggap "matang"
 sampai lolos ketiga lensa ini. (Lihat [[feedback-theme-system-skills]].)
+
+**Sejak 2026-06-07, gerbang ini punya checklist tertulis konkret untuk dinilai** —
+bukan lagi "prinsip diterapkan saat membangun" yang abstrak. `design-rules/<mood>.md`
+§4 (States: default/hover/focus-visible/active/disabled/loading/empty, must/should)
+dan §5 (Accessibility checklist + catatan spesifik-mood) memberi /ui-design dan
+/make-interfaces-feel-better target bernomor untuk dicocokkan per mood.
 
 **Lensa ke-4 (pixel) — "terbukti":** ketiga skill di atas menilai *kode*. Untuk menutup
 celah "kurang menarik", tambah lensa ke-4 yang menilai *hasil render*: `ui-ux-pro-max`
@@ -284,6 +309,11 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 ### Polish lintas-sprint
 - ~~**#4 next/font asli**~~ — ✅ SELESAI (2026-06-07). Jakarta/Fraunces/Space Grotesk/Nunito via `[slug]/layout.tsx`, `_fonts.ts` var()+fallback. Ganti font per-keluarga di sini bila mau variasi tipografi lebih jauh.
 - **Opsi lanjut:** perdalam balok (hero/showcase varian baru), pecah `theme-packs.ts` lebih granular bila perlu, atau industri `custom` (saat ini fallback variant lama).
+- **Lapis baru siap pakai (2026-06-07):** `design-rules/<mood>.md` (§5/§5.a di atas) —
+  konsultasikan di DEFINE **sebelum** sprint berikutnya dimulai (S10+, atau "perdalam
+  blok"/`custom`), apa pun arah yang dipilih user. Juga berguna retroaktif: bisa dipakai
+  meng-grade ulang salah satu dari 96 tema yang sudah live bila ada keluhan "kurang pas
+  dengan mood"-nya.
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
 1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).
