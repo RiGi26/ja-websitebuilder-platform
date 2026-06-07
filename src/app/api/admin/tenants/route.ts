@@ -5,6 +5,9 @@ import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { createLandingPage } from '@/lib/supabase/websitebuilder'
 import { industriToTipe, addonsToFeatures, slugify, industryToTheme } from '@/lib/websitebuilder-mapping'
 import { createClientAccountForTenant } from '@/lib/client-account'
+import { generateContent } from '@/lib/build/generateContent'
+import { applyBuildPlan } from '@/lib/build/persist'
+import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 
 async function requireAdmin() {
   const cookieStore = await cookies()
@@ -122,6 +125,25 @@ export async function POST(request: Request) {
       .eq('id', orderId)
     if (linkErr) throw linkErr
 
+    // 5b. Auto-build konten DRAFT dari briefing (non-fatal). Briefing sudah diisi
+    //     saat order, jadi ini menghasilkan konten nyata; field kosong -> fallback
+    //     dummy spesifik bisnis (templates.ts), BUKAN halaman kosong. Tetap draft:
+    //     anon RLS memblokir status draft -> belum live sampai admin Publish dari
+    //     Preview. "Bangun Draft" di kartu order tinggal jadi rebuild bila perlu.
+    let built: { nSections: number } | null = null
+    try {
+      const plan = generateContent(order)
+      built = await applyBuildPlan(supabaseAdmin, {
+        pageId: page.id,
+        tenantId: tenant.id,
+        currentKonfigurasi: (page.konfigurasi ?? {}) as KonfigurasiWebsite,
+        plan,
+        publish: false,
+      })
+    } catch (e: any) {
+      console.error('auto-build saat provision (non-fatal):', e?.message)
+    }
+
     // 6. Buat akun login customer (otomatis). Tidak fatal kalau gagal /
     //    tak ada email — provisioning tetap sukses, akun bisa dibuat ulang nanti.
     let clientAccount = null
@@ -131,7 +153,7 @@ export async function POST(request: Request) {
       console.error('createClientAccountForTenant gagal (non-fatal):', e?.message)
     }
 
-    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false, clientAccount })
+    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false, clientAccount, built })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
