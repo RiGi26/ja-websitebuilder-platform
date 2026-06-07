@@ -5,7 +5,7 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
 // Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
@@ -58,6 +58,10 @@ export function composableContentFromSections(
   const proc = parseProcess(konten.process)
   const partners = parsePartners(konten.partners)
   const social = parseSocial(konten.social)
+  // Testimoni & foto pendukung sudah dikumpulkan form "Lengkapi Website"
+  // (data_konten.testimoni / .foto_items) — petakan ke balok composable.
+  const testimonials = parseTestimoni(konten.testimoni)
+  const gallery = galleryFromFotoItems(konten.foto_items)
   const aboutImage = str(konten.about_image)
   const ctaImage = str(konten.cta_image)
 
@@ -67,6 +71,8 @@ export function composableContentFromSections(
     features: base.features,
     showcase,
     info,
+    testimonials,
+    gallery,
     team,
     pricing,
     process: proc,
@@ -76,6 +82,36 @@ export function composableContentFromSections(
     cta: base.cta ? { ...base.cta, image: ctaImage } : base.cta,
     contact: base.contact,
   }
+}
+
+// data_konten.testimoni (bentuk form: {nama,kota,teks,bintang}) → Testimonial
+// (quote/nama/peran). Dukung juga nama field composable langsung (quote/peran).
+function parseTestimoni(v: unknown): Testimonial[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const out: Testimonial[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const quote = str(r.teks) ?? str(r.quote)
+    const nama = str(r.nama)
+    if (!quote || !nama) continue // quote + nama wajib
+    out.push({ quote, nama, peran: str(r.kota) ?? str(r.peran) })
+  }
+  return out.length ? out.slice(0, 12) : undefined
+}
+
+// data_konten.foto_items ({label,url}) → galeri masonry ({src,caption}).
+function galleryFromFotoItems(v: unknown): GalleryContent | undefined {
+  if (!Array.isArray(v)) return undefined
+  const images: GalleryImage[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const src = str(r.url) ?? str(r.src)
+    if (!src) continue
+    images.push({ src, caption: str(r.label) ?? str(r.caption) })
+  }
+  return images.length ? { images } : undefined
 }
 
 // ── Parser defensif konten balok Sprint A/B dari data_konten ──

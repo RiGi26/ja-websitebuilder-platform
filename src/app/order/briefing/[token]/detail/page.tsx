@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import Navbar from '@/app/components/Navbar'
+import { getManifest } from '@/lib/theme-system/manifest'
 import DetailForm from './DetailForm'
 
 export const dynamic = 'force-dynamic'
@@ -26,6 +27,19 @@ export default async function BriefingDetailPage({ params }: { params: Promise<{
   const namaKlien = order.nama_perusahaan || order.nama_usaha || 'Customer'
   const existingTahap2 = (order.briefing_data as Record<string, unknown>)?.tahap_2 as Record<string, unknown> | undefined
 
+  // Tema composable yang dipilih klien menentukan section konten mana yang relevan
+  // ditampilkan (form hanya minta blok yang BENAR dirender tema). Tema lama/non-
+  // composable → manifest undefined → semua false → hanya foto/testimoni klasik.
+  const variant = ((order.briefing_data as Record<string, unknown>)?.branding as Record<string, unknown> | undefined)?.variant as string | undefined
+  const mblocks = getManifest(variant)?.blocks
+  const activeBlocks = {
+    team: !!mblocks?.team,
+    pricing: !!mblocks?.pricing,
+    process: !!mblocks?.process,
+    partners: !!mblocks?.partners,
+    social: !!mblocks?.social,
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
       <Navbar />
@@ -36,6 +50,7 @@ export default async function BriefingDetailPage({ params }: { params: Promise<{
           namaKlien={namaKlien}
           industri={order.industri ?? ''}
           existingData={existingTahap2}
+          blocks={activeBlocks}
         />
       </main>
     </div>
