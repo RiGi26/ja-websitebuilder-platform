@@ -596,6 +596,12 @@ const KLINIK_UMUM: ComposableContent = {
     ctaText: 'Buat Janji via WhatsApp',
     ctaHref: '#wa',
   },
+  team: [
+    { nama: 'dr. Andini Pratiwi', peran: 'Dokter Umum', bio: 'Berpengalaman 12 tahun menangani kesehatan keluarga.' },
+    { nama: 'drg. Rio Saputra', peran: 'Dokter Gigi', bio: 'Perawatan gigi modern yang nyaman dan tanpa cemas.' },
+    { nama: 'dr. Lina Marlina, Sp.A', peran: 'Spesialis Anak', bio: 'Sabar mendampingi tumbuh kembang si kecil.' },
+    { nama: 'Ns. Bayu Anggara', peran: 'Kepala Perawat', bio: 'Memastikan setiap pasien dilayani dengan hangat.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@kliniksehatsentosa.id', alamat: 'Semarang, Jawa Tengah' },
 }
 
@@ -965,6 +971,25 @@ const SEKOLAH_KURSUS: ComposableContent = {
     ctaText: 'Coba Gratis via WhatsApp',
     ctaHref: '#wa',
   },
+  process: {
+    title: 'Cara Mulai Belajar',
+    subtitle: 'Empat langkah menuju nilai juara.',
+    steps: [
+      { judul: 'Coba Kelas Gratis', desc: 'Rasakan metode belajar kami tanpa biaya.' },
+      { judul: 'Tes Penempatan', desc: 'Kami petakan level dan kebutuhanmu.' },
+      { judul: 'Pilih Paket', desc: 'Ambil program yang paling sesuai targetmu.' },
+      { judul: 'Mulai & Pantau', desc: 'Belajar rutin dengan laporan progres berkala.' },
+    ],
+  },
+  pricing: {
+    title: 'Pilih Paket Belajar',
+    subtitle: 'Harga transparan, hasil yang terukur.',
+    plans: [
+      { nama: 'Reguler', harga: 'Rp350rb', periode: '/bulan', desc: 'Kelas grup, fondasi kuat.', fitur: ['8x pertemuan/bulan', 'Modul & latihan soal', 'Kelas maks. 10 siswa', 'Laporan bulanan'], ctaText: 'Daftar Reguler', ctaHref: '#wa' },
+      { nama: 'Intensif UTBK', harga: 'Rp650rb', periode: '/bulan', desc: 'Persiapan tembus PTN.', fitur: ['12x pertemuan/bulan', 'Try out + pembahasan', 'Konsultasi jurusan', 'Garansi naik nilai', 'Grup diskusi tutor'], unggulan: true, ctaText: 'Daftar Intensif', ctaHref: '#wa' },
+      { nama: 'Privat', harga: 'Rp1,2jt', periode: '/bulan', desc: 'Belajar 1-on-1 fleksibel.', fitur: ['8x pertemuan privat', 'Jadwal fleksibel', 'Materi disesuaikan', 'Fokus penuh tutor'], ctaText: 'Daftar Privat', ctaHref: '#wa' },
+    ],
+  },
   contact: { wa: '6281296917963', email: 'halo@cerdasjuara.id', alamat: 'Jakarta Pusat' },
 }
 
@@ -1157,12 +1182,25 @@ const PERSONAL_COACH: ComposableContent = {
   about: {
     title: 'Kenalan dengan Coach Maya',
     body: 'Saya percaya setiap orang punya potensi besar yang sering terhalang keraguan. Tugas saya menemani kamu menemukan arah, menyusun langkah, dan bertanggung jawab atas pertumbuhanmu sendiri.',
+    image: IMG('photo-1573496359142-b8d87734a5a2'),
   },
   cta: {
     title: 'Saatnya Bertumbuh Serius',
     subtitle: 'Booking sesi pertama dan rasakan bedanya.',
     ctaText: 'Booking via WhatsApp',
     ctaHref: '#wa',
+  },
+  team: [
+    { nama: 'Maya Anggraini', peran: 'Lead Coach (ICF Certified)', bio: 'Mendampingi 1.500+ klien menemukan arah dan bertindak.' },
+    { nama: 'Reza Pratama', peran: 'Career Coach', bio: 'Spesialis transisi karier dan pengembangan diri.' },
+    { nama: 'Dina Saraswati', peran: 'Program Manager', bio: 'Menjaga perjalanan coaching-mu tetap on-track.' },
+  ],
+  pricing: {
+    title: 'Pilih Cara Bertumbuh',
+    subtitle: 'Investasi terbaik adalah pada dirimu sendiri.',
+    plans: [
+      { nama: 'Paket Transformasi 3 Bulan', harga: 'Rp4,5jt', periode: '/program', desc: 'Pendampingan intensif untuk perubahan yang nyata dan terukur.', fitur: ['12 sesi 1-on-1 (mingguan)', 'Asesmen tujuan & rencana aksi', 'Akses WhatsApp antar-sesi', 'Materi & worksheet eksklusif', 'Garansi puas di sesi pertama'], unggulan: true, badge: 'Paling Direkomendasikan', ctaText: 'Booking Sesi Pertama', ctaHref: '#wa' },
+    ],
   },
   contact: { wa: '6281296917963', email: 'halo@coachmaya.id', alamat: 'Bandung' },
 }
@@ -1221,12 +1259,37 @@ const COMPANY_STARTUP: ComposableContent = {
   about: {
     title: 'Tentang TechFlow',
     body: 'Kami membangun TechFlow karena percaya bisnis kecil pun berhak punya alat sekelas korporasi. Sejak 2020, misi kami sederhana: bikin teknologi yang benar-benar memudahkan, bukan menambah ribet.',
+    image: IMG('photo-1522071820081-009f0129c71c'),
   },
   cta: {
     title: 'Siap Bikin Bisnis Lebih Efisien?',
     subtitle: 'Mulai gratis hari ini, rasakan bedanya.',
     ctaText: 'Mulai via WhatsApp',
     ctaHref: '#wa',
+  },
+  team: [
+    { nama: 'Arya Wibowo', peran: 'CEO & Co-founder', bio: 'Membangun produk yang dipakai ribuan bisnis.' },
+    { nama: 'Nadia Putri', peran: 'CTO', bio: 'Memimpin engineering dengan obsesi pada keandalan.' },
+    { nama: 'Doni Kurnia', peran: 'Head of Product', bio: 'Menerjemahkan kebutuhan pengguna jadi fitur nyata.' },
+    { nama: 'Sinta Lestari', peran: 'Head of Customer Success', bio: 'Memastikan setiap pelanggan benar-benar berhasil.' },
+  ],
+  process: {
+    title: 'Mulai dalam 3 Langkah',
+    subtitle: 'Dari daftar sampai jalan, kurang dari 10 menit.',
+    steps: [
+      { judul: 'Daftar Gratis', desc: 'Buat akun tanpa kartu kredit, langsung aktif.' },
+      { judul: 'Hubungkan Data', desc: 'Impor data atau sambungkan tools yang sudah dipakai.' },
+      { judul: 'Pantau & Tumbuh', desc: 'Lihat performa real-time, ambil keputusan lebih cepat.' },
+    ],
+  },
+  pricing: {
+    title: 'Harga yang Tumbuh Bersamamu',
+    subtitle: 'Mulai gratis, upgrade kapan pun. Tanpa biaya tersembunyi.',
+    plans: [
+      { nama: 'Starter', harga: 'Gratis', periode: 'selamanya', desc: 'Untuk coba-coba & tim kecil.', fitur: ['1 pengguna', '100 transaksi/bln', 'Dashboard dasar', 'Dukungan email'], ctaText: 'Mulai Gratis', ctaHref: '#trial' },
+      { nama: 'Growth', harga: 'Rp299rb', periode: '/bulan', desc: 'Untuk bisnis yang berkembang.', fitur: ['10 pengguna', 'Transaksi tanpa batas', 'Dashboard lengkap', 'Integrasi API', 'Dukungan prioritas'], unggulan: true, ctaText: 'Coba 14 Hari', ctaHref: '#trial' },
+      { nama: 'Enterprise', harga: 'Custom', desc: 'Untuk skala besar & kebutuhan khusus.', fitur: ['Pengguna tanpa batas', 'SLA & keamanan lanjutan', 'Onboarding khusus', 'Account manager'], ctaText: 'Hubungi Sales', ctaHref: '#wa' },
+    ],
   },
   contact: { wa: '6281296917963', email: 'halo@techflow.id', alamat: 'Jakarta' },
 }
@@ -1364,6 +1427,17 @@ const COMPANY_KORPORAT: ComposableContent = {
     subtitle: 'Diskusikan kebutuhan industri Anda dengan tim kami.',
     ctaText: 'Hubungi via WhatsApp',
     ctaHref: '#wa',
+  },
+  process: {
+    title: 'Cara Kami Bekerja',
+    subtitle: 'Proses teruji, dari diskusi awal sampai purna jual.',
+    steps: [
+      { judul: 'Konsultasi Kebutuhan', desc: 'Memahami spesifikasi dan target Anda secara detail.' },
+      { judul: 'Penawaran & Perencanaan', desc: 'Menyusun solusi, jadwal, dan estimasi yang transparan.' },
+      { judul: 'Produksi & Quality Control', desc: 'Pengerjaan presisi dengan kontrol mutu berstandar ISO.' },
+      { judul: 'Distribusi Tepat Waktu', desc: 'Pengiriman andal ke seluruh jaringan nasional.' },
+      { judul: 'Dukungan Purna Jual', desc: 'Garansi dan dukungan teknis yang berkelanjutan.' },
+    ],
   },
   contact: { wa: '6281296917963', email: 'corporate@majubersama.co.id', alamat: 'Bekasi, Jawa Barat' },
 }
@@ -1578,6 +1652,25 @@ const JASTIP_LUAR: ComposableContent = {
   info: { jam: [{ hari: 'Admin online', jam: 'Setiap hari, 09.00 – 21.00' }], alamat: 'Jakarta (open trip jastip rutin)', telp: '081296917963', reservasiText: 'Titip via WhatsApp', reservasiHref: '#wa' },
   about: { title: 'Tentang GlobalJastip', body: 'Kami bantu kamu mendapatkan produk original dari luar negeri tanpa repot. Sejak 2019, kepercayaan ribuan pelanggan kami jaga lewat transparansi di setiap langkah.' },
   cta: { title: 'Mau Titip Barang dari Luar?', subtitle: 'Cek jadwal trip jastip terdekat.', ctaText: 'Titip via WhatsApp', ctaHref: '#wa' },
+  process: {
+    title: 'Cara Titip',
+    subtitle: 'Empat langkah, barang impian sampai ke tangan.',
+    steps: [
+      { judul: 'Kirim Wishlist', desc: 'Share link atau foto produk yang kamu mau.' },
+      { judul: 'Konfirmasi & DP', desc: 'Kami kabari harga total dan fee, lalu DP.' },
+      { judul: 'Kami Belikan', desc: 'Dibeli dari toko resmi, bukti dikirim ke kamu.' },
+      { judul: 'Barang Dikirim', desc: 'Pelunasan, lalu barang meluncur ke alamatmu.' },
+    ],
+  },
+  pricing: {
+    title: 'Pilihan Layanan Titip',
+    subtitle: 'Fee jujur, tanpa biaya kejutan.',
+    plans: [
+      { nama: 'Reguler', harga: 'Fee 10%', periode: '/barang', desc: 'Untuk titipan santai.', fitur: ['Pembelian produk original', 'Foto bukti beli', 'Update resi', 'Estimasi 2–3 minggu'], ctaText: 'Titip Reguler', ctaHref: '#wa' },
+      { nama: 'Express', harga: 'Fee 18%', periode: '/barang', desc: 'Untuk yang butuh cepat.', fitur: ['Prioritas pembelian', 'Foto & video bukti', 'Pengiriman tercepat', 'Estimasi 7–10 hari', 'Asuransi pengiriman'], unggulan: true, ctaText: 'Titip Express', ctaHref: '#wa' },
+      { nama: 'Borongan', harga: 'Nego', desc: 'Untuk reseller & jumlah besar.', fitur: ['Rate khusus volume', 'Dedicated admin', 'Skema pembayaran fleksibel'], ctaText: 'Hubungi Admin', ctaHref: '#wa' },
+    ],
+  },
   contact: { wa: '6281296917963', email: 'halo@globaljastip.id', alamat: 'Jakarta' },
 }
 
