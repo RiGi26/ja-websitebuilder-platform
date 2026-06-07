@@ -5,7 +5,7 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
 // Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
@@ -49,16 +49,96 @@ export function composableContentFromSections(
   // merendernya; tema lain abaikan. Absen data → undefined → tak dirender.
   const info = buildInfoLokasi(profile)
 
+  // Balok Sprint A/B (team/pricing/process + gambar about/cta) — diisi pasca-DP
+  // lewat data_konten (form "Lengkapi Website" / draft Claude). Parser defensif:
+  // entri tak valid dibuang, kosong → undefined → balok tak dirender (nol regresi
+  // untuk situs lama yang data_konten-nya belum punya field ini).
+  const team = parseTeam(konten.team)
+  const pricing = parsePricing(konten.pricing)
+  const proc = parseProcess(konten.process)
+  const aboutImage = str(konten.about_image)
+  const ctaImage = str(konten.cta_image)
+
   return {
     nama: base.nama,
     hero: { ...base.hero, image: fotoHero },
     features: base.features,
     showcase,
     info,
-    about: base.about,
-    cta: base.cta,
+    team,
+    pricing,
+    process: proc,
+    about: base.about ? { ...base.about, image: aboutImage } : base.about,
+    cta: base.cta ? { ...base.cta, image: ctaImage } : base.cta,
     contact: base.contact,
   }
+}
+
+// ── Parser defensif konten balok Sprint A/B dari data_konten ──
+// data_konten = JSON bebas (diisi pasca-DP). Validasi ketat: field wajib harus
+// string non-kosong, entri tak valid dilewati, hasil kosong → undefined.
+function str(v: unknown): string | undefined {
+  return typeof v === 'string' && v.trim() ? v.trim() : undefined
+}
+function strList(v: unknown): string[] {
+  return Array.isArray(v) ? v.map(str).filter((x): x is string => !!x) : []
+}
+
+function parseTeam(v: unknown): TeamMember[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const out: TeamMember[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const nama = str(r.nama)
+    const peran = str(r.peran)
+    if (!nama || !peran) continue // nama + peran wajib
+    out.push({ nama, peran, foto: str(r.foto), bio: str(r.bio) })
+  }
+  return out.length ? out.slice(0, 12) : undefined
+}
+
+function parsePricing(v: unknown): PricingContent | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const o = v as Record<string, unknown>
+  if (!Array.isArray(o.plans)) return undefined
+  const plans: PricingPlan[] = []
+  for (const raw of o.plans) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const nama = str(r.nama)
+    const harga = str(r.harga)
+    if (!nama || !harga) continue // nama + harga wajib
+    plans.push({
+      nama, harga,
+      periode: str(r.periode),
+      desc: str(r.desc),
+      fitur: strList(r.fitur),
+      ctaText: str(r.ctaText),
+      ctaHref: str(r.ctaHref),
+      unggulan: r.unggulan === true,
+      badge: str(r.badge),
+    })
+  }
+  if (!plans.length) return undefined
+  return { title: str(o.title), subtitle: str(o.subtitle), plans: plans.slice(0, 6) }
+}
+
+function parseProcess(v: unknown): ProcessContent | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const o = v as Record<string, unknown>
+  if (!Array.isArray(o.steps)) return undefined
+  const steps: ProcessContent['steps'] = []
+  for (const raw of o.steps) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const judul = str(r.judul)
+    const desc = str(r.desc)
+    if (!judul || !desc) continue // judul + desc wajib
+    steps.push({ judul, desc })
+  }
+  if (!steps.length) return undefined
+  return { title: str(o.title), subtitle: str(o.subtitle), steps: steps.slice(0, 8) }
 }
 
 // Profil bisnis → InfoLokasi. Jam = string bebas (1 baris). mapsQuery dari
