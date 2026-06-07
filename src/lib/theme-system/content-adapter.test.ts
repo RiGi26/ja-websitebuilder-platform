@@ -179,6 +179,26 @@ describe('composableContentFromSections — data_konten Sprint A/B (team/pricing
     expect(c.testimonials).toBeUndefined()
     expect(c.gallery).toBeUndefined()
   })
+
+  it('stats & faq: dipetakan dari data_konten; entri tak lengkap dibuang', () => {
+    const konten = {
+      stats: [{ angka: '5rb+', label: 'Pelanggan' }, { angka: 'tanpa label' }],
+      faq: [{ q: 'Buka kapan?', a: 'Setiap hari.' }, { a: 'tanpa pertanyaan' }],
+    }
+    const c = composableContentFromSections('Toko X', sectionsAboutCta, [], null, konten)
+    expect(c.stats).toHaveLength(1)
+    expect(c.stats?.[0]).toEqual({ angka: '5rb+', label: 'Pelanggan' })
+    expect(c.faq).toHaveLength(1)
+    expect(c.faq?.[0]).toEqual({ q: 'Buka kapan?', a: 'Setiap hari.' })
+  })
+
+  it('nol regresi + defensif: stats/faq absen atau tipe salah → undefined', () => {
+    expect(composableContentFromSections('X', sectionsAboutCta, [], null, {}).stats).toBeUndefined()
+    expect(composableContentFromSections('X', sectionsAboutCta, [], null, {}).faq).toBeUndefined()
+    const bad = composableContentFromSections('X', sectionsAboutCta, [], null, { stats: 9, faq: 'x' })
+    expect(bad.stats).toBeUndefined()
+    expect(bad.faq).toBeUndefined()
+  })
 })
 
 describe('sampleContentForTheme — konten contoh Sprint A/B (preview)', () => {
@@ -211,6 +231,16 @@ describe('sampleContentForTheme — konten contoh Sprint A/B (preview)', () => {
     expect(sampleContentForTheme('korporat-biru').partners?.logos.length).toBeGreaterThan(0)
     expect(sampleContentForTheme('kuliner-rustic').social?.links.length).toBeGreaterThan(0)
     expect(sampleContentForTheme('luar-premium').social?.links.length).toBeGreaterThan(0)
+  })
+
+  it('Enrich toko: 8 sub-kat toko kini punya stats + testimonials + faq', async () => {
+    const { sampleContentForTheme } = await import('./sample-content')
+    for (const id of ['kuliner-rustic', 'fashion-minimal', 'kerajinan-galeri', 'kecantikan-blush', 'gadget-onyx', 'rumah-natural', 'herbal-daun', 'anak-pop']) {
+      const c = sampleContentForTheme(id)
+      expect(c.stats?.length, `${id} stats`).toBeGreaterThan(0)
+      expect(c.testimonials?.length, `${id} testimonials`).toBeGreaterThan(0)
+      expect(c.faq?.length, `${id} faq`).toBeGreaterThan(0)
+    }
   })
 })
 

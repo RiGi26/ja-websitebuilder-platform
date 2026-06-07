@@ -161,21 +161,21 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'kuliner-rustic',
     label: 'Rustic Hangat',
     basePackId: 'kuliner-rustic',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list', social: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list', stats: true, testimoni: 'cards', faq: true, social: true },
   },
   // Modern Appetite — brand F&B kekinian. Bersih, cerah, grid kartu produk.
   'kuliner-modern': {
     id: 'kuliner-modern',
     label: 'Modern Appetite',
     basePackId: 'kuliner-modern',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', faq: true },
   },
   // Heritage Kuliner — kuliner premium/tradisional. Gelap-hangat maroon + gold.
   'kuliner-heritage': {
     id: 'kuliner-heritage',
     label: 'Heritage Kuliner',
     basePackId: 'kuliner-heritage',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', stats: true, testimoni: 'spotlight', faq: true },
   },
 
   // ── FASHION ×3 (Sprint 2). Token otentik di theme-packs.ts. DORMANT
@@ -184,105 +184,105 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'fashion-editorial',
     label: 'Fashion Editorial',
     basePackId: 'fashion-editorial',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook', stats: true, testimoni: 'spotlight', faq: true },
   },
   'fashion-minimal': {
     id: 'fashion-minimal',
     label: 'Fashion Minimalis',
     basePackId: 'fashion-minimal',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'fashion-vibrant': {
     id: 'fashion-vibrant',
     label: 'Fashion Vibrant',
     basePackId: 'fashion-vibrant',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', faq: true },
   },
 
   // ── KERAJINAN ×3 (flagship) — motif/tekstur panen batik ───────
   'kerajinan-pusaka': {
     id: 'kerajinan-pusaka', label: 'Kerajinan Pusaka', basePackId: 'kerajinan-pusaka',
     motif: 'kawung',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true },
   },
   'kerajinan-tenun': {
     id: 'kerajinan-tenun', label: 'Kerajinan Tenun', basePackId: 'kerajinan-tenun',
     motif: 'tenun',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'kerajinan-galeri': {
     id: 'kerajinan-galeri', label: 'Kerajinan Galeri', basePackId: 'kerajinan-galeri',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'lookbook' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'lookbook', stats: true, testimoni: 'cards', faq: true },
   },
 
   // ── KECANTIKAN ×3 — lembut/elegan/pastel ──────────────────────
   'kecantikan-blush': {
     id: 'kecantikan-blush', label: 'Kecantikan Blush', basePackId: 'kecantikan-blush',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'kecantikan-glow': {
     id: 'kecantikan-glow', label: 'Kecantikan Glow', basePackId: 'kecantikan-glow',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'kecantikan-noir': {
     id: 'kecantikan-noir', label: 'Kecantikan Noir', basePackId: 'kecantikan-noir',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'lookbook', stats: true, testimoni: 'spotlight', faq: true },
   },
 
   // ── GADGET ×3 — modern/gelap/tech ─────────────────────────────
   'gadget-onyx': {
     id: 'gadget-onyx', label: 'Gadget Onyx', basePackId: 'gadget-onyx',
-    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true },
   },
   'gadget-studio': {
     id: 'gadget-studio', label: 'Gadget Studio', basePackId: 'gadget-studio',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'gadget-neon': {
     id: 'gadget-neon', label: 'Gadget Neon', basePackId: 'gadget-neon',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', faq: true },
   },
 
   // ── RUMAH ×3 — natural/lapang ─────────────────────────────────
   'rumah-natural': {
     id: 'rumah-natural', label: 'Rumah Natural', basePackId: 'rumah-natural',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'rumah-japandi': {
     id: 'rumah-japandi', label: 'Rumah Japandi', basePackId: 'rumah-japandi',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'rumah-walnut': {
     id: 'rumah-walnut', label: 'Rumah Walnut', basePackId: 'rumah-walnut',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true },
   },
 
   // ── HERBAL ×3 — natural/hijau/trust ───────────────────────────
   'herbal-daun': {
     id: 'herbal-daun', label: 'Herbal Daun', basePackId: 'herbal-daun',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'herbal-jamu': {
     id: 'herbal-jamu', label: 'Herbal Jamu', basePackId: 'herbal-jamu',
-    blocks: { hero: 'centered', features: 'rows', showcase: 'menu-list' },
+    blocks: { hero: 'centered', features: 'rows', showcase: 'menu-list', stats: true, testimoni: 'marquee', faq: true },
   },
   'herbal-botani': {
     id: 'herbal-botani', label: 'Herbal Botani', basePackId: 'herbal-botani',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', faq: true },
   },
 
   // ── ANAK ×3 — playful/ramah ───────────────────────────────────
   'anak-pastel': {
     id: 'anak-pastel', label: 'Anak Pastel', basePackId: 'anak-pastel',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'anak-ceria': {
     id: 'anak-ceria', label: 'Anak Ceria', basePackId: 'anak-ceria',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true },
   },
   'anak-pop': {
     id: 'anak-pop', label: 'Anak Pop', basePackId: 'anak-pop',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', faq: true },
   },
 
   // ── RESTAURANT (Sprint 4) — pakai balok Sprint 5 (info/stats/
