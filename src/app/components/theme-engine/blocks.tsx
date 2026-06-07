@@ -167,7 +167,11 @@ export const ENGINE_CSS = `
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
-const HERO_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)'
+const HERO_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.38) 55%, rgba(0,0,0,.66) 100%)'
+// Wash brand: tint primary halus di sudut atas-kiri → foto hero terasa DIDESAIN
+// untuk brand ini (kohesi palet), bukan stock yang sekадar digelapkan scrim hitam.
+// Transparan di tengah/bawah supaya tak ganggu keterbacaan teks putih.
+const HERO_BRAND_WASH = 'linear-gradient(120deg, color-mix(in srgb, var(--c-primary) 30%, transparent) 0%, transparent 52%)'
 
 // ── MOTIF / TEKSTUR (panen dari BatikTokoRenderer) ────────────
 // Tile SVG data-uri, ditint warna primary tema. Dipakai sebagai overlay halus
@@ -229,7 +233,7 @@ type Hero = ComposableContent['hero']
 // Latar hero: foto + scrim kalau ada gambar; gradient token kalau tidak.
 function heroBg(image?: string): React.CSSProperties {
   if (image) {
-    return { backgroundImage: `${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    return { backgroundImage: `${HERO_BRAND_WASH}, ${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
   }
   // Gradient MESH (bukan flat): 2 radial aksen + linear dasar → ada kedalaman.
   return {
@@ -273,7 +277,7 @@ export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama:
           {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, color: 'var(--c-muted)', lineHeight: 1.7, maxWidth: 520 }}>{hero.subtitle}</p>}
           {hero.ctaText && <div style={{ marginTop: 36 }}><Btn text={hero.ctaText} href={hero.ctaHref} /></div>}
         </div>
-        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...(hero.image ? { backgroundImage: `url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))` }) }}>
+        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...(hero.image ? { backgroundImage: `${HERO_BRAND_WASH}, url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))` }) }}>
           {!hero.image && (
             <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(120px, 18vw, 220px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: .9 }}>
               {(nama.trim()[0] ?? 'A').toUpperCase()}
