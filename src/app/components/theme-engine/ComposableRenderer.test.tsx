@@ -175,8 +175,13 @@ describe('Sprint 5 balok — stats / testimoni / FAQ / info-lokasi', () => {
   })
 
   it('balok Sprint 5 TAK dirender bila manifest tak mengaktifkan (nol regresi)', () => {
-    // kuliner-rustic tak punya stats/testimoni/faq/info di blocks
-    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={CONTENT_FULL} />)
+    // Manifest minimal (hanya hero/features/showcase) — uji gating renderer langsung,
+    // tak bergantung pada manifest registry tertentu tetap "polos".
+    const bare: ThemeManifest = {
+      id: 'bare-test', label: 'Bare', basePackId: 'kuliner-rustic',
+      blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list' },
+    }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={bare} content={CONTENT_FULL} />)
     expect(html).not.toContain('Dipercaya Pelanggan Kami') // testimoni
     expect(html).not.toContain('output=embed') // info-lokasi
     expect(html).not.toContain('Tahun melayani') // stats

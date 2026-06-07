@@ -57,6 +57,22 @@ const KULINER: ComposableContent = {
       { platform: 'shopee', href: '#' },
     ],
   },
+  stats: [
+    { angka: '4.9', label: 'Rating pelanggan' },
+    { angka: '10rb+', label: 'Porsi terjual' },
+    { angka: '8 thn', label: 'Melayani' },
+    { angka: '100%', label: 'Ikan tenggiri asli' },
+  ],
+  testimonials: [
+    { quote: 'Pempeknya autentik, cukonya nampol. Sudah langganan bertahun-tahun.', nama: 'Bu Hesti', peran: 'Pelanggan setia' },
+    { quote: 'Dikirim frozen, sampai Jakarta masih rapi dan rasanya tetap juara.', nama: 'Andi', peran: 'Pelanggan Jakarta' },
+    { quote: 'Cuko-nya beda dari yang lain, beneran resep Palembang.', nama: 'Rina', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah bisa kirim luar kota?', a: 'Bisa. Pempek dikemas vacuum + frozen, tahan 1 bulan dan aman dikirim ke seluruh Indonesia.' },
+    { q: 'Cuko terpisah atau dicampur?', a: 'Cuko selalu dikemas terpisah dalam botol agar pempek tetap kering dan tahan lama.' },
+    { q: 'Bagaimana cara pesan?', a: 'Klik tombol WhatsApp, pilih menu dan jumlah, kami konfirmasi ongkir dan total. Mudah.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@pempekrigizaf.id', alamat: 'Palembang, Sumatera Selatan' },
 }
 
@@ -97,6 +113,21 @@ const FASHION: ComposableContent = {
     ctaText: 'Belanja Sekarang',
     ctaHref: '#koleksi',
   },
+  stats: [
+    { angka: '4.8', label: 'Rating' },
+    { angka: '5rb+', label: 'Pelanggan' },
+    { angka: '48 jam', label: 'Proses kirim' },
+    { angka: '30 hari', label: 'Garansi tukar' },
+  ],
+  testimonials: [
+    { quote: 'Bahannya premium, jahitannya rapi. Worth every rupiah.', nama: 'Dinda', peran: 'Pelanggan' },
+    { quote: 'Desainnya timeless, dipakai ke kantor maupun acara tetap pas.', nama: 'Maya', peran: 'Profesional' },
+    { quote: 'Packaging-nya elegan, cocok untuk hadiah.', nama: 'Sarah', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah ada panduan ukuran?', a: 'Ya, setiap produk dilengkapi size chart detail. Tim kami juga siap bantu via WhatsApp.' },
+    { q: 'Bagaimana kebijakan tukar?', a: 'Tukar ukuran gratis dalam 30 hari selama label masih terpasang dan belum dicuci.' },
+  ],
   contact: { wa: '6281296917963', email: 'hello@arnalabel.com', alamat: 'Bandung, Jawa Barat' },
 }
 
@@ -137,6 +168,21 @@ const KERAJINAN: ComposableContent = {
     ctaText: 'Pesan via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: '100%', label: 'Tulis tangan' },
+    { angka: '20+', label: 'Perajin mitra' },
+    { angka: '4.9', label: 'Rating' },
+    { angka: '25 thn', label: 'Melestarikan' },
+  ],
+  testimonials: [
+    { quote: 'Kualitas kainnya istimewa, motifnya halus. Bangga pakai wastra asli.', nama: 'Bu Retno', peran: 'Kolektor' },
+    { quote: 'Senang bisa mendukung perajin lokal langsung. Ceritanya juga dikirim.', nama: 'Pak Joko', peran: 'Pelanggan' },
+    { quote: 'Cocok untuk hadiah, dikemas sangat rapi dan berkelas.', nama: 'Lia', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah ini batik tulis asli?', a: 'Ya, seluruh koleksi dicanting tangan oleh perajin mitra kami, bukan cetak printing.' },
+    { q: 'Bagaimana cara merawatnya?', a: 'Cuci dengan lerak atau sabun lembut, jangan diperas, dan jemur di tempat teduh.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@wastranusantara.id', alamat: 'Pekalongan, Jawa Tengah' },
 }
 
@@ -177,6 +223,21 @@ const KECANTIKAN: ComposableContent = {
     ctaText: 'Chat via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: 'BPOM', label: 'Terdaftar' },
+    { angka: '50rb+', label: 'Pelanggan' },
+    { angka: '4.9', label: 'Rating' },
+    { angka: '0%', label: 'Bahan berbahaya' },
+  ],
+  testimonials: [
+    { quote: 'Kulit jadi lebih cerah dan lembap setelah 2 minggu. Suka banget!', nama: 'Tari', peran: 'Pelanggan' },
+    { quote: 'Teksturnya ringan, tidak lengket, dan wanginya lembut.', nama: 'Nadia', peran: 'Pelanggan' },
+    { quote: 'Aman buat kulit sensitif aku. Sudah repurchase 3x.', nama: 'Vina', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah produk sudah BPOM?', a: 'Ya, seluruh produk kami terdaftar BPOM dan teruji aman untuk pemakaian harian.' },
+    { q: 'Apakah aman untuk kulit sensitif?', a: 'Formula kami bebas alkohol keras dan pewangi berlebih, cocok untuk kulit sensitif. Tetap disarankan patch test.' },
+  ],
   contact: { wa: '6281296917963', email: 'care@lumiereskin.id', alamat: 'Jakarta Selatan' },
 }
 
@@ -217,6 +278,21 @@ const GADGET: ComposableContent = {
     ctaText: 'Order via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: '4.8', label: 'Rating' },
+    { angka: '30rb+', label: 'Unit terjual' },
+    { angka: '1 thn', label: 'Garansi resmi' },
+    { angka: '24 jam', label: 'Kirim cepat' },
+  ],
+  testimonials: [
+    { quote: 'Barang ori, garansi resmi, pengiriman ngebut. Recommended.', nama: 'Rio', peran: 'Pelanggan' },
+    { quote: 'Harga bersaing dan after-sales-nya responsif.', nama: 'Bayu', peran: 'Pelanggan' },
+    { quote: 'Packing aman pakai bubble tebal, gadget sampai mulus.', nama: 'Dewi', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah produk bergaransi resmi?', a: 'Ya, semua produk bergaransi resmi distributor Indonesia, bukan sekadar garansi toko.' },
+    { q: 'Berapa lama pengiriman?', a: 'Pesanan sebelum jam 3 sore dikirim hari yang sama. Estimasi tiba 1–3 hari kerja.' },
+  ],
   contact: { wa: '6281296917963', email: 'cs@nexagear.id', alamat: 'Bandung, Jawa Barat' },
 }
 
@@ -257,6 +333,21 @@ const RUMAH: ComposableContent = {
     ctaText: 'Konsultasi via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: '4.9', label: 'Rating' },
+    { angka: '3rb+', label: 'Rumah ditata' },
+    { angka: 'Solid', label: 'Kayu jati & mahoni' },
+    { angka: '5 thn', label: 'Garansi rangka' },
+  ],
+  testimonials: [
+    { quote: 'Furniturnya kokoh dan finishing-nya halus. Ruang tamu jadi hangat.', nama: 'Pak Hendra', peran: 'Pelanggan' },
+    { quote: 'Custom ukuran sesuai ruangan, hasilnya pas banget.', nama: 'Bu Sinta', peran: 'Pelanggan' },
+    { quote: 'Kayu solid asli, bukan partikel. Awet bertahun-tahun.', nama: 'Andre', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah bisa custom ukuran?', a: 'Bisa. Kirim ukuran dan referensi, tim kami buatkan sesuai kebutuhan ruangan Anda.' },
+    { q: 'Apakah kayunya solid?', a: 'Ya, kami memakai kayu jati dan mahoni solid berkualitas, bukan kayu olahan/partikel.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@rumahkayustudio.id', alamat: 'Jepara, Jawa Tengah' },
 }
 
@@ -297,6 +388,21 @@ const HERBAL: ComposableContent = {
     ctaText: 'Tanya via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: '100%', label: 'Murni alami' },
+    { angka: '12rb+', label: 'Pelanggan' },
+    { angka: '4.9', label: 'Rating' },
+    { angka: 'Lokal', label: 'Dari petani' },
+  ],
+  testimonials: [
+    { quote: 'Badan terasa lebih segar dan tidur lebih nyenyak. Alami tanpa efek aneh.', nama: 'Bu Wati', peran: 'Pelanggan' },
+    { quote: 'Racikannya terasa tradisional asli, bukan instan.', nama: 'Pak Slamet', peran: 'Pelanggan' },
+    { quote: 'Madunya kental dan murni, beda dari yang di pasaran.', nama: 'Endah', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah produk dijamin murni?', a: 'Ya, produk kami alami tanpa campuran gula/pengawet dan lolos uji kualitas lab.' },
+    { q: 'Bagaimana aturan konsumsinya?', a: 'Setiap produk dilengkapi aturan pakai. Untuk kondisi medis tertentu, konsultasikan dulu ke dokter.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@tanahherbal.id', alamat: 'Magelang, Jawa Tengah' },
 }
 
@@ -337,6 +443,21 @@ const ANAK: ComposableContent = {
     ctaText: 'Pesan via WhatsApp',
     ctaHref: '#wa',
   },
+  stats: [
+    { angka: 'SNI', label: 'Berstandar' },
+    { angka: '4.9', label: 'Rating' },
+    { angka: '15rb+', label: 'Keluarga senang' },
+    { angka: '0%', label: 'Bahan berbahaya' },
+  ],
+  testimonials: [
+    { quote: 'Mainannya aman, bahannya tebal, anak betah main berjam-jam.', nama: 'Bunda Sasa', peran: 'Orang tua' },
+    { quote: 'Edukatif dan warnanya cerah. Anak belajar sambil bermain.', nama: 'Ibu Ratna', peran: 'Orang tua' },
+    { quote: 'Pengiriman cepat dan packing rapi. Cocok buat kado.', nama: 'Pak Dimas', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah mainannya aman untuk balita?', a: 'Ya, material food-grade/SNI, tidak tajam, dan bebas BPA. Tetap dampingi anak saat bermain.' },
+    { q: 'Untuk usia berapa?', a: 'Setiap produk mencantumkan rekomendasi usia — ada pilihan untuk 0–1, 1–3, dan 3 tahun ke atas.' },
+  ],
   contact: { wa: '6281296917963', email: 'halo@cilukbakids.id', alamat: 'Surabaya, Jawa Timur' },
 }
 

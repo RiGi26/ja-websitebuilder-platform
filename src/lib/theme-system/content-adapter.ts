@@ -5,7 +5,7 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
 // Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
@@ -62,6 +62,8 @@ export function composableContentFromSections(
   // (data_konten.testimoni / .foto_items) — petakan ke balok composable.
   const testimonials = parseTestimoni(konten.testimoni)
   const gallery = galleryFromFotoItems(konten.foto_items)
+  const stats = parseStats(konten.stats)
+  const faq = parseFaq(konten.faq)
   const aboutImage = str(konten.about_image)
   const ctaImage = str(konten.cta_image)
 
@@ -72,6 +74,8 @@ export function composableContentFromSections(
     showcase,
     info,
     testimonials,
+    stats,
+    faq,
     gallery,
     team,
     pricing,
@@ -98,6 +102,36 @@ function parseTestimoni(v: unknown): Testimonial[] | undefined {
     out.push({ quote, nama, peran: str(r.kota) ?? str(r.peran) })
   }
   return out.length ? out.slice(0, 12) : undefined
+}
+
+// data_konten.stats ({angka,label}) → strip angka kredibilitas.
+function parseStats(v: unknown): StatItem[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const out: StatItem[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const angka = str(r.angka)
+    const label = str(r.label)
+    if (!angka || !label) continue // angka + label wajib
+    out.push({ angka, label })
+  }
+  return out.length ? out.slice(0, 4) : undefined
+}
+
+// data_konten.faq ({q,a}) → accordion.
+function parseFaq(v: unknown): FaqItem[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const out: FaqItem[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const q = str(r.q)
+    const a = str(r.a)
+    if (!q || !a) continue // q + a wajib
+    out.push({ q, a })
+  }
+  return out.length ? out.slice(0, 10) : undefined
 }
 
 // data_konten.foto_items ({label,url}) → galeri masonry ({src,caption}).
