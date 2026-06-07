@@ -19,7 +19,11 @@ import {
   // Personal (Sprint 8a): Kreator / Profesional / Coach
   Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award,
   // Company (Sprint 8b): Startup / Agency / Korporat
-  Megaphone, Building2, Building, Gauge, Boxes, Layers, Landmark, type LucideProps,
+  Megaphone, Building2, Building, Gauge, Boxes, Layers, Landmark,
+  // Travel / Blog / Jastip (Sprint 9)
+  Car, Bike, KeyRound, Palmtree, Mountain, Sunset, BedDouble, Home, Hotel,
+  NotebookPen, Type, Newspaper, Globe, Radio, Hash, Terminal,
+  Plane, ShoppingBag, PackageCheck, Truck, Clock, type LucideProps,
 } from 'lucide-react'
 
 const MAP = {
@@ -32,6 +36,9 @@ const MAP = {
   GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler,
   Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award,
   Megaphone, Building2, Building, Gauge, Boxes, Layers, Landmark,
+  Car, Bike, KeyRound, Palmtree, Mountain, Sunset, BedDouble, Home, Hotel,
+  NotebookPen, Type, Newspaper, Globe, Radio, Hash, Terminal,
+  Plane, ShoppingBag, PackageCheck, Truck, Clock,
 } as const
 
 export function ThemeIcon({ name, ...props }: { name: string } & LucideProps) {

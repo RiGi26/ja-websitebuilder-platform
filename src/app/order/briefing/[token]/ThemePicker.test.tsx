@@ -77,9 +77,9 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Kursus / Bimbel')
   })
 
-  it('tetap dormant untuk industri tanpa sub-kategori ready (mis. blog)', () => {
+  it('tetap dormant untuk industri tanpa sub-kategori (mis. custom)', () => {
     const html = renderToStaticMarkup(
-      <SubKategoriPicker tipe="blog" value="" onChange={noop} />,
+      <SubKategoriPicker tipe="custom" value="" onChange={noop} />,
     )
     expect(html).toBe('')
   })
