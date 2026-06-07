@@ -48,12 +48,14 @@ export interface BuildRowService {
   dp_amount?: number
   durasi_menit?: number
   kategori?: string
+  gambar?: string // foto placeholder (Unsplash terkurasi) — ditimpa saat klien upload
 }
 export interface BuildRowMenu {
   nama: string
   deskripsi?: string
   harga: number
   kategori?: string
+  gambar?: string
 }
 export interface BuildRowProduct {
   nama: string
@@ -61,6 +63,7 @@ export interface BuildRowProduct {
   harga: number
   kategori?: string
   stok?: number
+  gambar?: string
 }
 
 export interface BuildTenantProfile {

@@ -10,6 +10,7 @@ import { runTemplate } from './templates'
 import { deriveDesignTokens, defaultVariant } from './designTokens'
 import { industryToTheme, addonsToFeatures } from '@/lib/websitebuilder-mapping'
 import { getManifest } from '@/lib/theme-system/manifest'
+import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
 
 type OrderLike = {
   industri?: string | null
@@ -29,13 +30,35 @@ export function generateContent(order: OrderLike): BuildPlan {
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
   // Selain itu jalur lama (theme per industri). Dormant sampai sub-kategori ready.
-  const theme = getManifest(variant) ? 'composable' : industryToTheme(b.tipe)
+  const manifest = getManifest(variant)
+  const theme = manifest ? 'composable' : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
 
-  const services = out.services ?? []
-  const menuItems = out.menuItems ?? []
-  const products = out.products ?? []
+  // Imagery enrichment (anti-slop): dummy auto-build tak punya foto → semua jatuh
+  // ke placeholder gradient. Pinjam foto Unsplash terkurasi dari sample-content
+  // (per sub-kategori) HANYA utk tema composable — di situ sub-kat pasti cocok,
+  // jadi fotonya relevan (tema lama/generik dilewati supaya tak salah industri).
+  // Hanya mengisi yang masih kosong; saat klien upload foto via portal, ditimpa.
+  const sample = manifest && variant ? sampleContentForTheme(variant) : null
+  const showcaseImgs = (sample?.showcase?.items ?? [])
+    .map((it) => it.gambar)
+    .filter((g): g is string => !!g)
+  const withGambar = <T extends { gambar?: string }>(rows: T[]): T[] =>
+    showcaseImgs.length
+      ? rows.map((r, i) => (r.gambar ? r : { ...r, gambar: showcaseImgs[i % showcaseImgs.length] }))
+      : rows
+
+  const services = withGambar(out.services ?? [])
+  const menuItems = withGambar(out.menuItems ?? [])
+  const products = withGambar(out.products ?? [])
+
+  const dataKonten: Record<string, unknown> = { ...out.dataKonten }
+  if (sample) {
+    if (sample.hero?.image && !dataKonten.foto_hero) dataKonten.foto_hero = sample.hero.image
+    if (sample.about?.image && !dataKonten.about_image) dataKonten.about_image = sample.about.image
+    if (sample.cta?.image && !dataKonten.cta_image) dataKonten.cta_image = sample.cta.image
+  }
 
   const tenantProfile: BuildTenantProfile = {
     wa: b.wa || undefined,
@@ -51,7 +74,7 @@ export function generateContent(order: OrderLike): BuildPlan {
     primary: b.primary,
     designTokens,
     features,
-    dataKonten: out.dataKonten,
+    dataKonten,
     sections: out.sections,
     services,
     menuItems,
