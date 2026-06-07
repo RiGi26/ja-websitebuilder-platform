@@ -37,6 +37,30 @@ export interface TeamMember {
   foto?: string // URL foto; fallback = avatar inisial
   bio?: string  // 1 kalimat bio; muncul saat hover (CSS-only)
 }
+// Sprint B — Conversion layer balok baru
+// Pricing: 'cards' = kartu tier berdampingan · 'table' = matriks perbandingan ·
+// 'single' = 1 paket unggulan terfokus. Harga string supaya fleksibel.
+export type PricingVariant = 'cards' | 'table' | 'single'
+// Process: 'horizontal' = langkah bernomor sebaris + konektor · 'timeline' =
+// linimasa vertikal · 'cards' = kartu langkah grid.
+export type ProcessVariant = 'horizontal' | 'timeline' | 'cards'
+// CTA: 'card' = kartu gradient (perilaku lama) · 'banner' = strip lebar penuh ·
+// 'split' = gambar + ajakan berdampingan.
+export type CtaVariant = 'card' | 'banner' | 'split'
+export interface PricingPlan {
+  nama: string
+  harga: string         // string fleksibel: "Rp250rb" / "Gratis" / "Hubungi kami"
+  periode?: string      // "/bulan" · "/paket" · "/orang"
+  desc?: string
+  fitur: string[]
+  ctaText?: string
+  ctaHref?: string
+  unggulan?: boolean    // tandai paket utama → di-highlight
+  badge?: string        // override teks badge (default "Paling Populer")
+}
+export interface PricingContent { title?: string; subtitle?: string; plans: PricingPlan[] }
+export interface ProcessStep { judul: string; desc: string }
+export interface ProcessContent { title?: string; subtitle?: string; steps: ProcessStep[] }
 
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
@@ -58,6 +82,10 @@ export interface ThemeManifest {
     // ── Balok Sprint A — Trust layer (semua opsional → tema lama nol regresi) ──
     team?: TeamVariant    // grid kartu · spotlight 1-featured · horizontal scroll
     about?: AboutVariant  // default 'text' (perilaku lama); 'split-right/left/story' = dengan gambar
+    // ── Balok Sprint B — Conversion layer (semua opsional → tema lama nol regresi) ──
+    pricing?: PricingVariant // cards tier · table perbandingan · single unggulan
+    process?: ProcessVariant // horizontal langkah · timeline · cards
+    cta?: CtaVariant         // default 'card' (perilaku lama); 'banner' · 'split'
   }
 }
 
@@ -103,7 +131,10 @@ export interface ComposableContent {
   gallery?: GalleryContent
   about?: { title: string; body: string; image?: string; ctaText?: string; ctaHref?: string }
   team?: TeamMember[]
-  cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
+  // Sprint B — conversion layer; absen + manifest off = tak dirender (nol regresi)
+  pricing?: PricingContent
+  process?: ProcessContent
+  cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
   contact?: { wa?: string; email?: string; alamat?: string }
 }
 
@@ -353,7 +384,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // KURSUS / BIMBEL
   'kursus-fokus': {
     id: 'kursus-fokus', label: 'Kursus Fokus', basePackId: 'kursus-fokus',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true, info: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', faq: true, info: true, process: 'cards', pricing: 'cards' },
   },
   'kursus-energi': {
     id: 'kursus-energi', label: 'Kursus Energi', basePackId: 'kursus-energi',
@@ -403,7 +434,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
   'coach-prestige': {
     id: 'coach-prestige', label: 'Coach Prestige', basePackId: 'coach-prestige',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true, team: 'spotlight', about: 'story' },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true, team: 'spotlight', about: 'story', pricing: 'single', cta: 'banner' },
   },
 
   // ── COMPANY / CORPORATE (Sprint 8b) — showcase=layanan, stats=angka
@@ -411,11 +442,11 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // STARTUP / TECH / SAAS
   'startup-aurora': {
     id: 'startup-aurora', label: 'Startup Aurora', basePackId: 'startup-aurora',
-    blocks: { hero: 'split', features: 'zigzag', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, team: 'grid', about: 'split-right' },
+    blocks: { hero: 'split', features: 'zigzag', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, team: 'grid', about: 'split-right', process: 'horizontal', pricing: 'cards' },
   },
   'startup-midnight': {
     id: 'startup-midnight', label: 'Startup Midnight', basePackId: 'startup-midnight',
-    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true, pricing: 'table' },
   },
   'startup-mint': {
     id: 'startup-mint', label: 'Startup Mint', basePackId: 'startup-mint',
@@ -437,7 +468,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // KORPORAT / MANUFAKTUR / B2B
   'korporat-biru': {
     id: 'korporat-biru', label: 'Korporat Biru', basePackId: 'korporat-biru',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, process: 'timeline' },
   },
   'korporat-slate': {
     id: 'korporat-slate', label: 'Korporat Slate', basePackId: 'korporat-slate',
@@ -472,7 +503,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
 
   // ── JASTIP (Sprint 9) — showcase=katalog titipan (products) ──
   'luar-global': { id: 'luar-global', label: 'Jastip Global', basePackId: 'luar-global', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
-  'luar-premium': { id: 'luar-premium', label: 'Jastip Premium', basePackId: 'luar-premium', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true } },
+  'luar-premium': { id: 'luar-premium', label: 'Jastip Premium', basePackId: 'luar-premium', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true, process: 'horizontal', pricing: 'cards' } },
   'luar-pop': { id: 'luar-pop', label: 'Jastip Pop', basePackId: 'luar-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
   'lokal-hangat': { id: 'lokal-hangat', label: 'Jastip Hangat', basePackId: 'lokal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
   'lokal-segar': { id: 'lokal-segar', label: 'Jastip Segar', basePackId: 'lokal-segar', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },

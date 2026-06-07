@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -96,6 +96,44 @@ export const ENGINE_CSS = `
 .ce-zigzag-item:nth-child(even) { flex-direction: row-reverse; }
 @media (max-width: 767px) { .ce-zigzag-item, .ce-zigzag-item:nth-child(even) { flex-direction: column; gap: 32px; padding: 40px 0; } }
 @media (prefers-reduced-motion: reduce) { .ce-team-photo img { transition: none; } .ce-team-bio-reveal { transition: none; transform: translateY(0); } }
+/* ── Sprint B — Conversion layer ──────────────────────────── */
+/* Pricing cards — kartu tier, paket unggulan diangkat + ring primary */
+.ce-pcard { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); display: flex; flex-direction: column; transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease; }
+.ce-pcard:hover { transform: translateY(-4px); box-shadow: var(--s-lg); }
+.ce-pcard.feat { border-color: var(--c-primary); box-shadow: 0 16px 44px color-mix(in srgb, var(--c-primary) 22%, transparent); }
+.ce-pcard-amt { font-family: var(--f-display); font-weight: var(--fw-display); font-variant-numeric: tabular-nums; color: var(--c-ink); line-height: 1; letter-spacing: var(--tracking); }
+.ce-pcard-badge { background: var(--c-primary); color: var(--c-on-primary); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+.ce-pcard-feat { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-top: 1px solid var(--c-border); font-size: 14px; color: var(--c-ink); line-height: 1.5; }
+.ce-pcard-feat:first-child { border-top: none; }
+.ce-pcard-tick { flex-shrink: 0; color: var(--c-primary); margin-top: 2px; }
+/* Pricing table — matriks perbandingan, scroll horizontal di mobile */
+.ce-ptab-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--c-border); border-radius: var(--r-lg); }
+.ce-ptab { width: 100%; border-collapse: collapse; min-width: 560px; }
+.ce-ptab th, .ce-ptab td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--c-border); vertical-align: middle; }
+.ce-ptab tr:last-child td { border-bottom: none; }
+.ce-ptab thead th { border-bottom: 2px solid var(--c-border); vertical-align: bottom; }
+.ce-ptab .col { text-align: center; }
+.ce-ptab thead th.feat { background: color-mix(in srgb, var(--c-primary) 9%, transparent); }
+.ce-ptab tbody td.feat, .ce-ptab tfoot td.feat { background: color-mix(in srgb, var(--c-primary) 5%, transparent); }
+.ce-ptab-amt { font-family: var(--f-display); font-weight: var(--fw-display); font-variant-numeric: tabular-nums; color: var(--c-ink); font-size: 26px; line-height: 1; }
+.ce-ptab-tick { color: var(--c-primary); }
+.ce-ptab-x { color: var(--c-muted); opacity: .45; }
+/* Process horizontal — node bernomor sebaris + konektor garis */
+.ce-proc { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 20px; }
+.ce-proc-step { position: relative; text-align: center; padding: 0 8px; }
+.ce-proc-node { width: 56px; height: 56px; margin: 0 auto 18px; border-radius: 999px; background: color-mix(in srgb, var(--c-primary) 14%, var(--c-surface)); color: var(--c-primary); display: flex; align-items: center; justify-content: center; font-family: var(--f-display); font-weight: 800; font-size: 22px; position: relative; z-index: 1; }
+.ce-proc-line { position: absolute; top: 28px; left: 50%; right: -50%; height: 2px; background: var(--c-border); z-index: 0; }
+.ce-proc-step:last-child .ce-proc-line { display: none; }
+@media (max-width: 767px) { .ce-proc { grid-auto-flow: row; } .ce-proc-line { display: none; } }
+/* Process timeline — linimasa vertikal + node */
+.ce-tl-item { position: relative; padding: 0 0 32px 60px; }
+.ce-tl-item:last-child { padding-bottom: 0; }
+.ce-tl-item::before { content: ''; position: absolute; left: 19px; top: 8px; bottom: -8px; width: 2px; background: var(--c-border); }
+.ce-tl-item:last-child::before { display: none; }
+.ce-tl-node { position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 999px; background: var(--c-primary); color: var(--c-on-primary); display: flex; align-items: center; justify-content: center; font-family: var(--f-display); font-weight: 800; font-size: 16px; z-index: 1; }
+/* CTA banner — strip lebar penuh, teks kiri + tombol kanan */
+.ce-cta-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; }
+@media (prefers-reduced-motion: reduce) { .ce-pcard { transition: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -861,6 +899,267 @@ export function FeaturesZigzag({ features }: { features: NonNullable<ComposableC
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── SPRINT B — Conversion layer (Pricing / Process / CTA varian) ──
+// Ikon centang reusable (SVG, stroke = currentColor → ikut warna parent).
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
+
+// Tombol outline (sekunder) — dipakai paket non-unggulan supaya hierarki jelas.
+function BtnOutline({ text, href }: { text?: string; href?: string }) {
+  if (!text) return null
+  return (
+    <a href={href ?? '#'} style={{ display: 'inline-block', padding: '13px 28px', borderRadius: 'var(--r-pill)', border: '1px solid var(--c-border)', color: 'var(--c-ink)', textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+      {text}
+    </a>
+  )
+}
+
+// ── PRICING — 3 varian (cards / table / single) ──────────────
+function PricingCard({ plan }: { plan: PricingPlan }) {
+  const feat = !!plan.unggulan
+  return (
+    <div className={feat ? 'ce-pcard feat' : 'ce-pcard'} style={{ padding: 30, position: 'relative' }}>
+      {feat && <span className="ce-pcard-badge" style={{ position: 'absolute', top: -12, left: 30 }}>{plan.badge ?? 'Paling Populer'}</span>}
+      <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 6px', color: 'var(--c-ink)' }}>{plan.nama}</h3>
+      {plan.desc && <p style={{ fontSize: 13, color: 'var(--c-muted)', lineHeight: 1.5, margin: '0 0 18px' }}>{plan.desc}</p>}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 22 }}>
+        <span className="ce-pcard-amt" style={{ fontSize: 'clamp(30px, 5vw, 40px)' }}>{plan.harga}</span>
+        {plan.periode && <span style={{ fontSize: 14, color: 'var(--c-muted)' }}>{plan.periode}</span>}
+      </div>
+      {plan.fitur.length > 0 && (
+        <div style={{ marginBottom: 26 }}>
+          {plan.fitur.map((f, i) => (
+            <div key={i} className="ce-pcard-feat">
+              <CheckIcon className="ce-pcard-tick" />
+              <span>{f}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div style={{ marginTop: 'auto' }}>
+        {feat
+          ? <Btn text={plan.ctaText ?? 'Pilih Paket'} href={plan.ctaHref} />
+          : <BtnOutline text={plan.ctaText ?? 'Pilih Paket'} href={plan.ctaHref} />}
+      </div>
+    </div>
+  )
+}
+
+// Cards — tier berdampingan; paket unggulan di-highlight (ring + badge).
+export function PricingCards({ pricing }: { pricing: PricingContent }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Paket & Harga" title={pricing.title ?? 'Pilih Paket yang Pas'} subtitle={pricing.subtitle} />
+        <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, alignItems: 'stretch' }}>
+          {pricing.plans.map((p, i) => <PricingCard key={i} plan={p} />)}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Table — matriks perbandingan; baris = gabungan semua fitur, centang per paket.
+export function PricingTable({ pricing }: { pricing: PricingContent }) {
+  const plans = pricing.plans
+  const allFeatures: string[] = []
+  for (const p of plans) for (const f of p.fitur) if (!allFeatures.includes(f)) allFeatures.push(f)
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <SectionHead eyebrow="Paket & Harga" title={pricing.title ?? 'Bandingkan Paket'} subtitle={pricing.subtitle} />
+        <div className="ce-ptab-wrap">
+          <table className="ce-ptab">
+            <thead>
+              <tr>
+                <th aria-hidden />
+                {plans.map((p, i) => (
+                  <th key={i} className={p.unggulan ? 'col feat' : 'col'}>
+                    {p.unggulan && <div className="ce-pcard-badge" style={{ display: 'inline-block', marginBottom: 8 }}>{p.badge ?? 'Populer'}</div>}
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--c-ink)' }}>{p.nama}</div>
+                    <div className="ce-ptab-amt" style={{ marginTop: 6 }}>{p.harga}</div>
+                    {p.periode && <div style={{ fontSize: 12, color: 'var(--c-muted)' }}>{p.periode}</div>}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {allFeatures.map((f, ri) => (
+                <tr key={ri}>
+                  <td style={{ fontSize: 14, color: 'var(--c-ink)' }}>{f}</td>
+                  {plans.map((p, ci) => (
+                    <td key={ci} className={p.unggulan ? 'col feat' : 'col'}>
+                      {p.fitur.includes(f)
+                        ? <CheckIcon className="ce-ptab-tick" />
+                        : <span className="ce-ptab-x" aria-label="tidak termasuk">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td aria-hidden />
+                {plans.map((p, i) => (
+                  <td key={i} className={p.unggulan ? 'col feat' : 'col'}>
+                    {p.unggulan
+                      ? <Btn text={p.ctaText ?? 'Pilih'} href={p.ctaHref} />
+                      : <BtnOutline text={p.ctaText ?? 'Pilih'} href={p.ctaHref} />}
+                  </td>
+                ))}
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Single — 1 paket unggulan terfokus, fitur 2-kolom, CTA besar.
+export function PricingSingle({ pricing }: { pricing: PricingContent }) {
+  const plan = pricing.plans.find(p => p.unggulan) ?? pricing.plans[0]
+  if (!plan) return null
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <SectionHead eyebrow="Penawaran" title={pricing.title ?? 'Satu Paket, Semua Fitur'} subtitle={pricing.subtitle} />
+        <div className="ce-pcard feat" style={{ padding: 'clamp(28px, 5vw, 48px)', textAlign: 'center', alignItems: 'center' }}>
+          {plan.badge && <span className="ce-pcard-badge" style={{ marginBottom: 16 }}>{plan.badge}</span>}
+          <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-ink)' }}>{plan.nama}</h3>
+          {plan.desc && <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: '0 0 20px', maxWidth: 420 }}>{plan.desc}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, marginBottom: 28 }}>
+            <span className="ce-pcard-amt" style={{ fontSize: 'clamp(40px, 8vw, 60px)' }}>{plan.harga}</span>
+            {plan.periode && <span style={{ fontSize: 16, color: 'var(--c-muted)' }}>{plan.periode}</span>}
+          </div>
+          {plan.fitur.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 28px', textAlign: 'left', width: '100%', maxWidth: 520, marginBottom: 32 }}>
+              {plan.fitur.map((f, i) => (
+                <div key={i} className="ce-pcard-feat" style={{ borderTop: 'none' }}>
+                  <CheckIcon className="ce-pcard-tick" />
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <Btn text={plan.ctaText ?? 'Mulai Sekarang'} href={plan.ctaHref} />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── PROCESS / STEPS — 3 varian (horizontal / timeline / cards) ──
+// Horizontal — node bernomor sebaris + konektor; collapse ke kolom di mobile.
+export function ProcessHorizontal({ process }: { process: ProcessContent }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Cara Kerja" title={process.title ?? 'Cara Kerjanya'} subtitle={process.subtitle} />
+        <div className="ce-proc">
+          {process.steps.map((s, i) => (
+            <div key={i} className="ce-proc-step">
+              <div className="ce-proc-node">{i + 1}</div>
+              <span className="ce-proc-line" aria-hidden />
+              <h3 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-ink)' }}>{s.judul}</h3>
+              <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Timeline — linimasa vertikal bernomor (cocok proses panjang / riwayat).
+export function ProcessTimeline({ process }: { process: ProcessContent }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <SectionHead eyebrow="Proses Kami" title={process.title ?? 'Langkah demi Langkah'} subtitle={process.subtitle} />
+        <div>
+          {process.steps.map((s, i) => (
+            <div key={i} className="ce-tl-item">
+              <div className="ce-tl-node">{i + 1}</div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 6px', color: 'var(--c-ink)' }}>{s.judul}</h3>
+              <p style={{ fontSize: 15, color: 'var(--c-muted)', lineHeight: 1.7, margin: 0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Cards — kartu langkah grid dengan angka watermark besar.
+export function ProcessCards({ process }: { process: ProcessContent }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Cara Kerja" title={process.title ?? 'Cara Kerjanya'} subtitle={process.subtitle} />
+        <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
+          {process.steps.map((s, i) => (
+            <div key={i} className="ce-card" style={{ padding: 28, position: 'relative' }}>
+              <span aria-hidden style={{ position: 'absolute', top: 16, right: 20, fontFamily: 'var(--f-display)', fontWeight: 900, fontSize: 56, lineHeight: 1, color: 'var(--c-primary)', opacity: 0.12, userSelect: 'none' }}>{String(i + 1).padStart(2, '0')}</span>
+              <div style={{ width: 40, height: 40, borderRadius: 999, background: 'color-mix(in srgb, var(--c-primary) 14%, var(--c-surface))', color: 'var(--c-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--f-display)', fontWeight: 800, fontSize: 17, marginBottom: 18 }}>{i + 1}</div>
+              <h3 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-ink)' }}>{s.judul}</h3>
+              <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── CTA varian — banner (strip lebar) / split (gambar + ajakan) ──
+export function CTABanner({ cta }: { cta: NonNullable<ComposableContent['cta']> }) {
+  return (
+    <section style={{ padding: '32px 24px 96px' }}>
+      <div
+        className="ce-cta-banner"
+        style={{
+          maxWidth: 1120, margin: '0 auto', padding: 'clamp(36px, 5vw, 56px)',
+          borderRadius: 'var(--r-lg)', color: 'var(--c-hero-ink)', boxShadow: 'var(--s-lg)',
+          border: '1px solid var(--c-border)', overflow: 'hidden',
+          backgroundImage: [
+            'radial-gradient(ellipse 50% 120% at 100% 50%, color-mix(in srgb, var(--c-primary) 24%, transparent) 0%, transparent 60%)',
+            'linear-gradient(120deg, var(--c-hero-from), var(--c-hero-to))',
+          ].join(', '),
+        }}
+      >
+        <div style={{ flex: '1 1 360px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: '0 0 8px', color: 'var(--c-hero-ink)' }}>{cta.title}</h2>
+          {cta.subtitle && <p style={{ opacity: .85, margin: 0, fontSize: 16, lineHeight: 1.6 }}>{cta.subtitle}</p>}
+        </div>
+        <Btn text={cta.ctaText ?? 'Pesan Sekarang'} href={cta.ctaHref} />
+      </div>
+    </section>
+  )
+}
+
+export function CTASplit({ cta }: { cta: NonNullable<ComposableContent['cta']> }) {
+  return (
+    <section style={{ padding: '32px 24px 96px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        <div style={{ minHeight: 280, background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+          {cta.image && <img src={cta.image} alt={cta.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 280 }} />}
+        </div>
+        <div style={{ padding: 'clamp(32px, 5vw, 56px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'var(--c-surface)' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: '0 0 12px', color: 'var(--c-ink)' }}>{cta.title}</h2>
+          {cta.subtitle && <p style={{ color: 'var(--c-muted)', margin: '0 0 28px', fontSize: 16, lineHeight: 1.7 }}>{cta.subtitle}</p>}
+          <div><Btn text={cta.ctaText ?? 'Pesan Sekarang'} href={cta.ctaHref} /></div>
         </div>
       </div>
     </section>

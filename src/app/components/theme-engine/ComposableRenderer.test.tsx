@@ -496,6 +496,146 @@ describe('Sprint A — Team / About / Zigzag', () => {
   })
 })
 
+// Konten konversi — pricing/process/cta untuk Sprint B.
+const CONV_CONTENT: ComposableContent = {
+  ...CONTENT,
+  pricing: {
+    title: 'Pilih Paket Belajar',
+    subtitle: 'Harga transparan, tanpa biaya tersembunyi.',
+    plans: [
+      { nama: 'Reguler', harga: 'Rp250rb', periode: '/bulan', desc: 'Untuk pemula.', fitur: ['8x pertemuan', 'Modul digital'], ctaText: 'Daftar Reguler', ctaHref: '#reg' },
+      { nama: 'Intensif', harga: 'Rp450rb', periode: '/bulan', desc: 'Paling diminati.', fitur: ['8x pertemuan', 'Modul digital', 'Konsultasi 1-on-1', 'Garansi nilai'], unggulan: true, ctaText: 'Daftar Intensif', ctaHref: '#int' },
+      { nama: 'Privat', harga: 'Rp900rb', periode: '/bulan', desc: 'Belajar eksklusif.', fitur: ['12x pertemuan', 'Konsultasi 1-on-1'], ctaText: 'Daftar Privat', ctaHref: '#priv' },
+    ],
+  },
+  process: {
+    title: 'Cara Mulai Belajar',
+    steps: [
+      { judul: 'Konsultasi Awal', desc: 'Diskusi kebutuhan belajarmu.' },
+      { judul: 'Pilih Jadwal', desc: 'Tentukan waktu yang pas.' },
+      { judul: 'Mulai Kelas', desc: 'Belajar bersama mentor.' },
+    ],
+  },
+  cta: { title: 'Siap Mulai?', subtitle: 'Gabung sekarang.', ctaText: 'Daftar', ctaHref: '#daftar', image: 'https://x.test/cta-foto.jpg' },
+}
+
+describe('Sprint B — Pricing / Process / CTA varian', () => {
+  const withBlocks = (id: string, extra: Partial<ThemeManifest['blocks']>): ThemeManifest => ({
+    ...MANIFESTS[id],
+    blocks: { ...MANIFESTS[id].blocks, ...extra },
+  })
+  const render = (m: ThemeManifest, c: ComposableContent) =>
+    renderToStaticMarkup(<ComposableRenderer manifest={m} content={c} />)
+
+  // ── PRICING ──
+  it('pricing cards: render semua paket + harga + badge unggulan + fitur', () => {
+    const html = render(withBlocks('kuliner-rustic', { pricing: 'cards' }), CONV_CONTENT)
+    expect(html).toContain('Reguler')
+    expect(html).toContain('Intensif')
+    expect(html).toContain('Privat')
+    expect(html).toContain('Rp450rb')
+    expect(html).toContain('Paling Populer')      // badge default plan.unggulan
+    expect(html).toContain('Konsultasi 1-on-1')   // fitur
+    expect(html).toContain('ce-pcard feat')       // class spasi hanya di markup (bukan CSS)
+  })
+
+  it('pricing table: gabungan fitur jadi baris perbandingan semua paket', () => {
+    const html = render(withBlocks('kuliner-rustic', { pricing: 'table' }), CONV_CONTENT)
+    expect(html).toContain('Garansi nilai')   // fitur khusus Intensif → tetap jadi baris
+    expect(html).toContain('8x pertemuan')    // fitur bersama
+    expect(html).toContain('12x pertemuan')   // fitur khusus Privat
+    expect(html).toContain('Reguler')
+    expect(html).toContain('Privat')
+  })
+
+  it('pricing single: pilih paket unggulan (Intensif), bukan paket lain', () => {
+    const html = render(withBlocks('kuliner-rustic', { pricing: 'single' }), CONV_CONTENT)
+    expect(html).toContain('Intensif')
+    expect(html).toContain('Rp450rb')
+    expect(html).not.toContain('Reguler') // single hanya render 1 paket
+    expect(html).not.toContain('Privat')
+  })
+
+  it('pricing TAK dirender bila manifest tak punya slot (nol regresi)', () => {
+    const html = render(MANIFESTS['kuliner-rustic'], CONV_CONTENT)
+    expect(html).not.toContain('Pilih Paket Belajar') // judul pricing
+    expect(html).not.toContain('Paling Populer')
+  })
+
+  it('pricing TAK dirender bila content.pricing kosong walau manifest aktif', () => {
+    const html = render(withBlocks('kuliner-rustic', { pricing: 'cards' }), CONTENT)
+    expect(html).not.toContain('Paket & Harga') // eyebrow pricing
+  })
+
+  // ── PROCESS ──
+  it('process horizontal: render judul tiap langkah', () => {
+    const html = render(withBlocks('kuliner-rustic', { process: 'horizontal' }), CONV_CONTENT)
+    expect(html).toContain('Cara Mulai Belajar')
+    expect(html).toContain('Konsultasi Awal')
+    expect(html).toContain('Pilih Jadwal')
+    expect(html).toContain('Mulai Kelas')
+  })
+
+  it('process timeline: render linimasa vertikal (ce-tl-item di markup)', () => {
+    const html = render(withBlocks('kuliner-rustic', { process: 'timeline' }), CONV_CONTENT)
+    expect(html).toContain('ce-tl-item')
+    expect(html).toContain('Konsultasi Awal')
+  })
+
+  it('process cards: render kartu langkah', () => {
+    const html = render(withBlocks('kuliner-rustic', { process: 'cards' }), CONV_CONTENT)
+    expect(html).toContain('Cara Mulai Belajar')
+    expect(html).toContain('Mulai Kelas')
+  })
+
+  it('process TAK dirender bila manifest tak punya slot (nol regresi)', () => {
+    const html = render(MANIFESTS['kuliner-rustic'], CONV_CONTENT)
+    expect(html).not.toContain('Cara Mulai Belajar')
+    expect(html).not.toContain('Konsultasi Awal')
+  })
+
+  // ── CTA VARIAN ──
+  it('cta split: render gambar (unik untuk varian split) + judul', () => {
+    const html = render(withBlocks('kuliner-rustic', { cta: 'split' }), CONV_CONTENT)
+    expect(html).toContain('https://x.test/cta-foto.jpg') // hanya split render cta.image
+    expect(html).toContain('Siap Mulai?')
+  })
+
+  it('cta banner: markup beda dari card default + tetap render judul', () => {
+    const banner = render(withBlocks('kuliner-rustic', { cta: 'banner' }), CONV_CONTENT)
+    const card = render(MANIFESTS['kuliner-rustic'], CONV_CONTENT) // tanpa varian = card
+    expect(banner).toContain('Siap Mulai?')
+    expect(banner).not.toBe(card)
+    expect(banner).not.toContain('https://x.test/cta-foto.jpg') // banner tak render gambar
+  })
+
+  it('cta default (card): nol regresi — render judul tanpa gambar', () => {
+    const html = render(MANIFESTS['kuliner-rustic'], CONV_CONTENT)
+    expect(html).toContain('Siap Mulai?')
+    expect(html).not.toContain('https://x.test/cta-foto.jpg') // card tak render cta.image
+  })
+
+  // ── MANIFEST TERUPDATE ──
+  it('startup-aurora (updated): pricing cards + process horizontal aktif', () => {
+    const html = render(MANIFESTS['startup-aurora'], CONV_CONTENT)
+    expect(html).toContain('Intensif')        // pricing
+    expect(html).toContain('Konsultasi Awal') // process
+  })
+
+  it('coach-prestige (updated): pricing single pilih unggulan', () => {
+    const html = render(MANIFESTS['coach-prestige'], CONV_CONTENT)
+    expect(html).toContain('Intensif')
+    expect(html).not.toContain('Reguler') // single → 1 paket saja
+  })
+
+  it('startup-midnight (updated): pricing table aktif', () => {
+    const html = render(MANIFESTS['startup-midnight'], CONV_CONTENT)
+    expect(html).toContain('Garansi nilai') // baris fitur tabel
+    expect(html).toContain('Reguler')
+    expect(html).toContain('Privat')
+  })
+})
+
 describe('Sprint 9 — travel / blog / jastip', () => {
   const ALL_S9 = [
     'kendaraan-asphalt', 'kendaraan-bersih', 'kendaraan-kuning',
