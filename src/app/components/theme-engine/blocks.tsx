@@ -43,6 +43,9 @@ export const ENGINE_CSS = `
 .ce-quote { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease; }
 .ce-quote:hover { transform: translateY(-4px); box-shadow: var(--s-lg); border-color: color-mix(in srgb, var(--c-primary) 40%, var(--c-border)); }
 .ce-quote-mark { font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); opacity: .28; line-height: .6; }
+/* Testimoni spotlight — panel signature: watermark kutipan raksasa + panel ber-tint + avatar */
+.ce-spotlight { position: relative; overflow: hidden; margin: 0; border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); background: linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 7%, var(--c-surface)) 0%, var(--c-surface) 70%); }
+.ce-spotlight-mark { position: absolute; top: clamp(-28px, -2.5vw, -8px); left: 50%; transform: translateX(-50%); font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); opacity: .1; font-size: clamp(180px, 28vw, 300px); line-height: 1; pointer-events: none; user-select: none; }
 /* Marquee testimoni — dua track berjalan, CSS-only, jeda saat hover */
 .ce-marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .ce-marquee-track { display: flex; gap: 20px; width: max-content; animation: ceMarquee 38s linear infinite; }
@@ -587,14 +590,23 @@ export function TestimoniSpotlight({ testimonials }: { testimonials: Testimonial
   if (!t) return null
   return (
     <section style={{ background: 'var(--c-surface)', padding: '96px 24px' }}>
-      <div style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center' }}>
-        <span className="ce-quote-mark" style={{ fontSize: 'clamp(64px, 10vw, 96px)', display: 'block' }} aria-hidden>&ldquo;</span>
-        <blockquote style={{ margin: '0 0 28px', fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(22px, 3.4vw, 32px)', lineHeight: 1.35, color: 'var(--c-ink)', letterSpacing: 'var(--tracking)' }}>
-          {t.quote}
-        </blockquote>
-        <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--c-ink)' }}>{t.nama}</div>
-        {t.peran && <div style={{ fontSize: 13, color: 'var(--c-muted)', marginTop: 2 }}>{t.peran}</div>}
-      </div>
+      <figure className="ce-spotlight" style={{ maxWidth: 880, margin: '0 auto', padding: 'clamp(40px, 6vw, 68px) clamp(28px, 5vw, 56px)' }}>
+        <span className="ce-spotlight-mark" aria-hidden>&ldquo;</span>
+        <div style={{ position: 'relative', textAlign: 'center' }}>
+          <blockquote style={{ margin: '0 0 32px', fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(22px, 3.4vw, 32px)', lineHeight: 1.4, color: 'var(--c-ink)', letterSpacing: 'var(--tracking)' }}>
+            {t.quote}
+          </blockquote>
+          <figcaption style={{ display: 'inline-flex', alignItems: 'center', gap: 13 }}>
+            <span style={{ width: 46, height: 46, borderRadius: 999, background: 'color-mix(in srgb, var(--c-primary) 16%, transparent)', color: 'var(--c-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--f-display)', fontWeight: 800, fontSize: 19, flexShrink: 0 }}>
+              {(t.nama.trim()[0] ?? 'A').toUpperCase()}
+            </span>
+            <span style={{ textAlign: 'left' }}>
+              <span style={{ display: 'block', fontWeight: 700, fontSize: 15, color: 'var(--c-ink)' }}>{t.nama}</span>
+              {t.peran && <span style={{ display: 'block', fontSize: 13, color: 'var(--c-muted)', marginTop: 2 }}>{t.peran}</span>}
+            </span>
+          </figcaption>
+        </div>
+      </figure>
     </section>
   )
 }
