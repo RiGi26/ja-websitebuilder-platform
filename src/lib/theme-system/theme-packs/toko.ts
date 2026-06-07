@@ -81,7 +81,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'fashion-minimal': {
     id: 'fashion-minimal', label: 'Fashion Minimalis', mood: 'minimal',
     color: {
-      page: '#FAFAF8', surface: '#FFFFFF', ink: '#1C1B19', muted: '#8A857C',
+      page: '#FAFAF8', surface: '#FFFFFF', ink: '#1C1B19', muted: '#706C63',
       border: 'rgba(0,0,0,0.07)', primary: '#1C1B19', onPrimary: '#FFFFFF',
       heroFrom: '#F4F1EC', heroTo: '#E8E2D8', heroInk: '#1C1B19',
     },
@@ -153,7 +153,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'kerajinan-galeri': {
     id: 'kerajinan-galeri', label: 'Kerajinan Galeri', mood: 'minimal',
     color: {
-      page: '#FAF8F4', surface: '#FFFFFF', ink: '#211D18', muted: '#837C71',
+      page: '#FAF8F4', surface: '#FFFFFF', ink: '#211D18', muted: '#736D62',
       border: 'rgba(0,0,0,0.07)', primary: '#8A6D3B', onPrimary: '#FFFFFF',
       heroFrom: '#F2EEE7', heroTo: '#E6DFD2', heroInk: '#211D18',
     },
@@ -175,8 +175,8 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'kecantikan-blush': {
     id: 'kecantikan-blush', label: 'Kecantikan Blush', mood: 'clean',
     color: {
-      page: '#FFF6F4', surface: '#FFFFFF', ink: '#3D2B30', muted: '#927B80',
-      border: 'rgba(61,43,48,0.08)', primary: '#D98A9E', onPrimary: '#FFFFFF',
+      page: '#FFF6F4', surface: '#FFFFFF', ink: '#3D2B30', muted: '#7C656C',
+      border: 'rgba(61,43,48,0.08)', primary: '#D98A9E', onPrimary: '#1A1A1A',
       heroFrom: '#FFE9EC', heroTo: '#FBD7DE', heroInk: '#3D2B30',
     },
     font: { display: SERIF, body: SANS, displayWeight: 600, bodyWeight: 400, tracking: '-0.01em' },
@@ -191,7 +191,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'kecantikan-glow': {
     id: 'kecantikan-glow', label: 'Kecantikan Glow', mood: 'minimal',
     color: {
-      page: '#FFFFFF', surface: '#FAF7F2', ink: '#2A2622', muted: '#8A8278',
+      page: '#FFFFFF', surface: '#FAF7F2', ink: '#2A2622', muted: '#756E64',
       border: 'rgba(0,0,0,0.06)', primary: '#BD9A5F', onPrimary: '#2A2622',
       heroFrom: '#FFFFFF', heroTo: '#F4ECDD', heroInk: '#2A2622',
     },
@@ -245,7 +245,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'gadget-studio': {
     id: 'gadget-studio', label: 'Gadget Studio', mood: 'clean',
     color: {
-      page: '#FFFFFF', surface: '#F5F6F8', ink: '#111316', muted: '#6B7280',
+      page: '#FFFFFF', surface: '#F5F6F8', ink: '#111316', muted: '#686F7D',
       border: 'rgba(0,0,0,0.07)', primary: '#0071E3', onPrimary: '#FFFFFF',
       heroFrom: '#FFFFFF', heroTo: '#EEF2F7', heroInk: '#111316',
     },
@@ -283,7 +283,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'rumah-natural': {
     id: 'rumah-natural', label: 'Rumah Natural', mood: 'warm',
     color: {
-      page: '#F8F4EC', surface: '#FFFFFF', ink: '#322A1F', muted: '#7C7060',
+      page: '#F8F4EC', surface: '#FFFFFF', ink: '#322A1F', muted: '#776B57',
       border: 'rgba(50,42,31,0.09)', primary: '#9C6B3F', onPrimary: '#FFFFFF',
       heroFrom: '#F1E7D4', heroTo: '#DFC9A6', heroInk: '#322A1F',
     },
@@ -299,7 +299,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'rumah-japandi': {
     id: 'rumah-japandi', label: 'Rumah Japandi', mood: 'minimal',
     color: {
-      page: '#F4F3EF', surface: '#FFFFFF', ink: '#2B2A26', muted: '#847F75',
+      page: '#F4F3EF', surface: '#FFFFFF', ink: '#2B2A26', muted: '#6E6A60',
       border: 'rgba(0,0,0,0.06)', primary: '#6B6657', onPrimary: '#FFFFFF',
       heroFrom: '#ECEAE3', heroTo: '#DAD6CB', heroInk: '#2B2A26',
     },
@@ -391,7 +391,7 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'anak-pastel': {
     id: 'anak-pastel', label: 'Anak Pastel', mood: 'minimal',
     color: {
-      page: '#FBF7FF', surface: '#FFFFFF', ink: '#4A4458', muted: '#948CA6',
+      page: '#FBF7FF', surface: '#FFFFFF', ink: '#4A4458', muted: '#6E6788',
       border: 'rgba(74,68,88,0.08)', primary: '#8FC9C2', onPrimary: '#233B38',
       heroFrom: '#E8F7F4', heroTo: '#FDE6E9', heroInk: '#4A4458',
     },
@@ -407,8 +407,8 @@ export const TOKO_PACKS: Record<string, TokenPack> = {
   'anak-ceria': {
     id: 'anak-ceria', label: 'Anak Ceria', mood: 'clean',
     color: {
-      page: '#F6FBFF', surface: '#FFFFFF', ink: '#1F2A44', muted: '#6B7689',
-      border: 'rgba(31,42,68,0.08)', primary: '#2BA8E0', onPrimary: '#FFFFFF',
+      page: '#F6FBFF', surface: '#FFFFFF', ink: '#1F2A44', muted: '#646E81',
+      border: 'rgba(31,42,68,0.08)', primary: '#2BA8E0', onPrimary: '#1A1A1A',
       heroFrom: '#DFF1FF', heroTo: '#FFF0C9', heroInk: '#1F2A44',
     },
     font: { display: ROUNDED, body: ROUNDED, displayWeight: 800, bodyWeight: 400, tracking: '-0.02em' },

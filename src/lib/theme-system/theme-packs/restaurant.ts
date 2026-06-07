@@ -97,8 +97,8 @@ export const RESTAURANT_PACKS: Record<string, TokenPack> = {
   'cafe-bloom': {
     id: 'cafe-bloom', label: 'Cafe Bloom', mood: 'minimal',
     color: {
-      page: '#FFF8F4', surface: '#FFFFFF', ink: '#3A2B30', muted: '#917A80',
-      border: 'rgba(58,43,48,0.08)', primary: '#E08CA0', onPrimary: '#FFFFFF',
+      page: '#FFF8F4', surface: '#FFFFFF', ink: '#3A2B30', muted: '#7C666C',
+      border: 'rgba(58,43,48,0.08)', primary: '#E08CA0', onPrimary: '#1A1A1A',
       heroFrom: '#FFEAF0', heroTo: '#FCE2CF', heroInk: '#3A2B30',
     },
     font: { display: ROUNDED, body: ROUNDED, displayWeight: 700, bodyWeight: 400, tracking: '-0.015em' },
@@ -149,7 +149,7 @@ export const RESTAURANT_PACKS: Record<string, TokenPack> = {
   'finedining-nordic': {
     id: 'finedining-nordic', label: 'Fine Dining Nordic', mood: 'minimal',
     color: {
-      page: '#FAFAF8', surface: '#FFFFFF', ink: '#23271F', muted: '#7B8178',
+      page: '#FAFAF8', surface: '#FFFFFF', ink: '#23271F', muted: '#6B7167',
       border: 'rgba(0,0,0,0.07)', primary: '#3E4A42', onPrimary: '#FFFFFF',
       heroFrom: '#EEF0EA', heroTo: '#DCE0D4', heroInk: '#23271F',
     },
