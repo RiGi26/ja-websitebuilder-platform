@@ -96,6 +96,7 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       dp_amount: s.dp_amount ?? 0,
       durasi_menit: s.durasi_menit ?? null,
       kategori: s.kategori ?? null,
+      gambar_url: s.gambar ?? null,
       is_active: true,
       urutan: i,
     }))
@@ -111,6 +112,7 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       deskripsi: m.deskripsi ?? null,
       harga: m.harga,
       kategori: m.kategori ?? null,
+      gambar_url: m.gambar ?? null,
       is_active: true,
       urutan: i,
     }))
@@ -127,6 +129,7 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       harga: p.harga,
       kategori: p.kategori ?? null,
       stok: p.stok ?? null,
+      gambar_url: p.gambar ?? null,
       is_active: true,
       urutan: i,
     }))
