@@ -65,8 +65,8 @@ export const KLINIK_PACKS: Record<string, TokenPack> = {
   'estetik-rosegold': {
     id: 'estetik-rosegold', label: 'Estetik Rosegold', mood: 'warm',
     color: {
-      page: '#FFF6F3', surface: '#FFFFFF', ink: '#3A2A2A', muted: '#917573',
-      border: 'rgba(58,42,42,0.08)', primary: '#C58B6B', onPrimary: '#FFFFFF',
+      page: '#FFF6F3', surface: '#FFFFFF', ink: '#3A2A2A', muted: '#806863',
+      border: 'rgba(58,42,42,0.08)', primary: '#C58B6B', onPrimary: '#1A1A1A',
       heroFrom: '#FBE7DD', heroTo: '#F3CDBE', heroInk: '#3A2A2A',
     },
     font: { display: SERIF, body: SANS, displayWeight: 600, bodyWeight: 400, tracking: '-0.01em' },
@@ -81,8 +81,8 @@ export const KLINIK_PACKS: Record<string, TokenPack> = {
   'estetik-derma': {
     id: 'estetik-derma', label: 'Estetik Derma', mood: 'clean',
     color: {
-      page: '#FFFFFF', surface: '#F8FAFB', ink: '#1F2A30', muted: '#74828A',
-      border: 'rgba(0,0,0,0.06)', primary: '#E0789C', onPrimary: '#FFFFFF',
+      page: '#FFFFFF', surface: '#F8FAFB', ink: '#1F2A30', muted: '#67737B',
+      border: 'rgba(0,0,0,0.06)', primary: '#E0789C', onPrimary: '#1A1A1A',
       heroFrom: '#FFFFFF', heroTo: '#FBEAF0', heroInk: '#1F2A30',
     },
     font: { display: SANS, body: SANS, displayWeight: 600, bodyWeight: 400, tracking: '-0.02em' },
@@ -117,7 +117,7 @@ export const KLINIK_PACKS: Record<string, TokenPack> = {
   'wellness-sage': {
     id: 'wellness-sage', label: 'Wellness Sage', mood: 'minimal',
     color: {
-      page: '#F4F7F1', surface: '#FFFFFF', ink: '#232B20', muted: '#6E7A63',
+      page: '#F4F7F1', surface: '#FFFFFF', ink: '#232B20', muted: '#636E58',
       border: 'rgba(35,43,32,0.08)', primary: '#6E8B5A', onPrimary: '#FFFFFF',
       heroFrom: '#E6EFDD', heroTo: '#CDDFC0', heroInk: '#232B20',
     },

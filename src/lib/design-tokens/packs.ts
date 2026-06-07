@@ -61,7 +61,7 @@ export const PACKS: Record<string, TokenPack> = {
     id: 'clean-modern', label: 'Clean Modern', mood: 'clean',
     color: {
       page: '#FFFFFF', surface: '#F8FAFC', ink: '#0F172A', muted: '#5B6472',
-      border: 'rgba(15,23,42,0.08)', primary: '#0EA5E9', onPrimary: '#FFFFFF',
+      border: 'rgba(15,23,42,0.08)', primary: '#0EA5E9', onPrimary: '#1A1A1A',
       heroFrom: '#F8FAFC', heroTo: '#DBEAFE', heroInk: '#0F172A',
     },
     font: { display: SANS, body: SANS, displayWeight: 800, bodyWeight: 400, tracking: '-0.02em' },
@@ -187,15 +187,27 @@ function clampHex(hex?: string): string | null {
   return /^#([0-9a-fA-F]{6})$/.test(hex) ? hex : null
 }
 
-// Pilih teks kontras (putih/gelap) untuk di atas warna primary klien.
-function readableOn(hex: string): string {
+// WCAG 2.1 luminance relatif + rasio kontras — dipakai readableOn + gate kontras.
+function relLuminance(hex: string): number {
   const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16)
-  const g = parseInt(h.slice(2, 4), 16)
-  const b = parseInt(h.slice(4, 6), 16)
-  // luminance relatif (perceptual)
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-  return lum > 0.6 ? '#111111' : '#FFFFFF'
+  const ch = [0, 2, 4]
+    .map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+    .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+}
+/** Rasio kontras WCAG 2.1 (1–21). NaN bila salah satu warna bukan hex 6-digit. */
+export function contrastRatio(a: string, b: string): number {
+  const ca = clampHex(a), cb = clampHex(b)
+  if (!ca || !cb) return NaN
+  const L1 = relLuminance(ca), L2 = relLuminance(cb)
+  const [hi, lo] = L1 >= L2 ? [L1, L2] : [L2, L1]
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Pilih teks kontras (putih/gelap) untuk di atas warna primary klien — kini
+// berbasis rasio kontras WCAG (pilih yang kontrasnya lebih tinggi).
+function readableOn(hex: string): string {
+  return contrastRatio(hex, '#FFFFFF') >= contrastRatio(hex, '#111111') ? '#FFFFFF' : '#111111'
 }
 
 /**
