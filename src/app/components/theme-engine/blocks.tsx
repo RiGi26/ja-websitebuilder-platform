@@ -48,8 +48,18 @@ export const ENGINE_CSS = `
 .ce-marquee-track { display: flex; gap: 20px; width: max-content; animation: ceMarquee 38s linear infinite; }
 .ce-marquee:hover .ce-marquee-track { animation-play-state: paused; }
 @keyframes ceMarquee { to { transform: translateX(-50%); } }
-/* Stats — angka kredibilitas, tabular-nums, garis pemisah halus */
+/* Stats — signature credibility band: kontainer ber-tint primary + garis pemisah antar kolom */
 .ce-stat-num { font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: var(--tracking); }
+.ce-stats-band { border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); background: linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 6%, var(--c-surface)) 0%, var(--c-surface) 100%); overflow: hidden; }
+.ce-stat { padding: 14px 18px; }
+.ce-stat + .ce-stat { border-left: 1px solid var(--c-border); }
+@media (max-width: 560px) {
+  .ce-stats-band { grid-template-columns: repeat(2, 1fr) !important; }
+  .ce-stat + .ce-stat { border-left: 0; }
+  .ce-stat { border-top: 1px solid var(--c-border); }
+  .ce-stat:nth-child(-n+2) { border-top: 0; }
+  .ce-stat:nth-child(even) { border-left: 1px solid var(--c-border); }
+}
 /* FAQ — accordion CSS-only via <details>, ikon +/− berputar */
 .ce-faq { border-top: 1px solid var(--c-border); }
 .ce-faq > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; font-family: var(--f-display); font-weight: 700; color: var(--c-ink); transition: color .2s ease; }
@@ -468,9 +478,12 @@ export function ShowcaseLookbook({ showcase }: { showcase: NonNullable<Composabl
 // ── ABOUT / CTA / FOOTER ──────────────────────────────────────
 export function About({ about }: { about: NonNullable<ComposableContent['about']> }) {
   return (
-    <section style={{ padding: '64px 24px', maxWidth: 760, margin: '0 auto' }}>
-      <h2 style={{ fontSize: 'clamp(26px, 4vw, 34px)', margin: '0 0 16px' }}>{about.title}</h2>
-      <p style={{ fontSize: 16, color: 'var(--c-muted)', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
+    <section style={{ padding: '72px 24px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', borderLeft: '3px solid var(--c-primary)', paddingLeft: 'clamp(20px, 4vw, 40px)' }}>
+        <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
+        <h2 style={{ fontSize: 'clamp(26px, 4vw, 34px)', margin: '0 0 16px', color: 'var(--c-ink)' }}>{about.title}</h2>
+        <p style={{ fontSize: 17, color: 'var(--c-muted)', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
+      </div>
     </section>
   )
 }
@@ -524,12 +537,12 @@ function SectionHead({ eyebrow, title, subtitle }: { eyebrow?: string; title: st
 // ── STATS — strip angka kredibilitas (tabular-nums) ───────────
 export function Stats({ stats }: { stats: StatItem[] }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '56px 24px' }}>
-      <div className="ce-stagger" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, gap: 24 }}>
+    <section style={{ background: 'var(--c-page)', padding: '64px 24px' }}>
+      <div className="ce-stats-band ce-stagger" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '28px 12px' }}>
         {stats.map((s, i) => (
-          <div key={i} style={{ textAlign: 'center' }}>
+          <div key={i} className="ce-stat" style={{ textAlign: 'center' }}>
             <div className="ce-stat-num" style={{ fontSize: 'clamp(34px, 5vw, 52px)' }}>{s.angka}</div>
-            <div style={{ marginTop: 6, fontSize: 13, color: 'var(--c-muted)', fontWeight: 600 }}>{s.label}</div>
+            <div style={{ marginTop: 8, fontSize: 13, color: 'var(--c-muted)', fontWeight: 600 }}>{s.label}</div>
           </div>
         ))}
       </div>
