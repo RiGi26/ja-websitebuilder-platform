@@ -5,7 +5,7 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
 // Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
@@ -56,6 +56,8 @@ export function composableContentFromSections(
   const team = parseTeam(konten.team)
   const pricing = parsePricing(konten.pricing)
   const proc = parseProcess(konten.process)
+  const partners = parsePartners(konten.partners)
+  const social = parseSocial(konten.social)
   const aboutImage = str(konten.about_image)
   const ctaImage = str(konten.cta_image)
 
@@ -68,6 +70,8 @@ export function composableContentFromSections(
     team,
     pricing,
     process: proc,
+    partners,
+    social,
     about: base.about ? { ...base.about, image: aboutImage } : base.about,
     cta: base.cta ? { ...base.cta, image: ctaImage } : base.cta,
     contact: base.contact,
@@ -139,6 +143,40 @@ function parseProcess(v: unknown): ProcessContent | undefined {
   }
   if (!steps.length) return undefined
   return { title: str(o.title), subtitle: str(o.subtitle), steps: steps.slice(0, 8) }
+}
+
+function parsePartners(v: unknown): PartnersContent | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const o = v as Record<string, unknown>
+  if (!Array.isArray(o.logos)) return undefined
+  const logos: PartnerLogo[] = []
+  for (const raw of o.logos) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const nama = str(r.nama)
+    if (!nama) continue // nama wajib (jadi chip teks bila tak ada logo)
+    logos.push({ nama, logo: str(r.logo), href: str(r.href) })
+  }
+  if (!logos.length) return undefined
+  return { title: str(o.title), subtitle: str(o.subtitle), logos: logos.slice(0, 24) }
+}
+
+const SOCIAL_PLATFORMS = new Set<SocialPlatform>(['instagram', 'tiktok', 'youtube', 'facebook', 'whatsapp', 'x', 'shopee', 'tokopedia', 'website'])
+function parseSocial(v: unknown): SocialContent | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const o = v as Record<string, unknown>
+  if (!Array.isArray(o.links)) return undefined
+  const links: SocialLink[] = []
+  for (const raw of o.links) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const platform = str(r.platform)
+    const href = str(r.href)
+    if (!platform || !href || !SOCIAL_PLATFORMS.has(platform as SocialPlatform)) continue // platform valid + href wajib
+    links.push({ platform: platform as SocialPlatform, href, label: str(r.label) })
+  }
+  if (!links.length) return undefined
+  return { title: str(o.title), subtitle: str(o.subtitle), links: links.slice(0, 12) }
 }
 
 // Profil bisnis → InfoLokasi. Jam = string bebas (1 baris). mapsQuery dari

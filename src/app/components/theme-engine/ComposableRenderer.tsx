@@ -25,6 +25,7 @@ import {
   PricingCards, PricingTable, PricingSingle,
   ProcessHorizontal, ProcessTimeline, ProcessCards,
   CTABanner, CTASplit,
+  PartnersGrid, PartnersMarquee, SocialStrip,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -86,6 +87,12 @@ export default function ComposableRenderer({
         <Stats stats={content.stats} />
       )}
 
+      {/* Partner/Logo strip (Sprint C) — setelah stats (klaster kredibilitas) */}
+      {B.partners && content.partners && content.partners.logos.length > 0 && (
+        B.partners === 'marquee' ? <PartnersMarquee partners={content.partners} /> :
+        <PartnersGrid partners={content.partners} />
+      )}
+
       {/* Team/People — Trust layer (Sprint A) */}
       {B.team && content.team && content.team.length > 0 && (
         B.team === 'spotlight' ? <TeamSpotlight team={content.team} /> :
@@ -139,6 +146,11 @@ export default function ComposableRenderer({
         B.cta === 'banner' ? <CTABanner cta={content.cta} /> :
         B.cta === 'split' ? <CTASplit cta={content.cta} /> :
         <CTA cta={content.cta} />
+      )}
+
+      {/* Social strip (Sprint C) — "Ikuti Kami", dekat footer */}
+      {B.social && content.social && content.social.links.length > 0 && (
+        <SocialStrip social={content.social} />
       )}
 
       <Footer content={content} motif={motif} motifColor={motifColor} />

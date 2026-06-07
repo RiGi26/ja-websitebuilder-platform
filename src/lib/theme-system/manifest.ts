@@ -61,6 +61,16 @@ export interface PricingPlan {
 export interface PricingContent { title?: string; subtitle?: string; plans: PricingPlan[] }
 export interface ProcessStep { judul: string; desc: string }
 export interface ProcessContent { title?: string; subtitle?: string; steps: ProcessStep[] }
+// Sprint C — Trust/Social layer balok baru
+// Partners: 'grid' = deret logo statis · 'marquee' = strip bergerak (CSS-only).
+export type PartnersVariant = 'grid' | 'marquee'
+export interface PartnerLogo { nama: string; logo?: string; href?: string } // logo URL; fallback = chip teks nama
+export interface PartnersContent { title?: string; subtitle?: string; logos: PartnerLogo[] }
+// Social: deret ikon medsos/marketplace (kritis konteks Indonesia: jualan di
+// IG/TikTok/Shopee/WA). Ikon monokrom (currentColor) → ikut token tema.
+export type SocialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'whatsapp' | 'x' | 'shopee' | 'tokopedia' | 'website'
+export interface SocialLink { platform: SocialPlatform; href: string; label?: string }
+export interface SocialContent { title?: string; subtitle?: string; links: SocialLink[] }
 
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
@@ -86,6 +96,9 @@ export interface ThemeManifest {
     pricing?: PricingVariant // cards tier · table perbandingan · single unggulan
     process?: ProcessVariant // horizontal langkah · timeline · cards
     cta?: CtaVariant         // default 'card' (perilaku lama); 'banner' · 'split'
+    // ── Balok Sprint C — Trust/Social layer (semua opsional → tema lama nol regresi) ──
+    partners?: PartnersVariant // grid logo · marquee strip
+    social?: boolean           // strip ikon medsos/marketplace
   }
 }
 
@@ -135,6 +148,9 @@ export interface ComposableContent {
   pricing?: PricingContent
   process?: ProcessContent
   cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
+  // Sprint C — trust/social layer; absen + manifest off = tak dirender (nol regresi)
+  partners?: PartnersContent
+  social?: SocialContent
   contact?: { wa?: string; email?: string; alamat?: string }
 }
 
@@ -145,7 +161,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'kuliner-rustic',
     label: 'Rustic Hangat',
     basePackId: 'kuliner-rustic',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list' },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list', social: true },
   },
   // Modern Appetite — brand F&B kekinian. Bersih, cerah, grid kartu produk.
   'kuliner-modern': {
@@ -442,7 +458,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // STARTUP / TECH / SAAS
   'startup-aurora': {
     id: 'startup-aurora', label: 'Startup Aurora', basePackId: 'startup-aurora',
-    blocks: { hero: 'split', features: 'zigzag', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, team: 'grid', about: 'split-right', process: 'horizontal', pricing: 'cards' },
+    blocks: { hero: 'split', features: 'zigzag', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, team: 'grid', about: 'split-right', process: 'horizontal', pricing: 'cards', partners: 'grid' },
   },
   'startup-midnight': {
     id: 'startup-midnight', label: 'Startup Midnight', basePackId: 'startup-midnight',
@@ -468,7 +484,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // KORPORAT / MANUFAKTUR / B2B
   'korporat-biru': {
     id: 'korporat-biru', label: 'Korporat Biru', basePackId: 'korporat-biru',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, process: 'timeline' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, process: 'timeline', partners: 'marquee' },
   },
   'korporat-slate': {
     id: 'korporat-slate', label: 'Korporat Slate', basePackId: 'korporat-slate',
@@ -503,7 +519,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
 
   // ── JASTIP (Sprint 9) — showcase=katalog titipan (products) ──
   'luar-global': { id: 'luar-global', label: 'Jastip Global', basePackId: 'luar-global', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
-  'luar-premium': { id: 'luar-premium', label: 'Jastip Premium', basePackId: 'luar-premium', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true, process: 'horizontal', pricing: 'cards' } },
+  'luar-premium': { id: 'luar-premium', label: 'Jastip Premium', basePackId: 'luar-premium', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true, process: 'horizontal', pricing: 'cards', social: true } },
   'luar-pop': { id: 'luar-pop', label: 'Jastip Pop', basePackId: 'luar-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
   'lokal-hangat': { id: 'lokal-hangat', label: 'Jastip Hangat', basePackId: 'lokal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
   'lokal-segar': { id: 'lokal-segar', label: 'Jastip Segar', basePackId: 'lokal-segar', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },

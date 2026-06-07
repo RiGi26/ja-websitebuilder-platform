@@ -48,6 +48,15 @@ const KULINER: ComposableContent = {
     ctaText: 'Order via WhatsApp',
     ctaHref: '#wa',
   },
+  social: {
+    title: 'Ikuti & Pesan di',
+    links: [
+      { platform: 'instagram', href: '#', label: '@pempekrigizaf' },
+      { platform: 'tiktok', href: '#' },
+      { platform: 'whatsapp', href: '#wa' },
+      { platform: 'shopee', href: '#' },
+    ],
+  },
   contact: { wa: '6281296917963', email: 'halo@pempekrigizaf.id', alamat: 'Palembang, Sumatera Selatan' },
 }
 
@@ -1291,6 +1300,12 @@ const COMPANY_STARTUP: ComposableContent = {
       { nama: 'Enterprise', harga: 'Custom', desc: 'Untuk skala besar & kebutuhan khusus.', fitur: ['Pengguna tanpa batas', 'SLA & keamanan lanjutan', 'Onboarding khusus', 'Account manager'], ctaText: 'Hubungi Sales', ctaHref: '#wa' },
     ],
   },
+  partners: {
+    title: 'Dipercaya Tim Hebat',
+    logos: [
+      { nama: 'Tokopedia' }, { nama: 'Gojek' }, { nama: 'Ruangguru' }, { nama: 'Sirclo' }, { nama: 'Xendit' }, { nama: 'Mekari' },
+    ],
+  },
   contact: { wa: '6281296917963', email: 'halo@techflow.id', alamat: 'Jakarta' },
 }
 
@@ -1437,6 +1452,12 @@ const COMPANY_KORPORAT: ComposableContent = {
       { judul: 'Produksi & Quality Control', desc: 'Pengerjaan presisi dengan kontrol mutu berstandar ISO.' },
       { judul: 'Distribusi Tepat Waktu', desc: 'Pengiriman andal ke seluruh jaringan nasional.' },
       { judul: 'Dukungan Purna Jual', desc: 'Garansi dan dukungan teknis yang berkelanjutan.' },
+    ],
+  },
+  partners: {
+    title: 'Mitra & Klien Kami',
+    logos: [
+      { nama: 'Astra' }, { nama: 'Pertamina' }, { nama: 'Wijaya Karya' }, { nama: 'Pupuk Indonesia' }, { nama: 'Semen Gresik' }, { nama: 'Krakatau Steel' }, { nama: 'PLN' },
     ],
   },
   contact: { wa: '6281296917963', email: 'corporate@majubersama.co.id', alamat: 'Bekasi, Jawa Barat' },
@@ -1669,6 +1690,16 @@ const JASTIP_LUAR: ComposableContent = {
       { nama: 'Reguler', harga: 'Fee 10%', periode: '/barang', desc: 'Untuk titipan santai.', fitur: ['Pembelian produk original', 'Foto bukti beli', 'Update resi', 'Estimasi 2–3 minggu'], ctaText: 'Titip Reguler', ctaHref: '#wa' },
       { nama: 'Express', harga: 'Fee 18%', periode: '/barang', desc: 'Untuk yang butuh cepat.', fitur: ['Prioritas pembelian', 'Foto & video bukti', 'Pengiriman tercepat', 'Estimasi 7–10 hari', 'Asuransi pengiriman'], unggulan: true, ctaText: 'Titip Express', ctaHref: '#wa' },
       { nama: 'Borongan', harga: 'Nego', desc: 'Untuk reseller & jumlah besar.', fitur: ['Rate khusus volume', 'Dedicated admin', 'Skema pembayaran fleksibel'], ctaText: 'Hubungi Admin', ctaHref: '#wa' },
+    ],
+  },
+  social: {
+    title: 'Ikuti & Belanja di',
+    links: [
+      { platform: 'instagram', href: '#', label: '@globaljastip' },
+      { platform: 'tiktok', href: '#' },
+      { platform: 'whatsapp', href: '#wa' },
+      { platform: 'shopee', href: '#' },
+      { platform: 'tokopedia', href: '#' },
     ],
   },
   contact: { wa: '6281296917963', email: 'halo@globaljastip.id', alamat: 'Jakarta' },

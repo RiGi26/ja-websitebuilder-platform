@@ -106,6 +106,48 @@ describe('composableContentFromSections — data_konten Sprint A/B (team/pricing
     expect(c.pricing).toBeUndefined()
     expect(c.process).toBeUndefined()
   })
+
+  it('partners: dipetakan; logo tanpa nama dibuang', () => {
+    const konten = {
+      partners: {
+        title: 'Klien',
+        logos: [
+          { nama: 'Astra', href: 'https://astra.test' },
+          { nama: 'Logo Img', logo: 'https://x.test/l.png' },
+          { logo: 'https://x.test/no-name.png' }, // invalid → dibuang (nama wajib)
+        ],
+      },
+    }
+    const c = composableContentFromSections('PT X', sectionsAboutCta, [], null, konten)
+    expect(c.partners?.title).toBe('Klien')
+    expect(c.partners?.logos).toHaveLength(2)
+    expect(c.partners?.logos[0]).toMatchObject({ nama: 'Astra', href: 'https://astra.test' })
+  })
+
+  it('social: dipetakan; platform tak dikenal / tanpa href dibuang', () => {
+    const konten = {
+      social: {
+        links: [
+          { platform: 'instagram', href: 'https://ig.test/a', label: '@a' },
+          { platform: 'tiktok', href: 'https://tt.test/a' },
+          { platform: 'myspace', href: 'https://x.test' }, // platform invalid → dibuang
+          { platform: 'shopee' },                          // tanpa href → dibuang
+        ],
+      },
+    }
+    const c = composableContentFromSections('Toko X', sectionsAboutCta, [], null, konten)
+    expect(c.social?.links).toHaveLength(2)
+    expect(c.social?.links[0]).toMatchObject({ platform: 'instagram', href: 'https://ig.test/a', label: '@a' })
+    expect(c.social?.links[1].platform).toBe('tiktok')
+  })
+
+  it('nol regresi + defensif: partners/social absen atau tipe salah → undefined', () => {
+    expect(composableContentFromSections('X', sectionsAboutCta, [], null, {}).partners).toBeUndefined()
+    expect(composableContentFromSections('X', sectionsAboutCta, [], null, {}).social).toBeUndefined()
+    const bad = composableContentFromSections('X', sectionsAboutCta, [], null, { partners: 'x', social: { links: 9 } })
+    expect(bad.partners).toBeUndefined()
+    expect(bad.social).toBeUndefined()
+  })
 })
 
 describe('sampleContentForTheme — konten contoh Sprint A/B (preview)', () => {
@@ -130,6 +172,14 @@ describe('sampleContentForTheme — konten contoh Sprint A/B (preview)', () => {
     const kursus = sampleContentForTheme('kursus-fokus')
     expect(kursus.pricing?.plans.length).toBeGreaterThan(0)
     expect(kursus.process?.steps.length).toBeGreaterThan(0)
+  })
+
+  it('Sprint C: startup+korporat punya partners; kuliner+jastip punya social', async () => {
+    const { sampleContentForTheme } = await import('./sample-content')
+    expect(sampleContentForTheme('startup-aurora').partners?.logos.length).toBeGreaterThan(0)
+    expect(sampleContentForTheme('korporat-biru').partners?.logos.length).toBeGreaterThan(0)
+    expect(sampleContentForTheme('kuliner-rustic').social?.links.length).toBeGreaterThan(0)
+    expect(sampleContentForTheme('luar-premium').social?.links.length).toBeGreaterThan(0)
   })
 })
 
