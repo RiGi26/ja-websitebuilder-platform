@@ -434,6 +434,39 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'korporat-netral', label: 'Korporat Netral', basePackId: 'korporat-netral',
     blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
   },
+
+  // ── TRAVEL / RENTAL (Sprint 9) — showcase=armada/paket, gallery=destinasi ──
+  'kendaraan-asphalt': { id: 'kendaraan-asphalt', label: 'Kendaraan Asphalt', basePackId: 'kendaraan-asphalt', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true } },
+  'kendaraan-bersih': { id: 'kendaraan-bersih', label: 'Kendaraan Bersih', basePackId: 'kendaraan-bersih', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
+  'kendaraan-kuning': { id: 'kendaraan-kuning', label: 'Kendaraan Kuning', basePackId: 'kendaraan-kuning', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
+  'wisata-tropis': { id: 'wisata-tropis', label: 'Wisata Tropis', basePackId: 'wisata-tropis', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', gallery: 'masonry', info: true } },
+  'wisata-rimba': { id: 'wisata-rimba', label: 'Wisata Rimba', basePackId: 'wisata-rimba', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true } },
+  'wisata-senja': { id: 'wisata-senja', label: 'Wisata Senja', basePackId: 'wisata-senja', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true } },
+  'akomodasi-resort': { id: 'akomodasi-resort', label: 'Akomodasi Resort', basePackId: 'akomodasi-resort', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true } },
+  'akomodasi-kayu': { id: 'akomodasi-kayu', label: 'Akomodasi Kayu', basePackId: 'akomodasi-kayu', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'cards', gallery: 'masonry', info: true } },
+  'akomodasi-malam': { id: 'akomodasi-malam', label: 'Akomodasi Malam', basePackId: 'akomodasi-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true } },
+
+  // ── BLOG / MEDIA (Sprint 9) — showcase=artikel (blog_posts) ──
+  'jurnal-hangat': { id: 'jurnal-hangat', label: 'Blog Jurnal', basePackId: 'jurnal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', faq: true } },
+  'jurnal-mono': { id: 'jurnal-mono', label: 'Blog Mono', basePackId: 'jurnal-mono', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', faq: true } },
+  'jurnal-senja': { id: 'jurnal-senja', label: 'Blog Senja', basePackId: 'jurnal-senja', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', faq: true } },
+  'media-merah': { id: 'media-merah', label: 'Media Merah', basePackId: 'media-merah', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, faq: true } },
+  'media-biru': { id: 'media-biru', label: 'Media Biru', basePackId: 'media-biru', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, faq: true } },
+  'media-malam': { id: 'media-malam', label: 'Media Malam', basePackId: 'media-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, faq: true } },
+  'niche-hijau': { id: 'niche-hijau', label: 'Niche Hijau', basePackId: 'niche-hijau', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'cards', faq: true } },
+  'niche-pop': { id: 'niche-pop', label: 'Niche Pop', basePackId: 'niche-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'marquee', faq: true } },
+  'niche-gelap': { id: 'niche-gelap', label: 'Niche Gelap', basePackId: 'niche-gelap', blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', testimoni: 'spotlight', faq: true } },
+
+  // ── JASTIP (Sprint 9) — showcase=katalog titipan (products) ──
+  'luar-global': { id: 'luar-global', label: 'Jastip Global', basePackId: 'luar-global', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
+  'luar-premium': { id: 'luar-premium', label: 'Jastip Premium', basePackId: 'luar-premium', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true } },
+  'luar-pop': { id: 'luar-pop', label: 'Jastip Pop', basePackId: 'luar-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
+  'lokal-hangat': { id: 'lokal-hangat', label: 'Jastip Hangat', basePackId: 'lokal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
+  'lokal-segar': { id: 'lokal-segar', label: 'Jastip Segar', basePackId: 'lokal-segar', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
+  'lokal-gelap': { id: 'lokal-gelap', label: 'Jastip Lokal Gelap', basePackId: 'lokal-gelap', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true } },
+  'preorder-fokus': { id: 'preorder-fokus', label: 'PO Fokus', basePackId: 'preorder-fokus', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
+  'preorder-energi': { id: 'preorder-energi', label: 'PO Energi', basePackId: 'preorder-energi', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
+  'preorder-malam': { id: 'preorder-malam', label: 'PO Malam', basePackId: 'preorder-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true } },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {

@@ -5,8 +5,9 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **Fase aktif:** 🎉 **COMPANY TUNTAS (Sprint 8b) — 7 INDUSTRI, 69 TEMA.** Industri **Company/Corporate** (3 sub-kat: Startup/Agency/Korporat ×3 = **9 tema**, AKTIF), pipeline visual penuh. Total tema otentik kini **69** (24 Toko + 9 Resto + 9 Klinik + 9 Sekolah + 9 Personal + 9 Company), **7 industri**. 214/214 test (+1 skip), tsc + build bersih.
-- **Sebelumnya:** PERSONAL (S8a, 9). FU#1 (showcase per-industri) + FU#2 (theme-packs dipecah). SEKOLAH (S7, 9, pipeline visual). KLINIK (S6, 9) + galeri S5b. RESTAURANT (S4, 9) + balok S5. TOKO ONLINE (S1-3, 24).
+- **Fase aktif:** 🎉 **SEMUA INDUSTRI TUNTAS (Sprint 9) — 9 INDUSTRI, 96 TEMA.** Sprint 9 menambah **Travel/Rental** (kendaraan/wisata/akomodasi), **Blog/Media** (jurnal/media/niche), **Jastip** (luar/lokal/preorder) — 27 tema, AKTIF. Total **96 tema** otentik di **9 industri** (semua `TipeIndustri` kecuali `custom`). Composable showcase kini per-industri benar (products/menu/services/blog_posts). 253/253 test (+1 skip), tsc + build bersih, S9 flagship verified pixel (scorecard PASS).
+- **Sebelumnya:** COMPANY (S8b, 9) · PERSONAL (S8a, 9) · FU#1/FU#2 · SEKOLAH (S7, 9) · KLINIK (S6, 9)+galeri S5b · RESTAURANT (S4, 9)+S5 · TOKO ONLINE (S1-3, 24).
+- **Berikutnya:** POLISH lintas-sprint — **next/font asli** per gaya (#4, sekarang masih stack sistem).
 - **Yang LIVE:** mini-step "Tipe Toko" menampilkan **8 sub-kategori** ter-filter, masing-masing 3 gaya distinct; pilih **Lainnya** → variant lama. Renderer composable + resolusi build aktif.
 - **6 sub-kategori baru (gaya):** Kerajinan (pusaka gelap kawung / tenun hangat anyaman / galeri terang minimal) · Kecantikan (blush pastel / glow champagne / noir plum gelap) · Gadget (onyx cyan gelap / studio Apple-clean / neon magenta) · Rumah (natural kayu / japandi greige / walnut gelap) · Herbal (daun hijau / jamu amber / botani emerald gelap) · Anak (pastel lembut / ceria seimbang / pop lantang). VARIASI dijaga: tiap sub-kat rentang gelap↔terang + mood beda (dijaga test).
 - **Perpustakaan balok bertambah:** **MOTIF/TEKSTUR** (`MotifOverlay` + tile kawung/tenun, panen `BatikTokoRenderer`) — overlay hero + strip footer, ditint primary, parametrik. Dipakai Kerajinan; siap untuk tema heritage berikutnya. Plus font ROUNDED (playful/lembut).
@@ -275,8 +276,13 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 - **Hasil:** 9 tema AKTIF (tipe `corporate`). **Startup** (aurora light/midnight dark/mint light) · **Agency** (bold light/noir dark/prisma light) · **Korporat** (biru light/slate dark/netral warm). VARIASI gelap↔terang. Pipeline visual penuh (scorecard PASS).
 - **Dikerjakan:** `theme-packs/company.ts` + 9 manifest + sample-content 3 sub-kat + 7 ikon (Megaphone/Building2/Building/Gauge/Boxes/Layers/Landmark). corporate sudah di SERVICE_INDUSTRI → showcase=services otomatis.
 
-### Sprint 9+ — Industri tersisa — BERIKUTNYA
-- Tersisa di `TipeIndustri`: **travel/rental** (sub-kat: mobil/motor/bus? atau wisata/tour) · **blog/berita** · **jastip**. Pertimbangkan mana yang cukup volume order. Pola sama + pipeline visual.
+### Sprint 9 — Industri tersisa (Travel/Blog/Jastip) — ✅ SELESAI (2026-06-07)
+- **Hasil:** 27 tema AKTIF. **Travel** (kendaraan asphalt-dark/bersih/kuning · wisata tropis/rimba-dark/senja · akomodasi resort/kayu/malam-dark) · **Blog** (jurnal hangat/mono/senja-dark · media merah/biru/malam-dark · niche hijau/pop/gelap-dark) · **Jastip** (luar global/premium-dark/pop · lokal hangat/segar/gelap-dark · preorder fokus/energi/malam-dark).
+- **Dikerjakan:** theme-packs/{travel,blog,jastip}.ts + 27 manifest + sample-content 9 sub-kat + 21 ikon. **blog→blog_posts** mapping di SiteRenderer (judul→nama, ringkasan→deskripsi, cover→gambar, "Artikel Terbaru"); travel→"Pilihan Kami"; jastip→"Katalog Titipan".
+- **SEMUA `TipeIndustri` (kecuali `custom`) kini punya tema composable.** Coverage industri tuntas.
+
+### Polish lintas-sprint — BERIKUTNYA
+- **#4 next/font asli** per gaya (sekarang stack sistem SANS/SERIF/GROTESK/ROUNDED). Naikkan keotentikan tipografi.
 
 ### Hal lintas-sprint yang perlu diputuskan user (sebelum eksekusi)
 1. ~~**Urutan industri**~~ — DIPUTUSKAN: Restaurant (S4) → Klinik (S6) → berikutnya Jasa/Personal/Sekolah (S7).
@@ -287,4 +293,4 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 6. ~~**Services→showcase utk industri jasa**~~ — ✅ DONE (2026-06-07, FU#1). Composable route SiteRenderer fetch source per `tipe_industri`: toko_online→products, restaurant→menu_items, jasa(klinik/sekolah/corporate/travel)→services. content-adapter map generik + judul kontekstual ("Produk/Menu/Layanan/Program Kami").
 7. ~~**Visual pipeline (lensa pixel)**~~ — ✅ HIDUP sejak S7. ui-ux-pro-max DB (front) + Playwright shoot + scorecard (back) + generator HTML (`gen-samples.test.tsx`). Dipakai di playbook §5 tiap sprint berikutnya.
 
-> **Status: S4–S8 + FU#1 + FU#2 SELESAI & LIVE (69 tema, 7 industri: toko/resto/klinik/sekolah/personal/company + toko 8 sub-kat).** Berikutnya Sprint 9 (travel/blog/jastip bila perlu) atau polish lintas-sprint (next/font #4).
+> **Status: S4–S9 + FU#1 + FU#2 SELESAI & LIVE — 96 tema, 9 industri (coverage TipeIndustri tuntas kecuali `custom`).** Berikutnya: POLISH next/font (#4); opsional perdalam balok/varian.
