@@ -200,9 +200,22 @@ export async function renderSite({
       {primary && <div style={{ height: 4, backgroundColor: primary }} />}
 
       {sections.length === 0 ? (
-        <div className="px-6 py-32 text-center text-gray-400">
-          <h1 className="text-2xl font-bold text-gray-700">{page.nama_website}</h1>
-          <p className="mt-2 text-sm">Halaman ini belum memiliki konten.</p>
+        // Safety net: halaman tanpa konten (mis. dipublish sebelum di-build).
+        // Tampilkan "Segera Hadir" ber-brand, bukan teks abu polos.
+        <div className="px-6 py-32 text-center">
+          <div className="mx-auto max-w-md">
+            <div
+              className="mx-auto mb-6 h-14 w-14 rounded-2xl flex items-center justify-center text-2xl font-bold"
+              style={{
+                backgroundColor: primary ? `${primary}1A` : '#f3f4f6',
+                color: primary ?? '#6b7280',
+              }}
+            >
+              {(page.nama_website?.trim()[0] ?? 'W').toUpperCase()}
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">{page.nama_website}</h1>
+            <p className="mt-2 text-sm text-gray-500">Website sedang disiapkan — segera hadir.</p>
+          </div>
         </div>
       ) : (
         sections.map((s) => (
