@@ -1368,6 +1368,277 @@ const COMPANY_KORPORAT: ComposableContent = {
   contact: { wa: '6281296917963', email: 'corporate@majubersama.co.id', alamat: 'Bekasi, Jawa Barat' },
 }
 
+// ── TRAVEL · Rental Kendaraan ──────────────────────────────────
+const TRAVEL_KENDARAAN: ComposableContent = {
+  nama: 'AutoRent',
+  hero: { eyebrow: 'Rental Mobil & Motor Terpercaya', title: 'Sewa Kendaraan, Gampang & Tanpa Ribet', subtitle: 'Armada terawat, harga transparan, antar-jemput. Lepas kunci atau dengan sopir, semua siap.', ctaText: 'Pesan Sekarang', ctaHref: '#booking', image: IMG('photo-1503376780353-7e6692767b70') },
+  features: [
+    { title: 'Armada Terawat', desc: 'Servis rutin & bersih, siap pakai setiap saat.' },
+    { title: 'Harga Transparan', desc: 'Tanpa biaya tersembunyi, semua jelas di awal.' },
+    { title: 'Antar-Jemput', desc: 'Diantar ke lokasi Anda, gratis area kota.' },
+  ],
+  showcase: { title: 'Pilihan Kami', subtitle: 'Armada untuk setiap kebutuhan.', items: [
+    { nama: 'Toyota Avanza', harga: 350000, desc: 'Per hari, cocok keluarga.', gambar: IMG('photo-1568605117036-5fe5e7bab0b7', 800) },
+    { nama: 'Honda Brio', harga: 300000, desc: 'Irit & lincah untuk kota.', gambar: IMG('photo-1502877338535-766e1452684a', 800) },
+    { nama: 'Innova Reborn', harga: 550000, desc: 'Nyaman untuk perjalanan jauh.', gambar: IMG('photo-1485291571150-772bcfc10da5', 800) },
+    { nama: 'Motor Vario', harga: 90000, desc: 'Praktis keliling kota.', gambar: IMG('photo-1449965408869-eaa3f722e40d', 800) },
+  ] },
+  stats: [{ angka: '120+', label: 'Unit armada' }, { angka: '10', label: 'Tahun melayani' }, { angka: '5', label: 'Kota layanan' }, { angka: '4.9', label: 'Rating Google' }],
+  testimonials: [
+    { quote: 'Mobilnya bersih, prosesnya cepat. Antar-jemputnya tepat waktu.', nama: 'Rian', peran: 'Pelanggan' },
+    { quote: 'Harga jelas tanpa kejutan. Sudah langganan tiap mudik.', nama: 'Bu Endah', peran: 'Pelanggan setia' },
+    { quote: 'Sopirnya ramah dan paham jalan. Recommended.', nama: 'Pak Yusuf', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apa syarat sewanya?', a: 'KTP dan SIM aktif. Untuk lepas kunci ada jaminan tambahan yang dijelaskan saat booking.' },
+    { q: 'Bisa antar ke bandara?', a: 'Bisa. Layanan antar-jemput bandara tersedia dengan biaya sesuai jarak.' },
+    { q: 'Apakah ada sopir?', a: 'Tersedia opsi lepas kunci maupun dengan sopir berpengalaman.' },
+  ],
+  info: { jam: [{ hari: 'Setiap hari', jam: '06.00 – 22.00' }], alamat: 'Jl. Diponegoro No. 45, Yogyakarta', mapsQuery: 'Jl. Diponegoro Yogyakarta', telp: '081296917963', reservasiText: 'Pesan via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang AutoRent', body: 'Sejak 2014 kami melayani ribuan perjalanan dengan armada terawat dan layanan yang jujur. Tujuan kami sederhana: bikin sewa kendaraan jadi tenang, bukan bikin pusing.' },
+  cta: { title: 'Siap Jalan? Pesan Sekarang', subtitle: 'Cek ketersediaan unit untuk tanggalmu.', ctaText: 'Pesan via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@autorent.id', alamat: 'Yogyakarta' },
+}
+
+// ── TRAVEL · Wisata / Tour ─────────────────────────────────────
+const TRAVEL_WISATA: ComposableContent = {
+  nama: 'Pesona Trip',
+  hero: { eyebrow: 'Open Trip & Paket Wisata', title: 'Jelajah Indonesia, Bikin Kenangan', subtitle: 'Paket wisata hemat dengan guide lokal berpengalaman. Tinggal berangkat, sisanya kami urus.', ctaText: 'Lihat Paket', ctaHref: '#paket', image: IMG('photo-1502602898657-3e91760cbb34') },
+  features: [
+    { title: 'Guide Lokal', desc: 'Pemandu ramah yang paham tiap destinasi.' },
+    { title: 'Harga Hemat', desc: 'Open trip patungan, lebih terjangkau.' },
+    { title: 'Itinerary Jelas', desc: 'Jadwal rapi, tanpa drama, anti molor.' },
+  ],
+  showcase: { title: 'Pilihan Kami', subtitle: 'Petualangan yang menanti.', items: [
+    { nama: 'Open Trip Bromo', harga: 350000, desc: 'Sunrise & lautan pasir.', gambar: IMG('photo-1501785888041-af3ef285b470', 800) },
+    { nama: 'Private Tour Bali', harga: 1200000, desc: 'Custom sesuai maumu.', gambar: IMG('photo-1502602898657-3e91760cbb34', 800) },
+    { nama: 'Snorkeling Komodo', harga: 2500000, desc: '3D2N kapal phinisi.', gambar: IMG('photo-1469854523086-cc02fe5d8800', 800) },
+    { nama: 'City Tour Jogja', harga: 250000, desc: 'Keraton, Malioboro, candi.', gambar: IMG('photo-1528127269322-539801943592', 800) },
+  ] },
+  stats: [{ angka: '8rb+', label: 'Peserta trip' }, { angka: '40+', label: 'Destinasi' }, { angka: '4.9', label: 'Rating' }, { angka: '9', label: 'Tahun jalan' }],
+  testimonials: [
+    { quote: 'Tripnya seru, guide-nya asik, jadwalnya tepat. Pasti ikut lagi!', nama: 'Sasa', peran: 'Peserta open trip' },
+    { quote: 'Harga ramah kantong tapi pelayanan maksimal. Salut.', nama: 'Doni', peran: 'Backpacker' },
+    { quote: 'Honeymoon kami diurus sempurna. Terima kasih Pesona Trip.', nama: 'Pasangan Wira', peran: 'Private tour' },
+  ],
+  gallery: { title: 'Galeri Perjalanan', subtitle: 'Momen dari trip-trip kami.', images: [
+    { src: IMG('photo-1501785888041-af3ef285b470', 700), caption: 'Bromo' },
+    { src: IMG('photo-1469854523086-cc02fe5d8800', 700), caption: 'Pantai' },
+    { src: IMG('photo-1528127269322-539801943592', 700), caption: 'Hutan' },
+    { src: IMG('photo-1502602898657-3e91760cbb34', 700), caption: 'Sunset' },
+    { src: IMG('photo-1455587734955-081b22074882', 700), caption: 'Resort' },
+  ] },
+  info: { jam: [{ hari: 'Senin – Sabtu', jam: '08.00 – 20.00' }], alamat: 'Jl. Kaliurang KM 7, Yogyakarta', mapsQuery: 'Jl. Kaliurang Yogyakarta', telp: '081296917963', reservasiText: 'Tanya Paket via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang Pesona Trip', body: 'Kami percaya jalan-jalan harusnya menyenangkan dari awal sampai pulang. Sejak 2016 kami merancang trip yang rapi, hemat, dan penuh cerita bersama guide lokal terbaik.' },
+  cta: { title: 'Yuk, Rencanakan Tripmu', subtitle: 'Slot open trip terbatas tiap keberangkatan.', ctaText: 'Tanya via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@pesonatrip.id', alamat: 'Yogyakarta' },
+}
+
+// ── TRAVEL · Akomodasi / Sewa ──────────────────────────────────
+const TRAVEL_AKOMODASI: ComposableContent = {
+  nama: 'Villa Serenity',
+  hero: { eyebrow: 'Villa & Penginapan Nyaman', title: 'Tempat Singgah yang Terasa Seperti Rumah', subtitle: 'Kamar bersih, suasana tenang, lokasi strategis. Liburan nyaman tanpa khawatir.', ctaText: 'Cek Ketersediaan', ctaHref: '#booking', image: IMG('photo-1571896349842-33c89424de2d') },
+  features: [
+    { title: 'Bersih & Nyaman', desc: 'Kamar rapi, seprai segar tiap tamu.' },
+    { title: 'Lokasi Strategis', desc: 'Dekat tempat wisata & pusat kota.' },
+    { title: 'Check-in Mudah', desc: 'Proses cepat, ramah, fleksibel.' },
+  ],
+  showcase: { title: 'Pilihan Kami', subtitle: 'Pilih tipe yang paling pas.', items: [
+    { nama: 'Deluxe Room', harga: 450000, desc: 'Per malam, untuk 2 orang.', gambar: IMG('photo-1571003123894-1f0594d2b5d9', 800) },
+    { nama: 'Private Villa', harga: 1500000, desc: 'Kolam pribadi, 3 kamar.', gambar: IMG('photo-1566073771259-6a8506099945', 800) },
+    { nama: 'Family Suite', harga: 850000, desc: 'Luas untuk keluarga.', gambar: IMG('photo-1582719478250-c89cae4dc85b', 800) },
+    { nama: 'Garden Bungalow', harga: 600000, desc: 'View taman asri.', gambar: IMG('photo-1455587734955-081b22074882', 800) },
+  ] },
+  stats: [{ angka: '4.9', label: 'Rating tamu' }, { angka: '12', label: 'Unit kamar' }, { angka: '6rb+', label: 'Tamu menginap' }, { angka: '24 jam', label: 'Resepsionis' }],
+  testimonials: [
+    { quote: 'Kamarnya bersih banget, pemandangannya juara. Pasti balik lagi.', nama: 'Mira', peran: 'Tamu' },
+    { quote: 'Pelayanan ramah, lokasi dekat ke mana-mana. Recommended.', nama: 'Pak Gun', peran: 'Tamu keluarga' },
+    { quote: 'Villanya cozy, cocok buat healing. Worth it.', nama: 'Nadia', peran: 'Tamu' },
+  ],
+  gallery: { title: 'Galeri Penginapan', subtitle: 'Intip suasananya.', images: [
+    { src: IMG('photo-1566073771259-6a8506099945', 700), caption: 'Eksterior' },
+    { src: IMG('photo-1571003123894-1f0594d2b5d9', 700), caption: 'Kamar deluxe' },
+    { src: IMG('photo-1582719478250-c89cae4dc85b', 700), caption: 'Ruang keluarga' },
+    { src: IMG('photo-1571896349842-33c89424de2d', 700), caption: 'Kolam' },
+    { src: IMG('photo-1455587734955-081b22074882', 700), caption: 'Taman' },
+  ] },
+  faq: [
+    { q: 'Jam berapa check-in?', a: 'Check-in mulai pukul 14.00, check-out pukul 12.00. Early check-in menyesuaikan ketersediaan.' },
+    { q: 'Apakah termasuk sarapan?', a: 'Beberapa tipe kamar sudah termasuk sarapan. Detailnya tertera saat pemesanan.' },
+  ],
+  info: { jam: [{ hari: 'Resepsionis', jam: '24 jam' }], alamat: 'Jl. Pantai Batu Bolong, Canggu, Bali', mapsQuery: 'Batu Bolong Canggu Bali', telp: '081296917963', reservasiText: 'Booking via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang Villa Serenity', body: 'Kami merancang setiap sudut untuk kenyamanan tamu. Dari seprai bersih sampai senyum resepsionis, tujuan kami satu: membuat Anda merasa di rumah, di mana pun Anda berlibur.' },
+  cta: { title: 'Liburan Nyaman Menanti', subtitle: 'Cek tanggal & amankan kamarmu.', ctaText: 'Booking via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'stay@villaserenity.id', alamat: 'Canggu, Bali' },
+}
+
+// ── BLOG · Jurnal / Pribadi ────────────────────────────────────
+const BLOG_JURNAL: ComposableContent = {
+  nama: 'Catatan Senja',
+  hero: { eyebrow: 'Jurnal & Cerita Sehari-hari', title: 'Menulis Pelan, Membaca Dalam', subtitle: 'Catatan tentang hidup, buku, dan perjalanan kecil. Tempat berpikir tanpa terburu-buru.', ctaText: 'Baca Tulisan', ctaHref: '#tulisan', image: IMG('photo-1455390582262-044cdead277a') },
+  features: [
+    { title: 'Cerita Jujur', desc: 'Ditulis dari pengalaman, bukan template.' },
+    { title: 'Terbit Rutin', desc: 'Tulisan baru tiap minggu, konsisten.' },
+    { title: 'Tanpa Iklan', desc: 'Fokus membaca, bebas gangguan.' },
+  ],
+  showcase: { title: 'Artikel Terbaru', subtitle: 'Beberapa tulisan pilihan.', items: [
+    { nama: 'Belajar Pelan dari Hujan', desc: 'Refleksi sore yang basah.', gambar: IMG('photo-1504711434969-e33886168f5c', 800) },
+    { nama: 'Buku yang Mengubah Cara Pandang', desc: 'Catatan bacaan bulan ini.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800) },
+    { nama: 'Perjalanan Kecil ke Timur', desc: 'Cerita dari jalan sunyi.', gambar: IMG('photo-1469854523086-cc02fe5d8800', 800) },
+    { nama: 'Tentang Memulai Lagi', desc: 'Sedikit soal keberanian.', gambar: IMG('photo-1455390582262-044cdead277a', 800) },
+  ] },
+  faq: [
+    { q: 'Seberapa sering terbit?', a: 'Tulisan baru rilis setiap minggu, biasanya akhir pekan.' },
+    { q: 'Bisa berlangganan?', a: 'Bisa. Tinggalkan email lewat tombol kontak untuk dapat kabar tulisan baru.' },
+  ],
+  about: { title: 'Halo, Saya Penulisnya', body: 'Catatan Senja lahir dari kebiasaan menulis di penghujung hari. Tak ada target muluk, hanya keinginan merekam pikiran dan berbagi dengan siapa pun yang mampir.' },
+  cta: { title: 'Suka Tulisan Pelan?', subtitle: 'Berlangganan, gratis selamanya.', ctaText: 'Hubungi via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@catatansenja.id', alamat: 'Indonesia' },
+}
+
+// ── BLOG · Media / Berita ──────────────────────────────────────
+const BLOG_MEDIA: ComposableContent = {
+  nama: 'Kabar Hari Ini',
+  hero: { eyebrow: 'Portal Berita Tepercaya', title: 'Berita Cepat, Jelas, dan Berimbang', subtitle: 'Liputan terkini dari ekonomi, teknologi, sampai gaya hidup. Tanpa hoaks, tanpa bertele-tele.', ctaText: 'Baca Berita', ctaHref: '#berita', image: IMG('photo-1542435503-956c469947f6') },
+  features: [
+    { title: 'Update 24 Jam', desc: 'Kabar terbaru sepanjang hari.' },
+    { title: 'Terverifikasi', desc: 'Setiap berita dicek sebelum tayang.' },
+    { title: 'Beragam Rubrik', desc: 'Dari headline sampai opini.' },
+  ],
+  showcase: { title: 'Artikel Terbaru', subtitle: 'Sorotan hari ini.', items: [
+    { nama: 'Ekonomi Tumbuh di Kuartal Ini', desc: 'Analisis & data terbaru.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800) },
+    { nama: 'Tren Teknologi Tahun Depan', desc: 'Apa yang perlu disimak.', gambar: IMG('photo-1504711434969-e33886168f5c', 800) },
+    { nama: 'Panduan Gaya Hidup Sehat', desc: 'Tips dari para ahli.', gambar: IMG('photo-1499750310107-5fef28a66643', 800) },
+    { nama: 'Sorotan Olahraga Pekan Ini', desc: 'Hasil & jadwal lengkap.', gambar: IMG('photo-1542435503-956c469947f6', 800) },
+  ] },
+  stats: [{ angka: '2jt+', label: 'Pembaca/bulan' }, { angka: '150+', label: 'Artikel/minggu' }, { angka: '12', label: 'Rubrik' }, { angka: '24/7', label: 'Liputan' }],
+  faq: [
+    { q: 'Apakah beritanya berbayar?', a: 'Sebagian besar gratis. Konten premium tertentu memerlukan langganan.' },
+    { q: 'Bagaimana memastikan akurasi?', a: 'Setiap berita melalui proses verifikasi dan editorial sebelum dipublikasikan.' },
+  ],
+  about: { title: 'Tentang Kabar Hari Ini', body: 'Kami hadir untuk menyajikan informasi yang cepat tanpa mengorbankan akurasi. Redaksi kami berkomitmen pada jurnalisme yang berimbang dan bebas dari kepentingan.' },
+  cta: { title: 'Tetap Update Setiap Hari', subtitle: 'Berlangganan kabar terbaru.', ctaText: 'Hubungi via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'redaksi@kabarhariini.id', alamat: 'Jakarta' },
+}
+
+// ── BLOG · Niche (food/lifestyle) ──────────────────────────────
+const BLOG_NICHE: ComposableContent = {
+  nama: 'Dapur Kita',
+  hero: { eyebrow: 'Blog Resep & Kuliner', title: 'Masak Enak, Mulai dari Dapur Rumah', subtitle: 'Resep praktis anti-gagal, tips dapur, dan cerita di balik tiap hidangan. Yuk, masak bareng!', ctaText: 'Lihat Resep', ctaHref: '#resep', image: IMG('photo-1504674900247-0877df9cc836') },
+  features: [
+    { title: 'Resep Anti-Gagal', desc: 'Langkah jelas, takaran pas, foto tiap step.' },
+    { title: 'Bahan Mudah', desc: 'Pakai bahan yang ada di pasar dekat rumah.' },
+    { title: 'Dicoba Sendiri', desc: 'Setiap resep kami masak & cicipi dulu.' },
+  ],
+  showcase: { title: 'Artikel Terbaru', subtitle: 'Resep yang lagi ramai dimasak.', items: [
+    { nama: 'Ayam Geprek Sambal Bawang', desc: 'Pedasnya nampol, gampang dibuat.', gambar: IMG('photo-1504674900247-0877df9cc836', 800) },
+    { nama: 'Brownies Kukus Lembut', desc: 'Tanpa oven, tetap legit.', gambar: IMG('photo-1490645935967-10de6ba17061', 800) },
+    { nama: 'Es Kopi Susu Rumahan', desc: 'Hemat, rasa kafe.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800) },
+    { nama: 'Tips Menyimpan Sayur', desc: 'Biar segar lebih lama.', gambar: IMG('photo-1542435503-956c469947f6', 800) },
+  ] },
+  testimonials: [
+    { quote: 'Resepnya selalu berhasil! Keluarga di rumah suka semua.', nama: 'Bunda Ratih', peran: 'Pembaca setia' },
+    { quote: 'Penjelasannya detail, cocok buat pemula seperti saya.', nama: 'Fina', peran: 'Pembaca' },
+    { quote: 'Foto step by step-nya sangat membantu. Terima kasih!', nama: 'Oki', peran: 'Pembaca' },
+  ],
+  faq: [
+    { q: 'Apakah resepnya gratis?', a: 'Semua resep gratis dibaca. Kamu bisa langsung praktik di rumah.' },
+    { q: 'Bisa request resep?', a: 'Bisa! Kirim permintaan lewat kontak, kami usahakan bahas di tulisan berikutnya.' },
+  ],
+  about: { title: 'Tentang Dapur Kita', body: 'Dapur Kita berawal dari kebiasaan berbagi resep keluarga. Kini kami ingin setiap orang berani masak sendiri, dengan panduan yang jujur dan mudah diikuti.' },
+  cta: { title: 'Lapar? Yuk Masak!', subtitle: 'Dapatkan resep baru tiap minggu.', ctaText: 'Hubungi via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@dapurkita.id', alamat: 'Indonesia' },
+}
+
+// ── JASTIP · Luar Negeri ───────────────────────────────────────
+const JASTIP_LUAR: ComposableContent = {
+  nama: 'GlobalJastip',
+  hero: { eyebrow: 'Jasa Titip Luar Negeri', title: 'Barang Impian dari Luar, Sampai ke Tanganmu', subtitle: 'Titip beli produk original dari LN: skincare, branded, gadget. Aman, terpercaya, harga jujur.', ctaText: 'Mulai Titip', ctaHref: '#titip', image: IMG('photo-1521791136064-7986c2920216') },
+  features: [
+    { title: '100% Original', desc: 'Dibeli langsung dari toko resmi.' },
+    { title: 'Update Real-time', desc: 'Foto bukti beli & resi dikirim.' },
+    { title: 'Harga Transparan', desc: 'Rate & fee jelas sejak awal.' },
+  ],
+  showcase: { title: 'Katalog Titipan', subtitle: 'Yang paling sering dititip.', items: [
+    { nama: 'Skincare Korea', harga: 250000, desc: 'Dari Olive Young & toko resmi.', gambar: IMG('photo-1556909212-d5b604d0c90d', 800) },
+    { nama: 'Tas Branded', harga: 5000000, desc: 'Boutique Eropa, bukti lengkap.', gambar: IMG('photo-1556910103-1c02745aae4d', 800) },
+    { nama: 'Sneakers Hype', harga: 2800000, desc: 'Rilis terbatas, langsung gas.', gambar: IMG('photo-1607082348824-0a96f2a4b9da', 800) },
+    { nama: 'Vitamin & Suplemen', harga: 350000, desc: 'Dari US & Australia.', gambar: IMG('photo-1607083206869-4c7672e72a8a', 800) },
+  ] },
+  stats: [{ angka: '12rb+', label: 'Pesanan' }, { angka: '15', label: 'Negara' }, { angka: '4.9', label: 'Rating' }, { angka: '100%', label: 'Original' }],
+  testimonials: [
+    { quote: 'Amanah banget, dikabarin tiap tahap. Barang ori sampai aman.', nama: 'Vina', peran: 'Pelanggan' },
+    { quote: 'Rate-nya jujur, fee jelas. Skincare-ku selalu titip sini.', nama: 'Tata', peran: 'Pelanggan setia' },
+    { quote: 'Dapat sneakers limited yang susah dicari. Mantap!', nama: 'Reno', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Bagaimana sistem pembayarannya?', a: 'DP saat order, pelunasan setelah barang dibeli dan bukti dikirim. Aman dan jelas.' },
+    { q: 'Berapa lama sampai?', a: 'Tergantung negara & jadwal, umumnya 1–3 minggu. Estimasi diberikan saat order.' },
+  ],
+  info: { jam: [{ hari: 'Admin online', jam: 'Setiap hari, 09.00 – 21.00' }], alamat: 'Jakarta (open trip jastip rutin)', telp: '081296917963', reservasiText: 'Titip via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang GlobalJastip', body: 'Kami bantu kamu mendapatkan produk original dari luar negeri tanpa repot. Sejak 2019, kepercayaan ribuan pelanggan kami jaga lewat transparansi di setiap langkah.' },
+  cta: { title: 'Mau Titip Barang dari Luar?', subtitle: 'Cek jadwal trip jastip terdekat.', ctaText: 'Titip via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@globaljastip.id', alamat: 'Jakarta' },
+}
+
+// ── JASTIP · Lokal / UMKM ──────────────────────────────────────
+const JASTIP_LOKAL: ComposableContent = {
+  nama: 'Titip Lokal',
+  hero: { eyebrow: 'Jasa Titip Produk Lokal', title: 'Oleh-Oleh & Produk Lokal, Tanpa Harus ke Sana', subtitle: 'Titip beli makanan khas, frozen food, dan produk UMKM dari berbagai kota. Dukung lokal, dimudahkan.', ctaText: 'Mulai Titip', ctaHref: '#titip', image: IMG('photo-1556740738-b6a63e27c4df') },
+  features: [
+    { title: 'Produk Lokal Pilihan', desc: 'Kurasi UMKM terbaik dari tiap daerah.' },
+    { title: 'Fresh & Aman', desc: 'Frozen dikemas rapi dengan ice pack.' },
+    { title: 'Dukung UMKM', desc: 'Tiap titipan menghidupi usaha kecil.' },
+  ],
+  showcase: { title: 'Katalog Titipan', subtitle: 'Favorit pelanggan.', items: [
+    { nama: 'Oleh-oleh Khas Daerah', harga: 75000, desc: 'Camilan & kue tradisional.', gambar: IMG('photo-1504674900247-0877df9cc836', 800) },
+    { nama: 'Frozen Food Rumahan', harga: 55000, desc: 'Dimsum, nugget, bakso.', gambar: IMG('photo-1490645935967-10de6ba17061', 800) },
+    { nama: 'Kopi Lokal', harga: 90000, desc: 'Single origin nusantara.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800) },
+    { nama: 'Kerajinan UMKM', harga: 120000, desc: 'Produk tangan perajin lokal.', gambar: IMG('photo-1556740738-b6a63e27c4df', 800) },
+  ] },
+  stats: [{ angka: '8rb+', label: 'Pesanan' }, { angka: '200+', label: 'UMKM mitra' }, { angka: '20', label: 'Kota' }, { angka: '4.9', label: 'Rating' }],
+  testimonials: [
+    { quote: 'Bisa dapat oleh-oleh kampung tanpa pulang. Seneng banget!', nama: 'Wati', peran: 'Perantau' },
+    { quote: 'Frozen-nya sampai masih beku rapi. Packing aman.', nama: 'Bu Sari', peran: 'Pelanggan' },
+    { quote: 'Senang bisa dukung UMKM sekaligus belanja gampang.', nama: 'Andre', peran: 'Pelanggan' },
+  ],
+  info: { jam: [{ hari: 'Admin online', jam: 'Setiap hari, 08.00 – 20.00' }], alamat: 'Bandung (jangkauan nasional)', telp: '081296917963', reservasiText: 'Titip via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang Titip Lokal', body: 'Kami menjembatani kamu dengan produk lokal terbaik dari seluruh nusantara. Setiap titipan bukan cuma soal belanja, tapi juga menghidupi usaha kecil di daerah.' },
+  cta: { title: 'Kangen Produk Daerah?', subtitle: 'Titip sekarang, kami carikan.', ctaText: 'Titip via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@titiplokal.id', alamat: 'Bandung' },
+}
+
+// ── JASTIP · Preorder / PO ─────────────────────────────────────
+const JASTIP_PREORDER: ComposableContent = {
+  nama: 'PO Station',
+  hero: { eyebrow: 'Sistem Preorder Terjadwal', title: 'Preorder Rapi, Stok Pasti, Tanpa Drama', subtitle: 'Sistem PO terstruktur dengan jadwal jelas dan update batch. Belanja barang incaran jadi tenang.', ctaText: 'Lihat Batch', ctaHref: '#batch', image: IMG('photo-1556742049-0cfed4f6a45d') },
+  features: [
+    { title: 'Jadwal Jelas', desc: 'Open & close PO transparan, tanpa PHP.' },
+    { title: 'Update Batch', desc: 'Progres tiap tahap dikabarkan rutin.' },
+    { title: 'Harga Grup', desc: 'Patungan batch, lebih hemat.' },
+  ],
+  showcase: { title: 'Katalog Titipan', subtitle: 'Batch yang sedang dibuka.', items: [
+    { nama: 'PO Skincare Batch 12', harga: 180000, desc: 'Close 5 hari lagi.', gambar: IMG('photo-1556909212-d5b604d0c90d', 800) },
+    { nama: 'PO Merch Limited', harga: 220000, desc: 'Kuota terbatas.', gambar: IMG('photo-1607082348824-0a96f2a4b9da', 800) },
+    { nama: 'PO Gadget Aksesoris', harga: 150000, desc: 'Ready 2 minggu.', gambar: IMG('photo-1556910103-1c02745aae4d', 800) },
+    { nama: 'PO Snack Impor', harga: 95000, desc: 'Grup buy hemat.', gambar: IMG('photo-1607083206869-4c7672e72a8a', 800) },
+  ] },
+  stats: [{ angka: '500+', label: 'Batch selesai' }, { angka: '15rb+', label: 'Peserta PO' }, { angka: '4.9', label: 'Rating' }, { angka: '0', label: 'Batch gagal' }],
+  testimonials: [
+    { quote: 'Sistemnya rapi, jadwalnya ditepati. Gak deg-degan nunggu barang.', nama: 'Lala', peran: 'Peserta PO' },
+    { quote: 'Update tiap tahap bikin tenang. Adminnya komunikatif.', nama: 'Bima', peran: 'Pelanggan' },
+    { quote: 'Harga grup beneran hemat. Sering ikut batch di sini.', nama: 'Citra', peran: 'Pelanggan setia' },
+  ],
+  faq: [
+    { q: 'Apa itu sistem batch?', a: 'PO dibuka per periode (batch). Setelah kuota/jadwal tercapai, pesanan diproses bersama agar efisien.' },
+    { q: 'Kalau barang tidak ready?', a: 'Jika batch batal karena stok, dana dikembalikan penuh. Kami jaga kepercayaanmu.' },
+  ],
+  info: { jam: [{ hari: 'Admin online', jam: 'Setiap hari, 09.00 – 21.00' }], alamat: 'Surabaya (pengiriman nasional)', telp: '081296917963', reservasiText: 'Ikut PO via WhatsApp', reservasiHref: '#wa' },
+  about: { title: 'Tentang PO Station', body: 'Kami bikin preorder jadi pengalaman yang menyenangkan: jadwal jelas, komunikasi rutin, dan komitmen yang ditepati. Tak ada lagi PO yang bikin cemas.' },
+  cta: { title: 'Incer Barang Lewat PO?', subtitle: 'Cek batch yang sedang dibuka.', ctaText: 'Ikut PO via WhatsApp', ctaHref: '#wa' },
+  contact: { wa: '6281296917963', email: 'halo@postation.id', alamat: 'Surabaya' },
+}
+
 // Sub-kategori → konten contoh. Tema diturunkan dari prefix id (mis.
 // 'fashion-editorial' → 'fashion'). Catatan: tema Kesehatan memakai id
 // berprefix 'herbal-' (branding), jadi kuncinya 'herbal' (bukan 'kesehatan').
@@ -1400,6 +1671,18 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   startup: COMPANY_STARTUP,
   agency: COMPANY_AGENCY,
   korporat: COMPANY_KORPORAT,
+  // Travel (Sprint 9): prefix 'kendaraan-' / 'wisata-' / 'akomodasi-'
+  kendaraan: TRAVEL_KENDARAAN,
+  wisata: TRAVEL_WISATA,
+  akomodasi: TRAVEL_AKOMODASI,
+  // Blog (Sprint 9): prefix 'jurnal-' / 'media-' / 'niche-'
+  jurnal: BLOG_JURNAL,
+  media: BLOG_MEDIA,
+  niche: BLOG_NICHE,
+  // Jastip (Sprint 9): prefix 'luar-' / 'lokal-' / 'preorder-'
+  luar: JASTIP_LUAR,
+  lokal: JASTIP_LOKAL,
+  preorder: JASTIP_PREORDER,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

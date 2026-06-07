@@ -19,7 +19,7 @@ import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
 import TokenDrivenRenderer from '@/app/components/themes/universal/TokenDrivenRenderer'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
 import { getManifest } from '@/lib/theme-system/manifest'
-import { composableContentFromSections } from '@/lib/theme-system/content-adapter'
+import { composableContentFromSections, type ShowcaseSourceItem } from '@/lib/theme-system/content-adapter'
 import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
@@ -57,20 +57,27 @@ export async function renderSite({
   const manifest = getManifest(variant)
   if (manifest) {
     // Showcase di-isi dari SOURCE yang benar per industri (bukan selalu products):
-    // restaurant→menu_items, jasa (klinik/sekolah/corporate/travel)→services,
-    // selain itu→products. Semua punya {nama,deskripsi,harga,gambar_url}.
+    // restaurant→menu_items, blog→blog_posts (artikel), jasa (klinik/sekolah/
+    // corporate/travel/personal)→services, selain itu→products. Semua dipetakan
+    // ke {nama,deskripsi,harga,gambar_url}.
     const tipe = (page as { tipe_industri?: string }).tipe_industri ?? ''
     const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel', 'personal']
-    const fetchSource =
+    const fetchSource: Promise<ShowcaseSourceItem[]> =
       tipe === 'restaurant' ? fetchMenuItemsByPage(client, page.id)
-        : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
-          : fetchProductsByPage(client, page.id)
+        : tipe === 'blog'
+          ? fetchBlogPostsByPage(client, page.id).then((posts) =>
+              posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url })))
+          : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
+            : fetchProductsByPage(client, page.id)
     const showcaseTitle =
       tipe === 'restaurant' ? 'Menu Kami'
-        : tipe === 'sekolah' ? 'Program Kami'
-          : tipe === 'personal' ? 'Layanan Saya'
-            : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
-              : 'Produk Kami'
+        : tipe === 'blog' ? 'Artikel Terbaru'
+          : tipe === 'sekolah' ? 'Program Kami'
+            : tipe === 'personal' ? 'Layanan Saya'
+              : tipe === 'travel' ? 'Pilihan Kami'
+                : tipe === 'jastip' ? 'Katalog Titipan'
+                  : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
+                    : 'Produk Kami'
     const [source, profile] = await Promise.all([
       fetchSource,
       fetchTenantProfile(client, page.id),

@@ -16,11 +16,11 @@ describe('theme-system taxonomy (S0-1)', () => {
   })
 
   it('industri tanpa registri → kosong, tidak error', () => {
-    // blog belum punya lapis sub-kategori (sekolah kini sudah, S7).
-    expect(hasSubKategori('blog')).toBe(false)
-    expect(getSubKategori('blog')).toEqual([])
-    expect(getThemes('blog', 'apapun')).toEqual([])
-    expect(getTheme('blog', 'apapun')).toBeUndefined()
+    // 'custom' = satu-satunya industri tanpa lapis sub-kategori (sisanya sudah, S1-9).
+    expect(hasSubKategori('custom')).toBe(false)
+    expect(getSubKategori('custom')).toEqual([])
+    expect(getThemes('custom', 'apapun')).toEqual([])
+    expect(getTheme('custom', 'apapun')).toBeUndefined()
   })
 
   it('Kuliner = pilot dengan 3 gaya', () => {
@@ -203,6 +203,28 @@ describe('theme-system taxonomy (S0-1)', () => {
       const bgs = new Set(themes.map((t) => t.bg))
       expect(bgs.has('dark')).toBe(true)
       expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+    }
+  })
+
+  it('Sprint 9 (travel/blog/jastip): tiap industri 3 sub-kat AKTIF ×3 gaya, VARIASI', () => {
+    const expected: Record<string, string[]> = {
+      travel: ['kendaraan', 'wisata', 'akomodasi'],
+      blog: ['jurnal', 'media', 'niche'],
+      jastip: ['luar', 'lokal', 'preorder'],
+    }
+    for (const [tipe, subs] of Object.entries(expected)) {
+      expect(hasSubKategori(tipe)).toBe(true)
+      expect(getReadySubKategori(tipe).map((s) => s.id)).toEqual(subs)
+      const all = subs.flatMap((s) => getThemes(tipe, s))
+      expect(new Set(all.map((t) => t.id)).size).toBe(9)
+      expect(all.every((t) => t.manifest === t.id)).toBe(true)
+      for (const s of subs) {
+        const themes = getThemes(tipe, s)
+        expect(themes).toHaveLength(3)
+        const bgs = new Set(themes.map((t) => t.bg))
+        expect(bgs.has('dark')).toBe(true)
+        expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+      }
     }
   })
 

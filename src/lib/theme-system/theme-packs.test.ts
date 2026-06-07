@@ -284,3 +284,36 @@ describe('theme-packs company (S8b)', () => {
     }
   })
 })
+
+// ── Sprint 9 (travel/blog/jastip) ────────────────────────────
+const S9_PACKS: Record<string, string[]> = {
+  kendaraan: ['kendaraan-asphalt', 'kendaraan-bersih', 'kendaraan-kuning'],
+  wisata: ['wisata-tropis', 'wisata-rimba', 'wisata-senja'],
+  akomodasi: ['akomodasi-resort', 'akomodasi-kayu', 'akomodasi-malam'],
+  jurnal: ['jurnal-hangat', 'jurnal-mono', 'jurnal-senja'],
+  media: ['media-merah', 'media-biru', 'media-malam'],
+  niche: ['niche-hijau', 'niche-pop', 'niche-gelap'],
+  luar: ['luar-global', 'luar-premium', 'luar-pop'],
+  lokal: ['lokal-hangat', 'lokal-segar', 'lokal-gelap'],
+  preorder: ['preorder-fokus', 'preorder-energi', 'preorder-malam'],
+}
+
+describe('theme-packs Sprint 9 (travel/blog/jastip)', () => {
+  for (const [sub, ids] of Object.entries(S9_PACKS)) {
+    it(`${sub}: 3 pack resolve + VARIASI + min 1 gelap + hex valid`, () => {
+      const packs = ids.map((id) => {
+        expect(Object.keys(THEME_PACKS)).toContain(id)
+        return resolveManifestPack(MANIFESTS[id])
+      })
+      expect(packs.every((p, i) => p.id === ids[i])).toBe(true)
+      expect(new Set(packs.map((p) => p.color.page)).size).toBe(3)
+      expect(new Set(packs.map((p) => p.mood)).size).toBe(3)
+      expect(packs.some((p) => ['#0', '#1', '#2'].some((x) => p.color.page.toLowerCase().startsWith(x)))).toBe(true)
+      for (const p of packs) {
+        for (const hex of [p.color.page, p.color.surface, p.color.primary, p.color.heroFrom, p.color.heroTo, p.color.heroInk]) {
+          expect(hex).toMatch(/^#[0-9a-fA-F]{6}$/)
+        }
+      }
+    })
+  }
+})

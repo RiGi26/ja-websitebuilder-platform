@@ -93,6 +93,24 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: true },
     { id: 'korporat', nama: 'Korporat / Manufaktur', deskripsi: 'Perusahaan mapan, manufaktur, distributor, B2B.', icon: 'Building2', ready: true },
   ],
+  // ── TRAVEL / RENTAL (Sprint 9) — perjalanan & sewa. AKTIF.
+  travel: [
+    { id: 'kendaraan', nama: 'Rental Kendaraan', deskripsi: 'Sewa mobil, motor, bus, lepas kunci & dengan sopir.', icon: 'Car', ready: true },
+    { id: 'wisata', nama: 'Wisata / Tour', deskripsi: 'Open trip, paket wisata, travel agent, tour guide.', icon: 'Palmtree', ready: true },
+    { id: 'akomodasi', nama: 'Akomodasi / Sewa', deskripsi: 'Villa, homestay, kos, guest house, penginapan.', icon: 'BedDouble', ready: true },
+  ],
+  // ── BLOG / MEDIA (Sprint 9) — konten & publikasi. AKTIF.
+  blog: [
+    { id: 'jurnal', nama: 'Blog Pribadi', deskripsi: 'Blog personal, jurnal, catatan, opini.', icon: 'NotebookPen', ready: true },
+    { id: 'media', nama: 'Media / Berita', deskripsi: 'Portal berita, majalah online, media digital.', icon: 'Newspaper', ready: true },
+    { id: 'niche', nama: 'Blog Niche', deskripsi: 'Blog tema khusus: kuliner, teknologi, traveling, gaya hidup.', icon: 'Hash', ready: true },
+  ],
+  // ── JASTIP (Sprint 9) — jasa titip & preorder. AKTIF.
+  jastip: [
+    { id: 'luar', nama: 'Jastip Luar Negeri', deskripsi: 'Titip beli dari LN: branded, skincare, gadget.', icon: 'Plane', ready: true },
+    { id: 'lokal', nama: 'Jastip Lokal / UMKM', deskripsi: 'Titip beli dalam negeri, oleh-oleh, produk UMKM.', icon: 'Store', ready: true },
+    { id: 'preorder', nama: 'Preorder / PO', deskripsi: 'Sistem PO terjadwal, ready stock batch, grup buy.', icon: 'PackageCheck', ready: true },
+  ],
 }
 
 // ── Registry tema per industri → sub-kategori ─────────────────
@@ -569,6 +587,69 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         deskripsi: 'Taupe hangat & mapan. Untuk manufaktur, distributor, perusahaan keluarga.',
         icon: 'Building', mood: '#5C5347', bg: 'warm', manifest: 'korporat-netral',
       },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // TRAVEL / RENTAL (Sprint 9). 3 sub-kategori × 3 gaya. Palet ui-ux-pro-max DB.
+  // ════════════════════════════════════════════════════════════
+  travel: {
+    kendaraan: [
+      { id: 'kendaraan-asphalt', subKategori: 'kendaraan', nama: 'Asphalt', deskripsi: 'Gelap tegas otomotif, aksen oranye. Untuk rental mobil sport, mewah, premium.', icon: 'Car', mood: '#FF6A00', bg: 'dark', manifest: 'kendaraan-asphalt' },
+      { id: 'kendaraan-bersih', subKategori: 'kendaraan', nama: 'Bersih', deskripsi: 'Biru bersih & terpercaya. Untuk rental harian, lepas kunci, mobil keluarga.', icon: 'KeyRound', mood: '#2563EB', bg: 'light', manifest: 'kendaraan-bersih' },
+      { id: 'kendaraan-kuning', subKategori: 'kendaraan', nama: 'Kuning', deskripsi: 'Kuning energik & ramah. Untuk rental motor, skuter, kendaraan harian.', icon: 'Bike', mood: '#A16207', bg: 'light', manifest: 'kendaraan-kuning' },
+    ],
+    wisata: [
+      { id: 'wisata-tropis', subKategori: 'wisata', nama: 'Tropis', deskripsi: 'Tosca cerah & segar. Untuk open trip pantai, snorkeling, paket pulau.', icon: 'Palmtree', mood: '#0B7A90', bg: 'light', manifest: 'wisata-tropis' },
+      { id: 'wisata-rimba', subKategori: 'wisata', nama: 'Rimba', deskripsi: 'Hijau hutan gelap & petualang. Untuk pendakian, eco-tour, trip alam liar.', icon: 'Mountain', mood: '#5FB389', bg: 'dark', manifest: 'wisata-rimba' },
+      { id: 'wisata-senja', subKategori: 'wisata', nama: 'Senja', deskripsi: 'Oranye senja hangat & syahdu. Untuk honeymoon, city tour, paket budaya.', icon: 'Sunset', mood: '#C2410C', bg: 'warm', manifest: 'wisata-senja' },
+    ],
+    akomodasi: [
+      { id: 'akomodasi-resort', subKategori: 'akomodasi', nama: 'Resort', deskripsi: 'Teal resort bersih & lapang. Untuk villa, resort, hotel butik.', icon: 'BedDouble', mood: '#0F766E', bg: 'light', manifest: 'akomodasi-resort' },
+      { id: 'akomodasi-kayu', subKategori: 'akomodasi', nama: 'Kayu', deskripsi: 'Kayu hangat & homey. Untuk homestay, guest house, kos eksklusif.', icon: 'Home', mood: '#9C6B3F', bg: 'warm', manifest: 'akomodasi-kayu' },
+      { id: 'akomodasi-malam', subKategori: 'akomodasi', nama: 'Malam', deskripsi: 'Gelap emas mewah. Untuk villa private, penginapan premium, glamping.', icon: 'Hotel', mood: '#C9A24A', bg: 'dark', manifest: 'akomodasi-malam' },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // BLOG / MEDIA (Sprint 9). 3 sub-kategori × 3 gaya. Palet ui-ux-pro-max DB.
+  // ════════════════════════════════════════════════════════════
+  blog: {
+    jurnal: [
+      { id: 'jurnal-hangat', subKategori: 'jurnal', nama: 'Hangat', deskripsi: 'Krem serif hangat & intim. Untuk blog pribadi, jurnal, catatan harian.', icon: 'NotebookPen', mood: '#9A3412', bg: 'warm', manifest: 'jurnal-hangat' },
+      { id: 'jurnal-mono', subKategori: 'jurnal', nama: 'Mono', deskripsi: 'Mono minimal & bersih, fokus tulisan. Untuk blog esai, penulis, opini.', icon: 'Type', mood: '#141414', bg: 'light', manifest: 'jurnal-mono' },
+      { id: 'jurnal-senja', subKategori: 'jurnal', nama: 'Senja', deskripsi: 'Gelap cozy & nyaman dibaca malam. Untuk blog puisi, refleksi, personal.', icon: 'Moon', mood: '#E0A458', bg: 'dark', manifest: 'jurnal-senja' },
+    ],
+    media: [
+      { id: 'media-merah', subKategori: 'media', nama: 'Merah', deskripsi: 'Merah berita tegas & cepat. Untuk portal berita, breaking news, media umum.', icon: 'Newspaper', mood: '#C81E1E', bg: 'light', manifest: 'media-merah' },
+      { id: 'media-biru', subKategori: 'media', nama: 'Biru', deskripsi: 'Biru editorial terpercaya. Untuk media bisnis, jurnal, majalah online.', icon: 'Globe', mood: '#1D4ED8', bg: 'light', manifest: 'media-biru' },
+      { id: 'media-malam', subKategori: 'media', nama: 'Malam', deskripsi: 'Gelap modern & fokus. Untuk media tech, review, kanal spesialis.', icon: 'Radio', mood: '#60A5FA', bg: 'dark', manifest: 'media-malam' },
+    ],
+    niche: [
+      { id: 'niche-hijau', subKategori: 'niche', nama: 'Hijau', deskripsi: 'Hijau segar & sehat. Untuk blog kuliner, organik, gaya hidup sehat.', icon: 'Leaf', mood: '#15803D', bg: 'light', manifest: 'niche-hijau' },
+      { id: 'niche-pop', subKategori: 'niche', nama: 'Pop', deskripsi: 'Violet ceria & ekspresif. Untuk blog gaya hidup, fashion, hiburan.', icon: 'Hash', mood: '#7C3AED', bg: 'light', manifest: 'niche-pop' },
+      { id: 'niche-gelap', subKategori: 'niche', nama: 'Gelap', deskripsi: 'Gelap teal techie. Untuk blog teknologi, coding, review gadget.', icon: 'Terminal', mood: '#2DD4BF', bg: 'dark', manifest: 'niche-gelap' },
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════
+  // JASTIP (Sprint 9). 3 sub-kategori × 3 gaya. Palet ui-ux-pro-max DB.
+  // ════════════════════════════════════════════════════════════
+  jastip: {
+    luar: [
+      { id: 'luar-global', subKategori: 'luar', nama: 'Global', deskripsi: 'Biru internasional bersih. Untuk jastip branded, mall LN, e-commerce global.', icon: 'Globe', mood: '#2563EB', bg: 'light', manifest: 'luar-global' },
+      { id: 'luar-premium', subKategori: 'luar', nama: 'Premium', deskripsi: 'Gelap emas eksklusif. Untuk jastip luxury, designer bag, watch, hype item.', icon: 'Crown', mood: '#C9A24A', bg: 'dark', manifest: 'luar-premium' },
+      { id: 'luar-pop', subKategori: 'luar', nama: 'Pop', deskripsi: 'Pink playful & ramah. Untuk jastip skincare, K-beauty, fashion gen-Z.', icon: 'ShoppingBag', mood: '#DB2777', bg: 'light', manifest: 'luar-pop' },
+    ],
+    lokal: [
+      { id: 'lokal-hangat', subKategori: 'lokal', nama: 'Hangat', deskripsi: 'Oranye hangat & dekat. Untuk jastip oleh-oleh, makanan, produk lokal.', icon: 'Truck', mood: '#C2410C', bg: 'warm', manifest: 'lokal-hangat' },
+      { id: 'lokal-segar', subKategori: 'lokal', nama: 'Segar', deskripsi: 'Hijau segar & jujur. Untuk jastip produk UMKM, sayur, frozen, sehat.', icon: 'Sprout', mood: '#15803D', bg: 'light', manifest: 'lokal-segar' },
+      { id: 'lokal-gelap', subKategori: 'lokal', nama: 'Gelap', deskripsi: 'Gelap amber elegan. Untuk jastip kopi, craft, produk premium lokal.', icon: 'Moon', mood: '#E0A458', bg: 'dark', manifest: 'lokal-gelap' },
+    ],
+    preorder: [
+      { id: 'preorder-fokus', subKategori: 'preorder', nama: 'Fokus', deskripsi: 'Indigo rapi & terjadwal. Untuk PO terstruktur, batch order, grup buy.', icon: 'PackageCheck', mood: '#4F46E5', bg: 'light', manifest: 'preorder-fokus' },
+      { id: 'preorder-energi', subKategori: 'preorder', nama: 'Energi', deskripsi: 'Coral semangat & cepat. Untuk flash PO, limited drop, hype release.', icon: 'Truck', mood: '#DC4220', bg: 'light', manifest: 'preorder-energi' },
+      { id: 'preorder-malam', subKategori: 'preorder', nama: 'Malam', deskripsi: 'Violet gelap premium. Untuk PO eksklusif, member-only, pre-launch.', icon: 'Clock', mood: '#A855F7', bg: 'dark', manifest: 'preorder-malam' },
     ],
   },
 }
