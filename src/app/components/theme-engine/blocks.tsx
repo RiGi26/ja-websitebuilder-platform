@@ -574,7 +574,8 @@ function QuoteCard({ t }: { t: Testimonial }) {
 
 export function TestimoniCards({ testimonials }: { testimonials: Testimonial[] }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    // Section pakai --c-page (base) supaya kartu quote (--c-surface, "raised") terangkat.
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Kata Mereka" title="Dipercaya Pelanggan Kami" />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
@@ -615,7 +616,7 @@ export function TestimoniMarquee({ testimonials }: { testimonials: Testimonial[]
   // Gandakan daftar agar loop -50% mulus.
   const loop = [...testimonials, ...testimonials]
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '80px 0' }}>
+    <section style={{ background: 'var(--c-page)', padding: '80px 0' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '0 24px' }}>
         <SectionHead eyebrow="Kata Mereka" title="Ribuan Pelanggan Puas" />
       </div>
@@ -1007,7 +1008,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 // Cards — tier berdampingan; paket unggulan di-highlight (ring + badge).
 export function PricingCards({ pricing }: { pricing: PricingContent }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Paket & Harga" title={pricing.title ?? 'Pilih Paket yang Pas'} subtitle={pricing.subtitle} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, alignItems: 'stretch' }}>
@@ -1080,7 +1081,7 @@ export function PricingSingle({ pricing }: { pricing: PricingContent }) {
   const plan = pricing.plans.find(p => p.unggulan) ?? pricing.plans[0]
   if (!plan) return null
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <SectionHead eyebrow="Penawaran" title={pricing.title ?? 'Satu Paket, Semua Fitur'} subtitle={pricing.subtitle} />
         <div className="ce-pcard feat" style={{ padding: 'clamp(28px, 5vw, 48px)', textAlign: 'center', alignItems: 'center' }}>
