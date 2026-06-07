@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnerLogo, PartnersContent, SocialContent, SocialPlatform } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -134,6 +134,23 @@ export const ENGINE_CSS = `
 /* CTA banner — strip lebar penuh, teks kiri + tombol kanan */
 .ce-cta-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; }
 @media (prefers-reduced-motion: reduce) { .ce-pcard { transition: none; } }
+/* ── Sprint C — Partner logos / Social links ──────────────── */
+/* Logo strip — grayscale→warna saat hover, chip teks bila tak ada logo */
+.ce-logo { display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 8px; filter: grayscale(1); opacity: .6; transition: filter .25s ease, opacity .25s ease, transform .25s cubic-bezier(.16,1,.3,1); }
+.ce-logo:hover { filter: grayscale(0); opacity: 1; transform: translateY(-2px); }
+.ce-logo img { max-height: 100%; max-width: 150px; width: auto; object-fit: contain; display: block; }
+.ce-logo-chip { font-family: var(--f-display); font-weight: 700; font-size: 18px; color: var(--c-ink); white-space: nowrap; letter-spacing: var(--tracking); }
+.ce-logo-grid { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px 48px; }
+.ce-logo-marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.ce-logo-track { display: flex; align-items: center; gap: 56px; width: max-content; animation: ceMarquee 30s linear infinite; }
+.ce-logo-marquee:hover .ce-logo-track { animation-play-state: paused; }
+/* Social — ikon bulat, hover isi primary + lift */
+.ce-social-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 22px; }
+.ce-social-item { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; }
+.ce-social-ic { width: 52px; height: 52px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: var(--c-surface); border: 1px solid var(--c-border); color: var(--c-ink); box-shadow: var(--s-sm); transition: transform .25s cubic-bezier(.16,1,.3,1), background-color .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.ce-social-item:hover .ce-social-ic { background: var(--c-primary); color: var(--c-on-primary); border-color: var(--c-primary); transform: translateY(-3px); box-shadow: var(--s-md); }
+.ce-social-lbl { font-size: 12px; font-weight: 600; color: var(--c-muted); }
+@media (prefers-reduced-motion: reduce) { .ce-logo-track { animation: none; } .ce-logo, .ce-social-ic { transition: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -1160,6 +1177,93 @@ export function CTASplit({ cta }: { cta: NonNullable<ComposableContent['cta']> }
           <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: '0 0 12px', color: 'var(--c-ink)' }}>{cta.title}</h2>
           {cta.subtitle && <p style={{ color: 'var(--c-muted)', margin: '0 0 28px', fontSize: 16, lineHeight: 1.7 }}>{cta.subtitle}</p>}
           <div><Btn text={cta.ctaText ?? 'Pesan Sekarang'} href={cta.ctaHref} /></div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── SPRINT C — Partner logos / Social links ──────────────────
+// Satu logo: <img> bila ada URL, fallback chip teks nama. Bungkus <a> bila href.
+// `dup` = salinan untuk loop marquee → aria-hidden + tak fokus.
+function LogoItem({ p, dup }: { p: PartnerLogo; dup?: boolean }) {
+  const inner = p.logo
+    ? <img src={p.logo} alt={p.nama} loading="lazy" />
+    : <span className="ce-logo-chip">{p.nama}</span>
+  const a11y = dup ? { 'aria-hidden': true, tabIndex: -1 } : {}
+  return p.href && !dup
+    ? <a className="ce-logo" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={p.nama}>{inner}</a>
+    : <div className="ce-logo" aria-label={dup ? undefined : p.nama} {...a11y}>{inner}</div>
+}
+
+// Grid — deret logo statis terpusat (sedikit logo, "dipercaya oleh").
+export function PartnersGrid({ partners }: { partners: PartnersContent }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '64px 24px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <SectionHead eyebrow="Mitra & Klien" title={partners.title ?? 'Dipercaya Oleh'} subtitle={partners.subtitle} />
+        <div className="ce-logo-grid">
+          {partners.logos.map((p, i) => <LogoItem key={i} p={p} />)}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Marquee — strip logo bergerak (banyak logo), jeda saat hover.
+export function PartnersMarquee({ partners }: { partners: PartnersContent }) {
+  const loop = [...partners.logos, ...partners.logos]
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '64px 0' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHead eyebrow="Mitra & Klien" title={partners.title ?? 'Dipercaya Oleh'} subtitle={partners.subtitle} />
+      </div>
+      <div className="ce-logo-marquee">
+        <div className="ce-logo-track">
+          {loop.map((p, i) => <LogoItem key={i} p={p} dup={i >= partners.logos.length} />)}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Ikon platform (24×24, fill=currentColor → ikut warna tema). Brand = simple-icons
+// (CC0); marketplace/website = bentuk solid sederhana. Label selalu tampil → jelas.
+const SOCIAL_ICONS: Record<SocialPlatform, string> = {
+  instagram: 'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.43.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.43.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.43-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.43-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.3-1.46.72-2.13 1.38C1.35 2.68.93 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13.67.66 1.34 1.08 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4zm6.4-11.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z',
+  tiktok: 'M16.6 0h-3.3v13.2a2.7 2.7 0 1 1-2.7-2.7c.2 0 .4 0 .6.1V7.2a6 6 0 0 0-.6 0 6 6 0 1 0 6 6V6.7a7.3 7.3 0 0 0 4.3 1.4V4.8a4.3 4.3 0 0 1-2.9-1.1A4.3 4.3 0 0 1 16.6 0z',
+  youtube: 'M23.5 6.2a3 3 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.5A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.14c1.88.5 9.38.5 9.38.5s7.5 0 9.38-.5a3 3 0 0 0 2.12-2.14A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12z',
+  facebook: 'M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 9.56 23.93v-8.39H6.69v-3.47h2.87V9.41c0-2.85 1.7-4.42 4.3-4.42 1.25 0 2.55.22 2.55.22v2.8h-1.44c-1.41 0-1.85.88-1.85 1.79v2.15h3.16l-.5 3.47h-2.66v8.39C19.61 23.1 24 18.1 24 12.07z',
+  whatsapp: 'M.06 24l1.69-6.16A11.87 11.87 0 0 1 .16 11.9C.16 5.34 5.5 0 12.05 0a11.82 11.82 0 0 1 8.41 3.49 11.82 11.82 0 0 1 3.48 8.41c0 6.56-5.34 11.89-11.89 11.89a11.9 11.9 0 0 1-5.69-1.45L.06 24zm6.6-3.8c1.68 1 3.28 1.59 5.39 1.59 5.45 0 9.89-4.43 9.89-9.89 0-5.46-4.42-9.89-9.88-9.89-5.45 0-9.89 4.43-9.89 9.88a9.86 9.86 0 0 0 1.51 5.26l-1 3.65 3.98-1.2zm11.39-5.46c-.07-.12-.27-.2-.57-.35-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37s-1.04 1.02-1.04 2.48 1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41z',
+  x: 'M18.24 2.25h3.31l-7.23 8.26L23 21.75h-6.66l-5.21-6.82-5.97 6.82H1.86l7.73-8.84L1.25 2.25h6.83l4.71 6.23zm-1.16 17.52h1.83L7.08 4.13H5.12z',
+  shopee: 'M12 2a4 4 0 0 0-4 4H5.5a1.5 1.5 0 0 0-1.5 1.36l-1 11A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.64l-1-11A1.5 1.5 0 0 0 18.5 6H16a4 4 0 0 0-4-4zm0 2a2 2 0 0 1 2 2h-4a2 2 0 0 1 2-2zm-2.5 7.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z',
+  tokopedia: 'M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .59 1.41l9 9a2 2 0 0 0 2.83 0l7-7a2 2 0 0 0 0-2.83zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z',
+  website: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.93 6h-2.95a15.7 15.7 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8zM12 4c.83 1.2 1.48 2.53 1.91 3.96h-3.82C10.52 6.53 11.17 5.2 12 4zM4.26 14a7.96 7.96 0 0 1 0-4h3.38a16.6 16.6 0 0 0 0 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 0 1 5.07 16zm2.95-8H5.07a8.03 8.03 0 0 1 4.33-3.56A15.7 15.7 0 0 0 8.02 8zM12 20c-.83-1.2-1.48-2.53-1.91-3.96h3.82C13.48 17.47 12.83 18.8 12 20zm2.34-6H9.66a14.7 14.7 0 0 1 0-4h4.68a14.7 14.7 0 0 1 0 4zm.27 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14a16.6 16.6 0 0 0 0-4h3.38a7.96 7.96 0 0 1 0 4h-3.38z',
+}
+const SOCIAL_LABEL: Record<SocialPlatform, string> = {
+  instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube', facebook: 'Facebook',
+  whatsapp: 'WhatsApp', x: 'X', shopee: 'Shopee', tokopedia: 'Tokopedia', website: 'Website',
+}
+
+// Social strip — ikon medsos/marketplace, arahkan ke tempat transaksi/komunitas.
+export function SocialStrip({ social }: { social: SocialContent }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '64px 24px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <SectionHead eyebrow="Terhubung" title={social.title ?? 'Ikuti & Belanja di'} subtitle={social.subtitle} />
+        <div className="ce-social-row">
+          {social.links.map((l, i) => {
+            const label = l.label ?? SOCIAL_LABEL[l.platform]
+            const path = SOCIAL_ICONS[l.platform] ?? SOCIAL_ICONS.website
+            return (
+              <a key={i} className="ce-social-item" href={l.href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+                <span className="ce-social-ic">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d={path} /></svg>
+                </span>
+                <span className="ce-social-lbl">{label}</span>
+              </a>
+            )
+          })}
         </div>
       </div>
     </section>
