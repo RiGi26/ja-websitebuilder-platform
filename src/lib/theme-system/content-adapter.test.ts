@@ -148,6 +148,37 @@ describe('composableContentFromSections — data_konten Sprint A/B (team/pricing
     expect(bad.partners).toBeUndefined()
     expect(bad.social).toBeUndefined()
   })
+
+  it('testimoni (form): data_konten.testimoni {nama,kota,teks} → testimonials {quote,nama,peran}', () => {
+    const konten = {
+      testimoni: [
+        { nama: 'Bu Sari', kota: 'Semarang', teks: 'Pelayanan ramah sekali.', bintang: 5 },
+        { kota: 'X', teks: 'tanpa nama' }, // invalid → dibuang
+        { nama: 'Tanpa teks' },            // invalid → dibuang
+      ],
+    }
+    const c = composableContentFromSections('Klinik X', sectionsAboutCta, [], null, konten)
+    expect(c.testimonials).toHaveLength(1)
+    expect(c.testimonials?.[0]).toEqual({ quote: 'Pelayanan ramah sekali.', nama: 'Bu Sari', peran: 'Semarang' })
+  })
+
+  it('foto_items (form): {label,url} → gallery.images {src,caption}; tanpa url dibuang', () => {
+    const konten = {
+      foto_items: [
+        { label: 'Ruang Tunggu', url: 'https://x.test/1.jpg' },
+        { label: 'Tanpa URL', url: '' }, // dibuang
+      ],
+    }
+    const c = composableContentFromSections('Klinik X', sectionsAboutCta, [], null, konten)
+    expect(c.gallery?.images).toHaveLength(1)
+    expect(c.gallery?.images?.[0]).toEqual({ src: 'https://x.test/1.jpg', caption: 'Ruang Tunggu' })
+  })
+
+  it('nol regresi: tanpa testimoni/foto_items → testimonials/gallery undefined', () => {
+    const c = composableContentFromSections('X', sectionsAboutCta, [], null, {})
+    expect(c.testimonials).toBeUndefined()
+    expect(c.gallery).toBeUndefined()
+  })
 })
 
 describe('sampleContentForTheme — konten contoh Sprint A/B (preview)', () => {
