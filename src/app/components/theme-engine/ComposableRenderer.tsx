@@ -22,6 +22,9 @@ import {
   FAQ, InfoLokasiBlock, MasonryGallery, BeforeAfterGallery,
   TeamGrid, TeamSpotlight, TeamHorizontal,
   AboutSplitRight, AboutSplitLeft, AboutStory,
+  PricingCards, PricingTable, PricingSingle,
+  ProcessHorizontal, ProcessTimeline, ProcessCards,
+  CTABanner, CTASplit,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -71,6 +74,13 @@ export default function ComposableRenderer({
         )
       )}
 
+      {/* Process / Cara Kerja (Sprint B) — setelah showcase, sebelum stats */}
+      {B.process && content.process && content.process.steps.length > 0 && (
+        B.process === 'timeline' ? <ProcessTimeline process={content.process} /> :
+        B.process === 'cards' ? <ProcessCards process={content.process} /> :
+        <ProcessHorizontal process={content.process} />
+      )}
+
       {/* ── Balok Sprint 5 — hanya bila manifest mengaktifkan & konten ada ── */}
       {B.stats && content.stats && content.stats.length > 0 && (
         <Stats stats={content.stats} />
@@ -113,11 +123,23 @@ export default function ComposableRenderer({
         <About about={content.about} />
       )}
 
+      {/* Pricing / Paket (Sprint B) — setelah about, sebelum FAQ (objection→harga→FAQ) */}
+      {B.pricing && content.pricing && content.pricing.plans.length > 0 && (
+        B.pricing === 'table' ? <PricingTable pricing={content.pricing} /> :
+        B.pricing === 'single' ? <PricingSingle pricing={content.pricing} /> :
+        <PricingCards pricing={content.pricing} />
+      )}
+
       {B.faq && content.faq && content.faq.length > 0 && (
         <FAQ faq={content.faq} />
       )}
 
-      {content.cta && <CTA cta={content.cta} />}
+      {/* CTA — dispatch ke varian (Sprint B); default 'card' = perilaku lama */}
+      {content.cta && (
+        B.cta === 'banner' ? <CTABanner cta={content.cta} /> :
+        B.cta === 'split' ? <CTASplit cta={content.cta} /> :
+        <CTA cta={content.cta} />
+      )}
 
       <Footer content={content} motif={motif} motifColor={motifColor} />
       <FloatingWA wa={content.contact?.wa} />
