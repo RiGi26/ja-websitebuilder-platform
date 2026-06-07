@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -78,6 +78,24 @@ export const ENGINE_CSS = `
 .ce-ba-tag { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; background: rgba(0,0,0,.62); color: #fff; }
 .ce-ba-tag.after { background: var(--c-primary); color: var(--c-on-primary); }
 @media (prefers-reduced-motion: reduce) { .ce-stagger > * { opacity: 1; transform: none; animation: none; } .ce-marquee-track { animation: none; } }
+/* ── Sprint A — Trust layer ───────────────────────────────── */
+/* Team/People — hover: foto zoom + bio slide up */
+.ce-team-card { position: relative; }
+.ce-team-photo { overflow: hidden; }
+.ce-team-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.001); transition: transform .5s cubic-bezier(.16,1,.3,1); }
+.ce-team-card:hover .ce-team-photo img { transform: scale(1.05); }
+.ce-team-bio-reveal { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 14px 10px; font-size: 12px; line-height: 1.5; color: #fff; background: linear-gradient(180deg, transparent, rgba(0,0,0,.72)); transform: translateY(100%); transition: transform .32s cubic-bezier(.16,1,.3,1); }
+.ce-team-card:hover .ce-team-bio-reveal { transform: translateY(0); }
+/* Team horizontal — scroll snapping, hidden scrollbar */
+.ce-team-scroll { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 8px; }
+.ce-team-scroll::-webkit-scrollbar { display: none; }
+.ce-team-scroll-item { scroll-snap-align: start; flex-shrink: 0; width: 200px; }
+/* Zigzag features — nth-child(even) reverses flex direction */
+.ce-zigzag-item { display: flex; gap: 56px; align-items: center; padding: 56px 0; border-top: 1px solid var(--c-border); }
+.ce-zigzag-item:first-child { border-top: none; padding-top: 0; }
+.ce-zigzag-item:nth-child(even) { flex-direction: row-reverse; }
+@media (max-width: 767px) { .ce-zigzag-item, .ce-zigzag-item:nth-child(even) { flex-direction: column; gap: 32px; padding: 40px 0; } }
+@media (prefers-reduced-motion: reduce) { .ce-team-photo img { transition: none; } .ce-team-bio-reveal { transition: none; transform: translateY(0); } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -652,6 +670,197 @@ export function InfoLokasiBlock({ info }: { info: InfoLokasi }) {
           <div style={{ borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-sm)', minHeight: 280, background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
             {mapSrc && <iframe className="ce-map" src={mapSrc} title="Peta lokasi" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />}
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── TEAM / PEOPLE — 3 varian (Sprint A) ──────────────────────
+// Avatar: foto bila ada, fallback inisial 2 huruf di atas surface-primary.
+function TeamAvatar({ member }: { member: TeamMember }) {
+  const initials = member.nama.trim().split(/\s+/).slice(0, 2).map(w => w[0] ?? '').join('').toUpperCase() || 'T'
+  if (member.foto) {
+    return <img src={member.foto} alt={member.nama} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+  }
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'color-mix(in srgb, var(--c-primary) 14%, var(--c-surface))', color: 'var(--c-primary)', fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(22px, 4vw, 44px)' }}>
+      {initials}
+    </div>
+  )
+}
+
+// Grid — semua anggota setara, auto-fit (klinik, sekolah, company)
+export function TeamGrid({ team }: { team: TeamMember[] }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
+          {team.map((m, i) => (
+            <div key={i} className="ce-team-card" style={{ textAlign: 'center' }}>
+              <div className="ce-team-photo" style={{ aspectRatio: '1/1', borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 14 }}>
+                <TeamAvatar member={m} />
+                {m.bio && <div className="ce-team-bio-reveal">{m.bio}</div>}
+              </div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-ink)' }}>{m.nama}</h3>
+              <span style={{ fontSize: 13, color: 'var(--c-primary)', fontWeight: 600 }}>{m.peran}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Spotlight — 1 featured besar (kiri/atas) + grid pendukung (kanan/bawah)
+export function TeamSpotlight({ team }: { team: TeamMember[] }) {
+  const [featured, ...rest] = team
+  if (!featured) return null
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Tim Kami" title="Kenali Tim Ahli Kami" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 40, alignItems: 'start' }}>
+          <div className="ce-team-card">
+            <div className="ce-team-photo" style={{ aspectRatio: '3/4', borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 20 }}>
+              <TeamAvatar member={featured} />
+              {featured.bio && <div className="ce-team-bio-reveal">{featured.bio}</div>}
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 6px', color: 'var(--c-ink)' }}>{featured.nama}</h3>
+            <span style={{ fontSize: 14, color: 'var(--c-primary)', fontWeight: 600 }}>{featured.peran}</span>
+            {featured.bio && <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.65, margin: '10px 0 0' }}>{featured.bio}</p>}
+          </div>
+          {rest.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16, alignContent: 'start', paddingTop: 8 }}>
+              {rest.map((m, i) => (
+                <div key={i} className="ce-team-card" style={{ textAlign: 'center' }}>
+                  <div className="ce-team-photo" style={{ aspectRatio: '1/1', borderRadius: 'var(--r-md)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 10 }}>
+                    <TeamAvatar member={m} />
+                  </div>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 3px', color: 'var(--c-ink)' }}>{m.nama}</h3>
+                  <span style={{ fontSize: 12, color: 'var(--c-primary)', fontWeight: 600 }}>{m.peran}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Horizontal — scroll strip (tim banyak, mis. coach directory)
+export function TeamHorizontal({ team }: { team: TeamMember[] }) {
+  return (
+    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <div className="ce-team-scroll">
+          {team.map((m, i) => (
+            <div key={i} className="ce-team-card ce-team-scroll-item">
+              <div className="ce-team-photo" style={{ aspectRatio: '1/1', borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 12 }}>
+                <TeamAvatar member={m} />
+                {m.bio && <div className="ce-team-bio-reveal">{m.bio}</div>}
+              </div>
+              <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 3px', color: 'var(--c-ink)' }}>{m.nama}</h3>
+              <span style={{ fontSize: 12, color: 'var(--c-primary)', fontWeight: 600 }}>{m.peran}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── ABOUT varian — 3 gaya baru + text lama (Sprint A) ─────────
+type AboutContent = NonNullable<ComposableContent['about']>
+
+// Split-Right — teks kiri, gambar kanan (editorial bersih)
+export function AboutSplitRight({ about }: { about: AboutContent }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '80px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
+        <div>
+          <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', margin: '0 0 20px', color: 'var(--c-ink)' }}>{about.title}</h2>
+          <p style={{ fontSize: 16, color: 'var(--c-muted)', lineHeight: 1.75, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
+          {about.ctaText && <div style={{ marginTop: 28 }}><Btn text={about.ctaText} href={about.ctaHref} /></div>}
+        </div>
+        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+          {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 360 }} />}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Split-Left — gambar kiri, teks kanan (reversed)
+export function AboutSplitLeft({ about }: { about: AboutContent }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '80px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
+        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+          {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 360 }} />}
+        </div>
+        <div>
+          <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', margin: '0 0 20px', color: 'var(--c-ink)' }}>{about.title}</h2>
+          <p style={{ fontSize: 16, color: 'var(--c-muted)', lineHeight: 1.75, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
+          {about.ctaText && <div style={{ marginTop: 28 }}><Btn text={about.ctaText} href={about.ctaHref} /></div>}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Story — sinematik: judul centered, gambar full-width, teks centered bawah
+export function AboutStory({ about }: { about: AboutContent }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
+          <h2 style={{ fontSize: 'clamp(28px, 5vw, 44px)', margin: 0, color: 'var(--c-ink)' }}>{about.title}</h2>
+        </div>
+        <div style={{ borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', marginBottom: 48, aspectRatio: '16/7', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))', boxShadow: 'var(--s-lg)' }}>
+          {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+        </div>
+        <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 17, color: 'var(--c-muted)', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
+          {about.ctaText && <div style={{ marginTop: 28 }}><Btn text={about.ctaText} href={about.ctaHref} /></div>}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── FEATURES ZIGZAG — alternating image+text (Sprint A) ───────
+export function FeaturesZigzag({ features }: { features: NonNullable<ComposableContent['features']> }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <FeatHeading />
+        <div>
+          {features.map((f, i) => (
+            <div key={i} className="ce-zigzag-item">
+              {/* Visual: foto bila ada, gradient + angka watermark bila tidak */}
+              <div style={{ flex: '1 1 340px', minHeight: 280, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-sm)', position: 'relative', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+                {f.image
+                  ? <img src={f.image} alt={f.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 280 }} />
+                  : <span aria-hidden style={{ position: 'absolute', bottom: 12, right: 20, fontFamily: 'var(--f-display)', fontWeight: 900, fontSize: 'clamp(80px, 14vw, 140px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: 0.18, userSelect: 'none' }}>{String(i + 1).padStart(2, '0')}</span>
+                }
+              </div>
+              {/* Teks: angka watermark dekoratif + heading + body */}
+              <div style={{ flex: '1 1 340px' }}>
+                <span aria-hidden style={{ display: 'block', fontFamily: 'var(--f-display)', fontWeight: 900, fontSize: 'clamp(56px, 10vw, 80px)', lineHeight: 1, color: 'var(--c-primary)', opacity: 0.1, marginBottom: -16, userSelect: 'none' }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 style={{ fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 700, margin: '0 0 14px', color: 'var(--c-ink)' }}>{f.title}</h3>
+                <p style={{ fontSize: 15, color: 'var(--c-muted)', lineHeight: 1.75, margin: 0 }}>{f.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

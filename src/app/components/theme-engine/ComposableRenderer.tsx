@@ -16,10 +16,12 @@ import {
 import {
   ENGINE_CSS, Nav, Footer, About, CTA, FloatingWA,
   HeroCentered, HeroSplit, HeroFullbleed,
-  FeaturesGrid, FeaturesRows,
+  FeaturesGrid, FeaturesRows, FeaturesZigzag,
   ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
   Stats, TestimoniCards, TestimoniSpotlight, TestimoniMarquee,
   FAQ, InfoLokasiBlock, MasonryGallery, BeforeAfterGallery,
+  TeamGrid, TeamSpotlight, TeamHorizontal,
+  AboutSplitRight, AboutSplitLeft, AboutStory,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -53,9 +55,9 @@ export default function ComposableRenderer({
 
       {/* Features (keunggulan / "Mengapa Kami") — varian dari manifest */}
       {content.features && content.features.length > 0 && (
-        B.features === 'rows'
-          ? <FeaturesRows features={content.features} />
-          : <FeaturesGrid features={content.features} />
+        B.features === 'rows' ? <FeaturesRows features={content.features} /> :
+        B.features === 'zigzag' ? <FeaturesZigzag features={content.features} /> :
+        <FeaturesGrid features={content.features} />
       )}
 
       {/* Showcase produk/menu — varian dari manifest */}
@@ -72,6 +74,13 @@ export default function ComposableRenderer({
       {/* ── Balok Sprint 5 — hanya bila manifest mengaktifkan & konten ada ── */}
       {B.stats && content.stats && content.stats.length > 0 && (
         <Stats stats={content.stats} />
+      )}
+
+      {/* Team/People — Trust layer (Sprint A) */}
+      {B.team && content.team && content.team.length > 0 && (
+        B.team === 'spotlight' ? <TeamSpotlight team={content.team} /> :
+        B.team === 'horizontal' ? <TeamHorizontal team={content.team} /> :
+        <TeamGrid team={content.team} />
       )}
 
       {B.testimoni && content.testimonials && content.testimonials.length > 0 && (
@@ -96,7 +105,13 @@ export default function ComposableRenderer({
         <InfoLokasiBlock info={content.info} />
       )}
 
-      {content.about && <About about={content.about} />}
+      {/* About — dispatch ke varian (Sprint A); default 'text' = perilaku lama */}
+      {content.about && (
+        B.about === 'split-right' ? <AboutSplitRight about={content.about} /> :
+        B.about === 'split-left' ? <AboutSplitLeft about={content.about} /> :
+        B.about === 'story' ? <AboutStory about={content.about} /> :
+        <About about={content.about} />
+      )}
 
       {B.faq && content.faq && content.faq.length > 0 && (
         <FAQ faq={content.faq} />
