@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import ComposableRenderer from './ComposableRenderer'
-import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
+import { MANIFESTS, type ComposableContent, type ThemeManifest } from '@/lib/theme-system/manifest'
 
 // Konten contoh = pempek (kasus nyata yang memicu Theme System).
 const CONTENT: ComposableContent = {
@@ -300,5 +300,225 @@ describe('Sprint 7 — sekolah', () => {
     expect(html).toContain('ce-masonry') // gallery masonry aktif (manifest gallery:'masonry')
     expect(html).toContain('output=embed') // info-lokasi
     expect(html).toContain('Jam berapa buka?') // FAQ
+  })
+})
+
+describe('Sprint 8a — personal', () => {
+  it('registry memuat 9 manifest personal', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of [
+      'kreator-spotlight', 'kreator-pop', 'kreator-clean',
+      'profesional-korporat', 'profesional-mono', 'profesional-warm',
+      'coach-energi', 'coach-tenang', 'coach-prestige',
+    ]) {
+      expect(keys).toContain(id)
+    }
+  })
+
+  it('9 gaya personal render tanpa error + data-theme benar', () => {
+    for (const id of [
+      'kreator-spotlight', 'kreator-pop', 'kreator-clean',
+      'profesional-korporat', 'profesional-mono', 'profesional-warm',
+      'coach-energi', 'coach-tenang', 'coach-prestige',
+    ]) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_GALLERY} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
+  })
+})
+
+describe('Sprint 8b — company', () => {
+  it('registry memuat 9 manifest company', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of [
+      'startup-aurora', 'startup-midnight', 'startup-mint',
+      'agency-bold', 'agency-noir', 'agency-prisma',
+      'korporat-biru', 'korporat-slate', 'korporat-netral',
+    ]) {
+      expect(keys).toContain(id)
+    }
+  })
+
+  it('9 gaya company render tanpa error + data-theme benar', () => {
+    for (const id of [
+      'startup-aurora', 'startup-midnight', 'startup-mint',
+      'agency-bold', 'agency-noir', 'agency-prisma',
+      'korporat-biru', 'korporat-slate', 'korporat-netral',
+    ]) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_GALLERY} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
+  })
+})
+
+// ── Sprint A — Trust layer balok baru ────────────────────────
+const TEAM_CONTENT: ComposableContent = {
+  ...CONTENT,
+  team: [
+    { nama: 'Dr. Sari Dewi', peran: 'Dokter Umum', foto: 'https://x.test/sari.jpg', bio: 'Berpengalaman 10 tahun di bidang kesehatan keluarga.' },
+    { nama: 'Dr. Budi Santoso', peran: 'Spesialis Penyakit Dalam', bio: 'Lulusan FK UI, spesialisasi sejak 2014.' },
+    { nama: 'Perawat Ani', peran: 'Kepala Perawat' },
+  ],
+  about: {
+    title: 'Klinik Terpercaya Keluarga',
+    body: 'Sejak 2010 kami melayani ribuan pasien dengan pelayanan terbaik.',
+    image: 'https://x.test/klinik-foto.jpg',
+    ctaText: 'Buat Janji',
+    ctaHref: '#janji',
+  },
+  features: [
+    { title: 'Dokter Berpengalaman', desc: 'Tim dokter rata-rata 10 tahun pengalaman.', image: 'https://x.test/feat1.jpg' },
+    { title: 'Peralatan Modern', desc: 'Alat diagnosis terkini untuk hasil akurat.' },
+    { title: 'Layanan 7 Hari', desc: 'Buka setiap hari termasuk hari libur.' },
+  ],
+}
+
+describe('Sprint A — Team / About / Zigzag', () => {
+  // helper: manifest inline dengan block override
+  const withBlocks = (id: string, extra: Partial<ThemeManifest['blocks']>): ThemeManifest => ({
+    ...MANIFESTS[id],
+    blocks: { ...MANIFESTS[id].blocks, ...extra },
+  })
+
+  it('team grid: merender nama + peran semua anggota', () => {
+    const m = withBlocks('umum-bluecare', { team: 'grid' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('Dr. Sari Dewi')
+    expect(html).toContain('Dokter Umum')
+    expect(html).toContain('Dr. Budi Santoso')
+    expect(html).toContain('Perawat Ani')
+    expect(html).toContain('ce-team-card')
+  })
+
+  it('team grid: foto ter-render sebagai <img> bila ada URL', () => {
+    const m = withBlocks('umum-bluecare', { team: 'grid' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('https://x.test/sari.jpg')
+  })
+
+  it('team grid: fallback inisial bila foto kosong (Perawat Ani)', () => {
+    const m = withBlocks('umum-bluecare', { team: 'grid' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    // Inisial "PA" dari "Perawat Ani"
+    expect(html).toContain('PA')
+  })
+
+  it('team spotlight: featured punya bio ditampilkan + pendukung tanpa bio besar', () => {
+    const m = withBlocks('umum-bluecare', { team: 'spotlight' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('Berpengalaman 10 tahun') // bio featured
+    expect(html).toContain('ce-team-bio-reveal')       // hover reveal container
+  })
+
+  it('team horizontal: semua anggota di scroll strip', () => {
+    const m = withBlocks('umum-bluecare', { team: 'horizontal' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('ce-team-scroll')
+    expect(html).toContain('ce-team-scroll-item')
+    expect(html).toContain('Perawat Ani')
+  })
+
+  it('team TAK dirender bila manifest tak punya slot team (nol regresi)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={TEAM_CONTENT} />)
+    expect(html).not.toContain('Dr. Sari Dewi')
+    expect(html).not.toContain('Kenali Tim di Balik Layanan Kami')
+  })
+
+  it('team TAK dirender bila content.team kosong walau manifest aktif', () => {
+    const m = withBlocks('umum-bluecare', { team: 'grid' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={CONTENT} />)
+    expect(html).not.toContain('Kenali Tim di Balik Layanan Kami')
+  })
+
+  it('about split-right: gambar + teks + CTA ter-render', () => {
+    const m = withBlocks('kuliner-rustic', { about: 'split-right' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('https://x.test/klinik-foto.jpg')
+    expect(html).toContain('Klinik Terpercaya Keluarga')
+    expect(html).toContain('Buat Janji')
+    expect(html).toContain('Tentang Kami') // eyebrow
+  })
+
+  it('about split-left: gambar + teks (urutan terbalik dari split-right)', () => {
+    const mRight = withBlocks('kuliner-rustic', { about: 'split-right' })
+    const mLeft  = withBlocks('kuliner-rustic', { about: 'split-left' })
+    const right = renderToStaticMarkup(<ComposableRenderer manifest={mRight} content={TEAM_CONTENT} />)
+    const left  = renderToStaticMarkup(<ComposableRenderer manifest={mLeft}  content={TEAM_CONTENT} />)
+    // Keduanya punya gambar + judul, tapi markup berbeda (urutan div berbeda)
+    expect(left).toContain('https://x.test/klinik-foto.jpg')
+    expect(right).not.toBe(left)
+  })
+
+  it('about story: gambar 16:7 + teks centered', () => {
+    const m = withBlocks('kuliner-rustic', { about: 'story' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('https://x.test/klinik-foto.jpg')
+    expect(html).toContain('16/7') // aspect-ratio story
+    expect(html).toContain('Klinik Terpercaya Keluarga')
+  })
+
+  it('about text (default): nol regresi — judul tetap muncul tanpa gambar', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={TEAM_CONTENT} />)
+    expect(html).toContain('Klinik Terpercaya Keluarga')
+    // Tidak pakai split karena manifest tak punya about variant
+    expect(html).not.toContain('split-right')
+  })
+
+  it('features zigzag: nomor watermark + teks tiap item', () => {
+    const m = withBlocks('startup-aurora', { features: 'zigzag' })
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={m} content={TEAM_CONTENT} />)
+    expect(html).toContain('ce-zigzag-item')
+    expect(html).toContain('Dokter Berpengalaman')
+    expect(html).toContain('Peralatan Modern')
+    // Gambar feat1 ter-render
+    expect(html).toContain('https://x.test/feat1.jpg')
+  })
+
+  it('features zigzag TAK aktif bila manifest pakai grid/rows (nol regresi)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={TEAM_CONTENT} />)
+    // Hanya FeaturesZigzag yang render gambar fitur — grid/rows tidak
+    expect(html).not.toContain('https://x.test/feat1.jpg')
+  })
+
+  it('umum-bluecare (updated manifest): team spotlight aktif saat ada data tim', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['umum-bluecare']} content={TEAM_CONTENT} />)
+    expect(html).toContain('ce-team-card')
+    expect(html).toContain('Dr. Sari Dewi')
+  })
+
+  it('startup-aurora (updated manifest): zigzag + team grid + about split-right', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['startup-aurora']} content={TEAM_CONTENT} />)
+    expect(html).toContain('ce-zigzag-item')
+    expect(html).toContain('ce-team-card')
+    expect(html).toContain('https://x.test/klinik-foto.jpg') // about split-right
+  })
+})
+
+describe('Sprint 9 — travel / blog / jastip', () => {
+  const ALL_S9 = [
+    'kendaraan-asphalt', 'kendaraan-bersih', 'kendaraan-kuning',
+    'wisata-tropis', 'wisata-rimba', 'wisata-senja',
+    'akomodasi-resort', 'akomodasi-kayu', 'akomodasi-malam',
+    'jurnal-hangat', 'jurnal-mono', 'jurnal-senja',
+    'media-merah', 'media-biru', 'media-malam',
+    'niche-hijau', 'niche-pop', 'niche-gelap',
+    'luar-global', 'luar-premium', 'luar-pop',
+    'lokal-hangat', 'lokal-segar', 'lokal-gelap',
+    'preorder-fokus', 'preorder-energi', 'preorder-malam',
+  ]
+
+  it('registry memuat 27 manifest Sprint 9', () => {
+    const keys = Object.keys(MANIFESTS)
+    for (const id of ALL_S9) expect(keys).toContain(id)
+  })
+
+  it('27 gaya Sprint 9 render tanpa error + data-theme benar', () => {
+    for (const id of ALL_S9) {
+      const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS[id]} content={CONTENT_GALLERY} />)
+      expect(html).toContain(`data-theme="${id}"`)
+      expect(html.length).toBeGreaterThan(300)
+    }
   })
 })

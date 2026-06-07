@@ -16,7 +16,7 @@ import { THEME_PACKS } from './theme-packs'
 
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
 export type ShowcaseVariant = 'menu-list' | 'card-grid' | 'lookbook'
-export type FeaturesVariant = 'grid' | 'rows'
+export type FeaturesVariant = 'grid' | 'rows' | 'zigzag'
 // Testimoni (Sprint 5) — sosial-proof. 3 varian parametrik via token.
 // 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
 // 'marquee' = strip bergerak (CSS-only) untuk banyak testimoni ringkas.
@@ -28,6 +28,15 @@ export type GalleryVariant = 'masonry' | 'before-after'
 // halus di hero + strip footer, ditint warna primary tema. 'none' = polos
 // (default semua tema lama → nol regresi).
 export type MotifVariant = 'none' | 'kawung' | 'tenun'
+// Sprint A — Trust layer balok baru
+export type TeamVariant = 'grid' | 'spotlight' | 'horizontal'
+export type AboutVariant = 'text' | 'split-right' | 'split-left' | 'story'
+export interface TeamMember {
+  nama: string
+  peran: string
+  foto?: string // URL foto; fallback = avatar inisial
+  bio?: string  // 1 kalimat bio; muncul saat hover (CSS-only)
+}
 
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
@@ -46,6 +55,9 @@ export interface ThemeManifest {
     faq?: boolean // accordion objection-handling (CSS-only <details>)
     info?: boolean // jam buka + lokasi/maps + reservasi (wajib F&B/toko fisik)
     gallery?: GalleryVariant // masonry fasilitas / before-after (Sprint 5b)
+    // ── Balok Sprint A — Trust layer (semua opsional → tema lama nol regresi) ──
+    team?: TeamVariant    // grid kartu · spotlight 1-featured · horizontal scroll
+    about?: AboutVariant  // default 'text' (perilaku lama); 'split-right/left/story' = dengan gambar
   }
 }
 
@@ -81,7 +93,7 @@ export interface GalleryContent {
 export interface ComposableContent {
   nama: string
   hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
-  features?: { title: string; desc: string }[]
+  features?: { title: string; desc: string; image?: string }[]
   showcase?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
   // Sprint 5 — semua opsional; absen + manifest off = tak dirender (nol regresi)
   testimonials?: Testimonial[]
@@ -89,7 +101,8 @@ export interface ComposableContent {
   faq?: FaqItem[]
   info?: InfoLokasi
   gallery?: GalleryContent
-  about?: { title: string; body: string }
+  about?: { title: string; body: string; image?: string; ctaText?: string; ctaHref?: string }
+  team?: TeamMember[]
   cta?: { title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
   contact?: { wa?: string; email?: string; alamat?: string }
 }
@@ -272,7 +285,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // KLINIK UMUM / GIGI
   'umum-bluecare': {
     id: 'umum-bluecare', label: 'Klinik Bluecare', basePackId: 'umum-bluecare',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true, team: 'spotlight' },
   },
   'umum-freshteal': {
     id: 'umum-freshteal', label: 'Klinik Freshteal', basePackId: 'umum-freshteal',
@@ -390,7 +403,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
   'coach-prestige': {
     id: 'coach-prestige', label: 'Coach Prestige', basePackId: 'coach-prestige',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true, team: 'spotlight', about: 'story' },
   },
 
   // ── COMPANY / CORPORATE (Sprint 8b) — showcase=layanan, stats=angka
@@ -398,7 +411,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // STARTUP / TECH / SAAS
   'startup-aurora': {
     id: 'startup-aurora', label: 'Startup Aurora', basePackId: 'startup-aurora',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true },
+    blocks: { hero: 'split', features: 'zigzag', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true, team: 'grid', about: 'split-right' },
   },
   'startup-midnight': {
     id: 'startup-midnight', label: 'Startup Midnight', basePackId: 'startup-midnight',
