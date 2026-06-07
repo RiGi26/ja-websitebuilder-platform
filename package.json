@@ -9,7 +9,9 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "samples": "cross-env GEN_SAMPLES=all vitest run src/lib/theme-system/gen-samples.test.tsx",
+    "shoot": "node scripts/shoot-themes.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.3",
@@ -72,6 +74,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-slick": "^0.23",
+    "cross-env": "^10.1.0",
     "eslint": "^8",
     "eslint-config-next": "15.3.2",
     "playwright": "^1.60.0",

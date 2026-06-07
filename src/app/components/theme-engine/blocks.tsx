@@ -314,7 +314,9 @@ export function FeaturesGrid({ features }: { features: Feature[] }) {
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
           {features.map((f, i) => (
             <div key={i} className="ce-card" style={{ padding: 32 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--c-primary)', opacity: .14, marginBottom: 18 }} />
+              <div style={{ width: 48, height: 48, borderRadius: 'var(--r-md)', background: 'color-mix(in srgb, var(--c-primary) 14%, transparent)', color: 'var(--c-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+                <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 18, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{String(i + 1).padStart(2, '0')}</span>
+              </div>
               <h3 style={{ fontSize: 19, margin: '0 0 8px', color: 'var(--c-ink)' }}>{f.title}</h3>
               <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
@@ -738,9 +740,13 @@ function TeamAvatar({ member }: { member: TeamMember }) {
   if (member.foto) {
     return <img src={member.foto} alt={member.nama} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
   }
+  // Fallback bermartabat: chip inisial bundar di atas gradient lembut — bukan
+  // blok warna polos sepenuh frame (yang terlihat kosong, terutama di spotlight 3/4).
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'color-mix(in srgb, var(--c-primary) 14%, var(--c-surface))', color: 'var(--c-primary)', fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(22px, 4vw, 44px)' }}>
-      {initials}
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, color-mix(in srgb, var(--c-primary) 16%, var(--c-surface)), var(--c-surface))' }}>
+      <div style={{ width: 'min(46%, 104px)', aspectRatio: '1', borderRadius: '999px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'color-mix(in srgb, var(--c-primary) 20%, var(--c-surface))', border: '1px solid color-mix(in srgb, var(--c-primary) 32%, transparent)', color: 'var(--c-primary)', fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(20px, 3.2vw, 36px)', lineHeight: 1 }}>
+        {initials}
+      </div>
     </div>
   )
 }
