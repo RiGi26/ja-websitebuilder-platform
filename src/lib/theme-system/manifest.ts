@@ -15,7 +15,14 @@ import { PACKS, type TokenPack } from '@/lib/design-tokens/packs'
 import { THEME_PACKS } from './theme-packs'
 
 export type HeroVariant = 'centered' | 'split' | 'fullbleed'
-export type ShowcaseVariant = 'menu-list' | 'card-grid' | 'lookbook'
+// Showcase = blok inti yang menggambarkan industri. Varian generik:
+// 'menu-list'/'card-grid'/'lookbook'. Varian KHAS-INDUSTRI (Sprint 10a) yang
+// mengonsumsi field industri dari DB → bentuk yang benar-benar berbeda:
+// 'service-list' (jasa/klinik: durasi + kategori) · 'article-feed' (blog:
+// penulis + tanggal) · 'menu-board' (resto: dikelompokkan per kategori).
+export type ShowcaseVariant =
+  | 'menu-list' | 'card-grid' | 'lookbook'
+  | 'service-list' | 'article-feed' | 'menu-board'
 export type FeaturesVariant = 'grid' | 'rows' | 'zigzag'
 // Testimoni (Sprint 5) — sosial-proof. 3 varian parametrik via token.
 // 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
@@ -108,6 +115,13 @@ export interface ShowcaseItem {
   harga?: number
   desc?: string
   gambar?: string
+  // Field khas-industri (Sprint 10a) — semua opsional → varian generik abaikan,
+  // varian khas-industri pakai bila ada. Dipetakan dari kolom DB lewat adapter.
+  kategori?: string  // products/services/menu_items.kategori → grouping menu / label layanan
+  durasi?: number    // services.durasi_menit (menit) → badge "± 30 menit" di service-list
+  penulis?: string   // blog_posts.penulis → meta artikel
+  tanggal?: string   // blog_posts.published_at (ISO) → meta tanggal artikel
+  stok?: number      // products.stok → badge ketersediaan (opsional)
 }
 // ── Konten balok Sprint 5 ─────────────────────────────────────
 export interface Testimonial { quote: string; nama: string; peran?: string }
@@ -290,15 +304,15 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // WARUNG / KEDAI
   'warung-rakyat': {
     id: 'warung-rakyat', label: 'Warung Rakyat', basePackId: 'warung-rakyat',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-list', stats: true, testimoni: 'cards', info: true, faq: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-board', stats: true, testimoni: 'cards', info: true, faq: true },
   },
   'warung-sambal': {
     id: 'warung-sambal', label: 'Warung Sambal', basePackId: 'warung-sambal',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'menu-board', stats: true, testimoni: 'marquee', info: true },
   },
   'warung-angkringan': {
     id: 'warung-angkringan', label: 'Warung Angkringan', basePackId: 'warung-angkringan',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', testimoni: 'spotlight', info: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', testimoni: 'spotlight', info: true },
   },
   // CAFE / COFFEE SHOP
   'cafe-latte': {
@@ -307,7 +321,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
   'cafe-roastery': {
     id: 'cafe-roastery', label: 'Cafe Roastery', basePackId: 'cafe-roastery',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', testimoni: 'spotlight', info: true, faq: true },
   },
   'cafe-bloom': {
     id: 'cafe-bloom', label: 'Cafe Bloom', basePackId: 'cafe-bloom',
@@ -316,7 +330,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // FINE DINING / RESTO KELUARGA
   'finedining-aurum': {
     id: 'finedining-aurum', label: 'Fine Dining Aurum', basePackId: 'finedining-aurum',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-list', stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', stats: true, testimoni: 'spotlight', info: true, faq: true },
   },
   'finedining-hearth': {
     id: 'finedining-hearth', label: 'Fine Dining Hearth', basePackId: 'finedining-hearth',
@@ -324,7 +338,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
   'finedining-nordic': {
     id: 'finedining-nordic', label: 'Fine Dining Nordic', basePackId: 'finedining-nordic',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'menu-board', testimoni: 'spotlight', info: true, faq: true },
   },
 
   // ── KLINIK (Sprint 6) — pakai balok S5 (stats/testimoni/faq/info
@@ -332,41 +346,41 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // KLINIK UMUM / GIGI
   'umum-bluecare': {
     id: 'umum-bluecare', label: 'Klinik Bluecare', basePackId: 'umum-bluecare',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true, team: 'spotlight' },
+    blocks: { hero: 'split', features: 'grid', showcase: 'service-list', stats: true, testimoni: 'cards', gallery: 'masonry', info: true, faq: true, team: 'spotlight' },
   },
   'umum-freshteal': {
     id: 'umum-freshteal', label: 'Klinik Freshteal', basePackId: 'umum-freshteal',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true, faq: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'service-list', stats: true, testimoni: 'marquee', info: true, faq: true },
   },
   'umum-trustnavy': {
     id: 'umum-trustnavy', label: 'Klinik Trustnavy', basePackId: 'umum-trustnavy',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'service-list', stats: true, testimoni: 'spotlight', info: true, faq: true },
   },
   // KLINIK ESTETIK / SKINCARE (before-after)
   'estetik-rosegold': {
     id: 'estetik-rosegold', label: 'Estetik Rosegold', basePackId: 'estetik-rosegold',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', gallery: 'before-after', info: true, faq: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'service-list', testimoni: 'cards', gallery: 'before-after', info: true, faq: true },
   },
   'estetik-derma': {
     id: 'estetik-derma', label: 'Estetik Derma', basePackId: 'estetik-derma',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', gallery: 'before-after', info: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'service-list', stats: true, testimoni: 'cards', gallery: 'before-after', info: true },
   },
   'estetik-noir': {
     id: 'estetik-noir', label: 'Estetik Noir', basePackId: 'estetik-noir',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'before-after', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'service-list', testimoni: 'spotlight', gallery: 'before-after', info: true, faq: true },
   },
   // FISIO / WELLNESS
   'wellness-sage': {
     id: 'wellness-sage', label: 'Wellness Sage', basePackId: 'wellness-sage',
-    blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', testimoni: 'cards', info: true, faq: true },
+    blocks: { hero: 'split', features: 'grid', showcase: 'service-list', testimoni: 'cards', info: true, faq: true },
   },
   'wellness-terra': {
     id: 'wellness-terra', label: 'Wellness Terra', basePackId: 'wellness-terra',
-    blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true },
+    blocks: { hero: 'centered', features: 'grid', showcase: 'service-list', stats: true, testimoni: 'marquee', info: true },
   },
   'wellness-forest': {
     id: 'wellness-forest', label: 'Wellness Forest', basePackId: 'wellness-forest',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'service-list', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
 
   // ── SEKOLAH (Sprint 7) — showcase=program/jurusan, stats=akreditasi,
@@ -507,15 +521,15 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   'akomodasi-malam': { id: 'akomodasi-malam', label: 'Akomodasi Malam', basePackId: 'akomodasi-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true } },
 
   // ── BLOG / MEDIA (Sprint 9) — showcase=artikel (blog_posts) ──
-  'jurnal-hangat': { id: 'jurnal-hangat', label: 'Blog Jurnal', basePackId: 'jurnal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', faq: true } },
-  'jurnal-mono': { id: 'jurnal-mono', label: 'Blog Mono', basePackId: 'jurnal-mono', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', faq: true } },
-  'jurnal-senja': { id: 'jurnal-senja', label: 'Blog Senja', basePackId: 'jurnal-senja', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', faq: true } },
-  'media-merah': { id: 'media-merah', label: 'Media Merah', basePackId: 'media-merah', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, faq: true } },
-  'media-biru': { id: 'media-biru', label: 'Media Biru', basePackId: 'media-biru', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, faq: true } },
-  'media-malam': { id: 'media-malam', label: 'Media Malam', basePackId: 'media-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, faq: true } },
-  'niche-hijau': { id: 'niche-hijau', label: 'Niche Hijau', basePackId: 'niche-hijau', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'cards', faq: true } },
-  'niche-pop': { id: 'niche-pop', label: 'Niche Pop', basePackId: 'niche-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', testimoni: 'marquee', faq: true } },
-  'niche-gelap': { id: 'niche-gelap', label: 'Niche Gelap', basePackId: 'niche-gelap', blocks: { hero: 'fullbleed', features: 'grid', showcase: 'card-grid', testimoni: 'spotlight', faq: true } },
+  'jurnal-hangat': { id: 'jurnal-hangat', label: 'Blog Jurnal', basePackId: 'jurnal-hangat', blocks: { hero: 'centered', features: 'grid', showcase: 'article-feed', faq: true } },
+  'jurnal-mono': { id: 'jurnal-mono', label: 'Blog Mono', basePackId: 'jurnal-mono', blocks: { hero: 'split', features: 'grid', showcase: 'article-feed', faq: true } },
+  'jurnal-senja': { id: 'jurnal-senja', label: 'Blog Senja', basePackId: 'jurnal-senja', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'article-feed', faq: true } },
+  'media-merah': { id: 'media-merah', label: 'Media Merah', basePackId: 'media-merah', blocks: { hero: 'split', features: 'grid', showcase: 'article-feed', stats: true, faq: true } },
+  'media-biru': { id: 'media-biru', label: 'Media Biru', basePackId: 'media-biru', blocks: { hero: 'split', features: 'grid', showcase: 'article-feed', stats: true, faq: true } },
+  'media-malam': { id: 'media-malam', label: 'Media Malam', basePackId: 'media-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'article-feed', stats: true, faq: true } },
+  'niche-hijau': { id: 'niche-hijau', label: 'Niche Hijau', basePackId: 'niche-hijau', blocks: { hero: 'centered', features: 'grid', showcase: 'article-feed', testimoni: 'cards', faq: true } },
+  'niche-pop': { id: 'niche-pop', label: 'Niche Pop', basePackId: 'niche-pop', blocks: { hero: 'centered', features: 'grid', showcase: 'article-feed', testimoni: 'marquee', faq: true } },
+  'niche-gelap': { id: 'niche-gelap', label: 'Niche Gelap', basePackId: 'niche-gelap', blocks: { hero: 'fullbleed', features: 'grid', showcase: 'article-feed', testimoni: 'spotlight', faq: true } },
 
   // ── JASTIP (Sprint 9) — showcase=katalog titipan (products) ──
   'luar-global': { id: 'luar-global', label: 'Jastip Global', basePackId: 'luar-global', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },

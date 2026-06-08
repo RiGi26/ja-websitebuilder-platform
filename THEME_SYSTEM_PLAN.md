@@ -5,6 +5,7 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
+- **⚠️ TEMUAN TERBUKA (2026-06-08):** keluhan user *"layout belum variatif menggambarkan industri"* sudah diinvestigasi & terbukti — variasi ada di **kulit** (token), bukan **rangka** (layout). Akar 3 lapis (generasi konten tipis → adapter buang sinyal industri → showcase 90% card-grid + urutan hardcode). Rencana fix = **Sprint 10**. **Lihat §13** sebelum garap "perdalam blok/varian". Belum dieksekusi.
 - **Fase aktif:** 🎉 **SEMUA INDUSTRI TUNTAS (Sprint 9) — 9 INDUSTRI, 96 TEMA.** Sprint 9 menambah **Travel/Rental** (kendaraan/wisata/akomodasi), **Blog/Media** (jurnal/media/niche), **Jastip** (luar/lokal/preorder) — 27 tema, AKTIF. Total **96 tema** otentik di **9 industri** (semua `TipeIndustri` kecuali `custom`). Composable showcase kini per-industri benar (products/menu/services/blog_posts). 253/253 test (+1 skip), tsc + build bersih, S9 flagship verified pixel (scorecard PASS).
 - **Sebelumnya:** COMPANY (S8b, 9) · PERSONAL (S8a, 9) · FU#1/FU#2 · SEKOLAH (S7, 9) · KLINIK (S6, 9)+galeri S5b · RESTAURANT (S4, 9)+S5 · TOKO ONLINE (S1-3, 24).
 - **Polish #4 (next/font) ✅ SELESAI (2026-06-07):** 4 font asli (Jakarta/Fraunces/Space Grotesk/Nunito) dimuat di `src/app/[slug]/layout.tsx` (subtree situs published saja). `_fonts.ts` pakai `var(--font-x, <fallback sistem>)` → produksi dapat font asli, UAT/test/admin jatuh ke sistem (nol regresi). Build compile next/font bersih.
@@ -325,3 +326,65 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 7. ~~**Visual pipeline (lensa pixel)**~~ — ✅ HIDUP sejak S7. ui-ux-pro-max DB (front) + Playwright shoot + scorecard (back) + generator HTML (`gen-samples.test.tsx`). Dipakai di playbook §5 tiap sprint berikutnya.
 
 > **Status: S4–S9 + FU#1/FU#2 + Polish next/font SELESAI & LIVE — 96 tema, 9 industri (coverage TipeIndustri tuntas kecuali `custom`), font asli aktif.** Program tema dasar TUNTAS. Opsional: perdalam balok/varian, font alternatif, industri custom.
+
+---
+
+## 13. DIAGNOSIS — "Layout belum variatif menggambarkan industri" (2026-06-08)
+
+> Ditulis 2026-06-08 atas keluhan user: *"layout yang dihasilkan masih belum variatif menggambarkan industrinya."* Investigasi 3 lapis (manifest → adapter → generasi konten + schema DB). **Belum dieksekusi — ini temuan + rencana.** Tujuan §ini: capture durable supaya tak perlu re-investigasi saat fix ini digarap.
+
+### 13.1 Temuan inti
+Keluhan **benar dan terukur**. 96 tema = 96 variasi **kulit** (palet/font/token), bukan variasi **rangka** (struktur + urutan section). Sistem berhasil bikin keragaman token, **gagal** bikin keragaman anatomi halaman. Industri tak terbedakan oleh layout — hanya oleh warna.
+
+### 13.2 Bukti keras (96 manifest, `src/lib/theme-system/manifest.ts`)
+- **Showcase — section paling "menggambarkan industri" — 90% identik:** `card-grid` 86/96 · `menu-list` 7 · `lookbook` 3. Toko=produk, resto=menu, klinik=layanan, sekolah=program, travel=armada/kamar, blog=artikel, jastip=katalog — **semua jadi kartu 4:3 + judul + harga rupiah yang sama** (`blocks.tsx:405 ShowcaseCardGrid`).
+- **Kosakata bentuk lain tipis:** features `grid` 65 / `rows` 30 / `zigzag` 1 (praktis 2 bentuk) · hero `centered` 33 / `fullbleed` 32 / `split` 31 (3 bentuk generik, cuma posisi). Blok konversi/trust nyaris tak dipakai: `process` 4× · `pricing` 5× · `about`-varian 2× · `cta`-varian 1× · `partners` 2× · `team` 2×.
+- **Urutan section DI-HARDCODE** (`ComposableRenderer.tsx:45-159`): Nav→Hero→Features→Showcase→Process→Stats→Partners→Team→Testimoni→Gallery→Info→About→Pricing→FAQ→CTA→Social→Footer. Manifest **tak bisa** atur ulang ritme. Anatomi vertikal 96 tema identik.
+
+### 13.3 Root-cause stack (3 lapis — semua wajib disentuh, urut)
+```
+Lapis 1 GENERASI  (src/lib/build/templates.ts)
+  auto-build isi dataKonten TIPIS: {nama_usaha, tagline, deskripsi, keunggulan,
+  kontak, syarat_sewa} + sections + showcase source. Return literal
+  { dataKonten, sections, services } — TANPA testimoni/stats/faq/team/pricing/
+  process/partners/social/gallery. (lihat templates.ts:114-134 dst, tiap industri.)
+  → Adapter parse field itu dari data_konten → undefined → balok TAK dirender.
+  → Situs auto-build fresh hanya render: Hero → Features → Showcase(card-grid)
+    → CTA → (Info bila profil ada jam/alamat). ~4-5 section, identik lintas industri.
+  → "96 tema kaya 10+ blok" = ILUSI sample-content (preview admin). Klien nyata
+    dapat kerangka kerdil. PRODUKSI ≠ PREVIEW.
+
+Lapis 2 ADAPTER  (src/lib/theme-system/content-adapter.ts:13-40)
+  ShowcaseSourceItem dipaksa flatten ke {nama, harga, desc, gambar} untuk SEMUA
+  industri ("Composable showcase generik → satu mapper"). Field khas industri
+  yang SUDAH ADA di DB & SUDAH diisi template DIBUANG di sini.
+
+Lapis 3 RENDER  (ComposableRenderer.tsx + blocks.tsx)
+  showcase 90% card-grid + urutan section hardcode → bentuk seragam walau data kaya.
+```
+
+### 13.4 Verdict schema DB (cek via MCP supabase-websitebuilder `list_tables`, 2026-06-08)
+**Sinyal industri SUDAH ADA di DB — tak perlu migration.** Yang dibuang adapter:
+
+| Tabel | Dipakai adapter | DIBUANG (sudah ada di DB) |
+|---|---|---|
+| `products` | nama, deskripsi, harga, gambar_url | **kategori, stok** |
+| `services` | nama, deskripsi, harga, gambar_url | **durasi_menit, kategori, dp_amount** |
+| `menu_items` | nama, deskripsi, harga, gambar_url | **kategori** (→ menu tak bisa dikelompokkan) |
+| `blog_posts` | judul→nama, ringkasan→desc, cover→gambar | **penulis, published_at, konten** |
+
+Catatan: `templates.ts:110-111` malah SUDAH isi `kategori` di item armada ('Harian' dst) — lalu adapter buang. Sinyal dibikin, lalu dibuang.
+
+### 13.5 Rencana fix — Sprint 10: "Variasi Layout (skeleton + konten, bukan skin)"
+Urutan WAJIB (fix Lapis 3 saja tak kelihatan di produksi selama Lapis 1 & 2 belum):
+1. **Lapis 1 — perkaya auto-build.** Generate testimoni/stats/faq (+ team/process per industri yang relevan) di `templates.ts` sebagai konten contoh; klien revisi pasca-DP (konsisten timing konten: konten dikumpulkan SETELAH DP, Claude draftkan dulu). Tanpa ini, balok baru apa pun tetap kosong di produksi.
+2. **Lapis 2 — adapter bawa field industri.** Lebarkan `ShowcaseSourceItem` + map `kategori`/`durasi_menit`/`penulis`/`published_at`/`stok` lewat ke `ComposableContent`.
+3. **Lapis 3 — balok showcase khas-industri** (mis. `ShowcaseServiceList` klinik/jasa: ikon+durasi+harga · `ShowcaseRooms` travel: foto besar+amenity · `ShowcaseArticles` blog: feed+kategori+tanggal+penulis · `ShowcaseMenuBoard` resto: berkategori). Lalu **petakan default per industri** (klinik→service-list, travel→rooms, blog→articles), bukan card-grid global. Audit 86 manifest card-grid, alihkan ke varian yang lebih cocok (murah, dampak cepat).
+4. **Lapis 3b (opsional) — urutan section via manifest.** Ganti urutan hardcode `ComposableRenderer` jadi `manifest.sections: string[]` → industri bisa beda ritme (blog taruh feed lebih atas; klinik taruh team+info lebih awal).
+
+### 13.6 Patuh aturan produksi
+Tiap lapis = 1+ branch = 1+ PR, additive, nol regresi page published (renderer/varian lama tetap jalan; default baru hanya untuk tema yang dipetakan ulang), VARIASI wajib (#6), gerbang 3 skill §5.a + scorecard pixel (THEME_VISUAL_PIPELINE.md §3.2) saat VERIFY. Cek pixel (Playwright) = langkah VERIFY, bukan blocker analisis.
+
+### 13.7 Status
+- **Investigasi:** ✅ SELESAI & terbukti (kode + schema, bukan asumsi). Cukup dalam untuk eksekusi.
+- **Eksekusi Sprint 10:** ⬜ BELUM. Mulai dari Lapis 1.

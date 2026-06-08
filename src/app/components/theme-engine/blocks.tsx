@@ -164,6 +164,33 @@ export const ENGINE_CSS = `
 .ce-social-item:hover .ce-social-ic { background: var(--c-primary); color: var(--c-on-primary); border-color: var(--c-primary); transform: translateY(-3px); box-shadow: var(--s-md); }
 .ce-social-lbl { font-size: 12px; font-weight: 600; color: var(--c-muted); }
 @media (prefers-reduced-motion: reduce) { .ce-logo-track { animation: none; } .ce-logo, .ce-social-ic { transition: none; } }
+/* ── Sprint 10a — Showcase khas-industri ──────────────────── */
+/* Header kategori (service-list & menu-board grouping) */
+.ce-cat-head { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; }
+.ce-cat-head h3 { font-size: clamp(18px, 2.4vw, 22px); margin: 0; color: var(--c-ink); white-space: nowrap; }
+.ce-cat-head::after { content: ""; flex: 1; height: 1px; background: var(--c-border); }
+/* Service list (jasa/klinik) — baris layanan: durasi + harga, aksen primary saat hover */
+.ce-svc-row { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease; }
+.ce-svc-row:hover { transform: translateY(-3px); box-shadow: var(--s-md); border-color: color-mix(in srgb, var(--c-primary) 35%, var(--c-border)); }
+.ce-svc-thumb { flex: 0 0 auto; width: 84px; height: 84px; border-radius: var(--r-md, 12px); background-size: cover; background-position: center; border: 1px solid var(--c-border); }
+.ce-meta-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--c-primary); background: color-mix(in srgb, var(--c-primary) 9%, transparent); border-radius: var(--r-pill); padding: 4px 11px; white-space: nowrap; }
+.ce-meta-pill svg { width: 13px; height: 13px; }
+/* Article feed (blog) — kartu artikel: cover zoom + meta penulis·tanggal */
+.ce-art-card { display: flex; flex-direction: column; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); box-shadow: var(--s-sm); overflow: hidden; transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease; }
+.ce-art-card:hover { transform: translateY(-4px); box-shadow: var(--s-lg); }
+.ce-art-imgwrap { overflow: hidden; aspect-ratio: 16 / 10; }
+.ce-art-img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.001); transition: transform .55s cubic-bezier(.16,1,.3,1); }
+.ce-art-card:hover .ce-art-img { transform: scale(1.06); }
+.ce-art-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--c-muted); }
+.ce-art-meta b { color: var(--c-primary); font-weight: 700; }
+.ce-art-readmore { font-size: 13px; font-weight: 700; color: var(--c-primary); letter-spacing: .02em; display: inline-flex; align-items: center; gap: 6px; transition: gap .2s ease; }
+.ce-art-card:hover .ce-art-readmore { gap: 11px; }
+/* Menu board (resto) — daftar berkelompok, harga dotted-leader feel */
+.ce-mb-row { display: flex; align-items: baseline; gap: 14px; padding: 13px 0; border-top: 1px dashed var(--c-border); transition: padding-left .2s ease; }
+.ce-mb-row:first-child { border-top: none; }
+.ce-mb-row:hover { padding-left: 6px; }
+.ce-mb-lead { flex: 1; min-width: 0; border-bottom: 1px dotted color-mix(in srgb, var(--c-border) 80%, transparent); transform: translateY(-5px); }
+@media (prefers-reduced-motion: reduce) { .ce-svc-row, .ce-art-card, .ce-art-img, .ce-mb-row { transition: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -484,6 +511,140 @@ export function ShowcaseLookbook({ showcase }: { showcase: NonNullable<Composabl
             ))}
           </div>
         )}
+      </div>
+    </section>
+  )
+}
+
+// ── Sprint 10a — SHOWCASE khas-industri ───────────────────────
+// Kelompokkan item per kategori, pertahankan urutan kemunculan. Bila tak ada
+// item ber-kategori → satu grup tunggal tanpa header (perilaku list polos).
+function groupByKategori(items: ShowcaseItem[]): { kategori?: string; items: ShowcaseItem[] }[] {
+  if (!items.some((it) => it.kategori)) return [{ items }]
+  const order: string[] = []
+  const map = new Map<string, ShowcaseItem[]>()
+  for (const it of items) {
+    const key = it.kategori || 'Lainnya'
+    if (!map.has(key)) { map.set(key, []); order.push(key) }
+    map.get(key)!.push(it)
+  }
+  return order.map((k) => ({ kategori: k, items: map.get(k)! }))
+}
+
+// Tanggal ISO → "8 Jun 2026". Defensif: input tak valid → undefined.
+const BULAN_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+function formatTanggalID(iso?: string): string | undefined {
+  if (!iso) return undefined
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return undefined
+  // UTC supaya deterministik lintas timezone (server/test/produksi konsisten).
+  return `${d.getUTCDate()} ${BULAN_ID[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+// Ikon jam inline (no-emoji policy, dijaga test) — currentColor ikut token.
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+    </svg>
+  )
+}
+
+// SERVICE-LIST (jasa/klinik) — baris layanan: nama + deskripsi + badge durasi +
+// harga, dikelompokkan per kategori bila ada. Foto opsional (thumbnail kecil).
+export function ShowcaseServiceList({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
+  const groups = groupByKategori(showcase.items)
+  return (
+    <section style={{ padding: '88px 24px', maxWidth: 880, margin: '0 auto' }}>
+      <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      <div className="ce-stagger" style={{ display: 'grid', gap: 36 }}>
+        {groups.map((g, gi) => (
+          <div key={gi}>
+            {g.kategori && <div className="ce-cat-head"><h3>{g.kategori}</h3></div>}
+            <div style={{ display: 'grid', gap: 14 }}>
+              {g.items.map((it, i) => (
+                <div key={i} className="ce-svc-row" style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '18px 20px' }}>
+                  {it.gambar && <div className="ce-svc-thumb" style={{ backgroundImage: `url(${it.gambar})` }} />}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: 18, margin: 0, color: 'var(--c-ink)' }}>{it.nama}</h3>
+                      {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
+                    </div>
+                    {it.desc && <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: '6px 0 0' }}>{it.desc}</p>}
+                    {it.durasi != null && (
+                      <div style={{ marginTop: 10 }}>
+                        <span className="ce-meta-pill"><ClockIcon /> ± {it.durasi} menit</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// ARTICLE-FEED (blog) — kartu artikel: cover + meta penulis · tanggal + judul +
+// ringkasan + "Baca selengkapnya". Tanpa harga (artikel bukan produk).
+export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
+  return (
+    <section style={{ padding: '88px 24px', maxWidth: 1120, margin: '0 auto' }}>
+      <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
+        {showcase.items.map((it, i) => {
+          const tgl = formatTanggalID(it.tanggal)
+          return (
+            <article key={i} className="ce-art-card">
+              <div className="ce-art-imgwrap" style={{ background: MESH_FILL }}>
+                {it.gambar && <img className="ce-art-img" src={it.gambar} alt={it.nama} loading="lazy" />}
+              </div>
+              <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                {(it.penulis || tgl) && (
+                  <div className="ce-art-meta">
+                    {it.penulis && <b>{it.penulis}</b>}
+                    {it.penulis && tgl && <span aria-hidden>·</span>}
+                    {tgl && <span>{tgl}</span>}
+                  </div>
+                )}
+                <h3 style={{ fontSize: 19, margin: 0, color: 'var(--c-ink)', lineHeight: 1.3 }}>{it.nama}</h3>
+                {it.desc && <p style={{ fontSize: 14, color: 'var(--c-muted)', lineHeight: 1.6, margin: 0 }}>{it.desc}</p>}
+                <span className="ce-art-readmore" style={{ marginTop: 'auto' }}>Baca selengkapnya →</span>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+// MENU-BOARD (resto) — daftar menu dikelompokkan per kategori (gaya papan menu):
+// nama + deskripsi di kiri (leader dotted), harga di kanan.
+export function ShowcaseMenuBoard({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
+  const groups = groupByKategori(showcase.items)
+  return (
+    <section style={{ padding: '88px 24px', maxWidth: 860, margin: '0 auto' }}>
+      <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      <div className="ce-stagger" style={{ display: 'grid', gap: 40 }}>
+        {groups.map((g, gi) => (
+          <div key={gi}>
+            {g.kategori && <div className="ce-cat-head"><h3>{g.kategori}</h3></div>}
+            <div>
+              {g.items.map((it, i) => (
+                <div key={i} className="ce-mb-row">
+                  <div className="ce-mb-lead">
+                    <h3 style={{ fontSize: 17, margin: 0, color: 'var(--c-ink)', display: 'inline' }}>{it.nama}</h3>
+                    {it.desc && <span style={{ fontSize: 13, color: 'var(--c-muted)', marginLeft: 8 }}>{it.desc}</span>}
+                  </div>
+                  {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )
