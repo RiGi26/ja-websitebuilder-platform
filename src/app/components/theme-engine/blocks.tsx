@@ -172,6 +172,13 @@ const HERO_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.38) 
 // untuk brand ini (kohesi palet), bukan stock yang sekадar digelapkan scrim hitam.
 // Transparan di tengah/bawah supaya tak ganggu keterbacaan teks putih.
 const HERO_BRAND_WASH = 'linear-gradient(120deg, color-mix(in srgb, var(--c-primary) 30%, transparent) 0%, transparent 52%)'
+// Fill bingkai gambar saat foto KOSONG. Mesh (radial aksen + linear dasar) → ada
+// kedalaman + tint primary, jadi state tanpa-foto terlihat intensional (konsisten
+// dgn hero no-image), bukan kotak gradient datar. Hanya tampak bila gambar absen.
+const MESH_FILL = [
+  'radial-gradient(ellipse 78% 60% at 25% 22%, color-mix(in srgb, var(--c-primary) 16%, transparent) 0%, transparent 60%)',
+  'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))',
+].join(', ')
 
 // ── MOTIF / TEKSTUR (panen dari BatikTokoRenderer) ────────────
 // Tile SVG data-uri, ditint warna primary tema. Dipakai sebagai overlay halus
@@ -402,7 +409,7 @@ export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<Composabl
       <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
         {showcase.items.map((it: ShowcaseItem, i) => (
           <div key={i} className="ce-card">
-            <div style={{ aspectRatio: '4 / 3', background: it.gambar ? `center/cover no-repeat url(${it.gambar})` : `linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))` }} />
+            <div style={{ aspectRatio: '4 / 3', background: it.gambar ? `center/cover no-repeat url(${it.gambar})` : MESH_FILL }} />
             <div style={{ padding: 20 }}>
               <h3 style={{ fontSize: 17, margin: '0 0 6px', color: 'var(--c-ink)' }}>{it.nama}</h3>
               {it.desc && <p style={{ fontSize: 13, color: 'var(--c-muted)', lineHeight: 1.55, margin: '0 0 10px' }}>{it.desc}</p>}
@@ -878,7 +885,7 @@ export function AboutSplitRight({ about }: { about: AboutContent }) {
           <p style={{ fontSize: 16, color: 'var(--c-muted)', lineHeight: 1.75, margin: 0, whiteSpace: 'pre-wrap' }}>{about.body}</p>
           {about.ctaText && <div style={{ marginTop: 28 }}><Btn text={about.ctaText} href={about.ctaHref} /></div>}
         </div>
-        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: MESH_FILL }}>
           {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 360 }} />}
         </div>
       </div>
@@ -891,7 +898,7 @@ export function AboutSplitLeft({ about }: { about: AboutContent }) {
   return (
     <section style={{ background: 'var(--c-page)', padding: '80px 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
-        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+        <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: MESH_FILL }}>
           {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 360 }} />}
         </div>
         <div>
@@ -914,7 +921,7 @@ export function AboutStory({ about }: { about: AboutContent }) {
           <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
           <h2 style={{ fontSize: 'clamp(28px, 5vw, 44px)', margin: 0, color: 'var(--c-ink)' }}>{about.title}</h2>
         </div>
-        <div style={{ borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', marginBottom: 48, aspectRatio: '16/7', background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))', boxShadow: 'var(--s-lg)' }}>
+        <div style={{ borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', marginBottom: 48, aspectRatio: '16/7', background: MESH_FILL, boxShadow: 'var(--s-lg)' }}>
           {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
         </div>
         <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
@@ -1206,7 +1213,7 @@ export function CTASplit({ cta }: { cta: NonNullable<ComposableContent['cta']> }
   return (
     <section style={{ padding: '32px 24px 96px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-        <div style={{ minHeight: 280, background: 'linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to))' }}>
+        <div style={{ minHeight: 280, background: MESH_FILL }}>
           {cta.image && <img src={cta.image} alt={cta.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 280 }} />}
         </div>
         <div style={{ padding: 'clamp(32px, 5vw, 56px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'var(--c-surface)' }}>
