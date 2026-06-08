@@ -11,7 +11,7 @@ import {
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
   // Restaurant (Sprint 4): Warung / Cafe / Fine Dining
-  Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
+  Coffee, ChefHat, Bean, Cherry, Utensils, Salad, Wine,
   // Klinik (Sprint 6): Umum / Estetik / Wellness
   Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
   // Sekolah (Sprint 7): Reguler / Islami / Kursus
@@ -31,7 +31,7 @@ const MAP = {
   Flame, CupSoda, Crown, Store, LayoutGrid, Camera, Wind, Zap,
   Gem, Grid2x2, Frame, Flower2, Sun, Moon, Cpu, Monitor, Gamepad2,
   Armchair, Lamp, Sprout, Soup, Rabbit, Smile, Candy,
-  Coffee, ChefHat, Bean, Cherry, Utensils, Salad,
+  Coffee, ChefHat, Bean, Cherry, Utensils, Salad, Wine,
   Stethoscope, HeartPulse, Activity, Shield, Droplet, TreePine,
   GraduationCap, Backpack, Trophy, BookOpen, Star, Target, Rocket, PencilRuler,
   Video, Briefcase, Compass, Mic, Heart, Aperture, PenTool, Award,

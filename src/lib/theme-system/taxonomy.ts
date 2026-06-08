@@ -353,9 +353,9 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         icon: 'Utensils', mood: '#B5532A', bg: 'warm', manifest: 'finedining-hearth',
       },
       {
-        id: 'finedining-nordic', subKategori: 'finedining', nama: 'Nordic',
-        deskripsi: 'Bersih sage & kontemporer, plating modern. Untuk bistro modern, healthy resto, farm-to-table.',
-        icon: 'Salad', mood: '#3E4A42', bg: 'light', manifest: 'finedining-nordic',
+        id: 'finedining-nordic', subKategori: 'finedining', nama: 'Noir',
+        deskripsi: 'Gelap dingin & elegan, aksen sampanye. Untuk fine dining modern, bar, omakase, chef’s table.',
+        icon: 'Wine', mood: '#C7B07E', bg: 'dark', manifest: 'finedining-nordic',
       },
     ],
   },
