@@ -10,6 +10,7 @@ import {
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
+import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
 import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
 import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRenderer'
@@ -49,6 +50,21 @@ export async function renderSite({
   const hasBooking = !!konfig.features?.hasBooking
   const tawkId = konfig.features?.hasLiveChat ? (konfig.addons?.tawk_property_id ?? null) : null
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
+
+  // ── Bespoke premium: Restaurant Lux (Opsi A, tier premium) ──
+  // theme='restaurant-lux' → renderer bespoke = view kaya atas ComposableContent
+  // yang SAMA (reuse menu fetch + composableContentFromSections). variant = preset
+  // palet (aurum/noir/hearth); primary = aksen brand. Coexist, nol regresi.
+  if (theme === 'restaurant-lux') {
+    const [source, profile] = await Promise.all([
+      fetchMenuItemsByPage(client, page.id),
+      fetchTenantProfile(client, page.id),
+    ])
+    const content = composableContentFromSections(
+      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami',
+    )
+    return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} />
+  }
 
   // ── Theme System (composable) ───────────────────────────────
   // Bila variant = id manifest composable (mis. 'kuliner-rustic'), render via

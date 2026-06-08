@@ -617,9 +617,9 @@ const FINEDINING: ComposableContent = {
     items: [
       { nama: 'Sup Buntut Bakar', harga: 75000, desc: 'Buntut sapi dibakar arang, kuah kaldu bening sarat rempah.', kategori: 'Pembuka' },
       { nama: 'Lumpia Udang Galah', harga: 55000, desc: 'Udang galah utuh, kulit renyah, saus asam manis rumahan.', kategori: 'Pembuka' },
-      { nama: 'Iga Bakar Madu Kecombrang', harga: 145000, desc: 'Iga diungkep lalu dibakar, glasir madu hutan, aroma kecombrang.', kategori: 'Hidangan Utama' },
-      { nama: 'Bebek Betutu Bali', harga: 165000, desc: 'Diungkep enam jam dengan base genep otentik, daging lepas dari tulang.', kategori: 'Hidangan Utama' },
-      { nama: 'Gurame Bakar Rica', harga: 135000, desc: 'Gurame segar dari kolam, sambal rica menyala, perasan jeruk nipis.', kategori: 'Hidangan Utama' },
+      { nama: 'Iga Bakar Madu Kecombrang', harga: 145000, desc: 'Iga diungkep lalu dibakar, glasir madu hutan, aroma kecombrang.', kategori: 'Hidangan Utama', gambar: IMG('photo-1504674900247-0877df9cc836', 1000) },
+      { nama: 'Bebek Betutu Bali', harga: 165000, desc: 'Diungkep enam jam dengan base genep otentik, daging lepas dari tulang.', kategori: 'Hidangan Utama', gambar: IMG('photo-1551024506-0bccd828d307', 1000) },
+      { nama: 'Gurame Bakar Rica', harga: 135000, desc: 'Gurame segar dari kolam, sambal rica menyala, perasan jeruk nipis.', kategori: 'Hidangan Utama', gambar: IMG('photo-1567620905732-2d1ec7ab7445', 1000) },
       { nama: 'Nasi Liwet Komplit (untuk 2)', harga: 120000, desc: 'Liwet santan, ayam kampung, ikan asin, lalapan, sambal terasi.', kategori: 'Hidangan Utama' },
       { nama: 'Kolak Durian Panggang', harga: 48000, desc: 'Durian lokal dipanggang, kuah santan pandan hangat.', kategori: 'Pencuci Mulut' },
       { nama: 'Es Selendang Mayang', harga: 35000, desc: 'Pencuci mulut klasik Betawi — santan, gula merah, segar dan legit.', kategori: 'Pencuci Mulut' },
