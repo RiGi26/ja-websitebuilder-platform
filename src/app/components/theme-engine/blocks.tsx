@@ -218,7 +218,19 @@ export const ENGINE_CSS = `
 .ce-btn-ghost { display: inline-block; padding: 13px 30px; border-radius: var(--r-pill); border: 1px solid currentColor; color: inherit; text-decoration: none; font-weight: 700; font-size: 15px; opacity: .9; transition: opacity .2s ease, background-color .2s ease; }
 .ce-btn-ghost:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
 @media (max-width: 767px) { .ce-nav-links { display: none; } }
-@media (prefers-reduced-motion: reduce) { .ce-nav-link, .ce-nav-link::after, .ce-btn-ghost { transition: none; } }
+/* Hero sinematik luxury (Maaemo/Quay) — lebih tinggi, scrim bawah dramatis, scroll cue */
+.ce-hero-cue { display: none; }
+.ce-root[data-mood="luxury"] .ce-hero-fb { min-height: 100vh; }
+.ce-root[data-mood="luxury"] .ce-hero-fb::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: linear-gradient(to top, color-mix(in srgb, var(--c-page) 90%, transparent) 0%, transparent 100%); pointer-events: none; z-index: 0; }
+.ce-root[data-mood="luxury"] .ce-hero-cue { display: block; position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 1; opacity: .7; animation: ceCue 2.2s ease-in-out infinite; }
+.ce-root[data-mood="luxury"] .ce-hero-cue svg { width: 26px; height: 26px; }
+@keyframes ceCue { 0%, 100% { transform: translate(-50%, 0); opacity: .5; } 50% { transform: translate(-50%, 7px); opacity: .9; } }
+/* Menu tab kategori (LiveKitchn) — chip jump-nav, align ikut mood */
+.ce-menu-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: var(--sec-items, center); margin: -8px 0 40px; }
+.ce-menu-tab { font-size: 13px; font-weight: 600; color: var(--c-muted); border: 1px solid var(--c-border); border-radius: var(--r-pill); padding: 8px 16px; text-decoration: none; transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+.ce-menu-tab:hover { color: var(--c-on-primary); background: var(--c-primary); border-color: var(--c-primary); }
+.ce-root [id^="menu-"] { scroll-margin-top: 96px; }
+@media (prefers-reduced-motion: reduce) { .ce-nav-link, .ce-nav-link::after, .ce-btn-ghost, .ce-menu-tab { transition: none; } .ce-hero-cue { animation: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -291,6 +303,7 @@ export function Nav({ content }: { content: ComposableContent }) {
   const links: { label: string; href: string }[] = []
   if (content.showcase?.items?.length) links.push({ label: navFirstWord(content.showcase.title) ?? 'Menu', href: '#showcase' })
   if (content.about) links.push({ label: 'Tentang', href: '#tentang' })
+  if (content.team?.length) links.push({ label: navFirstWord(content.teamTitle) ?? 'Tim', href: '#tim' })
   if (content.gallery && ((content.gallery.images?.length ?? 0) > 0 || (content.gallery.pairs?.length ?? 0) > 0)) links.push({ label: 'Galeri', href: '#galeri' })
   if (content.info) links.push({ label: 'Lokasi', href: '#lokasi' })
   return (
@@ -373,8 +386,11 @@ export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama:
 export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
-    <section style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
+    <section className="ce-hero-fb" style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
       <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} opacity={0.07} />
+      <span className="ce-hero-cue" aria-hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+      </span>
       <div style={{ maxWidth: 1120, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -407,7 +423,7 @@ function FeatHeading({ eyebrow, title, subtitle }: FeatHead) {
     <div className="ce-shead" data-rule>
       <p className="ce-eyebrow">{eyebrow ?? 'Keunggulan'}</p>
       <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>{title ?? 'Mengapa Memilih Kami'}</h2>
-      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '12px 0 0', lineHeight: 1.6, maxWidth: 640 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '12px 0 0', lineHeight: 1.6, maxWidth: 640, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
@@ -460,7 +476,7 @@ function ShowHeading({ title, subtitle }: { title?: string; subtitle?: string })
   return (
     <div className="ce-shead">
       {title && <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', margin: '0 0 8px', color: 'var(--c-ink)' }}>{title}</h2>}
-      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: 0 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: 0, maxWidth: 620, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
@@ -678,14 +694,22 @@ export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<Compos
 
 // MENU-BOARD (resto) — daftar menu dikelompokkan per kategori (gaya papan menu):
 // nama + deskripsi di kiri (leader dotted), harga di kanan.
+const menuSlug = (s: string) => 'menu-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 export function ShowcaseMenuBoard({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   const groups = groupByKategori(showcase.items)
+  const tabs = groups.filter((g) => g.kategori).length > 1
   return (
     <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 860, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      {/* Tab kategori (LiveKitchn) — jump ke tiap grup */}
+      {tabs && (
+        <div className="ce-menu-tabs">
+          {groups.map((g, gi) => g.kategori ? <a key={gi} className="ce-menu-tab" href={`#${menuSlug(g.kategori)}`}>{g.kategori}</a> : null)}
+        </div>
+      )}
       <div className="ce-stagger" style={{ display: 'grid', gap: 40 }}>
         {groups.map((g, gi) => (
-          <div key={gi}>
+          <div key={gi} id={g.kategori ? menuSlug(g.kategori) : undefined}>
             {g.kategori && <div className="ce-cat-head"><h3>{g.kategori}</h3></div>}
             <div>
               {g.items.map((it, i) => (
@@ -776,10 +800,10 @@ export function FloatingWA({ wa }: { wa?: string }) {
 // ── SECTION HEADING generik (eyebrow + judul) ─────────────────
 function SectionHead({ eyebrow, title, subtitle }: { eyebrow?: string; title: string; subtitle?: string }) {
   return (
-    <div style={{ textAlign: 'center', marginBottom: 44 }}>
-      {eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 10 }}>{eyebrow}</p>}
+    <div className="ce-shead" data-rule>
+      {eyebrow && <p className="ce-eyebrow">{eyebrow}</p>}
       <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', margin: 0, color: 'var(--c-ink)' }}>{title}</h2>
-      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '10px auto 0', maxWidth: 560, lineHeight: 1.6 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '10px 0 0', maxWidth: 560, lineHeight: 1.6, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
@@ -1025,11 +1049,12 @@ function TeamAvatar({ member }: { member: TeamMember }) {
 }
 
 // Grid — semua anggota setara, auto-fit (klinik, sekolah, company)
-export function TeamGrid({ team }: { team: TeamMember[] }) {
+export type TeamHead = { eyebrow?: string; title?: string }
+export function TeamGrid({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   return (
     <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim di Balik Layanan Kami'} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
           {team.map((m, i) => (
             <div key={i} className="ce-team-card" style={{ textAlign: 'center' }}>
@@ -1048,13 +1073,13 @@ export function TeamGrid({ team }: { team: TeamMember[] }) {
 }
 
 // Spotlight — 1 featured besar (kiri/atas) + grid pendukung (kanan/bawah)
-export function TeamSpotlight({ team }: { team: TeamMember[] }) {
+export function TeamSpotlight({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   const [featured, ...rest] = team
   if (!featured) return null
   return (
     <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim Ahli Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim Ahli Kami'} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 40, alignItems: 'start' }}>
           <div className="ce-team-card">
             <div className="ce-team-photo" style={{ aspectRatio: '3/4', borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 20 }}>
@@ -1085,11 +1110,11 @@ export function TeamSpotlight({ team }: { team: TeamMember[] }) {
 }
 
 // Horizontal — scroll strip (tim banyak, mis. coach directory)
-export function TeamHorizontal({ team }: { team: TeamMember[] }) {
+export function TeamHorizontal({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   return (
     <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim di Balik Layanan Kami'} />
         <div className="ce-team-scroll">
           {team.map((m, i) => (
             <div key={i} className="ce-team-card ce-team-scroll-item">

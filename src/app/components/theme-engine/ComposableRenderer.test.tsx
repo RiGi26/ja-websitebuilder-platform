@@ -882,3 +882,44 @@ describe('Craft upgrade (anti-slop)', () => {
     expect(html).not.toContain('X kalimat filosofi')
   })
 })
+
+// ── Craft round 2 — human-centric + cinematic hero + menu tabs (referensi resto) ──
+describe('Craft round 2 (referensi situs resto)', () => {
+  it('team "Di Balik Dapur": heading dari konten + anggota (finedining-aurum spotlight)', () => {
+    const c = {
+      ...CONTENT,
+      teamEyebrow: 'Di Balik Dapur',
+      teamTitle: 'Tim yang Menyiapkan Malam Anda',
+      team: [
+        { nama: 'Chef Anindya Larasati', peran: 'Kepala Dapur', bio: 'Dua puluh tahun memasak Nusantara.' },
+        { nama: 'Bagas Wirawan', peran: 'Sous Chef' },
+      ],
+    }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={c} />)
+    expect(html).toContain('id="tim"')
+    expect(html).toContain('Tim yang Menyiapkan Malam Anda') // heading dari konten
+    expect(html).toContain('Di Balik Dapur')                 // eyebrow dari konten
+    expect(html).toContain('Chef Anindya Larasati')
+    expect(html).toContain('Kepala Dapur')
+    expect(html).not.toContain('Kenali Tim Ahli Kami')        // default generik tak dipakai
+  })
+
+  it('menu category tabs render untuk menu-board multi-kategori (warung-rakyat)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT_MENU} />)
+    expect(html).toContain('class="ce-menu-tab"')
+    expect(html).toContain('href="#menu-makanan-utama"')
+    expect(html).toContain('id="menu-minuman"')
+  })
+
+  it('hero sinematik: kelas ce-hero-fb + scroll cue (fullbleed)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={CONTENT} />)
+    expect(html).toContain('class="ce-hero-fb"')
+    expect(html).toContain('ce-hero-cue')
+  })
+
+  it('nav sadar-konten memuat tautan #tim saat ada tim', () => {
+    const c = { ...CONTENT, teamTitle: 'Tim Dapur', team: [{ nama: 'A', peran: 'Chef' }] }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={c} />)
+    expect(html).toContain('href="#tim"')
+  })
+})

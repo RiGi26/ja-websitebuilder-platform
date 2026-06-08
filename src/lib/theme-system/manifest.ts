@@ -167,6 +167,9 @@ export interface ComposableContent {
   info?: InfoLokasi
   gallery?: GalleryContent
   about?: { title: string; body: string; image?: string; ctaText?: string; ctaHref?: string }
+  // Heading section tim dari konten (human-centric, pola sama featuresTitle).
+  teamEyebrow?: string
+  teamTitle?: string
   team?: TeamMember[]
   // Sprint B — conversion layer; absen + manifest off = tak dirender (nol regresi)
   pricing?: PricingContent
@@ -340,7 +343,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // FINE DINING / RESTO KELUARGA
   'finedining-aurum': {
     id: 'finedining-aurum', label: 'Fine Dining Aurum', basePackId: 'finedining-aurum',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', statement: true, stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', statement: true, stats: true, team: 'spotlight', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
   'finedining-hearth': {
     id: 'finedining-hearth', label: 'Fine Dining Hearth', basePackId: 'finedining-hearth',
