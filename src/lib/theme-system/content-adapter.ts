@@ -8,13 +8,21 @@ import type { PageSection, TenantProfile } from '@/types/websitebuilder'
 import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
-// Bentuk minimal yang dibagi Product / MenuItem / Service (semua punya field
-// ini). Composable showcase generik → satu mapper untuk semua industri.
+// Bentuk yang dibagi Product / MenuItem / Service / (blog map). Field dasar
+// dipakai semua varian; field industri (kategori/durasi_menit/stok/penulis/
+// tanggal) opsional — varian khas-industri (Sprint 10a) memakainya bila ada,
+// varian generik mengabaikan. Nama field = kolom DB supaya Product/Service/
+// MenuItem (select *) mengalir tanpa transform; blog dipetakan di SiteRenderer.
 export interface ShowcaseSourceItem {
   nama: string
   deskripsi?: string | null
   harga?: number | null
   gambar_url?: string | null
+  kategori?: string | null      // products/services/menu_items
+  durasi_menit?: number | null  // services
+  stok?: number | null          // products
+  penulis?: string | null       // blog (dipetakan dari blog_posts.penulis)
+  tanggal?: string | null       // blog (dipetakan dari blog_posts.published_at)
 }
 
 export function composableContentFromSections(
@@ -35,6 +43,12 @@ export function composableContentFromSections(
       harga: typeof p.harga === 'number' ? p.harga : undefined,
       desc: p.deskripsi ?? undefined,
       gambar: p.gambar_url ?? undefined,
+      // Field khas-industri (Sprint 10a) — diteruskan bila ada; varian generik abaikan.
+      kategori: p.kategori ?? undefined,
+      durasi: typeof p.durasi_menit === 'number' ? p.durasi_menit : undefined,
+      stok: typeof p.stok === 'number' ? p.stok : undefined,
+      penulis: p.penulis ?? undefined,
+      tanggal: p.tanggal ?? undefined,
     }))
 
   const showcase = items.length ? { title: showcaseTitle, items } : undefined

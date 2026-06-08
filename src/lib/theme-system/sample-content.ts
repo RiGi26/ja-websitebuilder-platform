@@ -482,10 +482,10 @@ const WARUNG: ComposableContent = {
     title: 'Menu Andalan',
     subtitle: 'Yang paling dicari pelanggan tiap hari.',
     items: [
-      { nama: 'Ayam Goreng Lengkuas + Nasi', harga: 18000, desc: 'Ayam ungkep bumbu meresap, kremes gurih.' },
-      { nama: 'Soto Daging Bening', harga: 20000, desc: 'Kuah kaldu rebus 4 jam, segar tak bikin enek.' },
-      { nama: 'Sayur Lodeh Komplit', harga: 13000, desc: 'Santan segar, sayur dari pasar pagi.' },
-      { nama: 'Es Teh Poci Gula Batu', harga: 5000, desc: 'Teh tubruk wangi, manis pas.' },
+      { nama: 'Ayam Goreng Lengkuas + Nasi', harga: 18000, desc: 'Ayam ungkep bumbu meresap, kremes gurih.', kategori: 'Makanan Utama' },
+      { nama: 'Soto Daging Bening', harga: 20000, desc: 'Kuah kaldu rebus 4 jam, segar tak bikin enek.', kategori: 'Makanan Utama' },
+      { nama: 'Sayur Lodeh Komplit', harga: 13000, desc: 'Santan segar, sayur dari pasar pagi.', kategori: 'Sayur & Sambal' },
+      { nama: 'Es Teh Poci Gula Batu', harga: 5000, desc: 'Teh tubruk wangi, manis pas.', kategori: 'Minuman' },
     ],
   },
   stats: [
@@ -549,10 +549,10 @@ const CAFE: ComposableContent = {
     title: 'Menu Favorit',
     subtitle: 'Yang paling sering dipesan tamu.',
     items: [
-      { nama: 'Es Kopi Susu Senja', harga: 22000, desc: 'Signature kami. Manis gula aren, kopi tebal.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800) },
-      { nama: 'Caffe Latte', harga: 28000, desc: 'Espresso lembut, susu segar steamed.', gambar: IMG('photo-1572442388796-11668a67e53d', 800) },
-      { nama: 'Butter Croissant', harga: 25000, desc: 'Dipanggang tiap pagi, renyah berlapis.', gambar: IMG('photo-1555507036-ab1f4038808a', 800) },
-      { nama: 'Manual Brew V60', harga: 30000, desc: 'Pilih bijimu, kami seduh di depanmu.', gambar: IMG('photo-1495474472287-4d71bcdd2085', 800) },
+      { nama: 'Es Kopi Susu Senja', harga: 22000, desc: 'Signature kami. Manis gula aren, kopi tebal.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800), kategori: 'Kopi Signature' },
+      { nama: 'Caffe Latte', harga: 28000, desc: 'Espresso lembut, susu segar steamed.', gambar: IMG('photo-1572442388796-11668a67e53d', 800), kategori: 'Espresso Based' },
+      { nama: 'Butter Croissant', harga: 25000, desc: 'Dipanggang tiap pagi, renyah berlapis.', gambar: IMG('photo-1555507036-ab1f4038808a', 800), kategori: 'Pastry' },
+      { nama: 'Manual Brew V60', harga: 30000, desc: 'Pilih bijimu, kami seduh di depanmu.', gambar: IMG('photo-1495474472287-4d71bcdd2085', 800), kategori: 'Manual Brew' },
     ],
   },
   testimonials: [
@@ -605,10 +605,10 @@ const FINEDINING: ComposableContent = {
     title: 'Signature Menu',
     subtitle: 'Hidangan kebanggaan dapur kami.',
     items: [
-      { nama: 'Iga Bakar Madu Kecombrang', harga: 145000, desc: 'Iga empuk, bumbu meresap, aroma kecombrang.' },
-      { nama: 'Bebek Betutu Bali', harga: 165000, desc: 'Diungkep 6 jam dengan base genep otentik.' },
-      { nama: 'Gurame Bakar Rica', harga: 135000, desc: 'Gurame segar, sambal rica pedas menggugah.' },
-      { nama: 'Es Selendang Mayang', harga: 35000, desc: 'Pencuci mulut klasik Betawi, segar dan legit.' },
+      { nama: 'Iga Bakar Madu Kecombrang', harga: 145000, desc: 'Iga empuk, bumbu meresap, aroma kecombrang.', kategori: 'Hidangan Utama' },
+      { nama: 'Bebek Betutu Bali', harga: 165000, desc: 'Diungkep 6 jam dengan base genep otentik.', kategori: 'Hidangan Utama' },
+      { nama: 'Gurame Bakar Rica', harga: 135000, desc: 'Gurame segar, sambal rica pedas menggugah.', kategori: 'Hidangan Utama' },
+      { nama: 'Es Selendang Mayang', harga: 35000, desc: 'Pencuci mulut klasik Betawi, segar dan legit.', kategori: 'Pencuci Mulut' },
     ],
   },
   stats: [
@@ -672,10 +672,10 @@ const KLINIK_UMUM: ComposableContent = {
     title: 'Layanan Kami',
     subtitle: 'Perawatan lengkap untuk seluruh keluarga.',
     items: [
-      { nama: 'Pemeriksaan Umum', harga: 50000, desc: 'Konsultasi dokter umum, diagnosa & resep.', gambar: IMG('photo-1579684385127-1ef15d508118', 800) },
-      { nama: 'Perawatan Gigi', harga: 150000, desc: 'Scaling, tambal, cabut oleh dokter gigi.', gambar: IMG('photo-1606811841689-23dfddce3e95', 800) },
-      { nama: 'Vaksinasi', harga: 200000, desc: 'Imunisasi anak & dewasa, stok lengkap.', gambar: IMG('photo-1612277795421-9bc7706a4a34', 800) },
-      { nama: 'Cek Laboratorium', harga: 100000, desc: 'Tes darah, gula, kolesterol. Hasil cepat.', gambar: IMG('photo-1582719508461-905c673771fd', 800) },
+      { nama: 'Pemeriksaan Umum', harga: 50000, desc: 'Konsultasi dokter umum, diagnosa & resep.', gambar: IMG('photo-1579684385127-1ef15d508118', 800), kategori: 'Pemeriksaan', durasi: 30 },
+      { nama: 'Perawatan Gigi', harga: 150000, desc: 'Scaling, tambal, cabut oleh dokter gigi.', gambar: IMG('photo-1606811841689-23dfddce3e95', 800), kategori: 'Gigi & Mulut', durasi: 45 },
+      { nama: 'Vaksinasi', harga: 200000, desc: 'Imunisasi anak & dewasa, stok lengkap.', gambar: IMG('photo-1612277795421-9bc7706a4a34', 800), kategori: 'Imunisasi', durasi: 20 },
+      { nama: 'Cek Laboratorium', harga: 100000, desc: 'Tes darah, gula, kolesterol. Hasil cepat.', gambar: IMG('photo-1582719508461-905c673771fd', 800), kategori: 'Laboratorium', durasi: 15 },
     ],
   },
   stats: [
@@ -756,10 +756,10 @@ const KLINIK_ESTETIK: ComposableContent = {
     title: 'Perawatan Unggulan',
     subtitle: 'Pilihan perawatan favorit pasien kami.',
     items: [
-      { nama: 'Facial Brightening', harga: 250000, desc: 'Mencerahkan & melembapkan, kulit segar.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800) },
-      { nama: 'Chemical Peeling', harga: 450000, desc: 'Mengangkat sel mati, samarkan noda.', gambar: IMG('photo-1596462502278-27bfdc403348', 800) },
-      { nama: 'Laser Rejuvenation', harga: 850000, desc: 'Meremajakan kulit, pori mengecil.', gambar: IMG('photo-1620916566398-39f1143ab7be', 800) },
-      { nama: 'Acne Treatment', harga: 350000, desc: 'Program tuntas atasi jerawat membandel.', gambar: IMG('photo-1556228720-195a672e8a03', 800) },
+      { nama: 'Facial Brightening', harga: 250000, desc: 'Mencerahkan & melembapkan, kulit segar.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800), kategori: 'Facial', durasi: 60 },
+      { nama: 'Chemical Peeling', harga: 450000, desc: 'Mengangkat sel mati, samarkan noda.', gambar: IMG('photo-1596462502278-27bfdc403348', 800), kategori: 'Peeling', durasi: 45 },
+      { nama: 'Laser Rejuvenation', harga: 850000, desc: 'Meremajakan kulit, pori mengecil.', gambar: IMG('photo-1620916566398-39f1143ab7be', 800), kategori: 'Laser', durasi: 90 },
+      { nama: 'Acne Treatment', harga: 350000, desc: 'Program tuntas atasi jerawat membandel.', gambar: IMG('photo-1556228720-195a672e8a03', 800), kategori: 'Acne', durasi: 60 },
     ],
   },
   testimonials: [
@@ -825,10 +825,10 @@ const KLINIK_WELLNESS: ComposableContent = {
     title: 'Layanan Terapi',
     subtitle: 'Penanganan menyeluruh untuk tubuh yang sehat.',
     items: [
-      { nama: 'Fisioterapi', harga: 200000, desc: 'Pemulihan cedera otot, sendi, pascaoperasi.', gambar: IMG('photo-1571019613454-1cb2f99b2d8b', 800) },
-      { nama: 'Pijat Terapi', harga: 175000, desc: 'Meredakan nyeri otot & ketegangan.', gambar: IMG('photo-1600334129128-685c5582fd35', 800) },
-      { nama: 'Akupunktur', harga: 250000, desc: 'Terapi titik tubuh untuk keseimbangan.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800) },
-      { nama: 'Konsultasi Postur', harga: 150000, desc: 'Analisa postur & saran latihan harian.', gambar: IMG('photo-1544161515-4ab6ce6db874', 800) },
+      { nama: 'Fisioterapi', harga: 200000, desc: 'Pemulihan cedera otot, sendi, pascaoperasi.', gambar: IMG('photo-1571019613454-1cb2f99b2d8b', 800), kategori: 'Terapi Fisik', durasi: 60 },
+      { nama: 'Pijat Terapi', harga: 175000, desc: 'Meredakan nyeri otot & ketegangan.', gambar: IMG('photo-1600334129128-685c5582fd35', 800), kategori: 'Terapi Fisik', durasi: 45 },
+      { nama: 'Akupunktur', harga: 250000, desc: 'Terapi titik tubuh untuk keseimbangan.', gambar: IMG('photo-1512290923902-8a9f81dc236c', 800), kategori: 'Terapi Holistik', durasi: 50 },
+      { nama: 'Konsultasi Postur', harga: 150000, desc: 'Analisa postur & saran latihan harian.', gambar: IMG('photo-1544161515-4ab6ce6db874', 800), kategori: 'Konsultasi', durasi: 30 },
     ],
   },
   stats: [
@@ -1698,10 +1698,10 @@ const BLOG_JURNAL: ComposableContent = {
     { title: 'Tanpa Iklan', desc: 'Fokus membaca, bebas gangguan.' },
   ],
   showcase: { title: 'Artikel Terbaru', subtitle: 'Beberapa tulisan pilihan.', items: [
-    { nama: 'Belajar Pelan dari Hujan', desc: 'Refleksi sore yang basah.', gambar: IMG('photo-1504711434969-e33886168f5c', 800) },
-    { nama: 'Buku yang Mengubah Cara Pandang', desc: 'Catatan bacaan bulan ini.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800) },
-    { nama: 'Perjalanan Kecil ke Timur', desc: 'Cerita dari jalan sunyi.', gambar: IMG('photo-1469854523086-cc02fe5d8800', 800) },
-    { nama: 'Tentang Memulai Lagi', desc: 'Sedikit soal keberanian.', gambar: IMG('photo-1455390582262-044cdead277a', 800) },
+    { nama: 'Belajar Pelan dari Hujan', desc: 'Refleksi sore yang basah.', gambar: IMG('photo-1504711434969-e33886168f5c', 800), penulis: 'Laras', tanggal: '2026-06-02' },
+    { nama: 'Buku yang Mengubah Cara Pandang', desc: 'Catatan bacaan bulan ini.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800), penulis: 'Laras', tanggal: '2026-05-24' },
+    { nama: 'Perjalanan Kecil ke Timur', desc: 'Cerita dari jalan sunyi.', gambar: IMG('photo-1469854523086-cc02fe5d8800', 800), penulis: 'Laras', tanggal: '2026-05-11' },
+    { nama: 'Tentang Memulai Lagi', desc: 'Sedikit soal keberanian.', gambar: IMG('photo-1455390582262-044cdead277a', 800), penulis: 'Laras', tanggal: '2026-04-28' },
   ] },
   faq: [
     { q: 'Seberapa sering terbit?', a: 'Tulisan baru rilis setiap minggu, biasanya akhir pekan.' },
@@ -1722,10 +1722,10 @@ const BLOG_MEDIA: ComposableContent = {
     { title: 'Beragam Rubrik', desc: 'Dari headline sampai opini.' },
   ],
   showcase: { title: 'Artikel Terbaru', subtitle: 'Sorotan hari ini.', items: [
-    { nama: 'Ekonomi Tumbuh di Kuartal Ini', desc: 'Analisis & data terbaru.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800) },
-    { nama: 'Tren Teknologi Tahun Depan', desc: 'Apa yang perlu disimak.', gambar: IMG('photo-1504711434969-e33886168f5c', 800) },
-    { nama: 'Panduan Gaya Hidup Sehat', desc: 'Tips dari para ahli.', gambar: IMG('photo-1499750310107-5fef28a66643', 800) },
-    { nama: 'Sorotan Olahraga Pekan Ini', desc: 'Hasil & jadwal lengkap.', gambar: IMG('photo-1542435503-956c469947f6', 800) },
+    { nama: 'Ekonomi Tumbuh di Kuartal Ini', desc: 'Analisis & data terbaru.', gambar: IMG('photo-1486312338219-ce68d2c6f44d', 800), penulis: 'Redaksi Ekonomi', tanggal: '2026-06-07' },
+    { nama: 'Tren Teknologi Tahun Depan', desc: 'Apa yang perlu disimak.', gambar: IMG('photo-1504711434969-e33886168f5c', 800), penulis: 'Tim Tekno', tanggal: '2026-06-06' },
+    { nama: 'Panduan Gaya Hidup Sehat', desc: 'Tips dari para ahli.', gambar: IMG('photo-1499750310107-5fef28a66643', 800), penulis: 'Desk Lifestyle', tanggal: '2026-06-05' },
+    { nama: 'Sorotan Olahraga Pekan Ini', desc: 'Hasil & jadwal lengkap.', gambar: IMG('photo-1542435503-956c469947f6', 800), penulis: 'Desk Olahraga', tanggal: '2026-06-04' },
   ] },
   stats: [{ angka: '2jt+', label: 'Pembaca/bulan' }, { angka: '150+', label: 'Artikel/minggu' }, { angka: '12', label: 'Rubrik' }, { angka: '24/7', label: 'Liputan' }],
   faq: [
@@ -1747,10 +1747,10 @@ const BLOG_NICHE: ComposableContent = {
     { title: 'Dicoba Sendiri', desc: 'Setiap resep kami masak & cicipi dulu.' },
   ],
   showcase: { title: 'Artikel Terbaru', subtitle: 'Resep yang lagi ramai dimasak.', items: [
-    { nama: 'Ayam Geprek Sambal Bawang', desc: 'Pedasnya nampol, gampang dibuat.', gambar: IMG('photo-1504674900247-0877df9cc836', 800) },
-    { nama: 'Brownies Kukus Lembut', desc: 'Tanpa oven, tetap legit.', gambar: IMG('photo-1490645935967-10de6ba17061', 800) },
-    { nama: 'Es Kopi Susu Rumahan', desc: 'Hemat, rasa kafe.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800) },
-    { nama: 'Tips Menyimpan Sayur', desc: 'Biar segar lebih lama.', gambar: IMG('photo-1542435503-956c469947f6', 800) },
+    { nama: 'Ayam Geprek Sambal Bawang', desc: 'Pedasnya nampol, gampang dibuat.', gambar: IMG('photo-1504674900247-0877df9cc836', 800), penulis: 'Bunda Rina', tanggal: '2026-06-06' },
+    { nama: 'Brownies Kukus Lembut', desc: 'Tanpa oven, tetap legit.', gambar: IMG('photo-1490645935967-10de6ba17061', 800), penulis: 'Bunda Rina', tanggal: '2026-05-30' },
+    { nama: 'Es Kopi Susu Rumahan', desc: 'Hemat, rasa kafe.', gambar: IMG('photo-1461023058943-07fcbe16d735', 800), penulis: 'Bunda Rina', tanggal: '2026-05-22' },
+    { nama: 'Tips Menyimpan Sayur', desc: 'Biar segar lebih lama.', gambar: IMG('photo-1542435503-956c469947f6', 800), penulis: 'Bunda Rina', tanggal: '2026-05-15' },
   ] },
   testimonials: [
     { quote: 'Resepnya selalu berhasil! Keluarga di rumah suka semua.', nama: 'Bunda Ratih', peran: 'Pembaca setia' },
