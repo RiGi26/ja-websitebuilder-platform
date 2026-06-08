@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnerLogo, PartnersContent, SocialContent, SocialPlatform } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnerLogo, PartnersContent, SocialContent, SocialPlatform, StatementContent } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -191,6 +191,46 @@ export const ENGINE_CSS = `
 .ce-mb-row:hover { padding-left: 6px; }
 .ce-mb-lead { flex: 1; min-width: 0; border-bottom: 1px dotted color-mix(in srgb, var(--c-border) 80%, transparent); transform: translateY(-5px); }
 @media (prefers-reduced-motion: reduce) { .ce-svc-row, .ce-art-card, .ce-art-img, .ce-mb-row { transition: none; } }
+/* ── Craft: heading sadar-align/ritme + polish per-mood ───── */
+.ce-shead { text-align: var(--sec-align, center); margin-bottom: var(--head-mb, 40px); }
+.ce-shead .ce-eyebrow { display: block; margin-bottom: 10px; }
+/* align-left → eyebrow dapat rule editorial; heading tak dipaksa sempit-tengah */
+.ce-root[data-mood="luxury"] .ce-shead .ce-eyebrow, .ce-root[data-mood="minimal"] .ce-shead .ce-eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.ce-root[data-mood="luxury"] .ce-shead[data-rule] .ce-eyebrow::before, .ce-root[data-mood="minimal"] .ce-shead[data-rule] .ce-eyebrow::before { content: ""; width: 30px; height: 1px; background: var(--c-primary); }
+/* luxury/minimal: motion lebih lambat & deliberate (design-rules §4 — "considered") */
+.ce-root[data-mood="luxury"] .ce-card, .ce-root[data-mood="luxury"] .ce-svc-row, .ce-root[data-mood="luxury"] .ce-art-card, .ce-root[data-mood="luxury"] .ce-quote, .ce-root[data-mood="luxury"] .ce-mb-row { transition-duration: .4s; }
+.ce-root[data-mood="luxury"] .ce-btn, .ce-root[data-mood="minimal"] .ce-btn { transition-duration: .35s; }
+/* Signature statement band — pull-quote editorial besar, mark raksasa di latar */
+.ce-statement { position: relative; overflow: hidden; }
+.ce-statement-mark { position: absolute; top: clamp(-40px, -3vw, -16px); left: 50%; transform: translateX(-50%); font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); opacity: .08; font-size: clamp(160px, 26vw, 300px); line-height: 1; pointer-events: none; user-select: none; }
+.ce-statement-q { font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-ink); letter-spacing: var(--tracking); line-height: 1.18; font-size: clamp(26px, 4.4vw, 46px); margin: 0; text-wrap: balance; }
+/* Nav sadar-konten — sticky + blur, tautan section, reservasi menonjol */
+.ce-nav { position: sticky; top: 0; z-index: 100; background: color-mix(in srgb, var(--c-page) 85%, transparent); backdrop-filter: saturate(1.2) blur(12px); -webkit-backdrop-filter: saturate(1.2) blur(12px); border-bottom: 1px solid color-mix(in srgb, var(--c-border) 55%, transparent); }
+.ce-nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 15px 24px; max-width: 1120px; margin: 0 auto; }
+.ce-nav-brand { font-family: var(--f-display); font-weight: var(--fw-display); font-size: 20px; letter-spacing: var(--tracking); color: var(--c-ink); }
+.ce-nav-links { display: flex; align-items: center; gap: 28px; }
+.ce-nav-link { color: var(--c-muted); text-decoration: none; font-size: 14px; font-weight: 600; letter-spacing: .01em; position: relative; transition: color .2s ease; }
+.ce-nav-link:hover { color: var(--c-primary); }
+.ce-nav-link::after { content: ""; position: absolute; left: 0; bottom: -5px; width: 0; height: 1.5px; background: var(--c-primary); transition: width .25s ease; }
+.ce-nav-link:hover::after { width: 100%; }
+.ce-root [id] { scroll-margin-top: 84px; }
+/* Hero secondary CTA (ghost) — kontras di atas foto/gelap (currentColor) */
+.ce-btn-ghost { display: inline-block; padding: 13px 30px; border-radius: var(--r-pill); border: 1px solid currentColor; color: inherit; text-decoration: none; font-weight: 700; font-size: 15px; opacity: .9; transition: opacity .2s ease, background-color .2s ease; }
+.ce-btn-ghost:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
+@media (max-width: 767px) { .ce-nav-links { display: none; } }
+/* Hero sinematik luxury (Maaemo/Quay) — lebih tinggi, scrim bawah dramatis, scroll cue */
+.ce-hero-cue { display: none; }
+.ce-root[data-mood="luxury"] .ce-hero-fb { min-height: 100vh; }
+.ce-root[data-mood="luxury"] .ce-hero-fb::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: linear-gradient(to top, color-mix(in srgb, var(--c-page) 90%, transparent) 0%, transparent 100%); pointer-events: none; z-index: 0; }
+.ce-root[data-mood="luxury"] .ce-hero-cue { display: block; position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 1; opacity: .7; animation: ceCue 2.2s ease-in-out infinite; }
+.ce-root[data-mood="luxury"] .ce-hero-cue svg { width: 26px; height: 26px; }
+@keyframes ceCue { 0%, 100% { transform: translate(-50%, 0); opacity: .5; } 50% { transform: translate(-50%, 7px); opacity: .9; } }
+/* Menu tab kategori (LiveKitchn) — chip jump-nav, align ikut mood */
+.ce-menu-tabs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: var(--sec-items, center); margin: -8px 0 40px; }
+.ce-menu-tab { font-size: 13px; font-weight: 600; color: var(--c-muted); border: 1px solid var(--c-border); border-radius: var(--r-pill); padding: 8px 16px; text-decoration: none; transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+.ce-menu-tab:hover { color: var(--c-on-primary); background: var(--c-primary); border-color: var(--c-primary); }
+.ce-root [id^="menu-"] { scroll-margin-top: 96px; }
+@media (prefers-reduced-motion: reduce) { .ce-nav-link, .ce-nav-link::after, .ce-btn-ghost, .ce-menu-tab { transition: none; } .ce-hero-cue { animation: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -252,11 +292,31 @@ export function Btn({ text, href }: { text?: string; href?: string }) {
   )
 }
 
+// Nav sadar-konten: tautan anchor ke section yang ada (pola situs resto nyata —
+// Locavore/Merah Putih) + tombol reservasi menonjol. Label showcase = kata
+// pertama judulnya (Menu/Layanan/Produk/Artikel) → generik lintas industri.
+function navFirstWord(s?: string): string | undefined {
+  const w = s?.trim().split(/\s+/)[0]
+  return w || undefined
+}
 export function Nav({ content }: { content: ComposableContent }) {
+  const links: { label: string; href: string }[] = []
+  if (content.showcase?.items?.length) links.push({ label: navFirstWord(content.showcase.title) ?? 'Menu', href: '#showcase' })
+  if (content.about) links.push({ label: 'Tentang', href: '#tentang' })
+  if (content.team?.length) links.push({ label: navFirstWord(content.teamTitle) ?? 'Tim', href: '#tim' })
+  if (content.gallery && ((content.gallery.images?.length ?? 0) > 0 || (content.gallery.pairs?.length ?? 0) > 0)) links.push({ label: 'Galeri', href: '#galeri' })
+  if (content.info) links.push({ label: 'Lokasi', href: '#lokasi' })
   return (
-    <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', maxWidth: 1120, margin: '0 auto' }}>
-      <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 20, letterSpacing: 'var(--tracking)' }}>{content.nama}</span>
-      {content.hero.ctaText && <Btn text={content.hero.ctaText} href={content.hero.ctaHref} />}
+    <header className="ce-nav">
+      <div className="ce-nav-inner">
+        <span className="ce-nav-brand">{content.nama}</span>
+        {links.length > 0 && (
+          <nav className="ce-nav-links" aria-label="Navigasi utama">
+            {links.map((l) => <a key={l.href} className="ce-nav-link" href={l.href}>{l.label}</a>)}
+          </nav>
+        )}
+        {content.hero.ctaText && <Btn text={content.hero.ctaText} href={content.hero.ctaHref} />}
+      </div>
     </header>
   )
 }
@@ -326,8 +386,11 @@ export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama:
 export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
-    <section style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
+    <section className="ce-hero-fb" style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
       <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} opacity={0.07} />
+      <span className="ce-hero-cue" aria-hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+      </span>
       <div style={{ maxWidth: 1120, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -338,7 +401,10 @@ export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?:
         <h1 style={{ fontSize: 'clamp(48px, 9vw, 104px)', lineHeight: .98, margin: 0, color: ink }}>{hero.title}</h1>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 28, marginTop: 32 }}>
           {hero.subtitle && <p style={{ fontSize: 18, opacity: .9, lineHeight: 1.6, maxWidth: 480, margin: 0 }}>{hero.subtitle}</p>}
-          {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+            {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
+            {hero.ctaText2 && <a className="ce-btn-ghost" href={hero.ctaHref2 ?? '#'}>{hero.ctaText2}</a>}
+          </div>
         </div>
       </div>
     </section>
@@ -348,20 +414,25 @@ export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?:
 // ── FEATURES varian (keunggulan / "Mengapa Kami") ─────────────
 type Feature = { title: string; desc: string }
 
-function FeatHeading() {
+// Heading "keunggulan" dari konten (bukan hardcode generik). Fallback non-generik;
+// align & ritme ikut craft var (.ce-shead). data-rule → eyebrow dapat rule editorial
+// di mood luxury/minimal.
+export type FeatHead = { eyebrow?: string; title?: string; subtitle?: string }
+function FeatHeading({ eyebrow, title, subtitle }: FeatHead) {
   return (
-    <div style={{ textAlign: 'center', marginBottom: 40 }}>
-      <p className="ce-eyebrow" style={{ marginBottom: 10 }}>Mengapa Kami</p>
-      <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>Alasan Pelanggan Selalu Kembali</h2>
+    <div className="ce-shead" data-rule>
+      <p className="ce-eyebrow">{eyebrow ?? 'Keunggulan'}</p>
+      <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', margin: 0, color: 'var(--c-ink)' }}>{title ?? 'Mengapa Memilih Kami'}</h2>
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '12px 0 0', lineHeight: 1.6, maxWidth: 640, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
 
-export function FeaturesGrid({ features }: { features: Feature[] }) {
+export function FeaturesGrid({ features, heading }: { features: Feature[]; heading?: FeatHead }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '80px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 80px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <FeatHeading />
+        <FeatHeading {...heading} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
           {features.map((f, i) => (
             <div key={i} className="ce-card" style={{ padding: 32 }}>
@@ -378,11 +449,11 @@ export function FeaturesGrid({ features }: { features: Feature[] }) {
   )
 }
 
-export function FeaturesRows({ features }: { features: Feature[] }) {
+export function FeaturesRows({ features, heading }: { features: Feature[]; heading?: FeatHead }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-      <FeatHeading />
+      <FeatHeading {...heading} />
       {features.map((f, i) => (
         <div key={i} className="ce-feat-row" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 28, alignItems: 'baseline', padding: '28px 0' }}>
           <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 40, lineHeight: 1, color: 'var(--c-primary)', opacity: .4 }}>
@@ -403,16 +474,16 @@ export function FeaturesRows({ features }: { features: Feature[] }) {
 function ShowHeading({ title, subtitle }: { title?: string; subtitle?: string }) {
   if (!title && !subtitle) return null
   return (
-    <div style={{ textAlign: 'center', marginBottom: 40 }}>
+    <div className="ce-shead">
       {title && <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', margin: '0 0 8px', color: 'var(--c-ink)' }}>{title}</h2>}
-      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: 0 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: 0, maxWidth: 620, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
 
 export function ShowcaseMenuList({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 820, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 820, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
       <div className="ce-stagger">
         {showcase.items.map((it: ShowcaseItem, i) => (
@@ -431,7 +502,7 @@ export function ShowcaseMenuList({ showcase }: { showcase: NonNullable<Composabl
 
 export function ShowcaseCardGrid({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 1120, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 1120, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
       <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
         {showcase.items.map((it: ShowcaseItem, i) => (
@@ -485,7 +556,7 @@ export function ShowcaseLookbook({ showcase }: { showcase: NonNullable<Composabl
   const items = showcase.items
   const [featured, ...rest] = items
   return (
-    <section style={{ padding: '96px 24px', maxWidth: 1120, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 96px) 24px', maxWidth: 1120, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
       <div className="ce-stagger">
         {/* Spread featured — landscape besar + kaption editorial di samping */}
@@ -555,7 +626,7 @@ function ClockIcon() {
 export function ShowcaseServiceList({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   const groups = groupByKategori(showcase.items)
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 880, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 880, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
       <div className="ce-stagger" style={{ display: 'grid', gap: 36 }}>
         {groups.map((g, gi) => (
@@ -591,7 +662,7 @@ export function ShowcaseServiceList({ showcase }: { showcase: NonNullable<Compos
 // ringkasan + "Baca selengkapnya". Tanpa harga (artikel bukan produk).
 export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 1120, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 1120, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
       <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
         {showcase.items.map((it, i) => {
@@ -623,14 +694,22 @@ export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<Compos
 
 // MENU-BOARD (resto) — daftar menu dikelompokkan per kategori (gaya papan menu):
 // nama + deskripsi di kiri (leader dotted), harga di kanan.
+const menuSlug = (s: string) => 'menu-' + s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 export function ShowcaseMenuBoard({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
   const groups = groupByKategori(showcase.items)
+  const tabs = groups.filter((g) => g.kategori).length > 1
   return (
-    <section style={{ padding: '88px 24px', maxWidth: 860, margin: '0 auto' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 88px) 24px', maxWidth: 860, margin: '0 auto' }}>
       <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+      {/* Tab kategori (LiveKitchn) — jump ke tiap grup */}
+      {tabs && (
+        <div className="ce-menu-tabs">
+          {groups.map((g, gi) => g.kategori ? <a key={gi} className="ce-menu-tab" href={`#${menuSlug(g.kategori)}`}>{g.kategori}</a> : null)}
+        </div>
+      )}
       <div className="ce-stagger" style={{ display: 'grid', gap: 40 }}>
         {groups.map((g, gi) => (
-          <div key={gi}>
+          <div key={gi} id={g.kategori ? menuSlug(g.kategori) : undefined}>
             {g.kategori && <div className="ce-cat-head"><h3>{g.kategori}</h3></div>}
             <div>
               {g.items.map((it, i) => (
@@ -650,10 +729,30 @@ export function ShowcaseMenuBoard({ showcase }: { showcase: NonNullable<Composab
   )
 }
 
+// STATEMENT — signature band (craft): pernyataan posisi/filosofi editorial. Mark
+// kutip raksasa di latar (ditint primary), kalimat besar serif, sitasi opsional.
+// Align ikut craft var (kiri utk luxury/minimal, tengah utk clean/warm).
+export function StatementBand({ statement }: { statement: StatementContent }) {
+  const inner: React.CSSProperties = {
+    maxWidth: 920, margin: '0 auto', position: 'relative', zIndex: 1,
+    textAlign: 'var(--sec-align, center)' as unknown as React.CSSProperties['textAlign'],
+  }
+  return (
+    <section className="ce-statement" style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 96px) 24px' }}>
+      <span className="ce-statement-mark" aria-hidden>&ldquo;</span>
+      <div style={inner}>
+        {statement.eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 18 }}>{statement.eyebrow}</p>}
+        <p className="ce-statement-q">{statement.quote}</p>
+        {statement.cite && <p style={{ marginTop: 24, fontSize: 14, color: 'var(--c-muted)', letterSpacing: '.04em' }}>{statement.cite}</p>}
+      </div>
+    </section>
+  )
+}
+
 // ── ABOUT / CTA / FOOTER ──────────────────────────────────────
 export function About({ about }: { about: NonNullable<ComposableContent['about']> }) {
   return (
-    <section style={{ padding: '72px 24px' }}>
+    <section style={{ padding: 'var(--sec-pad-y, 72px) 24px' }}>
       <div style={{ maxWidth: 760, margin: '0 auto', borderLeft: '3px solid var(--c-primary)', paddingLeft: 'clamp(20px, 4vw, 40px)' }}>
         <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
         <h2 style={{ fontSize: 'clamp(26px, 4vw, 34px)', margin: '0 0 16px', color: 'var(--c-ink)' }}>{about.title}</h2>
@@ -701,10 +800,10 @@ export function FloatingWA({ wa }: { wa?: string }) {
 // ── SECTION HEADING generik (eyebrow + judul) ─────────────────
 function SectionHead({ eyebrow, title, subtitle }: { eyebrow?: string; title: string; subtitle?: string }) {
   return (
-    <div style={{ textAlign: 'center', marginBottom: 44 }}>
-      {eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 10 }}>{eyebrow}</p>}
+    <div className="ce-shead" data-rule>
+      {eyebrow && <p className="ce-eyebrow">{eyebrow}</p>}
       <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', margin: 0, color: 'var(--c-ink)' }}>{title}</h2>
-      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '10px auto 0', maxWidth: 560, lineHeight: 1.6 }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 16, color: 'var(--c-muted)', margin: '10px 0 0', maxWidth: 560, lineHeight: 1.6, display: 'inline-block' }}>{subtitle}</p>}
     </div>
   )
 }
@@ -747,7 +846,7 @@ function QuoteCard({ t }: { t: Testimonial }) {
 export function TestimoniCards({ testimonials }: { testimonials: Testimonial[] }) {
   return (
     // Section pakai --c-page (base) supaya kartu quote (--c-surface, "raised") terangkat.
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Kata Mereka" title="Dipercaya Pelanggan Kami" />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
@@ -762,7 +861,7 @@ export function TestimoniSpotlight({ testimonials }: { testimonials: Testimonial
   const t = testimonials[0]
   if (!t) return null
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '96px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 96px) 24px' }}>
       <figure className="ce-spotlight" style={{ maxWidth: 880, margin: '0 auto', padding: 'clamp(40px, 6vw, 68px) clamp(28px, 5vw, 56px)' }}>
         <span className="ce-spotlight-mark" aria-hidden>&ldquo;</span>
         <div style={{ position: 'relative', textAlign: 'center' }}>
@@ -811,7 +910,7 @@ export function TestimoniMarquee({ testimonials }: { testimonials: Testimonial[]
 // ── FAQ — accordion CSS-only (<details>), objection-handling ───
 export function FAQ({ faq }: { faq: FaqItem[] }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
         <SectionHead eyebrow="Pertanyaan Umum" title="Yang Sering Ditanyakan" />
         <div>
@@ -837,7 +936,7 @@ export function MasonryGallery({ gallery }: { gallery: GalleryContent }) {
   const images = gallery.images ?? []
   if (images.length === 0) return null
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow={gallery.subtitle ? undefined : 'Galeri'} title={gallery.title ?? 'Galeri'} subtitle={gallery.subtitle} />
         <div className="ce-masonry">
@@ -857,7 +956,7 @@ export function BeforeAfterGallery({ gallery }: { gallery: GalleryContent }) {
   const pairs = gallery.pairs ?? []
   if (pairs.length === 0) return null
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <SectionHead eyebrow="Hasil Nyata" title={gallery.title ?? 'Sebelum & Sesudah'} subtitle={gallery.subtitle ?? 'Foto asli pasien kami, atas persetujuan.'} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
@@ -889,7 +988,7 @@ export function InfoLokasiBlock({ info }: { info: InfoLokasi }) {
     ? `https://maps.google.com/maps?q=${encodeURIComponent(info.mapsQuery!)}&t=&z=15&ie=UTF8&iwloc=&output=embed`
     : null
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Kunjungi Kami" title="Jam Buka & Lokasi" />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28, alignItems: 'stretch' }}>
@@ -950,11 +1049,12 @@ function TeamAvatar({ member }: { member: TeamMember }) {
 }
 
 // Grid — semua anggota setara, auto-fit (klinik, sekolah, company)
-export function TeamGrid({ team }: { team: TeamMember[] }) {
+export type TeamHead = { eyebrow?: string; title?: string }
+export function TeamGrid({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim di Balik Layanan Kami'} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
           {team.map((m, i) => (
             <div key={i} className="ce-team-card" style={{ textAlign: 'center' }}>
@@ -973,13 +1073,13 @@ export function TeamGrid({ team }: { team: TeamMember[] }) {
 }
 
 // Spotlight — 1 featured besar (kiri/atas) + grid pendukung (kanan/bawah)
-export function TeamSpotlight({ team }: { team: TeamMember[] }) {
+export function TeamSpotlight({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   const [featured, ...rest] = team
   if (!featured) return null
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim Ahli Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim Ahli Kami'} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 40, alignItems: 'start' }}>
           <div className="ce-team-card">
             <div className="ce-team-photo" style={{ aspectRatio: '3/4', borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', position: 'relative', marginBottom: 20 }}>
@@ -1010,11 +1110,11 @@ export function TeamSpotlight({ team }: { team: TeamMember[] }) {
 }
 
 // Horizontal — scroll strip (tim banyak, mis. coach directory)
-export function TeamHorizontal({ team }: { team: TeamMember[] }) {
+export function TeamHorizontal({ team, heading }: { team: TeamMember[]; heading?: TeamHead }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <SectionHead eyebrow="Tim Kami" title="Kenali Tim di Balik Layanan Kami" />
+        <SectionHead eyebrow={heading?.eyebrow ?? 'Tim Kami'} title={heading?.title ?? 'Kenali Tim di Balik Layanan Kami'} />
         <div className="ce-team-scroll">
           {team.map((m, i) => (
             <div key={i} className="ce-team-card ce-team-scroll-item">
@@ -1038,7 +1138,7 @@ type AboutContent = NonNullable<ComposableContent['about']>
 // Split-Right — teks kiri, gambar kanan (editorial bersih)
 export function AboutSplitRight({ about }: { about: AboutContent }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '80px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 80px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
         <div>
           <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
@@ -1057,7 +1157,7 @@ export function AboutSplitRight({ about }: { about: AboutContent }) {
 // Split-Left — gambar kiri, teks kanan (reversed)
 export function AboutSplitLeft({ about }: { about: AboutContent }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '80px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 80px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center' }}>
         <div style={{ minHeight: 360, borderRadius: 'var(--r-lg)', border: '1px solid var(--c-border)', overflow: 'hidden', boxShadow: 'var(--s-lg)', background: MESH_FILL }}>
           {about.image && <img src={about.image} alt={about.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 360 }} />}
@@ -1076,7 +1176,7 @@ export function AboutSplitLeft({ about }: { about: AboutContent }) {
 // Story — sinematik: judul centered, gambar full-width, teks centered bawah
 export function AboutStory({ about }: { about: AboutContent }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <p className="ce-eyebrow" style={{ marginBottom: 12 }}>Tentang Kami</p>
@@ -1095,11 +1195,11 @@ export function AboutStory({ about }: { about: AboutContent }) {
 }
 
 // ── FEATURES ZIGZAG — alternating image+text (Sprint A) ───────
-export function FeaturesZigzag({ features }: { features: NonNullable<ComposableContent['features']> }) {
+export function FeaturesZigzag({ features, heading }: { features: NonNullable<ComposableContent['features']>; heading?: FeatHead }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <FeatHeading />
+        <FeatHeading {...heading} />
         <div>
           {features.map((f, i) => (
             <div key={i} className="ce-zigzag-item">
@@ -1180,7 +1280,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 // Cards — tier berdampingan; paket unggulan di-highlight (ring + badge).
 export function PricingCards({ pricing }: { pricing: PricingContent }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Paket & Harga" title={pricing.title ?? 'Pilih Paket yang Pas'} subtitle={pricing.subtitle} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, alignItems: 'stretch' }}>
@@ -1197,7 +1297,7 @@ export function PricingTable({ pricing }: { pricing: PricingContent }) {
   const allFeatures: string[] = []
   for (const p of plans) for (const f of p.fitur) if (!allFeatures.includes(f)) allFeatures.push(f)
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <SectionHead eyebrow="Paket & Harga" title={pricing.title ?? 'Bandingkan Paket'} subtitle={pricing.subtitle} />
         <div className="ce-ptab-wrap">
@@ -1253,7 +1353,7 @@ export function PricingSingle({ pricing }: { pricing: PricingContent }) {
   const plan = pricing.plans.find(p => p.unggulan) ?? pricing.plans[0]
   if (!plan) return null
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <SectionHead eyebrow="Penawaran" title={pricing.title ?? 'Satu Paket, Semua Fitur'} subtitle={pricing.subtitle} />
         <div className="ce-pcard feat" style={{ padding: 'clamp(28px, 5vw, 48px)', textAlign: 'center', alignItems: 'center' }}>
@@ -1285,7 +1385,7 @@ export function PricingSingle({ pricing }: { pricing: PricingContent }) {
 // Horizontal — node bernomor sebaris + konektor; collapse ke kolom di mobile.
 export function ProcessHorizontal({ process }: { process: ProcessContent }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Cara Kerja" title={process.title ?? 'Cara Kerjanya'} subtitle={process.subtitle} />
         <div className="ce-proc">
@@ -1306,7 +1406,7 @@ export function ProcessHorizontal({ process }: { process: ProcessContent }) {
 // Timeline — linimasa vertikal bernomor (cocok proses panjang / riwayat).
 export function ProcessTimeline({ process }: { process: ProcessContent }) {
   return (
-    <section style={{ background: 'var(--c-page)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <SectionHead eyebrow="Proses Kami" title={process.title ?? 'Langkah demi Langkah'} subtitle={process.subtitle} />
         <div>
@@ -1326,7 +1426,7 @@ export function ProcessTimeline({ process }: { process: ProcessContent }) {
 // Cards — kartu langkah grid dengan angka watermark besar.
 export function ProcessCards({ process }: { process: ProcessContent }) {
   return (
-    <section style={{ background: 'var(--c-surface)', padding: '88px 24px' }}>
+    <section style={{ background: 'var(--c-surface)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
         <SectionHead eyebrow="Cara Kerja" title={process.title ?? 'Cara Kerjanya'} subtitle={process.subtitle} />
         <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>

@@ -106,6 +106,8 @@ export interface ThemeManifest {
     // ── Balok Sprint C — Trust/Social layer (semua opsional → tema lama nol regresi) ──
     partners?: PartnersVariant // grid logo · marquee strip
     social?: boolean           // strip ikon medsos/marketplace
+    // ── Signature (craft) — pernyataan posisi/filosofi editorial (1 beat dramatis) ──
+    statement?: boolean
   }
 }
 
@@ -145,10 +147,18 @@ export interface GalleryContent {
   images?: GalleryImage[]
   pairs?: BeforeAfterPair[]
 }
+export interface StatementContent { eyebrow?: string; quote: string; cite?: string }
 export interface ComposableContent {
   nama: string
-  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
+  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; ctaText2?: string; ctaHref2?: string; image?: string }
+  // Heading section "keunggulan" dari konten (bukan hardcode generik). Opsional →
+  // fallback non-generik di FeatHeading.
+  featuresEyebrow?: string
+  featuresTitle?: string
+  featuresSubtitle?: string
   features?: { title: string; desc: string; image?: string }[]
+  // Signature band (craft) — pernyataan posisi/filosofi. Absen + slot off = tak dirender.
+  statement?: StatementContent
   showcase?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
   // Sprint 5 — semua opsional; absen + manifest off = tak dirender (nol regresi)
   testimonials?: Testimonial[]
@@ -157,6 +167,9 @@ export interface ComposableContent {
   info?: InfoLokasi
   gallery?: GalleryContent
   about?: { title: string; body: string; image?: string; ctaText?: string; ctaHref?: string }
+  // Heading section tim dari konten (human-centric, pola sama featuresTitle).
+  teamEyebrow?: string
+  teamTitle?: string
   team?: TeamMember[]
   // Sprint B — conversion layer; absen + manifest off = tak dirender (nol regresi)
   pricing?: PricingContent
@@ -330,7 +343,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // FINE DINING / RESTO KELUARGA
   'finedining-aurum': {
     id: 'finedining-aurum', label: 'Fine Dining Aurum', basePackId: 'finedining-aurum',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', statement: true, stats: true, team: 'spotlight', testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
   'finedining-hearth': {
     id: 'finedining-hearth', label: 'Fine Dining Hearth', basePackId: 'finedining-hearth',

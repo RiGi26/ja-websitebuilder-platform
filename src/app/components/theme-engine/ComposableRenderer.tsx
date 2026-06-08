@@ -27,6 +27,7 @@ import {
   ProcessHorizontal, ProcessTimeline, ProcessCards,
   CTABanner, CTASplit,
   PartnersGrid, PartnersMarquee, SocialStrip,
+  StatementBand,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -44,7 +45,7 @@ export default function ComposableRenderer({
   const motifColor = pack.color.primary
 
   return (
-    <div className="ce-root" style={vars} data-theme={manifest.id}>
+    <div className="ce-root" style={vars} data-theme={manifest.id} data-mood={pack.mood}>
       <style dangerouslySetInnerHTML={{ __html: ENGINE_CSS }} />
 
       <Nav content={content} />
@@ -58,15 +59,22 @@ export default function ComposableRenderer({
         <HeroCentered hero={content.hero} motif={motif} motifColor={motifColor} />
       )}
 
-      {/* Features (keunggulan / "Mengapa Kami") — varian dari manifest */}
-      {content.features && content.features.length > 0 && (
-        B.features === 'rows' ? <FeaturesRows features={content.features} /> :
-        B.features === 'zigzag' ? <FeaturesZigzag features={content.features} /> :
-        <FeaturesGrid features={content.features} />
+      {/* Features (keunggulan) — varian + heading dari konten (bukan generik) */}
+      {content.features && content.features.length > 0 && (() => {
+        const heading = { eyebrow: content.featuresEyebrow, title: content.featuresTitle, subtitle: content.featuresSubtitle }
+        return B.features === 'rows' ? <FeaturesRows features={content.features} heading={heading} /> :
+          B.features === 'zigzag' ? <FeaturesZigzag features={content.features} heading={heading} /> :
+          <FeaturesGrid features={content.features} heading={heading} />
+      })()}
+
+      {/* Signature statement band (craft) — 1 beat editorial, setelah features */}
+      {B.statement && content.statement && (
+        <StatementBand statement={content.statement} />
       )}
 
       {/* Showcase produk/menu — varian dari manifest. Varian khas-industri
           (service-list/article-feed/menu-board) mengonsumsi field industri. */}
+      <div id="showcase" aria-hidden />
       {content.showcase && content.showcase.items.length > 0 && (
         B.showcase === 'lookbook' ? (
           <ShowcaseLookbook showcase={content.showcase} />
@@ -101,12 +109,14 @@ export default function ComposableRenderer({
         <PartnersGrid partners={content.partners} />
       )}
 
-      {/* Team/People — Trust layer (Sprint A) */}
-      {B.team && content.team && content.team.length > 0 && (
-        B.team === 'spotlight' ? <TeamSpotlight team={content.team} /> :
-        B.team === 'horizontal' ? <TeamHorizontal team={content.team} /> :
-        <TeamGrid team={content.team} />
-      )}
+      {/* Team/People — human-centric "Di Balik Dapur" (heading dari konten) */}
+      <div id="tim" aria-hidden />
+      {B.team && content.team && content.team.length > 0 && (() => {
+        const heading = { eyebrow: content.teamEyebrow, title: content.teamTitle }
+        return B.team === 'spotlight' ? <TeamSpotlight team={content.team} heading={heading} /> :
+          B.team === 'horizontal' ? <TeamHorizontal team={content.team} heading={heading} /> :
+          <TeamGrid team={content.team} heading={heading} />
+      })()}
 
       {B.testimoni && content.testimonials && content.testimonials.length > 0 && (
         B.testimoni === 'spotlight' ? (
@@ -118,6 +128,7 @@ export default function ComposableRenderer({
         )
       )}
 
+      <div id="galeri" aria-hidden />
       {/* Galeri (Sprint 5b) — masonry fasilitas / before-after */}
       {B.gallery === 'before-after' && content.gallery?.pairs && content.gallery.pairs.length > 0 && (
         <BeforeAfterGallery gallery={content.gallery} />
@@ -126,11 +137,13 @@ export default function ComposableRenderer({
         <MasonryGallery gallery={content.gallery} />
       )}
 
+      <div id="lokasi" aria-hidden />
       {B.info && content.info && (
         <InfoLokasiBlock info={content.info} />
       )}
 
       {/* About — dispatch ke varian (Sprint A); default 'text' = perilaku lama */}
+      <div id="tentang" aria-hidden />
       {content.about && (
         B.about === 'split-right' ? <AboutSplitRight about={content.about} /> :
         B.about === 'split-left' ? <AboutSplitLeft about={content.about} /> :
