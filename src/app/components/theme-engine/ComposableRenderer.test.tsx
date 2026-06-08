@@ -50,7 +50,7 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
         expect(html).toContain('Rp15.000') // harga terformat
       }
       expect(html).toContain('Homemade Harian') // features (keunggulan)
-      expect(html).toContain('Mengapa Kami') // heading features
+      expect(html).toContain('Mengapa Memilih Kami') // heading features (fallback non-generik; konten bisa override)
       expect(html).toContain('--c-primary') // token ter-inject
       expect(html).toContain(`data-theme="${id}"`)
     })
@@ -838,5 +838,47 @@ describe('Sprint 10a — showcase khas-industri', () => {
     expect(MANIFESTS['cafe-latte'].blocks.showcase).toBe('card-grid')
     const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['cafe-latte']} content={CONTENT_MENU} />)
     expect(html).toContain('class="ce-card"')
+  })
+})
+
+// ── Craft upgrade — mood/layout-aware + heading konten + statement ──
+describe('Craft upgrade (anti-slop)', () => {
+  it('inject craft vars + data-mood dari pack (luxury → align kiri)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={CONTENT} />)
+    expect(html).toContain('data-mood="luxury"')
+    expect(html).toContain('--sec-align:left')   // finedining-aurum layout.align = left
+    expect(html).toContain('--sec-pad-y')         // ritme whitespace dari pack
+  })
+
+  it('align center untuk pack yang memang center (warung-rakyat)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT} />)
+    expect(html).toContain('--sec-align:center')
+  })
+
+  it('heading features dari konten bila ada; fallback non-generik bila tidak', () => {
+    const withHead = { ...CONTENT, featuresEyebrow: 'Mengapa Meja Nusantara', featuresTitle: 'Pengalaman, bukan sekadar santapan' }
+    const a = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={withHead} />)
+    expect(a).toContain('Pengalaman, bukan sekadar santapan')
+    expect(a).toContain('Mengapa Meja Nusantara')
+    expect(a).not.toContain('Mengapa Memilih Kami')
+    // tanpa konten → fallback (bukan "Mengapa Kami" generik lama)
+    const b = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={CONTENT} />)
+    expect(b).toContain('Mengapa Memilih Kami')
+    expect(b).not.toContain('Mengapa Kami<') // string generik lama benar2 hilang
+  })
+
+  it('statement band render bila slot + konten ada (finedining-aurum)', () => {
+    const withStmt = { ...CONTENT, statement: { eyebrow: 'Filosofi Dapur', quote: 'Kami merawatnya, satu piring pada satu waktu.', cite: 'Chef Anindya' } }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['finedining-aurum']} content={withStmt} />)
+    expect(html).toContain('class="ce-statement"')
+    expect(html).toContain('Kami merawatnya, satu piring pada satu waktu.')
+    expect(html).toContain('Filosofi Dapur')
+  })
+
+  it('statement TAK render bila slot off walau konten ada (nol regresi)', () => {
+    const withStmt = { ...CONTENT, statement: { quote: 'X kalimat filosofi' } }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={withStmt} />)
+    expect(html).not.toContain('class="ce-statement"')
+    expect(html).not.toContain('X kalimat filosofi')
   })
 })
