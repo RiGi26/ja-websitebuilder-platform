@@ -18,6 +18,7 @@ import {
   HeroCentered, HeroSplit, HeroFullbleed,
   FeaturesGrid, FeaturesRows, FeaturesZigzag,
   ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
+  ShowcaseServiceList, ShowcaseArticleFeed, ShowcaseMenuBoard,
   Stats, TestimoniCards, TestimoniSpotlight, TestimoniMarquee,
   FAQ, InfoLokasiBlock, MasonryGallery, BeforeAfterGallery,
   TeamGrid, TeamSpotlight, TeamHorizontal,
@@ -64,12 +65,19 @@ export default function ComposableRenderer({
         <FeaturesGrid features={content.features} />
       )}
 
-      {/* Showcase produk/menu — varian dari manifest */}
+      {/* Showcase produk/menu — varian dari manifest. Varian khas-industri
+          (service-list/article-feed/menu-board) mengonsumsi field industri. */}
       {content.showcase && content.showcase.items.length > 0 && (
         B.showcase === 'lookbook' ? (
           <ShowcaseLookbook showcase={content.showcase} />
         ) : B.showcase === 'card-grid' ? (
           <ShowcaseCardGrid showcase={content.showcase} />
+        ) : B.showcase === 'service-list' ? (
+          <ShowcaseServiceList showcase={content.showcase} />
+        ) : B.showcase === 'article-feed' ? (
+          <ShowcaseArticleFeed showcase={content.showcase} />
+        ) : B.showcase === 'menu-board' ? (
+          <ShowcaseMenuBoard showcase={content.showcase} />
         ) : (
           <ShowcaseMenuList showcase={content.showcase} />
         )

@@ -66,7 +66,7 @@ export async function renderSite({
       tipe === 'restaurant' ? fetchMenuItemsByPage(client, page.id)
         : tipe === 'blog'
           ? fetchBlogPostsByPage(client, page.id).then((posts) =>
-              posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url })))
+              posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at })))
           : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
             : fetchProductsByPage(client, page.id)
     const showcaseTitle =

@@ -45,7 +45,10 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
       expect(html.length).toBeGreaterThan(300)
       expect(html).toContain('Pempek Homemade Asli Palembang') // hero
       expect(html).toContain('Pempek Kapal Selam') // showcase item
-      expect(html).toContain('Rp15.000') // harga terformat
+      // article-feed (blog) sengaja tak render harga (artikel bukan produk); varian lain tetap.
+      if (manifest.blocks.showcase !== 'article-feed') {
+        expect(html).toContain('Rp15.000') // harga terformat
+      }
       expect(html).toContain('Homemade Harian') // features (keunggulan)
       expect(html).toContain('Mengapa Kami') // heading features
       expect(html).toContain('--c-primary') // token ter-inject
@@ -742,5 +745,98 @@ describe('Sprint 9 — travel / blog / jastip', () => {
       expect(html).toContain(`data-theme="${id}"`)
       expect(html.length).toBeGreaterThan(300)
     }
+  })
+})
+
+// ── Sprint 10a — Showcase khas-industri ──────────────────────
+const CONTENT_SERVICE: ComposableContent = {
+  ...CONTENT,
+  showcase: {
+    title: 'Layanan Kami',
+    items: [
+      { nama: 'Pemeriksaan Umum', harga: 50000, desc: 'Konsultasi dokter umum.', kategori: 'Pemeriksaan', durasi: 30 },
+      { nama: 'Perawatan Gigi', harga: 150000, desc: 'Scaling & tambal.', kategori: 'Gigi & Mulut', durasi: 45 },
+      { nama: 'Vaksinasi', harga: 200000, desc: 'Imunisasi anak & dewasa.', kategori: 'Pemeriksaan', durasi: 20 },
+    ],
+  },
+}
+const CONTENT_ARTIKEL: ComposableContent = {
+  ...CONTENT,
+  showcase: {
+    title: 'Artikel Terbaru',
+    items: [
+      { nama: 'Belajar Pelan dari Hujan', desc: 'Refleksi sore yang basah.', gambar: 'https://x.test/art.jpg', penulis: 'Laras', tanggal: '2026-06-02' },
+      { nama: 'Tentang Memulai Lagi', desc: 'Sedikit soal keberanian.', penulis: 'Laras', tanggal: '2026-04-28' },
+    ],
+  },
+}
+const CONTENT_MENU: ComposableContent = {
+  ...CONTENT,
+  showcase: {
+    title: 'Menu Andalan',
+    items: [
+      { nama: 'Ayam Goreng', harga: 18000, desc: 'Kremes gurih.', kategori: 'Makanan Utama' },
+      { nama: 'Soto Daging', harga: 20000, desc: 'Kuah bening.', kategori: 'Makanan Utama' },
+      { nama: 'Es Teh', harga: 5000, desc: 'Manis pas.', kategori: 'Minuman' },
+    ],
+  },
+}
+
+describe('Sprint 10a — showcase khas-industri', () => {
+  it('default manifest: klinik→service-list, blog→article-feed, resto→menu-board', () => {
+    expect(MANIFESTS['umum-bluecare'].blocks.showcase).toBe('service-list')
+    expect(MANIFESTS['estetik-rosegold'].blocks.showcase).toBe('service-list')
+    expect(MANIFESTS['wellness-forest'].blocks.showcase).toBe('service-list')
+    expect(MANIFESTS['jurnal-hangat'].blocks.showcase).toBe('article-feed')
+    expect(MANIFESTS['media-merah'].blocks.showcase).toBe('article-feed')
+    expect(MANIFESTS['niche-gelap'].blocks.showcase).toBe('article-feed')
+    expect(MANIFESTS['warung-rakyat'].blocks.showcase).toBe('menu-board')
+    expect(MANIFESTS['finedining-aurum'].blocks.showcase).toBe('menu-board')
+  })
+
+  // Catatan: nama kelas (ce-svc-row dll) SELALU ada di <style>; untuk menguji
+  // RENDER elemen, assert bentuk atribut `class="..."` (bukan selektor CSS).
+  it('service-list: durasi + kategori grouping + harga (umum-bluecare)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['umum-bluecare']} content={CONTENT_SERVICE} />)
+    expect(html).toContain('class="ce-svc-row"')
+    expect(html).toContain('class="ce-meta-pill"') // badge durasi ter-render
+    expect(html).toContain('menit')                // teks durasi
+    expect(html).toContain('Rp50.000')             // harga layanan
+    expect(html).toContain('Pemeriksaan')          // header kategori
+    expect(html).toContain('Gigi &amp; Mulut')     // header kategori (escaped &)
+    expect(html).toContain('class="ce-cat-head"')
+  })
+
+  it('article-feed: penulis + tanggal + tanpa harga (jurnal-hangat)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['jurnal-hangat']} content={CONTENT_ARTIKEL} />)
+    expect(html).toContain('class="ce-art-card"')
+    expect(html).toContain('Laras')             // penulis
+    expect(html).toContain('2 Jun 2026')        // tanggal terformat (UTC-stabil)
+    expect(html).toContain('Baca selengkapnya')
+    expect(html).toContain('https://x.test/art.jpg') // cover ada
+    expect(html).not.toContain('Rp')            // artikel tak punya harga
+  })
+
+  it('menu-board: grouping kategori + harga (warung-rakyat)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['warung-rakyat']} content={CONTENT_MENU} />)
+    expect(html).toContain('class="ce-mb-row"')
+    expect(html).toContain('class="ce-cat-head"')
+    expect(html).toContain('Makanan Utama')
+    expect(html).toContain('Minuman')
+    expect(html).toContain('Rp18.000')
+  })
+
+  it('grouping: tanpa kategori → satu grup tanpa header (nol regresi)', () => {
+    // CONTENT (pempek) tak punya kategori → service-list render rows tanpa header kategori
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['umum-bluecare']} content={CONTENT} />)
+    expect(html).toContain('class="ce-svc-row"')
+    expect(html).not.toContain('class="ce-cat-head"') // elemen header tak dirender (CSS-nya tetap ada)
+    expect(html).toContain('Pempek Kapal Selam')
+  })
+
+  it('cafe-latte tetap card-grid (variasi intra-industri terjaga)', () => {
+    expect(MANIFESTS['cafe-latte'].blocks.showcase).toBe('card-grid')
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['cafe-latte']} content={CONTENT_MENU} />)
+    expect(html).toContain('class="ce-card"')
   })
 })
