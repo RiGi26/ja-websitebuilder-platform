@@ -593,7 +593,9 @@ const FINEDINING: ComposableContent = {
     subtitle:
       'Resep turun-temurun dari Aceh hingga Bali, diolah à la minute dengan bahan terbaik hari ini. Untuk malam yang pantas dikenang.',
     ctaText: 'Reservasi Meja',
-    ctaHref: '#reservasi',
+    ctaHref: '#lokasi',
+    ctaText2: 'Lihat Menu',
+    ctaHref2: '#showcase',
     image: IMG('photo-1414235077428-338989a2e8c0'),
   },
   featuresEyebrow: 'Mengapa Meja Nusantara',
@@ -636,6 +638,18 @@ const FINEDINING: ComposableContent = {
     { quote: 'Saya jamu klien dari Jepang di sini. Mereka terkesan — ini wajah Indonesia yang ingin saya tunjukkan.', nama: 'Surya Pratama', peran: 'Direktur' },
     { quote: 'Bebek betutunya butuh enam jam dan rasanya terbukti. Terbaik yang saya cicipi di luar Bali.', nama: 'Maria Hutapea', peran: 'Penulis kuliner' },
   ],
+  gallery: {
+    title: 'Suasana & Sajian',
+    subtitle: 'Ruang yang dibuat untuk perayaan, hidangan yang dibuat untuk dikenang.',
+    images: [
+      { src: IMG('photo-1414235077428-338989a2e8c0', 800), caption: 'Ruang makan utama' },
+      { src: IMG('photo-1551024506-0bccd828d307', 800), caption: 'Sajian penutup' },
+      { src: IMG('photo-1504674900247-0877df9cc836', 800), caption: 'Hidangan panggang' },
+      { src: IMG('photo-1572442388796-11668a67e53d', 800), caption: 'Bar & seleksi minuman' },
+      { src: IMG('photo-1555507036-ab1f4038808a', 800), caption: 'Roti & hidangan pembuka' },
+      { src: IMG('photo-1567620905732-2d1ec7ab7445', 800), caption: 'Plating signature' },
+    ],
+  },
   faq: [
     { q: 'Apakah perlu reservasi?', a: 'Untuk makan malam dan akhir pekan kami sangat menyarankan reservasi — meja kerap penuh dipesan, terutama ruang semi-privat.' },
     { q: 'Bisa untuk lamaran, ulang tahun, atau jamuan kantor?', a: 'Tentu. Kami punya ruang semi-privat, dekorasi sederhana, dan paket jamuan. Sampaikan rencana acara Anda, tim kami bantu siapkan.' },

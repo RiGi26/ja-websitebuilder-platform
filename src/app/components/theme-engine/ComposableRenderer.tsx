@@ -74,6 +74,7 @@ export default function ComposableRenderer({
 
       {/* Showcase produk/menu — varian dari manifest. Varian khas-industri
           (service-list/article-feed/menu-board) mengonsumsi field industri. */}
+      <div id="showcase" aria-hidden />
       {content.showcase && content.showcase.items.length > 0 && (
         B.showcase === 'lookbook' ? (
           <ShowcaseLookbook showcase={content.showcase} />
@@ -125,6 +126,7 @@ export default function ComposableRenderer({
         )
       )}
 
+      <div id="galeri" aria-hidden />
       {/* Galeri (Sprint 5b) — masonry fasilitas / before-after */}
       {B.gallery === 'before-after' && content.gallery?.pairs && content.gallery.pairs.length > 0 && (
         <BeforeAfterGallery gallery={content.gallery} />
@@ -133,11 +135,13 @@ export default function ComposableRenderer({
         <MasonryGallery gallery={content.gallery} />
       )}
 
+      <div id="lokasi" aria-hidden />
       {B.info && content.info && (
         <InfoLokasiBlock info={content.info} />
       )}
 
       {/* About — dispatch ke varian (Sprint A); default 'text' = perilaku lama */}
+      <div id="tentang" aria-hidden />
       {content.about && (
         B.about === 'split-right' ? <AboutSplitRight about={content.about} /> :
         B.about === 'split-left' ? <AboutSplitLeft about={content.about} /> :
