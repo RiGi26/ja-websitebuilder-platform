@@ -92,6 +92,26 @@ describe('composableContentFromSections — data_konten Sprint A/B (team/pricing
     expect(c.cta?.image).toBe('https://x.test/cta.jpg')
   })
 
+  it('statement: dipetakan dari data_konten.statement (quote wajib); teamTitle/teamEyebrow diteruskan', () => {
+    const konten = {
+      statement: { eyebrow: 'Filosofi', quote: 'Kami merangkai malam.', cite: 'Chef · Pendiri' },
+      teamEyebrow: 'Di Balik Dapur',
+      teamTitle: 'Tim yang Menyiapkan Malam Anda',
+    }
+    const c = composableContentFromSections('Resto', sectionsAboutCta, [], null, konten)
+    expect(c.statement).toMatchObject({ eyebrow: 'Filosofi', quote: 'Kami merangkai malam.', cite: 'Chef · Pendiri' })
+    expect(c.teamEyebrow).toBe('Di Balik Dapur')
+    expect(c.teamTitle).toBe('Tim yang Menyiapkan Malam Anda')
+  })
+
+  it('statement: quote kosong → undefined (tak dirender)', () => {
+    const c1 = composableContentFromSections('Resto', sectionsAboutCta, [], null, { statement: { eyebrow: 'X' } })
+    expect(c1.statement).toBeUndefined()
+    const c2 = composableContentFromSections('Resto', sectionsAboutCta, [], null, {})
+    expect(c2.statement).toBeUndefined()
+    expect(c2.teamTitle).toBeUndefined()
+  })
+
   it('nol regresi: tanpa data_konten field → team/pricing/process undefined', () => {
     const c = composableContentFromSections('Klinik X', sectionsAboutCta, [], null, {})
     expect(c.team).toBeUndefined()

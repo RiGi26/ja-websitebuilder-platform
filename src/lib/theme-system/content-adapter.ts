@@ -5,7 +5,7 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem, StatementContent } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 
 // Bentuk yang dibagi Product / MenuItem / Service / (blog map). Field dasar
@@ -78,6 +78,12 @@ export function composableContentFromSections(
   const gallery = galleryFromFotoItems(konten.foto_items)
   const stats = parseStats(konten.stats)
   const faq = parseFaq(konten.faq)
+  // Signature band (filosofi/posisi) — dipakai tema craft/bespoke (mis. restaurant-lux).
+  // data_konten.statement ({quote, cite?, eyebrow?}). Absen → balok tak dirender.
+  const statement = parseStatement(konten.statement)
+  // Heading section tim dari konten (human-centric). Absen → renderer pakai fallback.
+  const teamEyebrow = str(konten.teamEyebrow)
+  const teamTitle = str(konten.teamTitle)
   const aboutImage = str(konten.about_image)
   const ctaImage = str(konten.cta_image)
 
@@ -87,10 +93,13 @@ export function composableContentFromSections(
     features: base.features,
     showcase,
     info,
+    statement,
     testimonials,
     stats,
     faq,
     gallery,
+    teamEyebrow,
+    teamTitle,
     team,
     pricing,
     process: proc,
@@ -116,6 +125,15 @@ function parseTestimoni(v: unknown): Testimonial[] | undefined {
     out.push({ quote, nama, peran: str(r.kota) ?? str(r.peran) })
   }
   return out.length ? out.slice(0, 12) : undefined
+}
+
+// data_konten.statement ({quote, cite?, eyebrow?}) → signature band. quote wajib.
+function parseStatement(v: unknown): StatementContent | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const r = v as Record<string, unknown>
+  const quote = str(r.quote) ?? str(r.teks)
+  if (!quote) return undefined // quote wajib
+  return { quote, cite: str(r.cite), eyebrow: str(r.eyebrow) }
 }
 
 // data_konten.stats ({angka,label}) → strip angka kredibilitas.
