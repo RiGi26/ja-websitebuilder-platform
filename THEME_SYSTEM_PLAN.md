@@ -5,7 +5,7 @@
 ---
 
 ## 0. CURRENT STATUS (baca dulu)
-- **⚠️ TEMUAN TERBUKA (2026-06-08):** keluhan user *"layout belum variatif menggambarkan industri"* sudah diinvestigasi & terbukti — variasi ada di **kulit** (token), bukan **rangka** (layout). Akar 3 lapis (generasi konten tipis → adapter buang sinyal industri → showcase 90% card-grid + urutan hardcode). Rencana fix = **Sprint 10**. **Lihat §13** sebelum garap "perdalam blok/varian". Belum dieksekusi.
+- **🔧 VARIASI LAYOUT (2026-06-08):** keluhan user *"layout belum variatif menggambarkan industri"* terbukti — variasi ada di **kulit** (token), bukan **rangka**. Akar 3 lapis (generasi konten tipis → adapter buang sinyal industri → showcase 90% card-grid + urutan hardcode). **Sprint 10a SELESAI** (PR #102): showcase khas-industri (service-list/article-feed/menu-board) untuk klinik/blog/resto. Sisa: **Sprint 10b** (perkaya templates.ts), **10c** (rooms+amenity), **10d** (urutan via manifest). **Lihat §13** sebelum garap "perdalam blok/varian".
 - **Fase aktif:** 🎉 **SEMUA INDUSTRI TUNTAS (Sprint 9) — 9 INDUSTRI, 96 TEMA.** Sprint 9 menambah **Travel/Rental** (kendaraan/wisata/akomodasi), **Blog/Media** (jurnal/media/niche), **Jastip** (luar/lokal/preorder) — 27 tema, AKTIF. Total **96 tema** otentik di **9 industri** (semua `TipeIndustri` kecuali `custom`). Composable showcase kini per-industri benar (products/menu/services/blog_posts). 253/253 test (+1 skip), tsc + build bersih, S9 flagship verified pixel (scorecard PASS).
 - **Sebelumnya:** COMPANY (S8b, 9) · PERSONAL (S8a, 9) · FU#1/FU#2 · SEKOLAH (S7, 9) · KLINIK (S6, 9)+galeri S5b · RESTAURANT (S4, 9)+S5 · TOKO ONLINE (S1-3, 24).
 - **Polish #4 (next/font) ✅ SELESAI (2026-06-07):** 4 font asli (Jakarta/Fraunces/Space Grotesk/Nunito) dimuat di `src/app/[slug]/layout.tsx` (subtree situs published saja). `_fonts.ts` pakai `var(--font-x, <fallback sistem>)` → produksi dapat font asli, UAT/test/admin jatuh ke sistem (nol regresi). Build compile next/font bersih.
@@ -266,6 +266,7 @@ Aturan produksi (selaras UPGRADE_PLAN): 1 langkah = 1 branch = 1 PR; additive du
 | 2026-06-07 | Sprint 6 deploy | ✅ **PROD** (PR #78 merged) | Squash-merge ke master, CI + Vercel hijau. Klinik + galeri S5b live. |
 | 2026-06-07 | Pipeline seam | ✅ | Generator HTML tema baru: `src/lib/theme-system/gen-samples.test.tsx` (env-gated `GEN_SAMPLES`, SSR ComposableRenderer → `theme-samples/<id>.html`+index). `.gitignore` += `theme-samples/` penuh. Wire seam §3.1 THEME_VISUAL_PIPELINE.md. |
 | 2026-06-07 | **Sprint 7** | 🎉 **LENGKAP & LIVE** | Industri **Sekolah** ×3 sub-kat (Reguler/Islami/Kursus) ×3 gaya = **9 tema** AKTIF. Reguler(cerdas biru/ceria amber/prestasi navy-emas-gelap) · Islami(hijau emerald/emas krem/malam emerald-gelap) · Kursus(fokus indigo/energi coral/malam violet-gelap). VARIASI gelap↔terang tiap sub-kat. **Palet+font dari ui-ux-pro-max DB** (bukan invent). showcase=program, stats=akreditasi, info=PPDB CTA, gallery masonry=kegiatan. ThemeIcon +8 ikon. sample-content 3 sub-kat (copy edukasi spesifik + foto Unsplash verified 200). |
+| 2026-06-08 | **Sprint 10a** — Showcase khas-industri | ✅ PR #102 (CI+Vercel hijau) | Lapis 2 (ShowcaseItem/ShowcaseSourceItem +kategori/durasi/penulis/tanggal/stok, nol migration) + Lapis 3 (`service-list`/`article-feed`/`menu-board` di blocks.tsx, dispatch ComposableRenderer) + default per-industri (klinik 9→service-list, blog 9→article-feed, resto 6/9→menu-board; cafe-latte/bloom + finedining-hearth tetap card-grid utk variasi). sample-content +field. 317 test, tsc bersih, pixel 3 flagship distinct. Lihat §13. |
 | 2026-06-07 | **Pipeline visual** (front+back) | 📝 scorecard PASS | **Pertama kali pipeline penuh.** Front: ui-ux-pro-max DB → palet/pairing per sub-kat (kontras ≥4.5:1). Back: `scripts/shoot-themes.mjs` shoot 6 gaya ×3 viewport (375/768/1440) → scorecard ui-ux-pro-max pada pixel → semua CRITICAL/HIGH hijau, no iterate. 181/181 test, tsc + build bersih. HTML 51 tema di `theme-samples/index.html` (lokal). |
 
 ---
@@ -385,6 +386,16 @@ Urutan WAJIB (fix Lapis 3 saja tak kelihatan di produksi selama Lapis 1 & 2 belu
 ### 13.6 Patuh aturan produksi
 Tiap lapis = 1+ branch = 1+ PR, additive, nol regresi page published (renderer/varian lama tetap jalan; default baru hanya untuk tema yang dipetakan ulang), VARIASI wajib (#6), gerbang 3 skill §5.a + scorecard pixel (THEME_VISUAL_PIPELINE.md §3.2) saat VERIFY. Cek pixel (Playwright) = langkah VERIFY, bukan blocker analisis.
 
+### 13.6.a Koreksi urutan (saat eksekusi, 2026-06-08)
+"Urutan WAJIB 1→2→3" di §13.5 berlaku untuk blok **auxiliary** (testimoni/stats/
+faq) yang kosong di produksi. **Untuk showcase TIDAK** — datanya sudah terisi
+(products/services/menu_items/blog_posts via FU#1), jadi **Lapis 2+3 boleh
+duluan** tanpa Lapis 1. Itulah Sprint 10a (showcase-first), langkah berdampak
+tertinggi karena showcase = blok paling menggambarkan industri.
+
 ### 13.7 Status
-- **Investigasi:** ✅ SELESAI & terbukti (kode + schema, bukan asumsi). Cukup dalam untuk eksekusi.
-- **Eksekusi Sprint 10:** ⬜ BELUM. Mulai dari Lapis 1.
+- **Investigasi:** ✅ SELESAI & terbukti (kode + schema, bukan asumsi).
+- **Sprint 10a (Showcase khas-industri):** ✅ SELESAI — PR #102 (CI Typecheck&Render + Vercel hijau). Lapis 2 (pipa data field industri) + Lapis 3 (3 balok: `service-list` klinik, `article-feed` blog, `menu-board` resto) + default per-industri (klinik 9/blog 9/resto 6). 317 test + pixel 3 flagship. Nol migration, nol regresi.
+- **Sprint 10b (Lapis 1 — perkaya `templates.ts`):** ⬜ BELUM — testimoni/stats/faq per industri agar blok auxiliary muncul di produksi.
+- **Sprint 10c (Travel/personal rooms+amenity):** ⬜ BELUM — butuh kolom amenity/kapasitas (migration) + `ShowcaseRooms`.
+- **Sprint 10d (urutan section via manifest):** ⬜ BELUM — `manifest.sections[]`.
