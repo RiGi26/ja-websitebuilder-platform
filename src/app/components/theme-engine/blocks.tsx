@@ -204,6 +204,21 @@ export const ENGINE_CSS = `
 .ce-statement { position: relative; overflow: hidden; }
 .ce-statement-mark { position: absolute; top: clamp(-40px, -3vw, -16px); left: 50%; transform: translateX(-50%); font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-primary); opacity: .08; font-size: clamp(160px, 26vw, 300px); line-height: 1; pointer-events: none; user-select: none; }
 .ce-statement-q { font-family: var(--f-display); font-weight: var(--fw-display); color: var(--c-ink); letter-spacing: var(--tracking); line-height: 1.18; font-size: clamp(26px, 4.4vw, 46px); margin: 0; text-wrap: balance; }
+/* Nav sadar-konten — sticky + blur, tautan section, reservasi menonjol */
+.ce-nav { position: sticky; top: 0; z-index: 100; background: color-mix(in srgb, var(--c-page) 85%, transparent); backdrop-filter: saturate(1.2) blur(12px); -webkit-backdrop-filter: saturate(1.2) blur(12px); border-bottom: 1px solid color-mix(in srgb, var(--c-border) 55%, transparent); }
+.ce-nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 15px 24px; max-width: 1120px; margin: 0 auto; }
+.ce-nav-brand { font-family: var(--f-display); font-weight: var(--fw-display); font-size: 20px; letter-spacing: var(--tracking); color: var(--c-ink); }
+.ce-nav-links { display: flex; align-items: center; gap: 28px; }
+.ce-nav-link { color: var(--c-muted); text-decoration: none; font-size: 14px; font-weight: 600; letter-spacing: .01em; position: relative; transition: color .2s ease; }
+.ce-nav-link:hover { color: var(--c-primary); }
+.ce-nav-link::after { content: ""; position: absolute; left: 0; bottom: -5px; width: 0; height: 1.5px; background: var(--c-primary); transition: width .25s ease; }
+.ce-nav-link:hover::after { width: 100%; }
+.ce-root [id] { scroll-margin-top: 84px; }
+/* Hero secondary CTA (ghost) — kontras di atas foto/gelap (currentColor) */
+.ce-btn-ghost { display: inline-block; padding: 13px 30px; border-radius: var(--r-pill); border: 1px solid currentColor; color: inherit; text-decoration: none; font-weight: 700; font-size: 15px; opacity: .9; transition: opacity .2s ease, background-color .2s ease; }
+.ce-btn-ghost:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
+@media (max-width: 767px) { .ce-nav-links { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ce-nav-link, .ce-nav-link::after, .ce-btn-ghost { transition: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -265,11 +280,30 @@ export function Btn({ text, href }: { text?: string; href?: string }) {
   )
 }
 
+// Nav sadar-konten: tautan anchor ke section yang ada (pola situs resto nyata —
+// Locavore/Merah Putih) + tombol reservasi menonjol. Label showcase = kata
+// pertama judulnya (Menu/Layanan/Produk/Artikel) → generik lintas industri.
+function navFirstWord(s?: string): string | undefined {
+  const w = s?.trim().split(/\s+/)[0]
+  return w || undefined
+}
 export function Nav({ content }: { content: ComposableContent }) {
+  const links: { label: string; href: string }[] = []
+  if (content.showcase?.items?.length) links.push({ label: navFirstWord(content.showcase.title) ?? 'Menu', href: '#showcase' })
+  if (content.about) links.push({ label: 'Tentang', href: '#tentang' })
+  if (content.gallery && ((content.gallery.images?.length ?? 0) > 0 || (content.gallery.pairs?.length ?? 0) > 0)) links.push({ label: 'Galeri', href: '#galeri' })
+  if (content.info) links.push({ label: 'Lokasi', href: '#lokasi' })
   return (
-    <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', maxWidth: 1120, margin: '0 auto' }}>
-      <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 20, letterSpacing: 'var(--tracking)' }}>{content.nama}</span>
-      {content.hero.ctaText && <Btn text={content.hero.ctaText} href={content.hero.ctaHref} />}
+    <header className="ce-nav">
+      <div className="ce-nav-inner">
+        <span className="ce-nav-brand">{content.nama}</span>
+        {links.length > 0 && (
+          <nav className="ce-nav-links" aria-label="Navigasi utama">
+            {links.map((l) => <a key={l.href} className="ce-nav-link" href={l.href}>{l.label}</a>)}
+          </nav>
+        )}
+        {content.hero.ctaText && <Btn text={content.hero.ctaText} href={content.hero.ctaHref} />}
+      </div>
     </header>
   )
 }
@@ -351,7 +385,10 @@ export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?:
         <h1 style={{ fontSize: 'clamp(48px, 9vw, 104px)', lineHeight: .98, margin: 0, color: ink }}>{hero.title}</h1>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 28, marginTop: 32 }}>
           {hero.subtitle && <p style={{ fontSize: 18, opacity: .9, lineHeight: 1.6, maxWidth: 480, margin: 0 }}>{hero.subtitle}</p>}
-          {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+            {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
+            {hero.ctaText2 && <a className="ce-btn-ghost" href={hero.ctaHref2 ?? '#'}>{hero.ctaText2}</a>}
+          </div>
         </div>
       </div>
     </section>

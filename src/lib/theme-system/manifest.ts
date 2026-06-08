@@ -150,7 +150,7 @@ export interface GalleryContent {
 export interface StatementContent { eyebrow?: string; quote: string; cite?: string }
 export interface ComposableContent {
   nama: string
-  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; image?: string }
+  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; ctaText2?: string; ctaHref2?: string; image?: string }
   // Heading section "keunggulan" dari konten (bukan hardcode generik). Opsional →
   // fallback non-generik di FeatHeading.
   featuresEyebrow?: string
@@ -340,7 +340,7 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   // FINE DINING / RESTO KELUARGA
   'finedining-aurum': {
     id: 'finedining-aurum', label: 'Fine Dining Aurum', basePackId: 'finedining-aurum',
-    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', statement: true, stats: true, testimoni: 'spotlight', info: true, faq: true },
+    blocks: { hero: 'fullbleed', features: 'rows', showcase: 'menu-board', statement: true, stats: true, testimoni: 'spotlight', gallery: 'masonry', info: true, faq: true },
   },
   'finedining-hearth': {
     id: 'finedining-hearth', label: 'Fine Dining Hearth', basePackId: 'finedining-hearth',
