@@ -28,3 +28,54 @@ describe('generateContent — imagery enrichment (anti-slop dummy)', () => {
     expect(plan.dataKonten.foto_hero).toBeUndefined()
   })
 })
+
+// Fine Dining → renderer bespoke restaurant-lux (upgrade dari composable finedining).
+// Pilihan Fine Dining di briefing harus menghasilkan theme='restaurant-lux' + palet.
+describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)', () => {
+  const luxOrder = (variant: string) => ({
+    industri: 'Restaurant',
+    nama_usaha: 'Resto Uji',
+    briefing_data: {
+      industri_tipe: 'restaurant',
+      branding: { sub_kategori: 'finedining', variant, primary_color: '#1f7a3d' },
+    },
+  })
+
+  it('finedining-aurum → theme restaurant-lux, variant aurum, aksen brand', () => {
+    const plan = generateContent(luxOrder('finedining-aurum'))
+    expect(plan.theme).toBe('restaurant-lux')
+    expect(plan.variant).toBe('aurum')
+    expect(plan.primary).toBe('#1f7a3d')
+  })
+
+  it('finedining-hearth → variant hearth; finedining-nordic → noir (palet gelap terdekat)', () => {
+    expect(generateContent(luxOrder('finedining-hearth')).variant).toBe('hearth')
+    expect(generateContent(luxOrder('finedining-nordic')).variant).toBe('noir')
+  })
+
+  it('sub_kategori finedining tanpa variant cocok → default aurum', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      briefing_data: { industri_tipe: 'restaurant', branding: { sub_kategori: 'finedining' } },
+    })
+    expect(plan.theme).toBe('restaurant-lux')
+    expect(plan.variant).toBe('aurum')
+  })
+
+  it('imagery enrichment aktif: menuItems punya foto + foto_hero terisi', () => {
+    const plan = generateContent(luxOrder('finedining-aurum'))
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.menuItems.length).toBeGreaterThan(0)
+    expect(plan.menuItems.every((m) => typeof m.gambar === 'string' && m.gambar!.length > 0)).toBe(true)
+  })
+
+  it('restaurant non-finedining (warung) tetap jalur lama, BUKAN restaurant-lux', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Warung Uji',
+      briefing_data: { industri_tipe: 'restaurant', branding: { sub_kategori: 'warung', variant: 'warung-rakyat' } },
+    })
+    expect(plan.theme).not.toBe('restaurant-lux')
+  })
+})
