@@ -26,12 +26,32 @@ export function generateContent(order: OrderLike): BuildPlan {
   const b = normalizeBriefing(order)
   const out = runTemplate(b)
 
-  const variant = b.variant || defaultVariant(b.tipe)
+  // Fine Dining premium → renderer bespoke RestaurantLuxRenderer (theme
+  // 'restaurant-lux'). Upgrade dari finedining composable: pilihan Fine Dining di
+  // briefing kini membangun situs bespoke. Palet diturunkan dari gaya terpilih
+  // (default 'aurum'); 'nordic' (terang) dipetakan ke 'noir' karena renderer
+  // bespoke bergaya gelap-mewah, tak punya palet terang.
+  const LUX_PALETTE: Record<string, 'aurum' | 'noir' | 'hearth'> = {
+    'finedining-aurum': 'aurum',
+    'finedining-hearth': 'hearth',
+    'finedining-nordic': 'noir',
+  }
+  const isLux =
+    b.tipe === 'restaurant' &&
+    (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-'))
+
+  const variant = isLux
+    ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
+    : b.variant || defaultVariant(b.tipe)
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
-  // Selain itu jalur lama (theme per industri). Dormant sampai sub-kategori ready.
-  const manifest = getManifest(variant)
-  const theme = manifest ? 'composable' : industryToTheme(b.tipe)
+  // Fine Dining → 'restaurant-lux'. Selain itu jalur lama (theme per industri).
+  const manifest = isLux ? null : getManifest(variant)
+  const theme = isLux
+    ? 'restaurant-lux'
+    : manifest
+      ? 'composable'
+      : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
 
@@ -40,7 +60,14 @@ export function generateContent(order: OrderLike): BuildPlan {
   // (per sub-kategori) HANYA utk tema composable — di situ sub-kat pasti cocok,
   // jadi fotonya relevan (tema lama/generik dilewati supaya tak salah industri).
   // Hanya mengisi yang masih kosong; saat klien upload foto via portal, ditimpa.
-  const sample = manifest && variant ? sampleContentForTheme(variant) : null
+  // Imagery enrichment: composable pakai sample per manifest; Fine Dining bespoke
+  // pinjam sample 'finedining' (foto hidangan terkurasi) supaya signature dishes &
+  // hero tak kosong pada auto-build dummy.
+  const sample = isLux
+    ? sampleContentForTheme('finedining')
+    : manifest && variant
+      ? sampleContentForTheme(variant)
+      : null
   const showcaseImgs = (sample?.showcase?.items ?? [])
     .map((it) => it.gambar)
     .filter((g): g is string => !!g)
