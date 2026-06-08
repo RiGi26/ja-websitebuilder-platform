@@ -13,9 +13,18 @@ import { it } from 'vitest'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { renderToStaticMarkup } from 'react-dom/server'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
+import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
 import { MANIFESTS } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
+
+// Renderer bespoke premium (Opsi A). id sintetik → render renderer khusus dgn
+// sample-content kaya. `restaurant-lux-brand` mendemokan aksen ikut warna brand.
+const LUX: Record<string, { sample: string; variant?: string; primary?: string; label: string }> = {
+  'restaurant-lux': { sample: 'finedining-aurum', variant: 'aurum', label: 'Restaurant Lux — Aurum' },
+  'restaurant-lux-noir': { sample: 'finedining-aurum', variant: 'noir', label: 'Restaurant Lux — Noir' },
+  'restaurant-lux-brand': { sample: 'finedining-aurum', variant: 'aurum', primary: '#7FA06B', label: 'Restaurant Lux — aksen brand (hijau)' },
+}
 
 const GEN = process.env.GEN_SAMPLES
 
@@ -49,6 +58,16 @@ it.skipIf(!GEN)('generate theme sample HTML', () => {
     cards.push(
       `<a class="card" href="${t.id}.html"><span class="sw" style="background:${t.mood}"></span><b>${t.nama}</b><small>${t.subKategori} · ${t.id}</small><p>${t.deskripsi}</p></a>`,
     )
+  }
+
+  // ── Bespoke premium renderers (Opsi A) ──
+  const luxIds = GEN === 'all' || GEN === '1' ? Object.keys(LUX) : (GEN ?? '').split(',').map((s) => s.trim())
+  for (const id of luxIds) {
+    const cfg = LUX[id]
+    if (!cfg) continue
+    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={sampleContentForTheme(cfg.sample)} variant={cfg.variant} primary={cfg.primary} />)
+    writeFileSync(`${dir}/${id}.html`, pageDoc(cfg.label, html))
+    cards.push(`<a class="card" href="${id}.html"><span class="sw" style="background:#C9A24B"></span><b>${cfg.label}</b><small>bespoke · ${id}</small><p>Renderer premium Opsi A.</p></a>`)
   }
 
   const index = pageDoc(
