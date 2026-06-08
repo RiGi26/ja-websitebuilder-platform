@@ -638,6 +638,15 @@ const FINEDINING: ComposableContent = {
     { quote: 'Saya jamu klien dari Jepang di sini. Mereka terkesan — ini wajah Indonesia yang ingin saya tunjukkan.', nama: 'Surya Pratama', peran: 'Direktur' },
     { quote: 'Bebek betutunya butuh enam jam dan rasanya terbukti. Terbaik yang saya cicipi di luar Bali.', nama: 'Maria Hutapea', peran: 'Penulis kuliner' },
   ],
+  teamEyebrow: 'Di Balik Dapur',
+  teamTitle: 'Tim yang Menyiapkan Malam Anda',
+  team: [
+    { nama: 'Chef Anindya Larasati', peran: 'Kepala Dapur', bio: 'Dua puluh tahun memasak lintas Nusantara — dari dapur warisan keluarga di Padang sampai restoran di Ubud. Ia memimpin tiap layanan langsung dari pass, mengawal setiap piring yang keluar.' },
+    { nama: 'Bagas Wirawan', peran: 'Sous Chef', bio: 'Tangan kanan Chef Anindya, ahli bakaran arang dan ungkep panjang.' },
+    { nama: 'Sekar Ayu', peran: 'Pastry Chef', bio: 'Memperbarui pencuci mulut klasik Nusantara dengan presisi modern.' },
+    { nama: 'Rama Dwiputra', peran: 'Sommelier', bio: 'Memasangkan rempah Nusantara dengan lebih dari 200 label dunia.' },
+    { nama: 'Maitri Hapsari', peran: 'Manajer Restoran', bio: 'Memastikan tiap tamu disambut dan diingat seperti keluarga.' },
+  ],
   gallery: {
     title: 'Suasana & Sajian',
     subtitle: 'Ruang yang dibuat untuk perayaan, hidangan yang dibuat untuk dikenang.',

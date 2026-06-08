@@ -109,12 +109,14 @@ export default function ComposableRenderer({
         <PartnersGrid partners={content.partners} />
       )}
 
-      {/* Team/People — Trust layer (Sprint A) */}
-      {B.team && content.team && content.team.length > 0 && (
-        B.team === 'spotlight' ? <TeamSpotlight team={content.team} /> :
-        B.team === 'horizontal' ? <TeamHorizontal team={content.team} /> :
-        <TeamGrid team={content.team} />
-      )}
+      {/* Team/People — human-centric "Di Balik Dapur" (heading dari konten) */}
+      <div id="tim" aria-hidden />
+      {B.team && content.team && content.team.length > 0 && (() => {
+        const heading = { eyebrow: content.teamEyebrow, title: content.teamTitle }
+        return B.team === 'spotlight' ? <TeamSpotlight team={content.team} heading={heading} /> :
+          B.team === 'horizontal' ? <TeamHorizontal team={content.team} heading={heading} /> :
+          <TeamGrid team={content.team} heading={heading} />
+      })()}
 
       {B.testimoni && content.testimonials && content.testimonials.length > 0 && (
         B.testimoni === 'spotlight' ? (
