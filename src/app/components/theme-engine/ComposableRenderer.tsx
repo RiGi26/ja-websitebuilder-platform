@@ -27,6 +27,7 @@ import {
   ProcessHorizontal, ProcessTimeline, ProcessCards,
   CTABanner, CTASplit,
   PartnersGrid, PartnersMarquee, SocialStrip,
+  StatementBand,
 } from './blocks'
 
 export default function ComposableRenderer({
@@ -44,7 +45,7 @@ export default function ComposableRenderer({
   const motifColor = pack.color.primary
 
   return (
-    <div className="ce-root" style={vars} data-theme={manifest.id}>
+    <div className="ce-root" style={vars} data-theme={manifest.id} data-mood={pack.mood}>
       <style dangerouslySetInnerHTML={{ __html: ENGINE_CSS }} />
 
       <Nav content={content} />
@@ -58,11 +59,17 @@ export default function ComposableRenderer({
         <HeroCentered hero={content.hero} motif={motif} motifColor={motifColor} />
       )}
 
-      {/* Features (keunggulan / "Mengapa Kami") — varian dari manifest */}
-      {content.features && content.features.length > 0 && (
-        B.features === 'rows' ? <FeaturesRows features={content.features} /> :
-        B.features === 'zigzag' ? <FeaturesZigzag features={content.features} /> :
-        <FeaturesGrid features={content.features} />
+      {/* Features (keunggulan) — varian + heading dari konten (bukan generik) */}
+      {content.features && content.features.length > 0 && (() => {
+        const heading = { eyebrow: content.featuresEyebrow, title: content.featuresTitle, subtitle: content.featuresSubtitle }
+        return B.features === 'rows' ? <FeaturesRows features={content.features} heading={heading} /> :
+          B.features === 'zigzag' ? <FeaturesZigzag features={content.features} heading={heading} /> :
+          <FeaturesGrid features={content.features} heading={heading} />
+      })()}
+
+      {/* Signature statement band (craft) — 1 beat editorial, setelah features */}
+      {B.statement && content.statement && (
+        <StatementBand statement={content.statement} />
       )}
 
       {/* Showcase produk/menu — varian dari manifest. Varian khas-industri

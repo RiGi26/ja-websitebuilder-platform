@@ -255,5 +255,12 @@ export function packToCssVars(p: TokenPack): Record<string, string> {
     '--s-sm': p.shadow.sm,
     '--s-md': p.shadow.md,
     '--s-lg': p.shadow.lg,
+    // ── Craft vars (Sprint craft) — turunkan layout archetype ke CSS supaya blok
+    // composable sadar-mood: align heading & ritme whitespace ikut pack, bukan
+    // hardcode tengah. design-rules: luxury/minimal → left+airy; clean/warm → center.
+    '--sec-align': p.layout.align === 'left' ? 'left' : 'center',
+    '--sec-items': p.layout.align === 'left' ? 'flex-start' : 'center',
+    '--sec-pad-y': p.layout.pad === 'airy' ? '120px' : '84px',
+    '--head-mb': p.layout.pad === 'airy' ? '64px' : '44px',
   }
 }
