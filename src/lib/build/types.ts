@@ -93,6 +93,7 @@ export interface BuildPlan {
   primary?: string
   designTokens: DesignTokens
   features: FeatureFlags
+  capabilities: string[]
   dataKonten: Record<string, unknown>
   sections: BuildSection[]
   services: BuildRowService[]

@@ -3,7 +3,7 @@ import type { FeatureFlags } from '@/types/websitebuilder'
 import { addonsToFeatures } from '../websitebuilder-mapping'
 import {
   ADDON_CATALOG, FLAG_ALIASES, explicitFeatures,
-  orderAddons, upgradeAddons, aliasToId, isOffered,
+  orderAddons, upgradeAddons, aliasToId, isOffered, capabilitiesForAddons,
 } from './catalog'
 
 // ============================================================
@@ -212,5 +212,31 @@ describe('A1 — alias terkoreksi (fix mapping korup Temuan B)', () => {
     expect(blog).toBeDefined()
     expect(blog?.features).toContain('hasBlog')
     expect(addonsToFeatures(['blog'])).toEqual({ hasBlog: true })
+  })
+})
+
+describe('B-cap — capabilitiesForAddons (add-on → capability renderer)', () => {
+  it('memetakan id → capability dari katalog', () => {
+    expect(capabilitiesForAddons(['booking'])).toEqual(expect.arrayContaining(['booking', 'booking-page']))
+    expect(capabilitiesForAddons(['delivery'])).toEqual(['delivery-buttons'])
+    expect(capabilitiesForAddons(['qr-menu'])).toEqual(['qr-menu'])
+    expect(capabilitiesForAddons(['shop'])).toEqual(expect.arrayContaining(['cart', 'checkout-page']))
+  })
+
+  it('dedupe capability dari banyak add-on', () => {
+    // booking + telemedicine → 'video-meeting' tak dobel, 'booking' tetap ada
+    const caps = capabilitiesForAddons(['booking', 'telemedicine', 'live-session'])
+    expect(caps.filter((c) => c === 'video-meeting')).toHaveLength(1)
+    expect(caps).toContain('booking')
+  })
+
+  it('resolve alias (clinic-res → booking)', () => {
+    expect(capabilitiesForAddons(['clinic-res'])).toEqual(expect.arrayContaining(['booking']))
+  })
+
+  it('id tak dikenal / kosong → []', () => {
+    expect(capabilitiesForAddons(['id-ngawur'])).toEqual([])
+    expect(capabilitiesForAddons([])).toEqual([])
+    expect(capabilitiesForAddons(null)).toEqual([])
   })
 })

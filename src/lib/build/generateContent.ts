@@ -9,6 +9,7 @@ import { normalizeBriefing } from './briefing'
 import { runTemplate } from './templates'
 import { deriveDesignTokens, defaultVariant } from './designTokens'
 import { industryToTheme, addonsToFeatures } from '@/lib/websitebuilder-mapping'
+import { capabilitiesForAddons } from '@/lib/addons/catalog'
 import { getManifest } from '@/lib/theme-system/manifest'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
 
@@ -54,6 +55,7 @@ export function generateContent(order: OrderLike): BuildPlan {
       : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
+  const capabilities = capabilitiesForAddons(order.selected_addons)
 
   // Imagery enrichment (anti-slop): dummy auto-build tak punya foto → semua jatuh
   // ke placeholder gradient. Pinjam foto Unsplash terkurasi dari sample-content
@@ -101,6 +103,7 @@ export function generateContent(order: OrderLike): BuildPlan {
     primary: b.primary,
     designTokens,
     features,
+    capabilities,
     dataKonten,
     sections: out.sections,
     services,

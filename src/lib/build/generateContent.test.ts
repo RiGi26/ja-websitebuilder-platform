@@ -79,3 +79,24 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
     expect(plan.theme).not.toBe('restaurant-lux')
   })
 })
+
+describe('generateContent — capabilities (B-cap)', () => {
+  it('selected_addons → plan.capabilities', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      selected_addons: ['booking', 'delivery', 'qr-menu'],
+      briefing_data: { industri_tipe: 'restaurant' },
+    })
+    expect(plan.capabilities).toEqual(expect.arrayContaining(['booking', 'delivery-buttons', 'qr-menu']))
+  })
+
+  it('tanpa add-on → capabilities []', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      briefing_data: { industri_tipe: 'restaurant' },
+    })
+    expect(plan.capabilities).toEqual([])
+  })
+})

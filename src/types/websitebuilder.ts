@@ -78,6 +78,10 @@ export interface KonfigurasiWebsite {
   features?: FeatureFlags
   branding?: BrandingConfig
   addons?: AddonsConfig
+  // B-cap: capability add-on (mis. 'booking', 'delivery-buttons', 'qr-menu') —
+  // diturunkan dari selected_addons via catalog.capabilitiesForAddons, dibaca
+  // renderer untuk render UI kondisional. Beda dari `features` (flag boolean lama).
+  capabilities?: string[]
 }
 
 export type TipeKomponen =

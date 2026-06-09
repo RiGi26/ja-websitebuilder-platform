@@ -46,6 +46,8 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
   const konfigurasi: KonfigurasiWebsite = {
     ...currentKonfigurasi,
     features: { ...(currentKonfigurasi.features ?? {}), ...plan.features },
+    // B-cap: capabilities = turunan dari order (rebuild regenerasi penuh).
+    capabilities: plan.capabilities,
     branding: {
       ...(currentKonfigurasi.branding ?? {}),
       theme: plan.theme,

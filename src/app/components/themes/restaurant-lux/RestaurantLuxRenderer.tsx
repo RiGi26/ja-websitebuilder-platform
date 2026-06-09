@@ -154,6 +154,8 @@ function rlCss(): string {
 .rl-menu-row .rl-ds{font-size:13px;color:var(--rl-muted);margin-top:2px;line-height:1.5}
 .rl-menu-row .rl-pr{font-family:${SERIF};font-size:19px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);white-space:nowrap}
 .rl-root [id^="menu-"]{scroll-margin-top:96px}
+.rl-qr-note{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-size:13px;letter-spacing:.02em;color:var(--rl-muted);border:1px solid var(--rl-line);padding:9px 16px;border-radius:999px}
+.rl-qr-note svg{color:var(--rl-accent);flex-shrink:0}
 @media(max-width:780px){.rl-menu-grid{grid-template-columns:1fr;gap:44px}}
 /* about/story */
 .rl-story .rl-wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:clamp(28px,5vw,64px);align-items:start}
@@ -238,10 +240,16 @@ const CHEV = (
 const WA_ICON = (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.207zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" /></svg>
 )
+const TRUCK = (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 18V6a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2" /><path d="M14 9h4l3 3v5a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></svg>
+)
+const QR_ICON = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3M21 21v.01M21 17v.01M17 21v.01" /></svg>
+)
 
 export default function RestaurantLuxRenderer({
-  content, variant, primary, slug,
-}: { content: ComposableContent; variant?: string; primary?: string; slug?: string }) {
+  content, variant, primary, slug, capabilities,
+}: { content: ComposableContent; variant?: string; primary?: string; slug?: string; capabilities?: string[] }) {
   const pal = getPal(variant)
   const accent = (primary && primary.trim()) || pal.accent
   const rootStyle = {
@@ -257,8 +265,18 @@ export default function RestaurantLuxRenderer({
   const showTabs = groups.filter((g) => g.kategori).length > 1
   const wa = content.contact?.wa
   const waLink = wa ? `https://wa.me/${wa.replace(/[^\d]/g, '')}` : undefined
-  const resHref = content.info?.reservasiHref || waLink || '#kunjungi'
-  const resText = content.info?.reservasiText || 'Reservasi'
+
+  // B-cap: add-on capability (dari konfigurasi.capabilities) → UI kondisional.
+  //  - booking → reservasi diarahkan ke sistem booking nyata (/{slug}/booking)
+  //  - delivery-buttons → tombol "Pesan Antar"
+  //  - qr-menu → catatan menu digital QR di bawah judul menu
+  const caps = new Set(capabilities ?? [])
+  const bookingHref = caps.has('booking') && slug ? `/${slug}/booking` : undefined
+  const hasDelivery = caps.has('delivery-buttons')
+  const hasQrMenu = caps.has('qr-menu')
+  const resHref = bookingHref || content.info?.reservasiHref || waLink || '#kunjungi'
+  const resText = content.info?.reservasiText || (bookingHref ? 'Reservasi Meja' : 'Reservasi')
+  const deliveryHref = waLink || '#kunjungi'
   const gallery = content.gallery?.images ?? []
   const [chef, ...restTeam] = content.team ?? []
   const testi = content.testimonials?.[0]
@@ -305,6 +323,7 @@ export default function RestaurantLuxRenderer({
             <div className="rl-hero-actions">
               {content.hero.ctaText && <a className="rl-btn rl-btn-gold" href={content.hero.ctaHref ?? resHref}>{content.hero.ctaText}</a>}
               <a className="rl-btn rl-btn-ghost" href={content.hero.ctaHref2 ?? '#menu'}>{content.hero.ctaText2 ?? 'Lihat Menu'}</a>
+              {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref}>{TRUCK}Pesan Antar</a>}
             </div>
           </div>
         </div>
@@ -358,6 +377,7 @@ export default function RestaurantLuxRenderer({
               <span className="rl-eyebrow">Menu</span>
               <h2>{content.showcase?.title ?? 'Daftar Pilihan'}</h2>
               {content.showcase?.subtitle && <p>{content.showcase.subtitle}</p>}
+              {hasQrMenu && <p className="rl-qr-note">{QR_ICON} Pindai QR di meja untuk akses menu digital.</p>}
             </div>
             {showTabs && (
               <div className="rl-menu-tabs">
@@ -502,6 +522,7 @@ export default function RestaurantLuxRenderer({
               </div>
               <div className="rl-cta">
                 <a className="rl-btn rl-btn-gold" href={resHref}>{resText}</a>
+                {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref}>{TRUCK}Pesan Antar</a>}
               </div>
             </div>
             <div className="rl-map">
