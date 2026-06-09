@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Check, Image as ImageIcon, ChevronDown, ChevronRight } from 'lucide-react'
+import { Loader2, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import ImageUploadField from './ImageUploadField'
 
 export type EditableSection = {
   id: string
@@ -125,22 +126,7 @@ export default function ContentPanel({ initial }: { initial: EditableSection[] }
   // Render satu field string (input / textarea / gambar).
   const renderStringField = (sectionId: string, key: string, value: string, onChange: (v: string) => void) => {
     if (isImageKey(key)) {
-      return (
-        <div key={key}>
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{fieldLabel(key)}</label>
-          <div className="flex gap-2 items-start mt-1">
-            <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="https://…" className={inp} />
-            {value ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={value} alt="" className="w-12 h-12 rounded-lg object-cover border border-black/10 shrink-0" />
-            ) : (
-              <div className="w-12 h-12 rounded-lg border border-dashed border-black/15 flex items-center justify-center text-gray-300 shrink-0">
-                <ImageIcon size={16} />
-              </div>
-            )}
-          </div>
-        </div>
-      )
+      return <ImageUploadField key={key} label={fieldLabel(key)} value={value} onChange={onChange} />
     }
     return (
       <div key={key}>
