@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
+import ImageUploadField from './ImageUploadField'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -262,7 +263,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               <input value={add.nama} onChange={(e) => setAdd({ ...add, nama: e.target.value })} placeholder="Nama produk *" className={`${inp} sm:col-span-2`} />
               <input value={add.harga} onChange={(e) => setAdd({ ...add, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
               <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori" className={inp} />
-              <input value={add.gambar_url} onChange={(e) => setAdd({ ...add, gambar_url: e.target.value })} placeholder="URL gambar (opsional)" className={`${inp} sm:col-span-3`} />
+              <div className="sm:col-span-4"><ImageUploadField compact value={add.gambar_url} onChange={(url) => setAdd({ ...add, gambar_url: url })} /></div>
               <button disabled={busy === 'add'} onClick={create} className="flex items-center justify-center gap-1 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
                 {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah
               </button>
@@ -280,7 +281,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                         <input value={draft.nama} onChange={(e) => setDraft({ ...draft, nama: e.target.value })} placeholder="Nama *" className={`${inp} sm:col-span-2`} />
                         <input value={draft.harga} onChange={(e) => setDraft({ ...draft, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
                         <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
-                        <input value={draft.gambar_url} onChange={(e) => setDraft({ ...draft, gambar_url: e.target.value })} placeholder="URL gambar" className={`${inp} sm:col-span-3`} />
+                        <div className="sm:col-span-4"><ImageUploadField compact value={draft.gambar_url} onChange={(url) => setDraft({ ...draft, gambar_url: url })} /></div>
                         <input value={draft.stok} onChange={(e) => setDraft({ ...draft, stok: e.target.value })} placeholder="Stok" inputMode="numeric" className={inp} />
                         <textarea value={draft.deskripsi} onChange={(e) => setDraft({ ...draft, deskripsi: e.target.value })} placeholder="Deskripsi" rows={2} className={`${inp} sm:col-span-4`} />
                       </div>
@@ -637,7 +638,7 @@ function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tena
         <input value={add.dp_amount} onChange={(e) => setAdd({ ...add, dp_amount: e.target.value })} placeholder="DP/booking fee (0=tanpa)" inputMode="numeric" className={inp} />
         <input value={add.durasi_menit} onChange={(e) => setAdd({ ...add, durasi_menit: e.target.value })} placeholder="Durasi (menit)" inputMode="numeric" className={inp} />
         <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori" className={inp} />
-        <input value={add.gambar_url} onChange={(e) => setAdd({ ...add, gambar_url: e.target.value })} placeholder="URL gambar (opsional)" className={`${inp} sm:col-span-2`} />
+        <div className="sm:col-span-4"><ImageUploadField compact value={add.gambar_url} onChange={(url) => setAdd({ ...add, gambar_url: url })} /></div>
       </div>
       <div className="flex justify-end mb-6">
         <button disabled={busy === 'add'} onClick={create} className="flex items-center justify-center gap-1 px-5 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
@@ -660,7 +661,7 @@ function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tena
                   <input value={draft.dp_amount} onChange={(e) => setDraft({ ...draft, dp_amount: e.target.value })} placeholder="DP" inputMode="numeric" className={inp} />
                   <input value={draft.durasi_menit} onChange={(e) => setDraft({ ...draft, durasi_menit: e.target.value })} placeholder="Durasi (menit)" inputMode="numeric" className={inp} />
                   <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
-                  <input value={draft.gambar_url} onChange={(e) => setDraft({ ...draft, gambar_url: e.target.value })} placeholder="URL gambar" className={`${inp} sm:col-span-2`} />
+                  <div className="sm:col-span-4"><ImageUploadField compact value={draft.gambar_url} onChange={(url) => setDraft({ ...draft, gambar_url: url })} /></div>
                   <textarea value={draft.deskripsi} onChange={(e) => setDraft({ ...draft, deskripsi: e.target.value })} placeholder="Deskripsi" rows={2} className={`${inp} sm:col-span-4`} />
                 </div>
                 <div className="flex gap-2 justify-end">
@@ -885,7 +886,7 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
         <input value={add.nama} onChange={(e) => setAdd({ ...add, nama: e.target.value })} placeholder="Nama menu *" className={`${inp} sm:col-span-2`} />
         <input value={add.harga} onChange={(e) => setAdd({ ...add, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
         <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori (mis. Pembuka)" className={inp} />
-        <input value={add.gambar_url} onChange={(e) => setAdd({ ...add, gambar_url: e.target.value })} placeholder="URL gambar (opsional)" className={`${inp} sm:col-span-2`} />
+        <div className="sm:col-span-4"><ImageUploadField compact value={add.gambar_url} onChange={(url) => setAdd({ ...add, gambar_url: url })} /></div>
         <input value={add.deskripsi} onChange={(e) => setAdd({ ...add, deskripsi: e.target.value })} placeholder="Deskripsi (opsional)" className={`${inp} sm:col-span-2`} />
       </div>
       <div className="flex justify-end mb-6">
@@ -906,7 +907,7 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                   <input value={draft.nama} onChange={(e) => setDraft({ ...draft, nama: e.target.value })} placeholder="Nama *" className={`${inp} sm:col-span-2`} />
                   <input value={draft.harga} onChange={(e) => setDraft({ ...draft, harga: e.target.value })} placeholder="Harga" inputMode="numeric" className={inp} />
                   <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
-                  <input value={draft.gambar_url} onChange={(e) => setDraft({ ...draft, gambar_url: e.target.value })} placeholder="URL gambar" className={`${inp} sm:col-span-2`} />
+                  <div className="sm:col-span-4"><ImageUploadField compact value={draft.gambar_url} onChange={(url) => setDraft({ ...draft, gambar_url: url })} /></div>
                   <input value={draft.deskripsi} onChange={(e) => setDraft({ ...draft, deskripsi: e.target.value })} placeholder="Deskripsi" className={`${inp} sm:col-span-2`} />
                 </div>
                 <div className="flex gap-2 justify-end">
@@ -1017,7 +1018,7 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
         <input value={add.ringkasan} onChange={(e) => setAdd({ ...add, ringkasan: e.target.value })} placeholder="Ringkasan singkat" className={inp} />
         <textarea value={add.konten} onChange={(e) => setAdd({ ...add, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <input value={add.cover_url} onChange={(e) => setAdd({ ...add, cover_url: e.target.value })} placeholder="URL cover (opsional)" className={inp} />
+          <ImageUploadField compact value={add.cover_url} onChange={(url) => setAdd({ ...add, cover_url: url })} />
           <input value={add.penulis} onChange={(e) => setAdd({ ...add, penulis: e.target.value })} placeholder="Penulis (opsional)" className={inp} />
         </div>
       </div>
@@ -1037,7 +1038,7 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                 <input value={draft.ringkasan} onChange={(e) => setDraft({ ...draft, ringkasan: e.target.value })} placeholder="Ringkasan" className={inp} />
                 <textarea value={draft.konten} onChange={(e) => setDraft({ ...draft, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input value={draft.cover_url} onChange={(e) => setDraft({ ...draft, cover_url: e.target.value })} placeholder="URL cover" className={inp} />
+                  <ImageUploadField compact value={draft.cover_url} onChange={(url) => setDraft({ ...draft, cover_url: url })} />
                   <input value={draft.penulis} onChange={(e) => setDraft({ ...draft, penulis: e.target.value })} placeholder="Penulis" className={inp} />
                 </div>
                 <div className="flex gap-2 justify-end">
@@ -1108,7 +1109,7 @@ function GalleryPanel({ page, tenantId, initial }: { page: PageInfo | null; tena
         <span className="text-xs text-gray-400 font-medium">{items.length} foto</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
-        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL gambar *" className={`${inp} sm:col-span-2`} />
+        <div className="sm:col-span-2"><ImageUploadField compact value={url} onChange={setUrl} /></div>
         <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption (opsional)" className={inp} />
         <button disabled={busy === 'add'} onClick={add} className="sm:col-span-3 flex items-center justify-center gap-1 py-2.5 bg-apple-blue text-white rounded-lg text-[11px] font-bold uppercase hover:bg-blue-600 disabled:opacity-50">
           {busy === 'add' ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Tambah Foto
