@@ -249,6 +249,17 @@ export const ADDON_CATALOG: AddonDef[] = [
     note: 'hasNewsletter NOL pembaca (Temuan A). JANGAN aliaskan corp blog/email-auto ke sini (mapping korup, Temuan B).',
   },
   {
+    // BARU (A1): blog hilang dari katalog order lama; corp `blog` salah dipetakan
+    // ke newsletter (Temuan B). Kini SKU kanonik sendiri → hasBlog. id 'blog'
+    // langsung cocok dgn corp id 'blog' (tak perlu alias).
+    id: 'blog', name: 'Blog / Artikel', price: 200000, yearlyMaint: 100000,
+    desc: 'Halaman artikel/berita dengan manajemen konten.',
+    klass: 'structural', status: 'backend', industries: ['blog', 'corporate', 'personal', 'sekolah'],
+    features: ['hasBlog'], capability: ['blog'],
+    sections: [{ tipe: 'blog_list', anchor: 'after-showcase' }],
+    note: 'hasBlog dibaca portal tab; section blog_list dirender SiteRenderer bila ada. Injeksi section = Sprint B.',
+  },
+  {
     id: 'chat', name: 'Live Chat Support', price: 100000, yearlyMaint: 50000,
     desc: 'Chat langsung di website (Tawk.to).',
     klass: 'capability', status: 'live', features: ['hasLiveChat'], capability: ['live-chat'],
@@ -282,4 +293,75 @@ export function getAddon(id: string): AddonDef | undefined {
  *  ADDON_FLAG_MAP lama (dijaga test parity). */
 export function explicitFeatures(id: string): (keyof FeatureFlags)[] | undefined {
   return BY_ID[id]?.features ?? FLAG_ALIASES[id]
+}
+
+// ── A1: dual-tier harga + visibilitas triage + alias terkoreksi ─────────────
+
+// Harga tier UPGRADE (marketplace) bila beda dari harga order baru.
+// Keputusan user 2026-06-09: dua-tier EKSPLISIT (nol perubahan harga ke customer,
+// cuma dijadikan eksplisit di SSOT). id → [price, yearlyMaint].
+const UPGRADE_PRICE: Record<string, [number, number]> = {
+  shop: [299000, 199000],
+  admin: [199000, 99000],
+  midtrans: [299000, 99000],
+  wa: [199000, 99000],
+  seo: [149000, 49000],
+  booking: [249000, 99000],
+  chat: [99000, 49000],
+  blog: [99000, 50000],
+}
+
+// SKU yang TIDAK ditawarkan saat ini — triage A3 disetujui user 2026-06-09:
+//  - DROP snake-oil: protection, email-biz, client-portal
+//  - HIDE heavy-unbuilt: lms, membership, cert-auto, lang-multi
+// 4 SKU "wire" (delivery/newsletter/career/ads-tracking) TETAP ditawarkan
+// (kapabilitasnya digarap Sprint B).
+const NOT_OFFERED = new Set<string>([
+  'protection', 'email-biz', 'client-portal',
+  'lms', 'membership', 'cert-auto', 'lang-multi',
+])
+
+export function isOffered(id: string): boolean {
+  return BY_ID[id] != null && !NOT_OFFERED.has(id)
+}
+
+// Bentuk ringkas yang dikonsumsi UI order/marketplace (gantikan const ADDONS lokal).
+export interface AddonOption {
+  id: string
+  name: string
+  price: number
+  yearlyMaint: number
+  desc: string
+}
+
+/** Add-on yang ditawarkan di form ORDER BARU (harga order). */
+export function orderAddons(): AddonOption[] {
+  return ADDON_CATALOG.filter((a) => isOffered(a.id)).map((a) => ({
+    id: a.id, name: a.name, price: a.price, yearlyMaint: a.yearlyMaint, desc: a.desc,
+  }))
+}
+
+/** Add-on yang ditawarkan di marketplace UPGRADE (harga upgrade bila ada). */
+export function upgradeAddons(): AddonOption[] {
+  return ADDON_CATALOG.filter((a) => isOffered(a.id)).map((a) => {
+    const up = UPGRADE_PRICE[a.id]
+    return {
+      id: a.id, name: a.name,
+      price: up ? up[0] : a.price,
+      yearlyMaint: up ? up[1] : a.yearlyMaint,
+      desc: a.desc,
+    }
+  })
+}
+
+/** Peta alias id (surface lain, mis. corp-landing) → id kanonik katalog.
+ *  Gantikan CORP_TO_ORDER_ID hardcode (yang punya mapping korup blog→newsletter,
+ *  track-pack→ads-tracking). Hanya alias yang BENAR secara semantik dihormati;
+ *  id korup tak lagi dipetakan (jatuh & tersaring, bukan salah-petakan). */
+export function aliasToId(): Record<string, string> {
+  const m: Record<string, string> = {}
+  for (const a of ADDON_CATALOG) {
+    for (const al of a.aliases ?? []) m[al] = a.id
+  }
+  return m
 }
