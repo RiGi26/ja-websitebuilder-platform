@@ -39,8 +39,8 @@ export async function POST(request: Request) {
 
     const year = new Date().getFullYear()
     const displayId = `JA-${year}-${order.id.slice(0, 8).toUpperCase()}`
-    const DP_THRESHOLD = 3_000_000
-    const isDP = total_estimasi > DP_THRESHOLD
+    const DP_THRESHOLD = 4_000_000
+    const isDP = total_estimasi >= DP_THRESHOLD
     const dpAmount = isDP ? Math.ceil(total_estimasi * 0.5) : total_estimasi
     const clientName = client_type === 'perusahaan' ? nama_perusahaan : nama_usaha
     const midtransOrderId = `${displayId}-DP`
