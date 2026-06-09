@@ -39,6 +39,7 @@ export default function ThankYouPage() {
   const [mounted, setMounted] = useState(false)
   const [countdown, setCountdown] = useState(REDIRECT_DELAY_SECONDS)
   const [autoRedirect, setAutoRedirect] = useState(true)
+  const [isPelunasan, setIsPelunasan] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -52,13 +53,22 @@ export default function ThankYouPage() {
 
     let resolvedOrderId: string | null = null
     let resolvedDisplayId: string | null = null
+    let resolvedIsPelunasan = false
 
     if (idFromUrl) {
       resolvedOrderId = idFromUrl
     } else if (midtransOrderId) {
-      const parts = midtransOrderId.replace(/-DP$/i, '').split('-')
-      resolvedOrderId = parts[2]?.toLowerCase() ?? null
-      resolvedDisplayId = midtransOrderId.replace(/-DP$/i, '')
+      // Cek apakah ini pembayaran pelunasan berdasarkan suffix -LUNAS atau param lain
+      if (midtransOrderId.toUpperCase().endsWith('-LUNAS')) {
+          resolvedIsPelunasan = true;
+          const parts = midtransOrderId.replace(/-LUNAS$/i, '').split('-')
+          resolvedOrderId = parts[2]?.toLowerCase() ?? null
+          resolvedDisplayId = midtransOrderId.replace(/-LUNAS$/i, '')
+      } else {
+          const parts = midtransOrderId.replace(/-DP$/i, '').split('-')
+          resolvedOrderId = parts[2]?.toLowerCase() ?? null
+          resolvedDisplayId = midtransOrderId.replace(/-DP$/i, '')
+      }
     }
 
     const pending = sessionStorage.getItem('ja_pending_order')
@@ -66,7 +76,12 @@ export default function ThankYouPage() {
       try {
         const parsed = JSON.parse(pending)
         resolvedDisplayId = resolvedDisplayId || parsed.display_id
-        setDpAmount(parsed.dp_amount)
+        setDpAmount(parsed.dp_amount || parsed.pelunasan_amount || parsed.amount) // Support different amount keys
+
+        // Check if it's pelunasan from session storage
+        if (parsed.is_pelunasan || (parsed.display_id && parsed.display_id.toUpperCase().includes('LUNAS'))) {
+            resolvedIsPelunasan = true;
+        }
 
         // Fallback: kalau URL tidak punya id (kasus GoPay mobile), pakai sessionStorage
         if (!resolvedOrderId && parsed.order_id) {
@@ -75,12 +90,13 @@ export default function ThankYouPage() {
 
         // Trigger payment confirm (backup to webhook)
         if (parsed.order_id && parsed.display_id) {
+          const suffix = resolvedIsPelunasan ? '-LUNAS' : '-DP';
           fetch('/api/payment/confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               order_id: parsed.order_id,
-              midtrans_order_id: `${parsed.display_id}-DP`,
+              midtrans_order_id: `${parsed.display_id}${suffix}`,
             }),
           }).catch(() => {})
         }
@@ -90,6 +106,7 @@ export default function ThankYouPage() {
 
     if (resolvedOrderId) setOrderId(resolvedOrderId)
     if (resolvedDisplayId) setDisplayId(resolvedDisplayId)
+    setIsPelunasan(resolvedIsPelunasan)
 
     setMounted(true)
   }, [])
@@ -130,7 +147,9 @@ export default function ThankYouPage() {
               </div>
               <div>
                 <p className="text-white font-black text-lg leading-tight">Pembayaran Berhasil!</p>
-                <p className="text-green-100 text-sm font-medium mt-0.5">DP project Anda telah kami terima.</p>
+                <p className="text-green-100 text-sm font-medium mt-0.5">
+                  {isPelunasan ? 'Pelunasan project Anda telah kami terima.' : 'DP project Anda telah kami terima.'}
+                </p>
               </div>
             </div>
 
@@ -144,7 +163,9 @@ export default function ThankYouPage() {
               </div>
               <div className="flex justify-between items-center py-3">
                 <span className="text-sm text-gray-500">Jenis Pembayaran</span>
-                <span className="text-sm font-bold text-[#1D1D1F]">DP 50%</span>
+                <span className="text-sm font-bold text-[#1D1D1F]">
+                  {isPelunasan ? 'Pelunasan (Lunas)' : 'DP 50%'}
+                </span>
               </div>
               {dpAmount && (
                 <div className="flex justify-between items-center py-3">
