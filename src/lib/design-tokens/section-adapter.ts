@@ -5,6 +5,7 @@
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
 import type { SiteContent } from '@/app/components/themes/universal/TokenDrivenRenderer'
+import { resolveWaHref } from '@/lib/wa'
 
 type Isi = Record<string, unknown>
 const str = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v : undefined)
@@ -24,12 +25,16 @@ export function sectionsToSiteContent(
   const featIsi = sections.find((s) => s.tipe_komponen === 'features')
   const ctaIsi = sections.find((s) => s.tipe_komponen === 'cta')
 
+  // WA terpusat: nomor tunggal dari profil (tab Profil) → semua link wa.me di
+  // hero/CTA dirender ulang dari sini (cta_link build-time bisa basi).
+  const contactWa = profile?.wa ?? str(konten.wa)
+
   const hero = {
     eyebrow: str(heroIsi.eyebrow) ?? str(konten.tagline),
     title: str(heroIsi.title) ?? str(heroIsi.judul) ?? nama,
     subtitle: str(heroIsi.subtitle) ?? str(heroIsi.subjudul) ?? str(konten.deskripsi),
     ctaText: str(heroIsi.cta_text),
-    ctaHref: str(heroIsi.cta_link),
+    ctaHref: resolveWaHref(str(heroIsi.cta_link), contactWa),
   }
 
   const features = featIsi
@@ -45,11 +50,11 @@ export function sectionsToSiteContent(
 
   const ctaI = ctaIsi?.isi_komponen as Isi | undefined
   const cta = ctaI
-    ? { title: str(ctaI.title) ?? 'Siap Memulai?', subtitle: str(ctaI.subtitle), ctaText: str(ctaI.cta_text), ctaHref: str(ctaI.cta_link) }
+    ? { title: str(ctaI.title) ?? 'Siap Memulai?', subtitle: str(ctaI.subtitle), ctaText: str(ctaI.cta_text), ctaHref: resolveWaHref(str(ctaI.cta_link), contactWa) }
     : undefined
 
   const contact = {
-    wa: profile?.wa ?? str(konten.wa),
+    wa: contactWa,
     email: profile?.email ?? undefined,
     alamat: profile?.alamat ?? undefined,
   }
