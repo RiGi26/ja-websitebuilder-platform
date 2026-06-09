@@ -6,11 +6,12 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
-  FileText, Image as ImageIcon, Store, LayoutTemplate,
+  FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor,
 } from 'lucide-react'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ImageUploadField from './ImageUploadField'
+import LivePreview from './LivePreview'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -81,6 +82,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
   const [editId, setEditId] = useState<string | null>(null)
   const [draft, setDraft] = useState<Draft>(EMPTY)
   const [busy, setBusy] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
 
   const logout = async () => {
     await supabase.auth.signOut()
@@ -164,6 +166,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <h1 className="text-lg font-bold text-gray-900">{namaTenant}</h1>
           </div>
           <div className="flex items-center gap-2">
+            {page && (
+              <button onClick={() => setShowPreview((v) => !v)} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border text-[11px] font-bold uppercase transition-colors ${showPreview ? 'border-apple-blue/40 text-apple-blue bg-blue-50/40' : 'border-black/10 text-gray-600 hover:border-apple-blue/30 hover:text-apple-blue'}`}>
+                <Monitor size={14} /> Preview
+              </button>
+            )}
             {page?.status === 'published' && page.slug && (
               <a href={`/${page.slug}`} target="_blank" className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-black/10 text-gray-600 text-[11px] font-bold uppercase hover:border-apple-blue/30 hover:text-apple-blue transition-colors">
                 <ExternalLink size={14} /> Lihat Website
@@ -183,6 +190,10 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           </div>
         ) : (
         <>
+          {showPreview && (
+            <LivePreview slug={page.slug} published={page.status === 'published'} onClose={() => setShowPreview(false)} />
+          )}
+
           {/* Tab nav */}
           <div className="flex flex-wrap gap-2 mb-6">
             {hasContent && (
