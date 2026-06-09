@@ -4,6 +4,7 @@
 // ============================================================
 
 import type { TipeIndustri, FeatureFlags } from '@/types/websitebuilder'
+import { explicitFeatures } from './addons/catalog'
 
 // ── industri (teks bebas dari corp-landing) -> TipeIndustri enum ──
 // Nilai aktual yang ada di orders: "Website Perusahaan", "Toko Online", "".
@@ -26,44 +27,12 @@ export function industriToTipe(industri: string | null | undefined): TipeIndustr
 }
 
 // ── selected_addons (id add-on) -> FeatureFlags ──
-// Peta ID add-on RESMI dari form /order (src/app/order/page.tsx, konstanta ADDONS).
-// Inilah sumber utama: nilai di orders.selected_addons berupa id seperti
-// 'shop', 'katalog-pro', 'booking', dst — bukan kata bebas. Heuristik substring
-// dipertahankan sebagai fallback untuk teks bebas (mis. dari referensi_manual)
-// & variasi penulisan. Admin tetap bisa override semua flag lewat toggle editor.
-const ADDON_FLAG_MAP: Record<string, (keyof FeatureFlags)[]> = {
-  'admin': ['hasAdmin'],
-  'client-portal': ['hasClientPortal'],
-  'shop': ['hasCart'],
-  'midtrans': ['hasPayment'],
-  'ongkir': ['hasCart', 'hasShipping'],
-  'katalog-pro': ['hasCart'],
-  'variant': ['hasCart'],
-  'qr-menu': ['hasMenu'],
-  'delivery': ['hasDelivery'],
-  'booking': ['hasBooking'],
-  'telemedicine': ['hasBooking'],
-  'membership': ['hasMembership'],
-  'lms': ['hasLMS'],
-  'cert-auto': ['hasLMS'],
-  'live-session': ['hasLMS', 'hasBooking'],
-  'email-biz': ['hasEmail'],
-  'lang-multi': ['hasMultiLang'],
-  'wa': ['hasWhatsApp'],
-  'seo': ['hasSEO'],
-  'ads-tracking': ['hasAnalytics'],
-  'protection': [], // proteksi gambar — tak ada flag tampilan
-  'career': ['hasCareer'],
-  'newsletter': ['hasNewsletter'],
-  'chat': ['hasLiveChat'],
-  // rental-specific add-ons (dari services.ts ADDON_GROUPS.travel)
-  'gps': ['hasTracking'],
-  'e-ticket': ['hasTracking'],
-  'driver-sched': ['hasBooking'],
-  'seat': ['hasBooking'],
-  'invoice-travel': [],
-}
-
+// Peta ID add-on resmi kini berasal dari SSOT `addons/catalog.ts`
+// (ADDON_CATALOG + FLAG_ALIASES) via explicitFeatures() — union-nya PERSIS
+// sama dengan ADDON_FLAG_MAP lama (dijaga test parity). Heuristik substring
+// di bawah dipertahankan sebagai fallback untuk teks bebas (mis. dari
+// referensi_manual) & variasi penulisan. Admin tetap bisa override semua
+// flag lewat toggle editor.
 export function addonsToFeatures(addons: string[] | null | undefined): FeatureFlags {
   const features: FeatureFlags = {}
   const set = (k: keyof FeatureFlags) => { features[k] = true }
@@ -72,8 +41,8 @@ export function addonsToFeatures(addons: string[] | null | undefined): FeatureFl
     const a = (raw ?? '').toLowerCase().trim()
     if (!a) continue
 
-    // 1) cocokkan ID add-on resmi lebih dulu
-    const mapped = ADDON_FLAG_MAP[a]
+    // 1) cocokkan ID add-on resmi lebih dulu (SSOT katalog + alias)
+    const mapped = explicitFeatures(a)
     if (mapped) { mapped.forEach(set); continue }
 
     // 2) fallback heuristik substring (teks bebas / variasi penulisan)
