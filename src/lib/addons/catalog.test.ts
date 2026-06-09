@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import type { FeatureFlags } from '@/types/websitebuilder'
 import { addonsToFeatures } from '../websitebuilder-mapping'
-import { ADDON_CATALOG, FLAG_ALIASES, explicitFeatures } from './catalog'
+import {
+  ADDON_CATALOG, FLAG_ALIASES, explicitFeatures,
+  orderAddons, upgradeAddons, aliasToId, isOffered,
+} from './catalog'
 
 // ============================================================
 // GOLDEN — snapshot ADDON_FLAG_MAP LAMA (sebelum SSOT). Sprint A0 WAJIB
@@ -147,5 +150,67 @@ describe('addon catalog — census audit (kunci kesimpulan §B)', () => {
     for (const id of deadFlagAddons) {
       expect(ADDON_CATALOG.find((a) => a.id === id)?.status).not.toBe('live')
     }
+  })
+})
+
+describe('A1 — triage visibility (keputusan user 2026-06-09)', () => {
+  const NOT_OFFERED = [
+    'protection', 'email-biz', 'client-portal', // drop snake-oil
+    'lms', 'membership', 'cert-auto', 'lang-multi', // hide heavy-unbuilt
+  ]
+  const STILL_OFFERED = ['delivery', 'newsletter', 'career', 'ads-tracking'] // wire nanti
+
+  it('7 SKU di-drop/hide tak ditawarkan', () => {
+    for (const id of NOT_OFFERED) {
+      expect(isOffered(id), id).toBe(false)
+      expect(orderAddons().some((a) => a.id === id), id).toBe(false)
+      expect(upgradeAddons().some((a) => a.id === id), id).toBe(false)
+    }
+  })
+
+  it('4 SKU "wire nanti" TETAP ditawarkan', () => {
+    for (const id of STILL_OFFERED) {
+      expect(isOffered(id), id).toBe(true)
+      expect(orderAddons().some((a) => a.id === id), id).toBe(true)
+    }
+  })
+})
+
+describe('A1 — dual-tier harga (nol perubahan ke customer)', () => {
+  it('harga order = harga form lama (shop 450k)', () => {
+    expect(orderAddons().find((a) => a.id === 'shop')?.price).toBe(450000)
+  })
+
+  it('harga upgrade = harga marketplace lama (shop 299k)', () => {
+    expect(upgradeAddons().find((a) => a.id === 'shop')?.price).toBe(299000)
+  })
+
+  it('SKU tanpa override upgrade → fallback ke harga order', () => {
+    expect(upgradeAddons().find((a) => a.id === 'ongkir')?.price).toBe(250000)
+  })
+})
+
+describe('A1 — alias terkoreksi (fix mapping korup Temuan B)', () => {
+  const M = aliasToId()
+
+  it('alias benar dihormati', () => {
+    expect(M['admin-dash']).toBe('admin')
+    expect(M['cart']).toBe('shop')
+    expect(M['member']).toBe('membership')
+    expect(M['live-chat']).toBe('chat')
+  })
+
+  it('mapping korup LENYAP (blog→newsletter, track-pack→ads-tracking, g-sheets→admin)', () => {
+    expect(M['blog']).toBeUndefined() // blog kini SKU kanonik, bukan alias newsletter
+    expect(M['track-pack']).toBeUndefined()
+    expect(M['g-sheets']).toBeUndefined()
+    expect(M['email-auto']).toBeUndefined()
+  })
+
+  it('blog jadi SKU kanonik (hasBlog), bukan dipetakan ke newsletter', () => {
+    const blog = ADDON_CATALOG.find((a) => a.id === 'blog')
+    expect(blog).toBeDefined()
+    expect(blog?.features).toContain('hasBlog')
+    expect(addonsToFeatures(['blog'])).toEqual({ hasBlog: true })
   })
 })

@@ -5,23 +5,11 @@ import { Plus, Check, Loader2, Sparkles, ShoppingBag } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { upgradeAddons } from '@/lib/addons/catalog'
 
-const ADDONS = [
-  { id: 'blog', name: 'Blog / Artikel', price: 99000, yearlyMaint: 50000 },
-  { id: 'shop', name: 'Online Shop', price: 299000, yearlyMaint: 199000 },
-  { id: 'admin', name: 'Dashboard Admin', price: 199000, yearlyMaint: 99000 },
-  { id: 'member', name: 'Login Member', price: 199000, yearlyMaint: 99000 },
-  { id: 'lms', name: 'LMS / E-learning', price: 399000, yearlyMaint: 299000 },
-  { id: 'quiz', name: 'Quiz Online', price: 249000, yearlyMaint: 99000 },
-  { id: 'portal', name: 'Portal Siswa', price: 299000, yearlyMaint: 149000 },
-  { id: 'gsheets', name: 'Google Sheets Integration', price: 149000, yearlyMaint: 49000 },
-  { id: 'midtrans', name: 'Midtrans Payment', price: 299000, yearlyMaint: 99000 },
-  { id: 'wa', name: 'WhatsApp Automation', price: 199000, yearlyMaint: 99000 },
-  { id: 'invoice', name: 'Invoice Automation', price: 199000, yearlyMaint: 99000 },
-  { id: 'seo', name: 'SEO Optimization', price: 149000, yearlyMaint: 49000 },
-  { id: 'booking', name: 'Booking System', price: 249000, yearlyMaint: 99000 },
-  { id: 'chat', name: 'Live Chat', price: 99000, yearlyMaint: 49000 },
-]
+// Add-on upgrade diturunkan dari SSOT katalog (harga tier upgrade). Hapus harga
+// ganda & id mati (quiz/gsheets/invoice) yang dulu tak terpetakan ke flag.
+const ADDONS = upgradeAddons()
 
 const CONVENIENCE_FEE = 50000
 
