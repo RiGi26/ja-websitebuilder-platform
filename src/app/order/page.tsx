@@ -8,13 +8,14 @@ import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
   Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck,
-  Copy, Shield
+  Copy, Shield, Lock
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { templatesData } from '@/data/templates'
 import { orderAddons, aliasToId } from '@/lib/addons/catalog'
+import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 
@@ -122,7 +123,15 @@ function OrderFormContent() {
     if (kalkulatorAddons) {
       const rawIds = kalkulatorAddons.split(',').map(s => s.trim()).filter(Boolean)
       const mappedIds = rawIds.map(id => CORP_TO_ORDER_ID[id] ?? id)
-      const validIds = [...new Set(mappedIds)].filter(id => ADDONS.some(a => a.id === id))
+      let validIds = [...new Set(mappedIds)].filter(id => ADDONS.some(a => a.id === id))
+      // A2: buang pre-selection yang dependency (requires)-nya tak ikut terpilih
+      // (cegah orphan dari kalkulator, mis. 'variant' tanpa 'shop'). Cascade.
+      for (let changed = true; changed;) {
+        changed = false
+        const present = new Set(validIds)
+        const next = validIds.filter(id => (ADDONS.find(a => a.id === id)?.requires ?? []).every(r => present.has(r)))
+        if (next.length !== validIds.length) { validIds = next; changed = true }
+      }
       if (validIds.length > 0) {
         setForm(f => ({ ...f, selectedAddons: validIds }))
       }
@@ -182,10 +191,28 @@ function OrderFormContent() {
 
 
 
+  // ── A2 gating: dependency (hard) + relevansi industri (soft) ──
+  const addonTipe = industriToTipe(form.industri)
+  const unmetDeps = (id: string): string[] =>
+    (ADDONS.find(a => a.id === id)?.requires ?? []).filter(r => !form.selectedAddons.includes(r))
+  const nameOf = (id: string): string => ADDONS.find(a => a.id === id)?.name ?? id
+
   const toggleAddon = (id: string) => {
     if (form.selectedAddons.includes(id)) {
-      set('selectedAddons', form.selectedAddons.filter(a => a !== id))
+      // Lepas + cascade: buang juga add-on lain yang dependency (requires)-nya menunjuk id ini.
+      const remove = new Set<string>([id])
+      let changed = true
+      while (changed) {
+        changed = false
+        for (const a of ADDONS) {
+          if (form.selectedAddons.includes(a.id) && !remove.has(a.id) && (a.requires ?? []).some(r => remove.has(r))) {
+            remove.add(a.id); changed = true
+          }
+        }
+      }
+      set('selectedAddons', form.selectedAddons.filter(a => !remove.has(a)))
     } else {
+      if (unmetDeps(id).length > 0) return // terkunci sampai dependency dipilih (no-op)
       set('selectedAddons', [...form.selectedAddons, id])
     }
   }
@@ -358,24 +385,41 @@ function OrderFormContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar pb-6">
                 {ADDONS.map(addon => {
                   const isSelected = form.selectedAddons.includes(addon.id)
+                  const deps = addon.requires ?? []
+                  const locked = !isSelected && deps.some(r => !form.selectedAddons.includes(r))
+                  const relevant = !addon.industries || addon.industries.length === 0 || addonTipe === 'custom' || addon.industries.includes(addonTipe)
 
                   return (
                     <button
                       key={addon.id}
                       onClick={() => toggleAddon(addon.id)}
+                      disabled={locked}
+                      title={locked ? `Butuh: ${deps.map(nameOf).join(', ')}` : undefined}
                       className={`p-5 rounded-3xl border-2 text-left transition-all relative flex flex-col h-full ${
-                        isSelected ? 'border-[#0071E3] bg-blue-50/30' : 'border-gray-100 bg-white hover:border-gray-200'
+                        isSelected
+                          ? 'border-[#0071E3] bg-blue-50/30'
+                          : locked
+                            ? 'border-gray-100 bg-gray-50/60 opacity-60 cursor-not-allowed'
+                            : `border-gray-100 bg-white hover:border-gray-200 ${!relevant ? 'opacity-70' : ''}`
                       }`}
                     >
                       <h4 className={`text-sm font-bold mb-1 pr-16 ${isSelected ? 'text-[#0071E3]' : 'text-gray-900'}`}>{addon.name}</h4>
-                      <p className="text-xs text-gray-500 mb-4 leading-relaxed line-clamp-2">{addon.desc}</p>
-                      
+                      <p className="text-xs text-gray-500 mb-3 leading-relaxed line-clamp-2">{addon.desc}</p>
+
+                      {locked ? (
+                        <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wide mb-3 inline-flex items-center gap-1">
+                          <Lock size={11} /> Butuh: {deps.map(nameOf).join(', ')}
+                        </span>
+                      ) : !relevant && !isSelected ? (
+                        <span className="text-[10px] font-medium text-gray-400 mb-3">Kurang umum untuk industri Anda</span>
+                      ) : null}
+
                       <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/[0.03] w-full">
                         <span className="text-sm font-black text-gray-900">{formatPrice(addon.price)}</span>
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                           isSelected ? 'bg-[#0071E3] border-[#0071E3] text-white' : 'border-gray-200'
                         }`}>
-                          {isSelected && <Check size={12} strokeWidth={4} />}
+                          {isSelected ? <Check size={12} strokeWidth={4} /> : locked ? <Lock size={10} className="text-gray-300" /> : null}
                         </div>
                       </div>
                     </button>
