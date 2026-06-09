@@ -14,6 +14,7 @@ import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { templatesData } from '@/data/templates'
+import { orderAddons, aliasToId } from '@/lib/addons/catalog'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 
@@ -43,43 +44,9 @@ const INIT: FormData = {
   agreedToTerms: false,
 }
 
-const ADDONS = [
-  // Core & Operational
-  { id: 'admin', name: 'Dashboard Admin (CMS)', price: 250000, yearlyMaint: 150000, desc: 'Kelola konten website sendiri tanpa coding.' },
-  { id: 'client-portal', name: 'Client Portal Dashboard', price: 500000, yearlyMaint: 250000, desc: 'Area khusus klien untuk progres & invoice.' },
-  
-  // E-Commerce Specific
-  { id: 'shop', name: 'Sistem Toko Online', price: 450000, yearlyMaint: 300000, desc: 'Katalog, keranjang, dan manajemen order.' },
-  { id: 'midtrans', name: 'Payment Gateway (Midtrans)', price: 400000, yearlyMaint: 150000, desc: 'Terima bayar otomatis via QRIS & Bank.' },
-  { id: 'ongkir', name: 'Integrasi Ongkir Otomatis', price: 250000, yearlyMaint: 100000, desc: 'Cek ongkir real-time (JNE/J&T/dll).' },
-  { id: 'katalog-pro', name: 'Katalog & Stok Pro', price: 350000, yearlyMaint: 150000, desc: 'Manajemen inventori & stok otomatis.' },
-  { id: 'variant', name: 'Varian Produk (Size/Warna)', price: 150000, yearlyMaint: 50000, desc: 'Pilihan variasi untuk tiap produk.' },
-  
-  // F&B Specific
-  { id: 'qr-menu', name: 'Menu Digital QR-Code', price: 200000, yearlyMaint: 100000, desc: 'Pelanggan scan meja untuk lihat menu.' },
-  { id: 'delivery', name: 'Integrasi Delivery', price: 300000, yearlyMaint: 150000, desc: 'Tombol pesan via GrabFood/GoFood.' },
-  
-  // Medical & Service
-  { id: 'booking', name: 'Sistem Booking & Kalender', price: 300000, yearlyMaint: 150000, desc: 'Jadwal temu & janji temu real-time.' },
-  { id: 'telemedicine', name: 'Integrasi Telemedicine', price: 400000, yearlyMaint: 200000, desc: 'Konsultasi online via Zoom/Meet.' },
-  
-  // LMS & Education
-  { id: 'membership', name: 'Sistem Membership', price: 500000, yearlyMaint: 200000, desc: 'Area login khusus member/siswa.' },
-  { id: 'lms', name: 'LMS / Video Course', price: 400000, yearlyMaint: 300000, desc: 'Sistem pembelajaran & progres video.' },
-  { id: 'cert-auto', name: 'Sertifikat Otomatis', price: 350000, yearlyMaint: 150000, desc: 'Generate PDF sertifikat otomatis.' },
-  { id: 'live-session', name: 'Integrasi Live Class', price: 450000, yearlyMaint: 250000, desc: 'Penjadwalan kelas Zoom otomatis.' },
-
-  // Marketing & General
-  { id: 'email-biz', name: 'Email Bisnis (nama@brand.com)', price: 150000, yearlyMaint: 300000, desc: 'Email profesional untuk kredibilitas.' },
-  { id: 'lang-multi', name: 'Multi-Language (ID/EN/JP)', price: 400000, yearlyMaint: 200000, desc: 'Website dalam 2-3 bahasa sekaligus.' },
-  { id: 'wa', name: 'Otomasi WhatsApp', price: 300000, yearlyMaint: 150000, desc: 'Notifikasi order otomatis ke WA.' },
-  { id: 'seo', name: 'SEO Optimization', price: 200000, yearlyMaint: 100000, desc: 'Optimasi agar muncul di halaman 1 Google.' },
-  { id: 'ads-tracking', name: 'Ads Tracking (Pixel/GA)', price: 150000, yearlyMaint: 0, desc: 'Pantau efektivitas iklan FB/Google.' },
-  { id: 'protection', name: 'Proteksi Gambar (Anti-Copy)', price: 100000, yearlyMaint: 0, desc: 'Cegah download gambar ilegal.' },
-  { id: 'career', name: 'Portal Lowongan Kerja', price: 300000, yearlyMaint: 100000, desc: 'Halaman karir & lamaran online.' },
-  { id: 'newsletter', name: 'Newsletter System', price: 200000, yearlyMaint: 100000, desc: 'Kumpulkan email database pelanggan.' },
-  { id: 'chat', name: 'Live Chat Support', price: 100000, yearlyMaint: 50000, desc: 'Chat langsung di website (Tawk.to).' },
-]
+// Add-on diturunkan dari SSOT katalog (src/lib/addons/catalog.ts). SKU yang
+// di-drop/hide (triage A3) otomatis tak tampil via orderAddons().
+const ADDONS = orderAddons()
 
 // ── Reusable components ────────────────────────────────────────────────────────
 function StepHeader({ title, desc }: { title: string; desc: string }) {
@@ -140,21 +107,12 @@ function OrderFormContent() {
   const kalkulatorAddons = searchParams.get('addons') ?? ''
 
   // Mapping corp-landing addon IDs → order form addon IDs
-  const CORP_TO_ORDER_ID: Record<string, string> = {
-    'admin-dash': 'admin',
-    'wa-auto': 'wa',
-    'live-chat': 'chat',
-    'cart': 'shop',
-    'checkout': 'shop',
-    'track-pack': 'ads-tracking',
-    'blog': 'newsletter',
-    'email-auto': 'newsletter',
-    'zoom': 'lms',
-    'cert': 'cert-auto',
-    'vendor': 'shop',
-    'stock': 'katalog-pro',
-    'g-sheets': 'admin',
-  }
+  // Alias id corp-landing → id kanonik, diturunkan dari SSOT (.aliases).
+  // Gantikan mapping hardcode lama yang korup (blog→newsletter, track-pack→
+  // ads-tracking, g-sheets→admin). Hanya alias benar-semantik yang dihormati;
+  // id corp tanpa alias (track-pack/email-auto/g-sheets/dll) jatuh & tersaring
+  // oleh filter validIds di bawah — lebih baik hilang daripada salah-petakan.
+  const CORP_TO_ORDER_ID: Record<string, string> = aliasToId()
 
   useEffect(() => {
     const tid = searchParams.get('template')
