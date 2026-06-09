@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import type { FeatureFlags } from '@/types/websitebuilder'
 import { addonsToFeatures } from '../websitebuilder-mapping'
 import {
-  ADDON_CATALOG, FLAG_ALIASES, explicitFeatures,
+  ADDON_CATALOG, FLAG_ALIASES, explicitFeatures, getAddon,
   orderAddons, upgradeAddons, aliasToId, isOffered, capabilitiesForAddons,
 } from './catalog'
 
@@ -238,5 +238,31 @@ describe('B-cap — capabilitiesForAddons (add-on → capability renderer)', () 
     expect(capabilitiesForAddons(['id-ngawur'])).toEqual([])
     expect(capabilitiesForAddons([])).toEqual([])
     expect(capabilitiesForAddons(null)).toEqual([])
+  })
+})
+
+describe('A2 — gating dependency + relevansi industri', () => {
+  const offeredIds = new Set(orderAddons().map((a) => a.id))
+
+  it('live-session disembunyikan (orphan: induk lms hidden)', () => {
+    expect(isOffered('live-session')).toBe(false)
+    expect(offeredIds.has('live-session')).toBe(false)
+  })
+
+  it('midtrans tak lagi requires shop (payment lintas shop/booking)', () => {
+    expect(getAddon('midtrans')?.requires ?? []).toEqual([])
+  })
+
+  it('INVARIAN: requires tiap add-on YANG DITAWARKAN juga ditawarkan (no orphan-parent)', () => {
+    for (const a of orderAddons()) {
+      for (const r of a.requires ?? []) {
+        expect(offeredIds.has(r), `${a.id} requires '${r}' yang tak ditawarkan`).toBe(true)
+      }
+    }
+  })
+
+  it('orderAddons membawa requires + industries utk gating', () => {
+    expect(orderAddons().find((a) => a.id === 'variant')?.requires).toContain('shop')
+    expect(orderAddons().find((a) => a.id === 'qr-menu')?.industries).toContain('restaurant')
   })
 })
