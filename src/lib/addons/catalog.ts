@@ -157,11 +157,18 @@ export const ADDON_CATALOG: AddonDef[] = [
     note: 'Route /booking + /api/booking/create hidup. CTA in-page utk lux/composable = B2.',
   },
   {
-    id: 'telemedicine', name: 'Integrasi Telemedicine', price: 400000, yearlyMaint: 200000,
-    desc: 'Konsultasi online via Zoom/Meet.',
-    klass: 'capability', status: 'planned', industries: ['klinik'], requires: ['booking'],
+    // Hasil merge telemedicine + live-session → satu SKU "Video Meeting" (Temuan D).
+    // requires 'booking' (BUKAN 'lms' — lms disembunyikan; live-session dulu jadi
+    // orphan karena itu). Id lama 'telemedicine'/'live-session' kini ALIAS →
+    // order lama tetap resolve capability (capabilitiesForAddons) + FLAG_ALIASES
+    // jaga parity flag addonsToFeatures.
+    id: 'video-meeting', name: 'Integrasi Video Meeting', price: 400000, yearlyMaint: 200000,
+    desc: 'Jadwalkan sesi konsultasi atau kelas online via Zoom/Google Meet.',
+    klass: 'capability', status: 'planned',
+    industries: ['klinik', 'sekolah', 'personal'], requires: ['booking'],
     features: ['hasBooking'], capability: ['video-meeting'],
-    note: 'Duplikat booking (+video link). MERGE dgn live-session → "Integrasi Video Meeting" (Temuan D, A1).',
+    aliases: ['telemedicine', 'live-session'],
+    note: 'Merge telemedicine (konsultasi klinik) + live-session (kelas online). Penjadwalan via booking + tautan video; capability video-meeting dibaca renderer Sprint B2.',
   },
 
   // ── LMS / Education (lms = induk) ──
@@ -186,13 +193,7 @@ export const ADDON_CATALOG: AddonDef[] = [
     features: ['hasLMS'], capability: ['certificate'], aliases: ['cert'],
     note: 'Child lms. hasLMS mati.',
   },
-  {
-    id: 'live-session', name: 'Integrasi Live Class', price: 450000, yearlyMaint: 250000,
-    desc: 'Penjadwalan kelas Zoom otomatis.',
-    klass: 'capability', status: 'planned', industries: ['sekolah', 'klinik'], requires: ['lms'],
-    features: ['hasLMS', 'hasBooking'], capability: ['video-meeting'],
-    note: 'MERGE dgn telemedicine → "Integrasi Video Meeting" (Temuan D).',
-  },
+  // (live-session dihapus — di-merge ke 'video-meeting' di grup Booking/Service.)
 
   // ── Marketing & General ──
   {
@@ -279,6 +280,11 @@ export const FLAG_ALIASES: Record<string, (keyof FeatureFlags)[]> = {
   'driver-sched': ['hasBooking'],
   'seat': ['hasBooking'],
   'invoice-travel': [],
+  // Legacy: telemedicine + live-session di-merge → SKU 'video-meeting'. Id lama
+  // dipetakan ke flag asalnya supaya order LAMA tak berubah perilaku (parity
+  // ADDON_FLAG_MAP). Capability di-resolve via alias → video-meeting.
+  'telemedicine': ['hasBooking'],
+  'live-session': ['hasLMS', 'hasBooking'],
 }
 
 // ── Helper ─────────────────────────────────────────────────────
@@ -314,16 +320,14 @@ const UPGRADE_PRICE: Record<string, [number, number]> = {
 // SKU yang TIDAK ditawarkan saat ini — triage A3 disetujui user 2026-06-09:
 //  - DROP snake-oil: protection, email-biz, client-portal
 //  - HIDE heavy-unbuilt: lms, membership, cert-auto, lang-multi
-//  - A2 (2026-06-09): live-session = ORPHAN (requires 'lms' yang disembunyikan)
-//    → tak mungkin penuhi dependency → disembunyikan juga (hindari item terkunci
-//    permanen yang induknya tak terlihat). Sekalian kurangi duplikasi dgn
-//    telemedicine (yang tetap, requires 'booking').
+// Merge-video (2026-06-09): live-session DIHAPUS sbg SKU → di-merge ke
+//   'video-meeting' (requires 'booking', bukan lms) shg tak lagi orphan; id lama
+//   jadi alias. telemedicine juga lebur ke video-meeting (lihat grup Booking).
 // 4 SKU "wire" (delivery/newsletter/career/ads-tracking) TETAP ditawarkan
 // (kapabilitasnya digarap Sprint B).
 const NOT_OFFERED = new Set<string>([
   'protection', 'email-biz', 'client-portal',
   'lms', 'membership', 'cert-auto', 'lang-multi',
-  'live-session',
 ])
 
 export function isOffered(id: string): boolean {
