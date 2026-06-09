@@ -184,8 +184,8 @@ function OrderFormContent() {
     ? (kalkulatorMaintain ?? currentBaseRenewal)
     : currentBaseRenewal + totalAddonYearly
 
-  const DP_THRESHOLD = 3_000_000
-  const isDP = finalPrice > DP_THRESHOLD
+  const DP_THRESHOLD = 4_000_000
+  const isDP = finalPrice >= DP_THRESHOLD
   const dpAmount = isDP ? Math.ceil(finalPrice * 0.5) : finalPrice
   const pelunasan = isDP ? finalPrice - dpAmount : 0
 
@@ -516,7 +516,7 @@ function OrderFormContent() {
                                     </span>
                                   </div>
                                   <p className="text-2xl font-black text-green-700 tabular-nums">{formatPrice(dpAmount)}</p>
-                                  {!isDP && <p className="text-xs text-gray-500 mt-1.5">Pembayaran lunas — order di bawah Rp 3 juta</p>}
+                                  {!isDP && <p className="text-xs text-gray-500 mt-1.5">Pembayaran lunas — order di bawah Rp 4 juta</p>}
                                 </div>
                                 {isDP && (
                                   <div className="flex items-center justify-between gap-3 mt-2 px-1">

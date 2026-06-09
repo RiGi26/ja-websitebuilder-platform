@@ -27,9 +27,9 @@ export async function POST(request: Request) {
 
     const year = new Date(order.created_at).getFullYear()
     const displayId = `JA-${year}-${order.id.slice(0, 8).toUpperCase()}`
-    const DP_THRESHOLD = 3_000_000
-    const total = Number(order.total_estimasi)
-    const isDP = total > DP_THRESHOLD
+    const DP_THRESHOLD = 4_000_000
+    const total = Number(order.total_estimasi || 0)
+    const isDP = total >= DP_THRESHOLD
     const dpAmount = isDP ? Math.ceil(total * 0.5) : total
     const clientName = order.nama_perusahaan || order.nama_usaha || 'Customer'
     // Gunakan timestamp untuk buat midtrans order_id unik
