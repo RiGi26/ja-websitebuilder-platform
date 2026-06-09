@@ -244,7 +244,8 @@ describe('B-cap — capabilitiesForAddons (add-on → capability renderer)', () 
 describe('A2 — gating dependency + relevansi industri', () => {
   const offeredIds = new Set(orderAddons().map((a) => a.id))
 
-  it('live-session disembunyikan (orphan: induk lms hidden)', () => {
+  it('live-session tak lagi SKU standalone (di-merge ke video-meeting)', () => {
+    expect(getAddon('live-session')).toBeUndefined()
     expect(isOffered('live-session')).toBe(false)
     expect(offeredIds.has('live-session')).toBe(false)
   })
@@ -264,5 +265,40 @@ describe('A2 — gating dependency + relevansi industri', () => {
   it('orderAddons membawa requires + industries utk gating', () => {
     expect(orderAddons().find((a) => a.id === 'variant')?.requires).toContain('shop')
     expect(orderAddons().find((a) => a.id === 'qr-menu')?.industries).toContain('restaurant')
+  })
+})
+
+describe('Merge video — telemedicine + live-session → video-meeting (Temuan D)', () => {
+  const offeredIds = new Set(orderAddons().map((a) => a.id))
+
+  it('video-meeting = SKU kanonik & ditawarkan', () => {
+    const vm = getAddon('video-meeting')
+    expect(vm).toBeDefined()
+    expect(vm?.capability).toContain('video-meeting')
+    expect(isOffered('video-meeting')).toBe(true)
+    expect(offeredIds.has('video-meeting')).toBe(true)
+  })
+
+  it('telemedicine & live-session bukan lagi SKU kanonik', () => {
+    expect(getAddon('telemedicine')).toBeUndefined()
+    expect(getAddon('live-session')).toBeUndefined()
+  })
+
+  it('id lama jadi alias → video-meeting (order lama tetap resolve capability)', () => {
+    const M = aliasToId()
+    expect(M['telemedicine']).toBe('video-meeting')
+    expect(M['live-session']).toBe('video-meeting')
+    expect(capabilitiesForAddons(['telemedicine'])).toContain('video-meeting')
+    expect(capabilitiesForAddons(['live-session'])).toContain('video-meeting')
+  })
+
+  it('parity flag id lama dipertahankan (FLAG_ALIASES → order lama tak berubah)', () => {
+    expect(addonsToFeatures(['telemedicine'])).toEqual({ hasBooking: true })
+    expect(addonsToFeatures(['live-session'])).toEqual({ hasLMS: true, hasBooking: true })
+  })
+
+  it('video-meeting requires booking (bukan lms) → bukan orphan', () => {
+    expect(getAddon('video-meeting')?.requires).toEqual(['booking'])
+    expect(offeredIds.has('booking')).toBe(true)
   })
 })
