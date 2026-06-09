@@ -365,3 +365,20 @@ export function aliasToId(): Record<string, string> {
   }
   return m
 }
+
+// ── B-cap: capabilities ─────────────────────────────────────────────────────
+// Kumpulkan capability dari selected_addons → disimpan ke konfigurasi.capabilities,
+// dibaca renderer (mis. RestaurantLuxRenderer) untuk render kondisional. Resolve
+// alias dulu (order menyimpan id kanonik, tapi tahan thd alias corp-landing).
+export function capabilitiesForAddons(addons: string[] | null | undefined): string[] {
+  const alias = aliasToId()
+  const out = new Set<string>()
+  for (const raw of addons ?? []) {
+    const k = (raw ?? '').toLowerCase().trim()
+    if (!k) continue
+    const id = BY_ID[k] ? k : alias[k]
+    const def = id ? BY_ID[id] : undefined
+    for (const c of def?.capability ?? []) out.add(c)
+  }
+  return [...out]
+}

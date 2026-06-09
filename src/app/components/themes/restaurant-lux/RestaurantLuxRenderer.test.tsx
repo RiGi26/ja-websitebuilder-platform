@@ -47,3 +47,40 @@ describe('RestaurantLuxRenderer (bespoke premium, Opsi A)', () => {
     expect(html).toContain('class="rl-chef-ini"')
   })
 })
+
+describe('RestaurantLuxRenderer — B-cap capabilities (add-on → UI kondisional)', () => {
+  it('tanpa capability → tak ada delivery/QR, reservasi bukan ke /booking', () => {
+    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={content} slug="resto-x" />)
+    expect(html).not.toContain('Pesan Antar')
+    expect(html).not.toContain('Pindai QR') // teks elemen (rl-qr-note class selalu ada di <style>)
+    expect(html).not.toContain('/resto-x/booking')
+  })
+
+  it('capability booking → reservasi diarahkan ke /{slug}/booking', () => {
+    const html = renderToStaticMarkup(
+      <RestaurantLuxRenderer content={content} slug="resto-x" capabilities={['booking']} />,
+    )
+    expect(html).toContain('/resto-x/booking')
+  })
+
+  it('capability delivery-buttons → tombol "Pesan Antar" muncul', () => {
+    const html = renderToStaticMarkup(
+      <RestaurantLuxRenderer content={content} slug="resto-x" capabilities={['delivery-buttons']} />,
+    )
+    expect(html).toContain('Pesan Antar')
+  })
+
+  it('capability qr-menu → catatan QR menu muncul', () => {
+    const html = renderToStaticMarkup(
+      <RestaurantLuxRenderer content={content} slug="resto-x" capabilities={['qr-menu']} />,
+    )
+    expect(html).toContain('Pindai QR') // teks elemen kondisional (bukan sekadar class di CSS)
+  })
+
+  it('booking tanpa slug → tak bisa bikin link (aman, fallback lama)', () => {
+    const html = renderToStaticMarkup(
+      <RestaurantLuxRenderer content={content} capabilities={['booking']} />,
+    )
+    expect(html).not.toContain('/booking')
+  })
+})

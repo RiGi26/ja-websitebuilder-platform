@@ -63,7 +63,7 @@ export async function renderSite({
     const content = composableContentFromSections(
       page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami',
     )
-    return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} />
+    return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} capabilities={konfig.capabilities} />
   }
 
   // ── Theme System (composable) ───────────────────────────────
