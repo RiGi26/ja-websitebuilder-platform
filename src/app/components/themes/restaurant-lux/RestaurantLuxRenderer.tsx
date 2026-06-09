@@ -14,6 +14,7 @@
 // ============================================================
 import type { CSSProperties } from 'react'
 import type { ComposableContent, ShowcaseItem, TeamMember } from '@/lib/theme-system/manifest'
+import { resolveCapabilities } from '@/lib/addons/capabilities'
 
 // ── Palet peran semantik (warm-dark luxury) ──────────────────
 interface Pal {
@@ -270,10 +271,9 @@ export default function RestaurantLuxRenderer({
   //  - booking → reservasi diarahkan ke sistem booking nyata (/{slug}/booking)
   //  - delivery-buttons → tombol "Pesan Antar"
   //  - qr-menu → catatan menu digital QR di bawah judul menu
-  const caps = new Set(capabilities ?? [])
-  const bookingHref = caps.has('booking') && slug ? `/${slug}/booking` : undefined
-  const hasDelivery = caps.has('delivery-buttons')
-  const hasQrMenu = caps.has('qr-menu')
+  // Logika baca-capability diekstrak ke helper bersama (resolveCapabilities) supaya
+  // dipakai-ulang lintas renderer; resHref/resText tetap di sini (gabung konten + WA).
+  const { bookingHref, hasDelivery, hasQrMenu } = resolveCapabilities(capabilities, slug)
   const resHref = bookingHref || content.info?.reservasiHref || waLink || '#kunjungi'
   const resText = content.info?.reservasiText || (bookingHref ? 'Reservasi Meja' : 'Reservasi')
   const deliveryHref = waLink || '#kunjungi'
