@@ -117,6 +117,8 @@ export default function ContentPanel({ initial }: { initial: EditableSection[] }
       }
       setSaved((s) => ({ ...s, [sectionId]: structuredClone(drafts[sectionId]) }))
       setState((s) => ({ ...s, [sectionId]: 'saved' }))
+      window.dispatchEvent(new Event('portal:saved')) // refresh live preview
+
     } catch {
       setState((s) => ({ ...s, [sectionId]: 'error' }))
     }
