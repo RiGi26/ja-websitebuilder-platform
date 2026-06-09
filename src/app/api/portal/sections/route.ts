@@ -22,12 +22,34 @@ export async function PATCH(request: Request) {
 
   try {
     const body = await request.json()
-    const { sectionId, isi_komponen } = body ?? {}
+    const { sectionId, isi_komponen, is_visible, urutan } = body ?? {}
     if (!sectionId || typeof sectionId !== 'string') {
       return NextResponse.json({ error: 'sectionId wajib' }, { status: 400 })
     }
-    if (!isi_komponen || typeof isi_komponen !== 'object' || Array.isArray(isi_komponen)) {
-      return NextResponse.json({ error: 'isi_komponen tidak valid' }, { status: 400 })
+
+    // Bangun update dari field yang dikirim: isi_komponen (teks/gambar) dan/atau
+    // metadata is_visible (tampil/sembunyi) & urutan (reorder). Semua opsional.
+    const update: Record<string, unknown> = {}
+    if (isi_komponen !== undefined) {
+      if (typeof isi_komponen !== 'object' || Array.isArray(isi_komponen)) {
+        return NextResponse.json({ error: 'isi_komponen tidak valid' }, { status: 400 })
+      }
+      update.isi_komponen = isi_komponen
+    }
+    if (is_visible !== undefined) {
+      if (typeof is_visible !== 'boolean') {
+        return NextResponse.json({ error: 'is_visible tidak valid' }, { status: 400 })
+      }
+      update.is_visible = is_visible
+    }
+    if (urutan !== undefined) {
+      if (typeof urutan !== 'number' || !Number.isInteger(urutan)) {
+        return NextResponse.json({ error: 'urutan tidak valid' }, { status: 400 })
+      }
+      update.urutan = urutan
+    }
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: 'Tak ada perubahan' }, { status: 400 })
     }
 
     // Ownership: section harus milik tenant si klien.
@@ -43,7 +65,7 @@ export async function PATCH(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from('page_sections')
-      .update({ isi_komponen })
+      .update(update)
       .eq('id', sectionId)
       .select('id, tipe_komponen, urutan, isi_komponen, is_visible')
       .single()
