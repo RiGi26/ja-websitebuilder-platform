@@ -104,9 +104,9 @@ export const ADDON_CATALOG: AddonDef[] = [
   {
     id: 'midtrans', name: 'Payment Gateway (Midtrans)', price: 400000, yearlyMaint: 150000,
     desc: 'Terima bayar otomatis via QRIS & Bank.',
-    klass: 'capability', status: 'backend', requires: ['shop'],
+    klass: 'capability', status: 'backend',
     features: ['hasPayment'], capability: ['payment'],
-    note: 'Checkout pakai Midtrans via API (gated hasCart). Flag hasPayment sendiri hanya dibaca RentalRenderer.',
+    note: 'Lintas-fungsi: dipakai checkout shop ATAU DP booking → TIDAK di-requires ke shop saja (hindari blokir salah utk booking).',
   },
   {
     id: 'ongkir', name: 'Integrasi Ongkir Otomatis', price: 250000, yearlyMaint: 100000,
@@ -314,11 +314,16 @@ const UPGRADE_PRICE: Record<string, [number, number]> = {
 // SKU yang TIDAK ditawarkan saat ini — triage A3 disetujui user 2026-06-09:
 //  - DROP snake-oil: protection, email-biz, client-portal
 //  - HIDE heavy-unbuilt: lms, membership, cert-auto, lang-multi
+//  - A2 (2026-06-09): live-session = ORPHAN (requires 'lms' yang disembunyikan)
+//    → tak mungkin penuhi dependency → disembunyikan juga (hindari item terkunci
+//    permanen yang induknya tak terlihat). Sekalian kurangi duplikasi dgn
+//    telemedicine (yang tetap, requires 'booking').
 // 4 SKU "wire" (delivery/newsletter/career/ads-tracking) TETAP ditawarkan
 // (kapabilitasnya digarap Sprint B).
 const NOT_OFFERED = new Set<string>([
   'protection', 'email-biz', 'client-portal',
   'lms', 'membership', 'cert-auto', 'lang-multi',
+  'live-session',
 ])
 
 export function isOffered(id: string): boolean {
@@ -326,18 +331,22 @@ export function isOffered(id: string): boolean {
 }
 
 // Bentuk ringkas yang dikonsumsi UI order/marketplace (gantikan const ADDONS lokal).
+// `requires`/`industries` dibawa untuk gating A2 di form order.
 export interface AddonOption {
   id: string
   name: string
   price: number
   yearlyMaint: number
   desc: string
+  requires?: string[]
+  industries?: TipeIndustri[]
 }
 
 /** Add-on yang ditawarkan di form ORDER BARU (harga order). */
 export function orderAddons(): AddonOption[] {
   return ADDON_CATALOG.filter((a) => isOffered(a.id)).map((a) => ({
     id: a.id, name: a.name, price: a.price, yearlyMaint: a.yearlyMaint, desc: a.desc,
+    requires: a.requires, industries: a.industries,
   }))
 }
 
