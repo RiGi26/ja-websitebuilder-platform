@@ -198,3 +198,4 @@ Aturan: 1 sprint = 1 branch = 1 PR, additive dulu, verify SSR + Vercel Ready seb
 | Tanggal | Sprint | Status | Catatan |
 |---|---|---|---|
 | 2026-06-08 | — | Plan + Audit disusun | Investigasi kode+DB selesai. 4 temuan terbukti. Rekomendasi P0–P2. |
+| 2026-06-09 | **A0** | ✅ PR #105 (CI + Vercel hijau) | SSOT `src/lib/addons/catalog.ts` (24 SKU + metadata audit) + `FLAG_ALIASES`; `addonsToFeatures` derive dari katalog via `explicitFeatures` (behavior-preserving). 40 test parity+integritas. 377 test total, tsc bersih. Belum: A1 (surface konsumsi katalog + keputusan harga marketplace), A2 (gating), A3 (wire-vs-drop 11 SKU mati). |
