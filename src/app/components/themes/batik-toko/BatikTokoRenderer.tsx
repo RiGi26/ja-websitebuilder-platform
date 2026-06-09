@@ -11,6 +11,7 @@
 import { Cormorant_Garamond, Josefin_Sans } from 'next/font/google'
 import AddToCartButton from '@/app/components/cart/AddToCartButton'
 import type { PageSection, Product, TenantProfile } from '@/types/websitebuilder'
+import { resolveWaHref } from '@/lib/wa'
 
 const serif = Cormorant_Garamond({
   subsets: ['latin'],
@@ -182,7 +183,7 @@ function TopBar({ nama, wa, pal }: { nama: string; wa?: string; pal: Pal }) {
 }
 
 // ── Hero Full-Screen ──────────────────────────────────────────
-function Hero({ isi, pal }: { isi: Isi; pal: Pal }) {
+function Hero({ isi, pal, wa }: { isi: Isi; pal: Pal; wa?: string }) {
   return (
     <section
       className="relative min-h-[92vh] flex items-center justify-center text-center overflow-hidden"
@@ -259,7 +260,7 @@ function Hero({ isi, pal }: { isi: Isi; pal: Pal }) {
         {/* CTA */}
         {isi.cta_text && (
           <a
-            href={isi.cta_link ?? '#koleksi'}
+            href={resolveWaHref(isi.cta_link as string | undefined, wa) ?? '#koleksi'}
             className={`bt-btn inline-block mt-10 px-10 py-3.5 rounded-full font-bold text-sm uppercase ${sans.className}`}
             style={{ backgroundColor: pal.accent, color: pal.onAccentBtn, letterSpacing: '0.18em', boxShadow: S_AMBER }}
           >
@@ -510,7 +511,7 @@ function Testimonials({ isi, pal }: { isi: Isi; pal: Pal }) {
 }
 
 // ── CTA ───────────────────────────────────────────────────────
-function Cta({ isi, pal }: { isi: Isi; pal: Pal }) {
+function Cta({ isi, pal, wa }: { isi: Isi; pal: Pal; wa?: string }) {
   return (
     <section
       className="relative overflow-hidden text-center"
@@ -537,7 +538,7 @@ function Cta({ isi, pal }: { isi: Isi; pal: Pal }) {
         )}
         {isi.cta_text && (
           <a
-            href={isi.cta_link ?? '#'}
+            href={resolveWaHref(isi.cta_link as string | undefined, wa) ?? '#'}
             target="_blank"
             className={`bt-btn inline-block px-10 py-4 rounded-full font-bold text-sm uppercase tracking-[0.18em] ${sans.className}`}
             style={{ backgroundColor: pal.dark, color: pal.onDark, boxShadow: S_INDIGO }}
@@ -690,11 +691,11 @@ export default function BatikTokoRenderer({
     const isi = (s.isi_komponen ?? {}) as Isi
 
     switch (s.tipe_komponen) {
-      case 'hero_banner':  return <Hero key={s.id} isi={isi} pal={pal} />
+      case 'hero_banner':  return <Hero key={s.id} isi={isi} pal={pal} wa={waContact} />
       case 'features':     return <Features key={s.id} isi={isi} pal={pal} />
       case 'product_list': return <ProductList key={s.id} isi={isi} products={products} hasCart={hasCart} primary={primary} pal={pal} />
       case 'testimonials': return <Testimonials key={s.id} isi={isi} pal={pal} />
-      case 'cta':          return <Cta key={s.id} isi={isi} pal={pal} />
+      case 'cta':          return <Cta key={s.id} isi={isi} pal={pal} wa={waContact} />
       case 'contact_form': return <Contact key={s.id} isi={isi} profile={profile} pal={pal} />
       default:             return null
     }
