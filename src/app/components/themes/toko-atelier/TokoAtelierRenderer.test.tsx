@@ -48,6 +48,19 @@ describe('TokoAtelierRenderer', () => {
     expect(html).not.toContain('--ta-accent:#C5A572')
   })
 
+  it('variant ivoire → palet terang + scrim gelap tetap dipakai untuk foto', () => {
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} variant="ivoire" />)
+    expect(html).toContain('data-variant="ivoire"')
+    expect(html).toContain('--ta-bg:#F6F1E8') // panggung gading
+    expect(html).toContain('--ta-accent:#7A5C32') // aksen perunggu
+    expect(html).toContain('--ta-scrim:#1A150F') // overlay foto tetap gelap
+  })
+
+  it('variant tak dikenal → jatuh aman ke noir', () => {
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} variant="tidak-ada" />)
+    expect(html).toContain('--ta-bg:#141210')
+  })
+
   it('hero tanpa gambar → fallback gradient (tidak crash, tetap render)', () => {
     const c = { ...content, hero: { ...content.hero, image: undefined } }
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={c} />)

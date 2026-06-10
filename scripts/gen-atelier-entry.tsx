@@ -20,6 +20,7 @@ import { sampleContentForTheme } from '../src/lib/theme-system/sample-content'
 const ENTRIES: { id: string; variant: string; primary?: string; label: string; sw: string }[] = [
   { id: 'toko-atelier', variant: 'noir', label: 'Toko Atelier — Noir (flagship fashion)', sw: '#C5A572' },
   { id: 'toko-atelier-brand', variant: 'noir', primary: '#7E1F2D', label: 'Toko Atelier — aksen brand (burgundy)', sw: '#7E1F2D' },
+  { id: 'toko-atelier-ivoire', variant: 'ivoire', label: 'Toko Atelier — Ivoire (varian terang)', sw: '#7A5C32' },
 ]
 
 // Salinan persis pageDoc() dari gen-samples.test.tsx — jaga paritas output.
@@ -40,13 +41,17 @@ for (const e of ENTRIES) {
 // tanpa harus regenerasi semua tema via vitest.
 const idx = 'theme-samples/index.html'
 if (existsSync(idx)) {
-  const s = readFileSync(idx, 'utf8')
-  if (!s.includes('href="toko-atelier.html"')) {
-    const cards = ENTRIES.map(
+  let s = readFileSync(idx, 'utf8')
+  // Idempoten PER ENTRI — entri baru (mis. ivoire) tetap terselip walau kartu
+  // atelier lain sudah ada dari run sebelumnya.
+  const missing = ENTRIES.filter((e) => !s.includes(`href="${e.id}.html"`))
+  if (missing.length) {
+    const cards = missing.map(
       (e) =>
         `<a class="card" href="${e.id}.html"><span class="sw" style="background:${e.sw}"></span><b>${e.label}</b><small>bespoke · ${e.id}</small><p>Renderer premium Opsi A (flagship).</p></a>`,
     ).join('')
-    writeFileSync(idx, s.replace('<div class="grid">', '<div class="grid">' + cards))
-    console.log('ok index.html: kartu toko-atelier ditambahkan')
+    s = s.replace('<div class="grid">', '<div class="grid">' + cards)
+    writeFileSync(idx, s)
+    console.log(`ok index.html: ${missing.length} kartu atelier ditambahkan`)
   }
 }
