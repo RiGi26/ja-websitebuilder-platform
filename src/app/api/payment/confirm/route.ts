@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { notifyCustomer } from '@/lib/fonnte'
+import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
+import { createEarningForOrder } from '@/lib/referral'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -47,6 +48,35 @@ export async function POST(request: Request) {
           trackUrl: `${base}/track?id=${updated.id}`,
           briefingUrl: `${base}/order/briefing/${updated.tracking_token}`,
         }).catch((e) => console.error('[confirm] WA dp_confirmed failed:', e))
+      }
+
+      // Program Mitra — race-safe terhadap webhook: upsert onConflict order_id,
+      // siapa pun yang menang race hanya membuat satu earning + satu notif.
+      if (updated) {
+        try {
+          const t = await createEarningForOrder(updated.id)
+          if ((t.outcome === 'created' || t.outcome === 'created_confirmed') && t.referrerWa) {
+            const year = new Date(updated.created_at ?? Date.now()).getFullYear()
+            const displayId = `JA-${year}-${updated.id.slice(0, 8).toUpperCase()}`
+            const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+            notifyReferrer(
+              {
+                type: t.outcome === 'created_confirmed'
+                  ? 'referral_earning_confirmed'
+                  : 'referral_earning_pending',
+              },
+              t.referrerWa,
+              {
+                referrerName: t.referrerName ?? 'Mitra',
+                amount: t.amount,
+                displayId,
+                mitraUrl: `${base}/mitra`,
+              },
+            ).catch((e) => console.error('[confirm] WA referral earning failed:', e))
+          }
+        } catch (e) {
+          console.error('[confirm] referral earning failed:', e)
+        }
       }
 
       return NextResponse.json({ confirmed: true, status: 'dp_paid' })
