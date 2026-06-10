@@ -142,13 +142,22 @@ describe('addon catalog — census audit (kunci kesimpulan §B)', () => {
     }
   })
 
-  it('11 SKU flag-mati TIDAK ditandai live (jangan jual sbg jadi)', () => {
+  it('SKU flag-mati TIDAK ditandai live (jangan jual sbg jadi)', () => {
+    // career & newsletter keluar dari daftar ini (2026-06-11): band cta
+    // ber-preset kini terinjeksi build + dirender AddonBand (composable/lux)
+    // dan natively oleh SectionRenderer (token path) → pembaca NYATA ada.
     const deadFlagAddons = [
       'delivery', 'membership', 'lms', 'cert-auto', 'email-biz', 'lang-multi',
-      'ads-tracking', 'protection', 'career', 'newsletter', 'client-portal',
+      'ads-tracking', 'protection', 'client-portal',
     ]
     for (const id of deadFlagAddons) {
       expect(ADDON_CATALOG.find((a) => a.id === id)?.status).not.toBe('live')
+    }
+  })
+
+  it('career & newsletter LIVE — band terinjeksi + dirender (fix 2026-06-11)', () => {
+    for (const id of ['career', 'newsletter']) {
+      expect(ADDON_CATALOG.find((a) => a.id === id)?.status).toBe('live')
     }
   })
 })
