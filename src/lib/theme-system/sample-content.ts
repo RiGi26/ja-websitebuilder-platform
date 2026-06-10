@@ -131,6 +131,119 @@ const FASHION: ComposableContent = {
   contact: { wa: '6281296917963', email: 'hello@arnalabel.com', alamat: 'Bandung, Jawa Barat' },
 }
 
+// ── Toko Atelier (FLAGSHIP bespoke — fashion heritage dark-luxe) ─
+// Sample khusus renderer toko-atelier (Opsi A). JANGAN dipinjam tema lain:
+// kontennya ditulis untuk rangka flagship (9 produk ber-kategori + stok untuk
+// badge kelangkaan, galeri proses, 4 stats format campur untuk count-up).
+const TOKO_ATELIER: ComposableContent = {
+  nama: 'KALA Atelier',
+  hero: {
+    eyebrow: 'Atelier Busana — Bandung, Sejak 2017',
+    title: 'Pakaian yang Dijahit untuk Dikenang',
+    subtitle:
+      'Siluet tenang, bahan alam, dan jahitan tangan yang teliti. Tiap koleksi lahir terbatas dari atelier kami — sekali habis, tidak diulang.',
+    ctaText: 'Jelajahi Koleksi',
+    ctaHref: '#koleksi',
+    ctaText2: 'Kisah Kami',
+    ctaHref2: '#cerita',
+    image: IMG('photo-1490481651871-ab68de25d43d', 1600),
+  },
+  featuresEyebrow: 'Cara Kami Bekerja',
+  featuresTitle: 'Lambat itu disengaja',
+  featuresSubtitle:
+    'Empat prinsip yang menjaga setiap helai tetap bernilai — hari ini dan sepuluh tahun lagi.',
+  features: [
+    { title: 'Edisi Terbatas', desc: 'Maksimal 40 potong per desain, bernomor di label dalam. Milik Anda tidak akan pasaran.' },
+    { title: 'Bahan Alam', desc: 'Linen Eropa, katun organik, dan tenun pewarna alami dari mitra perajin di Jawa dan Sumba.' },
+    { title: 'Dijahit Utuh oleh Satu Tangan', desc: 'Satu penjahit menyelesaikan satu potong dari awal sampai akhir — bukan lini produksi.' },
+    { title: 'Reparasi Seumur Hidup', desc: 'Kancing lepas, kelim turun? Kirimkan kembali — kami perbaiki tanpa biaya. Selamanya.' },
+  ],
+  statement: {
+    eyebrow: 'Filosofi',
+    quote:
+      'Kami tidak mengejar musim. Pakaian yang baik justru dimulai ketika tren selesai — dipakai bertahun-tahun, dan makin lama makin berarti.',
+    cite: 'Kala Anjani — Pendiri & Perancang',
+  },
+  showcase: {
+    title: 'Koleksi Tahun Ini',
+    subtitle: 'Sembilan potong inti — dirancang saling padu, dirilis terbatas.',
+    items: [
+      { nama: 'Mantel Tenun “Pagi Buta”', harga: 1250000, desc: 'Mantel panjang tenun ikat, pewarna indigo alami, lapis katun organik.', gambar: IMG('photo-1445205170230-053b83016050', 900), kategori: 'Outerwear', stok: 4 },
+      { nama: 'Linen Overshirt “Renjana”', harga: 685000, desc: 'Linen Eropa 230 gsm, jatuh sempurna, kancing kerang asli.', gambar: IMG('photo-1539109136881-3be0616acf4b', 900), kategori: 'Outerwear' },
+      { nama: 'Kemeja “Subuh”', harga: 485000, desc: 'Katun organik, kerah tegak, potongan santai untuk harian.', gambar: IMG('photo-1496747611176-843222e1e57c', 900), kategori: 'Atasan' },
+      { nama: 'Kaus Berat “Tanah”', harga: 285000, desc: 'Katun 240 gsm celup tanah liat — makin dicuci makin berkarakter.', gambar: IMG('photo-1521572163474-6864f9cf17ab', 900), kategori: 'Atasan' },
+      { nama: 'Celana Wol “Lembah”', harga: 565000, desc: 'Pinggang tinggi, lipit tunggal, wol tropis yang tetap sejuk.', gambar: IMG('photo-1483985988355-763728e1935b', 900), kategori: 'Bawahan' },
+      { nama: 'Celana Linen “Muara”', harga: 525000, desc: 'Potongan lurus sebatas mata kaki, ringan untuk iklim tropis.', gambar: IMG('photo-1434389677669-e08b4cac3105', 900), kategori: 'Bawahan', stok: 3 },
+      { nama: 'Selendang Tenun “Arsa”', harga: 425000, desc: 'Ditenun dua minggu di Sumba, pewarna alam penuh.', gambar: IMG('photo-1610701596007-11502861dcfa', 900), kategori: 'Aksesori' },
+      { nama: 'Tas Kanvas “Pasar”', harga: 385000, desc: 'Kanvas lilin 18 oz dan kulit nabati — menua dengan anggun.', gambar: IMG('photo-1441986300917-64674bd600d8', 900), kategori: 'Aksesori' },
+      { nama: 'Ikat Pinggang “Akar”', harga: 325000, desc: 'Kulit nabati utuh, gesper kuningan padat.', gambar: IMG('photo-1509631179647-0177331693ae', 900), kategori: 'Aksesori', stok: 5 },
+    ],
+  },
+  about: {
+    title: 'Atelier Kecil yang Keras Kepala',
+    body: 'KALA berdiri tahun 2017 di sebuah garasi di Bandung — satu mesin jahit dan keyakinan sederhana: pakaian terbaik tidak berteriak. Sampai hari ini kami tetap kecil, delapan penjahit dalam satu atelier, karena justru di situ kualitas tinggal. Setiap bahan dipilih langsung dari perajinnya, dan setiap potong melewati delapan belas titik periksa sebelum dilipat, dibungkus, dan dikirim.',
+    image: IMG('photo-1487222477894-8943e31ef7b2', 1200),
+    ctaText: 'Kunjungi Atelier',
+    ctaHref: '#kontak',
+  },
+  stats: [
+    { angka: '4.9', label: 'Rating pembeli' },
+    { angka: '12rb+', label: 'Potong terkirim' },
+    { angka: '48 jam', label: 'Kirim seluruh Indonesia' },
+    { angka: '18', label: 'Titik periksa mutu' },
+  ],
+  gallery: {
+    title: 'Dari Atelier',
+    subtitle: 'Tangan, bahan, dan proses di balik tiap potong.',
+    images: [
+      { src: IMG('photo-1558769132-cb1aea458c5e', 800), caption: 'Pemilihan kain' },
+      { src: IMG('photo-1556905055-8f358a7a47b2', 800), caption: 'Meja potong' },
+      { src: IMG('photo-1528459801416-a9e53bbf4e17', 800), caption: 'Pewarnaan alami' },
+      { src: IMG('photo-1582738411706-bfc8e691d1c2', 800), caption: 'Detail tenun' },
+      { src: IMG('photo-1606744837616-56c9a5c6a6eb', 800), caption: 'Benang songket' },
+      { src: IMG('photo-1522335789203-aabd1fc54bc9', 800), caption: 'Uji tekstur bahan' },
+      { src: IMG('photo-1445205170230-053b83016050', 800), caption: 'Pengepasan akhir' },
+    ],
+  },
+  testimonials: [
+    { quote: 'Mantelnya saya pakai hampir tiap hari selama dua tahun — bentuknya tidak berubah. Ini pakaian yang menua bersama pemiliknya.', nama: 'Sarasvati', peran: 'Arsitek, Jakarta' },
+    { quote: 'Saya datang untuk satu kemeja, pulang dengan cara pandang baru soal pakaian. Reparasi seumur hidupnya bukan gimik — mereka serius.', nama: 'Dimas', peran: 'Kolektor wastra' },
+    { quote: 'Jahitan dalamnya lebih rapi daripada jahitan luar merek lain. Sulit dipercaya sampai dilihat sendiri.', nama: 'Maya', peran: 'Desainer grafis' },
+    { quote: 'Edisinya bernomor, ada ceritanya, dan tidak pasaran. Hadiah paling berkesan yang pernah saya beli.', nama: 'Rendra', peran: 'Pelanggan sejak 2019' },
+  ],
+  faq: [
+    { q: 'Apakah bisa custom ukuran?', a: 'Bisa. Panjang lengan, badan, dan celana dapat disesuaikan tanpa biaya tambahan — sampaikan lewat WhatsApp setelah memesan.' },
+    { q: 'Bagaimana klaim reparasi seumur hidup?', a: 'Hubungi kami via WhatsApp dengan foto bagian yang rusak, lalu kirimkan potongnya. Ongkos kirim kembali kami tanggung; pengerjaan 5–7 hari kerja.' },
+    { q: 'Apakah melayani pengiriman internasional?', a: 'Ya, kami mengirim ke seluruh dunia. Estimasi 3–5 hari kerja; bea masuk negara tujuan ditanggung pembeli.' },
+    { q: 'Kapan koleksi baru dirilis?', a: 'Sekali setahun, biasanya bulan Maret. Pelanggan terdaftar mendapat akses 48 jam lebih awal — daftar lewat WhatsApp.' },
+  ],
+  cta: {
+    title: 'Sekali Habis, Tidak Diulang',
+    subtitle: 'Koleksi tahun ini tersisa di bawah 30%. Potong yang Anda taksir hari ini mungkin tidak ada besok.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+    image: IMG('photo-1445205170230-053b83016050', 1600),
+  },
+  social: {
+    title: 'Ikuti Kami',
+    links: [
+      { platform: 'instagram', href: '#', label: '@kala.atelier' },
+      { platform: 'tiktok', href: '#' },
+      { platform: 'shopee', href: '#' },
+    ],
+  },
+  info: {
+    jam: [
+      { hari: 'Senin–Jumat', jam: '10.00–18.00' },
+      { hari: 'Sabtu', jam: '10.00–15.00' },
+      { hari: 'Minggu', jam: 'Dengan janji temu' },
+    ],
+    alamat: 'Jl. Cigadung Raya Timur 14, Bandung',
+    mapsQuery: 'Cigadung Raya Timur Bandung',
+  },
+  contact: { wa: '6281296917963', email: 'halo@kala-atelier.id', alamat: 'Bandung, Jawa Barat' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -1990,6 +2103,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'lux-personal': luxSample(PERSONAL_KREATOR, 'Tentang', 'Kami percaya hal-hal baik lahir dari ketekunan dan perhatian pada detail.'),
   'lux-blog': luxSample(BLOG_MEDIA, 'Redaksi', 'Kami menulis untuk memperjelas, bukan memperumit — gagasan yang layak dibaca pelan-pelan.'),
   'lux-jastip': luxSample(JASTIP_LUAR, 'Komitmen Kami', 'Kepercayaan Anda kami jaga seperti barang titipan itu sendiri — transparan, aman, dan tepat janji.'),
+  // FLAGSHIP bespoke (Opsi A) — sample dedikasi, BUKAN pinjaman. Tanpa entri ini
+  // prefix-split 'toko-atelier' → 'toko' dan jatuh ke sample toko generik.
+  'toko-atelier': TOKO_ATELIER,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

@@ -11,6 +11,8 @@ import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
+import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
+import AtelierCartButton from '@/app/components/themes/toko-atelier/AtelierCartButton'
 import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
 import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRenderer'
@@ -64,6 +66,32 @@ export async function renderSite({
       page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami',
     )
     return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} capabilities={konfig.capabilities} />
+  }
+
+  // ── Bespoke FLAGSHIP: Toko Atelier (Opsi A, toko/fashion) ──
+  // Dark-launch: hanya via branding.theme==='toko-atelier' (tak ada di taxonomy)
+  // → dormant, nol regresi. Reuse fetch products + composableContentFromSections;
+  // products mentah ikut diteruskan untuk pencocokan tombol keranjang per item
+  // (AtelierCartButton di-inject via slot supaya renderer bebas modul cart).
+  if (theme === 'toko-atelier') {
+    const [products, profile] = await Promise.all([
+      fetchProductsByPage(client, page.id),
+      fetchTenantProfile(client, page.id),
+    ])
+    const content = composableContentFromSections(
+      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, 'Koleksi Kami',
+    )
+    const renderer = (
+      <TokoAtelierRenderer
+        content={content}
+        variant={variant}
+        primary={primary}
+        products={products}
+        hasCart={hasCart}
+        CartButton={AtelierCartButton}
+      />
+    )
+    return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
   }
 
   // ── Theme System (composable) ───────────────────────────────
