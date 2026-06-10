@@ -29,16 +29,19 @@ export type ShowcaseVariant =
   | 'menu-list' | 'card-grid' | 'lookbook'
   | 'service-list' | 'article-feed' | 'menu-board'
   | 'signature'
-export type FeaturesVariant = 'grid' | 'rows' | 'zigzag'
+// 'sticky' (panen flagship) = passage kiri pinned + baris bernomor kanan.
+export type FeaturesVariant = 'grid' | 'rows' | 'zigzag' | 'sticky'
 // Testimoni (Sprint 5) — sosial-proof. 3 varian parametrik via token.
 // 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
 // 'marquee' = strip bergerak (CSS-only) untuk banyak testimoni ringkas.
-export type TestimoniVariant = 'cards' | 'spotlight' | 'marquee'
+// 'carousel' (panen flagship) = scroll-snap + tombol/dot via ce-script.ts.
+export type TestimoniVariant = 'cards' | 'spotlight' | 'marquee' | 'carousel'
 // Galeri (Sprint 5b) — 'masonry' = grid foto fasilitas tinggi-rendah;
 // 'before-after' = pasangan sebelum/sesudah (cocok estetik/skincare/interior).
 // 'editorial' (lux) = grid 4-kolom tetap dgn span tinggi/lebar (panen RestaurantLux
 // rl-gal), foto zoom + caption reveal. Hanya manifest lux (nol regresi).
-export type GalleryVariant = 'masonry' | 'before-after' | 'editorial'
+// 'editorial-quicklook' (panen flagship) = editorial + dialog lightbox per foto.
+export type GalleryVariant = 'masonry' | 'before-after' | 'editorial' | 'editorial-quicklook'
 // Stats (lux) — 'band' (default, kartu ber-tint) | 'recognition' (kolom divider
 // border-kiri, angka serif besar, panen RestaurantLux rl-recog).
 export type StatsVariant = 'band' | 'recognition'
@@ -64,7 +67,9 @@ export type PricingVariant = 'cards' | 'table' | 'single'
 export type ProcessVariant = 'horizontal' | 'timeline' | 'cards'
 // CTA: 'card' = kartu gradient (perilaku lama) · 'banner' = strip lebar penuh ·
 // 'split' = gambar + ajakan berdampingan.
-export type CtaVariant = 'card' | 'banner' | 'split'
+// 'duotone' (panen flagship) = band full-bleed foto grayscale + tint primary +
+// tombol magnetic (pointer presisi).
+export type CtaVariant = 'card' | 'banner' | 'split' | 'duotone'
 export interface PricingPlan {
   nama: string
   harga: string         // string fleksibel: "Rp250rb" / "Gratis" / "Hubungi kami"
@@ -113,6 +118,7 @@ export interface ThemeManifest {
     // ── Balok Sprint 5 (semua opsional → tema lama nol regresi) ──
     testimoni?: TestimoniVariant // sosial-proof; absen = tak dirender
     stats?: boolean | StatsVariant // strip angka kredibilitas; true/'band' = kartu, 'recognition' (lux) = kolom divider
+    statsCountUp?: boolean // panen flagship: angka stats dianimasikan 0→final saat terlihat (SSR tetap final)
     faq?: boolean // accordion objection-handling (CSS-only <details>)
     info?: boolean // jam buka + lokasi/maps + reservasi (wajib F&B/toko fisik)
     gallery?: GalleryVariant // masonry fasilitas / before-after (Sprint 5b)
@@ -587,8 +593,8 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     // Food-forward: filosofi → hidangan signature → suasana → pengakuan → chef.
     sections: ['statement', 'showcase', 'gallery', 'stats', 'team', 'testimoni', 'info', 'faq'],
     blocks: {
-      hero: 'cinematic', showcase: 'signature', statement: true, stats: 'recognition',
-      team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true,
+      hero: 'cinematic', showcase: 'signature', statement: true, stats: 'recognition', statsCountUp: true,
+      team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial-quicklook', info: true, faq: true,
     },
   },
   'lux-klinik': {
@@ -596,8 +602,8 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     // Trust-forward: kredibilitas (angka) → alasan → layanan → komitmen → dokter.
     sections: ['stats', 'features', 'showcase', 'statement', 'team', 'gallery', 'testimoni', 'info', 'faq'],
     blocks: {
-      hero: 'split', features: 'rows', showcase: 'service-list', statement: true,
-      stats: 'recognition', team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial',
+      hero: 'split', features: 'sticky', showcase: 'service-list', statement: true,
+      stats: 'recognition', statsCountUp: true, team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial-quicklook',
       info: true, faq: true,
     },
   },
@@ -609,31 +615,31 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
     id: 'lux-corporate', label: 'Lux Corporate', basePackId: 'lux-corporate',
     // Credibility + process: angka → kapabilitas → layanan → cara kerja → tim → klien.
     sections: ['stats', 'features', 'showcase', 'process', 'team', 'partners', 'testimoni', 'faq', 'cta'],
-    blocks: { hero: 'split', features: 'rows', showcase: 'service-list', stats: 'recognition', process: 'timeline', team: 'spotlight', partners: 'marquee', testimoni: 'spotlight', faq: true, cta: 'banner' },
+    blocks: { hero: 'split', features: 'sticky', showcase: 'service-list', stats: 'recognition', statsCountUp: true, process: 'timeline', team: 'spotlight', partners: 'marquee', testimoni: 'spotlight', faq: true, cta: 'duotone' },
   },
   'lux-sekolah': {
     id: 'lux-sekolah', label: 'Lux Sekolah', basePackId: 'lux-sekolah',
     // Proud institutional: visi → akreditasi → program → kegiatan → guru → PPDB.
     sections: ['statement', 'stats', 'showcase', 'gallery', 'team', 'testimoni', 'faq', 'info'],
-    blocks: { hero: 'centered', showcase: 'service-list', statement: true, stats: 'recognition', team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true },
+    blocks: { hero: 'centered', showcase: 'service-list', statement: true, stats: 'recognition', statsCountUp: true, team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial-quicklook', info: true, faq: true },
   },
   'lux-toko': {
     id: 'lux-toko', label: 'Lux Toko', basePackId: 'lux-toko',
-    // Product-forward: katalog lookbook → alasan → brand → angka → ulasan → sosial.
-    sections: ['showcase', 'features', 'statement', 'stats', 'testimoni', 'faq', 'social'],
-    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'lookbook', statement: true, stats: 'recognition', testimoni: 'spotlight', faq: true, social: true },
+    // Product-forward: katalog lookbook → alasan → brand → angka → ulasan → CTA penutup → sosial.
+    sections: ['showcase', 'features', 'statement', 'stats', 'testimoni', 'faq', 'cta', 'social'],
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'lookbook', statement: true, stats: 'recognition', statsCountUp: true, testimoni: 'carousel', faq: true, cta: 'duotone', social: true },
   },
   'lux-travel': {
     id: 'lux-travel', label: 'Lux Travel', basePackId: 'lux-travel',
     // Destination-forward: galeri destinasi → paket → angka → ulasan → lokasi.
     sections: ['gallery', 'showcase', 'stats', 'testimoni', 'info', 'faq'],
-    blocks: { hero: 'cinematic', showcase: 'card-grid', stats: 'recognition', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true },
+    blocks: { hero: 'cinematic', showcase: 'card-grid', stats: 'recognition', statsCountUp: true, testimoni: 'carousel', gallery: 'editorial-quicklook', info: true, faq: true },
   },
   'lux-personal': {
     id: 'lux-personal', label: 'Lux Personal', basePackId: 'lux-personal',
     // Portfolio + personality: karya → cerita → angka → ulasan → galeri → sosial.
     sections: ['showcase', 'about', 'stats', 'testimoni', 'gallery', 'social', 'faq'],
-    blocks: { hero: 'fullbleed', showcase: 'card-grid', stats: 'recognition', testimoni: 'spotlight', gallery: 'editorial', about: 'story', social: true, faq: true },
+    blocks: { hero: 'fullbleed', showcase: 'card-grid', stats: 'recognition', statsCountUp: true, testimoni: 'spotlight', gallery: 'editorial-quicklook', about: 'story', social: true, faq: true },
   },
   'lux-blog': {
     id: 'lux-blog', label: 'Lux Blog', basePackId: 'lux-blog',
@@ -643,9 +649,9 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   },
   'lux-jastip': {
     id: 'lux-jastip', label: 'Lux Jastip', basePackId: 'lux-jastip',
-    // Trust/process-forward: cara titip → katalog → angka → ulasan → faq → sosial.
-    sections: ['process', 'showcase', 'stats', 'testimoni', 'faq', 'social', 'info'],
-    blocks: { hero: 'split', showcase: 'card-grid', process: 'horizontal', stats: 'recognition', testimoni: 'spotlight', faq: true, social: true, info: true },
+    // Trust/process-forward: cara titip → katalog → angka → ulasan → faq → CTA penutup → sosial.
+    sections: ['process', 'showcase', 'stats', 'testimoni', 'faq', 'cta', 'social', 'info'],
+    blocks: { hero: 'split', showcase: 'card-grid', process: 'horizontal', stats: 'recognition', statsCountUp: true, testimoni: 'carousel', faq: true, cta: 'duotone', social: true, info: true },
   },
 }
 
