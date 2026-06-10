@@ -35,6 +35,28 @@ describe('composableContentFromSections (S0-4)', () => {
     expect(c.showcase?.title).toBe('Layanan Kami')
     expect(c.showcase?.items[0]).toMatchObject({ nama: 'Fisioterapi', harga: 200000 })
   })
+
+  // ── Band add-on (newsletter/career) — row cta ber-preset ──
+  it('row cta ber-preset → content.bands, dan CTA utama TIDAK terbajak', () => {
+    const withBands = [
+      ...sections,
+      { tipe_komponen: 'cta', isi_komponen: { preset: 'newsletter', title: 'Tetap Terhubung', subtitle: 'Promo terbaru.', cta_text: 'Berlangganan' } },
+      { tipe_komponen: 'cta', isi_komponen: { title: 'Pesan Sekarang', cta_text: 'Order' } },
+      { tipe_komponen: 'cta', isi_komponen: { preset: 'career', title: 'Bergabung dengan Tim Kami', cta_text: 'Kirim Lamaran' } },
+    ] as unknown as PageSection[]
+    const profile = { wa: '6281234567890' } as never
+    const c = composableContentFromSections('Toko', withBands, [], profile)
+    expect(c.cta?.title).toBe('Pesan Sekarang') // band newsletter di urutan lebih awal TIDAK membajak
+    expect(c.bands).toHaveLength(2)
+    expect(c.bands![0]).toMatchObject({ preset: 'newsletter', title: 'Tetap Terhubung', ctaText: 'Berlangganan' })
+    expect(c.bands![1].preset).toBe('career')
+    expect(c.bands![0].ctaHref).toContain('wa.me/6281234567890') // tanpa cta_link → WA terpusat
+  })
+
+  it('tanpa row ber-preset → bands undefined (nol regresi)', () => {
+    const c = composableContentFromSections('Toko', sections, [], null)
+    expect(c.bands).toBeUndefined()
+  })
 })
 
 // ── Wire konten Sprint A/B dari data_konten (pasca-DP) ────────

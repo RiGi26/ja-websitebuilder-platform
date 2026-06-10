@@ -30,7 +30,7 @@ import {
   ProcessHorizontal, ProcessTimeline, ProcessCards,
   CTABanner, CTASplit, CTADuotone,
   PartnersGrid, PartnersMarquee, SocialStrip,
-  StatementBand,
+  StatementBand, AddonBand,
 } from './blocks'
 import CeReveal from './CeReveal'
 import { CE_JS } from './ce-script'
@@ -179,6 +179,13 @@ export default function ComposableRenderer({
         }
         return out
       })}
+
+      {/* Band add-on (newsletter/career) — additive di luar alur manifest;
+          hadir hanya bila adapter menemukan row cta ber-preset (hasil injeksi
+          B-section). Absen → tak dirender (nol regresi). */}
+      {(content.bands ?? []).map((b, i) => (
+        <AddonBand key={`${b.preset}-${i}`} band={b} />
+      ))}
 
       <Footer content={content} motif={motif} motifColor={motifColor} />
       <FloatingWA wa={content.contact?.wa} />

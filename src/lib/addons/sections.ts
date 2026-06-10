@@ -41,9 +41,18 @@ function blueprintToSection(bp: SectionBlueprint): BuildSection | null {
     case 'contact_form':
       return { tipe_komponen: 'contact_form', isi_komponen: { title: 'Hubungi Kami' } }
     case 'cta':
+      // Band ber-`preset` — `preset` ikut tersimpan di isi_komponen supaya:
+      // (1) dedupe bisa membedakannya dari CTA penutup template, dan
+      // (2) adapter composable memetakannya ke content.bands (bukan CTA utama).
+      if (bp.preset === 'career') {
+        return {
+          tipe_komponen: 'cta',
+          isi_komponen: { preset: 'career', title: 'Bergabung dengan Tim Kami', subtitle: 'Kami selalu terbuka untuk talenta baru. Kirimkan CV dan portofolio Anda.', cta_text: 'Kirim Lamaran' },
+        }
+      }
       return {
         tipe_komponen: 'cta',
-        isi_komponen: { title: 'Tetap Terhubung', subtitle: 'Dapatkan info & promo terbaru dari kami.', cta_text: 'Berlangganan' },
+        isi_komponen: { preset: 'newsletter', title: 'Tetap Terhubung', subtitle: 'Dapatkan info & promo terbaru dari kami.', cta_text: 'Berlangganan' },
       }
     default:
       return null
@@ -63,20 +72,24 @@ function anchorIndex(sections: BuildSection[], anchor?: SectionBlueprint['anchor
 }
 
 /**
- * Gabung section template + blueprint add-on. DEDUPE per-tipe: bila template SUDAH
- * punya tipe itu, blueprint di-skip (native menang) — ini yang membuat resto/toko
- * tak dobel showcase, dan menjadikan blog_list (yang tak ada di template manapun)
- * satu-satunya yang benar-benar di-inject lintas industri. Additive, urutan
- * template dipertahankan.
+ * Gabung section template + blueprint add-on. DEDUPE per tipe+preset: bila
+ * template SUDAH punya kombinasi itu, blueprint di-skip (native menang) — resto/
+ * toko tak dobel showcase. Kunci menyertakan `preset` supaya band cta add-on
+ * (newsletter/career) TIDAK tertelan CTA penutup template — dulu dedupe per-tipe
+ * murni membuat newsletter selalu ter-skip (semua template punya `cta`).
+ * Additive, urutan template dipertahankan.
  */
+const keyOf = (tipe: TipeKomponen, isi: Record<string, unknown> | undefined): string =>
+  `${tipe}:${typeof isi?.preset === 'string' ? isi.preset : ''}`
+
 export function mergeAddonSections(template: BuildSection[], blueprints: SectionBlueprint[]): BuildSection[] {
   const result = [...template]
-  const existing = new Set<TipeKomponen>(template.map((s) => s.tipe_komponen))
+  const existing = new Set<string>(template.map((s) => keyOf(s.tipe_komponen, s.isi_komponen)))
   for (const bp of blueprints) {
     const sec = blueprintToSection(bp)
-    if (!sec || existing.has(sec.tipe_komponen)) continue
+    if (!sec || existing.has(keyOf(sec.tipe_komponen, sec.isi_komponen))) continue
     result.splice(anchorIndex(result, bp.anchor), 0, sec)
-    existing.add(sec.tipe_komponen)
+    existing.add(keyOf(sec.tipe_komponen, sec.isi_komponen))
   }
   return result
 }
