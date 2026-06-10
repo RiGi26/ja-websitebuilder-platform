@@ -7,11 +7,17 @@ import { Loader2, Upload, Image as ImageIcon, X } from 'lucide-react'
 // ATAU tempel URL (fallback). Mengganti input URL polos di seluruh panel portal.
 export default function ImageUploadField({
   value, onChange, label, compact = false,
+  uploadUrl = '/api/portal/upload', extraFields,
 }: {
   value: string
   onChange: (url: string) => void
   label?: string
   compact?: boolean
+  /** Endpoint unggah. Default portal (sesi tenant); form briefing pakai
+   *  '/api/briefing/upload' (otorisasi via token). */
+  uploadUrl?: string
+  /** Field tambahan di-append ke FormData (mis. { token } untuk briefing). */
+  extraFields?: Record<string, string>
 }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -23,7 +29,8 @@ export default function ImageUploadField({
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const res = await fetch('/api/portal/upload', { method: 'POST', body: fd })
+      if (extraFields) for (const [k, v] of Object.entries(extraFields)) fd.append(k, v)
+      const res = await fetch(uploadUrl, { method: 'POST', body: fd })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) { setErr(json.error ?? 'Gagal unggah'); return }
       onChange(json.url as string)
