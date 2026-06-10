@@ -231,6 +231,61 @@ export const ENGINE_CSS = `
 .ce-menu-tab:hover { color: var(--c-on-primary); background: var(--c-primary); border-color: var(--c-primary); }
 .ce-root [id^="menu-"] { scroll-margin-top: 96px; }
 @media (prefers-reduced-motion: reduce) { .ce-nav-link, .ce-nav-link::after, .ce-btn-ghost, .ce-menu-tab { transition: none; } .ce-hero-cue { animation: none; } }
+/* ══ Lapis LUX ══════════════════════════════════════════════════════════════
+   Gerbang craft via [data-lux] (di-set ComposableRenderer saat pack.lux ada) —
+   DEKUPEL dari mood gelap, jadi tema lux TERANG (klinik/sekolah) maupun GELAP
+   (resto) sama-sama dapat craft. Tema lama tanpa data-lux → tak terpengaruh. */
+.ce-root[data-lux] .ce-shead .ce-eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.ce-root[data-lux] .ce-shead[data-rule] .ce-eyebrow::before { content: ""; width: 30px; height: 1px; background: var(--c-primary); }
+.ce-root[data-lux] .ce-card, .ce-root[data-lux] .ce-svc-row, .ce-root[data-lux] .ce-art-card, .ce-root[data-lux] .ce-quote, .ce-root[data-lux] .ce-mb-row { transition-duration: var(--ce-dur-slow, .4s); }
+.ce-root[data-lux] .ce-btn { transition-duration: var(--ce-dur-fast, .35s); }
+.ce-root[data-lux] .ce-hero-fb { min-height: 100vh; }
+.ce-root[data-lux] .ce-hero-fb::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: linear-gradient(to top, color-mix(in srgb, var(--c-page) 90%, transparent) 0%, transparent 100%); pointer-events: none; z-index: 0; }
+.ce-root[data-lux] .ce-hero-cue { display: block; position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 1; opacity: .7; animation: ceCue 2.2s ease-in-out infinite; }
+.ce-root[data-lux] .ce-hero-cue svg { width: 26px; height: 26px; }
+/* Hero 'cinematic' — ken-burns gambar + scrim GELAP (teks putih terbaca utk lux terang/gelap) + cue */
+.ce-hero-cine { position: relative; overflow: hidden; min-height: 100vh; display: flex; align-items: flex-end; padding: 0 24px 92px; }
+.ce-hero-kb { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; transform: scale(1.06); animation: ceKenburns 18s ease-out forwards; }
+@keyframes ceKenburns { to { transform: scale(1); } }
+.ce-hero-cine-grad { position: absolute; inset: 0; z-index: 0; background: linear-gradient(to top, rgba(0,0,0,.74) 0%, rgba(0,0,0,.34) 44%, rgba(0,0,0,.12) 72%, rgba(0,0,0,.20) 100%); }
+.ce-hero-cine .ce-hero-cue { display: block; color: #fff; }
+/* Showcase 'signature' — beat editorial selang-seling (panen rl-dish) */
+.ce-sig { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; margin-bottom: clamp(48px, 8vw, 96px); }
+.ce-sig:last-child { margin-bottom: 0; }
+.ce-sig:nth-child(even) .ce-sig-media { order: 2; }
+.ce-sig-media { position: relative; overflow: hidden; border-radius: var(--r-md); aspect-ratio: 4 / 5; background: linear-gradient(135deg, var(--c-surface2), var(--c-surface)); }
+.ce-sig-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--ce-dur-slow, .5s) var(--ce-ease, cubic-bezier(.16,1,.3,1)); }
+.ce-sig:hover .ce-sig-media img { transform: scale(1.06); }
+.ce-sig-idx { font-family: var(--f-display); font-weight: var(--fw-display); font-size: clamp(40px, 6vw, 72px); color: var(--c-primary); opacity: .4; line-height: 1; font-variant-numeric: tabular-nums; display: block; }
+.ce-sig-name { font-size: clamp(26px, 3.4vw, 40px); margin: 10px 0 12px; color: var(--c-ink); }
+.ce-sig-lead { color: var(--c-ink-dim, var(--c-muted)); font-size: 16px; line-height: 1.75; max-width: 42ch; margin: 0; }
+.ce-sig-meta { margin-top: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ce-sig-price { font-family: var(--f-display); font-size: 24px; color: var(--c-primary); }
+.ce-sig-tag { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-muted); border: 1px solid var(--c-border2, var(--c-border)); padding: 5px 12px; border-radius: 999px; }
+@media (max-width: 780px) { .ce-sig { grid-template-columns: 1fr; gap: 24px; } .ce-sig:nth-child(even) .ce-sig-media { order: 0; } }
+/* Stats 'recognition' — kolom divider border-kiri, angka serif besar (panen rl-recog) */
+.ce-recog { border-top: 1px solid var(--c-border2, var(--c-border)); border-bottom: 1px solid var(--c-border2, var(--c-border)); }
+.ce-recog-stat { padding: 14px 26px; border-left: 1px solid var(--c-border2, var(--c-border)); }
+.ce-recog-stat:first-child { border-left: none; padding-left: 0; }
+.ce-recog-label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); margin-top: 10px; display: block; }
+@media (max-width: 640px) { .ce-recog-wrap { grid-template-columns: 1fr 1fr !important; gap: 28px 0; } .ce-recog-stat:nth-child(odd) { border-left: none; padding-left: 0; } }
+/* Gallery 'editorial' — grid 4-kolom span tinggi/lebar (panen rl-gal) */
+.ce-galed { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 14px; }
+.ce-galed figure { position: relative; overflow: hidden; border-radius: var(--r-md); margin: 0; border: 1px solid var(--c-border2, var(--c-border)); }
+.ce-galed img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--ce-dur-slow, .5s) var(--ce-ease, cubic-bezier(.16,1,.3,1)); }
+.ce-galed figure:hover img { transform: scale(1.07); }
+.ce-galed figcaption { position: absolute; left: 14px; bottom: 12px; font-size: 12px; letter-spacing: .06em; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.6); opacity: 0; transition: opacity .3s ease; }
+.ce-galed figure:hover figcaption { opacity: 1; }
+.ce-galed-tall { grid-row: span 2; }
+.ce-galed-wide { grid-column: span 2; }
+@media (max-width: 780px) { .ce-galed { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; } }
+@media (prefers-reduced-motion: reduce) { .ce-hero-kb { animation: none; transform: none; } .ce-sig-media img, .ce-galed img { transition: none; } }
+/* Scroll-reveal lux — section fade+rise saat masuk viewport. Disembunyikan HANYA
+   saat JS aktif (.ce-js ditambah <CeReveal/>) → tanpa JS konten tetap TAMPIL.
+   GPU murni (opacity/transform), tak ada layout thrash. */
+.ce-js .ce-reveal { opacity: 0; transform: translateY(26px); }
+.ce-js .ce-reveal.ce-in { opacity: 1; transform: none; transition: opacity .7s var(--ce-ease, cubic-bezier(.16,1,.3,1)), transform .7s var(--ce-ease, cubic-bezier(.16,1,.3,1)); }
+@media (prefers-reduced-motion: reduce) { .ce-js .ce-reveal { opacity: 1; transform: none; } }
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -973,6 +1028,130 @@ export function BeforeAfterGallery({ gallery }: { gallery: GalleryContent }) {
                 </div>
               </div>
               {p.label && <figcaption style={{ padding: '14px 18px', fontSize: 14, fontWeight: 600, color: 'var(--c-ink)' }}>{p.label}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── LUX — varian craft tier "lux" (panen RestaurantLuxRenderer) ──────────────
+// Hanya dirender oleh manifest lux (hero:'cinematic' / showcase:'signature' /
+// stats:'recognition' / gallery:'editorial'). Membaca nada lux (--c-surface2/
+// --c-ink-dim/--c-border2) + motion (--ce-ease/--ce-dur-*) dgn fallback aman →
+// nol regresi: tema lama tak pernah menjangkau balok ini.
+
+// Hero sinematik — ken-burns gambar + scrim gelap + scroll cue. Teks putih di atas
+// foto (terbaca utk lux terang maupun gelap). Tanpa foto → mesh fill bertekstur.
+export function HeroCinematic({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
+  return (
+    <section className="ce-hero-cine" style={{ color: '#FFFFFF', background: '#0B0B0C' }}>
+      <div className="ce-hero-kb" aria-hidden style={hero.image ? { backgroundImage: `url(${hero.image})` } : { backgroundImage: MESH_FILL }} />
+      <div className="ce-hero-cine-grad" aria-hidden />
+      <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} opacity={0.06} />
+      <span className="ce-hero-cue" aria-hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+      </span>
+      <div style={{ maxWidth: 1120, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
+        {hero.eyebrow && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 22 }}>
+            <span style={{ width: 32, height: 1, background: '#FFFFFF', opacity: .65 }} />
+            <span className="ce-eyebrow" style={{ color: '#FFFFFF' }}>{hero.eyebrow}</span>
+          </div>
+        )}
+        <h1 style={{ fontSize: 'clamp(50px, 9vw, 116px)', lineHeight: .98, letterSpacing: '-.02em', margin: 0, color: '#FFFFFF', maxWidth: '15ch' }}>{hero.title}</h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 30, marginTop: 34 }}>
+          {hero.subtitle && <p style={{ fontSize: 17, opacity: .92, lineHeight: 1.7, maxWidth: '46ch', margin: 0 }}>{hero.subtitle}</p>}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+            {hero.ctaText && <Btn text={hero.ctaText} href={hero.ctaHref} />}
+            {hero.ctaText2 && <a className="ce-btn-ghost" href={hero.ctaHref2 ?? '#'}>{hero.ctaText2}</a>}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Showcase signature — top-N item ber-gambar selang-seling kiri/kanan + indeks
+// besar + harga + tag; sisanya daftar ringkas. Industri-agnostik. Tanpa gambar →
+// fallback daftar penuh.
+export function ShowcaseSignature({ showcase }: { showcase: NonNullable<ComposableContent['showcase']> }) {
+  const items = showcase.items
+  const featured = items.filter((it) => it.gambar).slice(0, 3)
+  const rest = featured.length > 0 ? items.filter((it) => !featured.includes(it)) : items
+  return (
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 96px) 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <ShowHeading title={showcase.title} subtitle={showcase.subtitle} />
+        {featured.length > 0 && (
+          <div className="ce-stagger">
+            {featured.map((it, i) => (
+              <article key={i} className="ce-sig">
+                <div className="ce-sig-media">{it.gambar && <img src={it.gambar} alt={it.nama} loading="lazy" />}</div>
+                <div>
+                  <span className="ce-sig-idx">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="ce-sig-name">{it.nama}</h3>
+                  {it.desc && <p className="ce-sig-lead">{it.desc}</p>}
+                  <div className="ce-sig-meta">
+                    {it.harga != null && <span className="ce-price ce-sig-price">{formatRupiah(it.harga)}</span>}
+                    {it.kategori && <span className="ce-sig-tag">{it.kategori}</span>}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+        {rest.length > 0 && (
+          <div className="ce-stagger" style={{ maxWidth: 820, marginTop: featured.length > 0 ? 'clamp(40px, 6vw, 72px)' : 0 }}>
+            {rest.map((it, i) => (
+              <div key={i} className="ce-menu-row" style={{ padding: '18px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
+                  <h3 style={{ fontSize: 18, margin: 0, color: 'var(--c-ink)' }}>{it.nama}</h3>
+                  {it.harga != null && <span className="ce-price" style={{ fontFamily: 'var(--f-display)', fontWeight: 700, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>{formatRupiah(it.harga)}</span>}
+                </div>
+                {it.desc && <p style={{ fontSize: 13, color: 'var(--c-ink-dim, var(--c-muted))', lineHeight: 1.6, margin: '5px 0 0', maxWidth: 560 }}>{it.desc}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// Stats recognition — band kolom divider border-kiri, angka serif besar.
+export function StatsRecognition({ stats }: { stats: StatItem[] }) {
+  const items = stats.slice(0, 4)
+  if (items.length === 0) return null
+  return (
+    <section className="ce-recog" style={{ background: 'var(--c-surface2, var(--c-surface))', padding: 'clamp(56px, 7vw, 90px) 24px' }}>
+      <div className="ce-recog-wrap" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
+        {items.map((s, i) => (
+          <div key={i} className="ce-recog-stat">
+            <b className="ce-stat-num" style={{ fontSize: 'clamp(38px, 4.6vw, 58px)', display: 'block' }}>{s.angka}</b>
+            <span className="ce-recog-label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// Gallery editorial — grid 4-kolom dgn span tinggi/lebar (maks 6), foto zoom +
+// caption reveal saat hover.
+export function GalleryEditorial({ gallery }: { gallery: GalleryContent }) {
+  const images = (gallery.images ?? []).slice(0, 6)
+  if (images.length === 0) return null
+  return (
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <SectionHead eyebrow={gallery.subtitle ? undefined : 'Galeri'} title={gallery.title ?? 'Galeri'} subtitle={gallery.subtitle} />
+        <div className="ce-galed">
+          {images.map((img, i) => (
+            <figure key={i} className={i === 0 ? 'ce-galed-tall' : (i === 1 || i === 4) ? 'ce-galed-wide' : undefined}>
+              <img src={img.src} alt={img.caption ?? `Galeri ${i + 1}`} loading="lazy" />
+              {img.caption && <figcaption>{img.caption}</figcaption>}
             </figure>
           ))}
         </div>

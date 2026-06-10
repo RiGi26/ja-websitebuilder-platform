@@ -48,6 +48,19 @@ export interface TokenPack {
     pad: 'normal' | 'airy'
     align: 'center' | 'left'
   }
+  // ── Lapis LUX (opsional) — dimensi craft tambahan untuk tier "lux". ABSEN →
+  // packToCssVars menurunkan tiap var dari token yang SUDAH ADA, jadi 96 tema
+  // lama emit nilai sama (nol regresi) & var ekstra inert (tak dibaca balok lama).
+  // HADIR → pack jadi "lux": .ce-root dapat data-lux (gerbang craft) + balok lux
+  // baru membaca nada/motion ini. Nada panen dari RestaurantLuxRenderer (--rl-*).
+  lux?: {
+    surface2?: string  // nada latar ke-2 (ritme antar-section) → --c-surface2 (rl-bg2)
+    inkDim?: string    // nada teks tersier (antara ink & muted) → --c-ink-dim (rl-inkDim)
+    border2?: string   // garis ke-2 lebih samar                → --c-border2 (rl-line2)
+    ease?: string      // easing signature                       → --ce-ease
+    durFast?: string   // durasi transisi cepat (tombol/hover)   → --ce-dur-fast
+    durSlow?: string   // durasi transisi lambat (zoom gambar)   → --ce-dur-slow
+  }
 }
 
 // ── Pack definitions ──────────────────────────────────────────
@@ -262,5 +275,13 @@ export function packToCssVars(p: TokenPack): Record<string, string> {
     '--sec-items': p.layout.align === 'left' ? 'flex-start' : 'center',
     '--sec-pad-y': p.layout.pad === 'airy' ? '120px' : '84px',
     '--head-mb': p.layout.pad === 'airy' ? '64px' : '44px',
+    // ── Lapis LUX — default TURUNKAN dari token yang ADA → tema lama tak berubah
+    // (var ini inert kecuali dibaca balok lux). Pack lux menimpa via p.lux.
+    '--c-surface2': p.lux?.surface2 ?? p.color.surface,
+    '--c-ink-dim': p.lux?.inkDim ?? p.color.muted,
+    '--c-border2': p.lux?.border2 ?? p.color.border,
+    '--ce-ease': p.lux?.ease ?? 'cubic-bezier(.16,1,.3,1)',
+    '--ce-dur-fast': p.lux?.durFast ?? '.2s',
+    '--ce-dur-slow': p.lux?.durSlow ?? '.5s',
   }
 }
