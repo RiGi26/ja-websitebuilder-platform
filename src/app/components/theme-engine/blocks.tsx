@@ -286,6 +286,60 @@ export const ENGINE_CSS = `
 .ce-js .ce-reveal { opacity: 0; transform: translateY(26px); }
 .ce-js .ce-reveal.ce-in { opacity: 1; transform: none; transition: opacity .7s var(--ce-ease, cubic-bezier(.16,1,.3,1)), transform .7s var(--ce-ease, cubic-bezier(.16,1,.3,1)); }
 @media (prefers-reduced-motion: reduce) { .ce-js .ce-reveal { opacity: 1; transform: none; } }
+/* ── Panen flagship toko-atelier (ce-script.ts) ─────────────── */
+/* Testimoni carousel — scroll-snap; JS hanya tombol/dot */
+.ce-tcar-track { display: flex; gap: clamp(16px, 2vw, 24px); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 6px; }
+.ce-tcar-track::-webkit-scrollbar { display: none; }
+.ce-tslide { flex: 0 0 min(100%, 480px); scroll-snap-align: start; }
+.ce-tctrl { display: flex; gap: 10px; }
+.ce-tbtn { width: 46px; height: 46px; border-radius: 999px; border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-ink); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color .25s ease, color .25s ease, border-color .25s ease, opacity .25s ease; }
+.ce-tbtn:hover:not(:disabled) { background: var(--c-primary); color: var(--c-on-primary); border-color: var(--c-primary); }
+.ce-tbtn:disabled { opacity: .32; cursor: default; }
+.ce-dots { display: flex; gap: 8px; margin-top: 24px; }
+.ce-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: var(--c-border); border: 0; padding: 0; cursor: pointer; transition: width .3s cubic-bezier(.16,1,.3,1), background-color .3s ease; }
+.ce-dot::after { content: ""; position: absolute; inset: -16px; }
+.ce-dot[aria-current="true"] { width: 26px; background: var(--c-primary); }
+/* Galeri quick-look — trigger overlay + dialog lightbox aksesibel */
+.ce-lb-open { position: absolute; inset: 0; z-index: 2; background: transparent; border: 0; cursor: zoom-in; padding: 0; }
+.ce-lb { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: clamp(12px, 3vw, 40px); }
+.ce-lb[hidden] { display: none; }
+.ce-lb-back { position: absolute; inset: 0; background: rgba(8,8,10,.78); backdrop-filter: blur(8px); border: 0; cursor: pointer; }
+.ce-lb-panel { position: relative; z-index: 2; max-width: 920px; width: 100%; max-height: 88vh; display: flex; flex-direction: column; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-lg); overflow: hidden; margin: 0; opacity: 0; transform: translateY(16px) scale(.985); transition: opacity .45s cubic-bezier(.16,1,.3,1), transform .45s cubic-bezier(.16,1,.3,1); }
+.ce-lb-in .ce-lb-panel { opacity: 1; transform: none; }
+.ce-lb-media { position: relative; background: linear-gradient(135deg, var(--c-hero-from), var(--c-hero-to)); aspect-ratio: 16/10; }
+.ce-lb-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ce-lb-title { padding: 16px 20px; font-family: var(--f-display); font-weight: 700; color: var(--c-ink); font-size: 16px; }
+.ce-lb-x { position: absolute; top: 10px; right: 10px; z-index: 3; width: 44px; height: 44px; border-radius: 999px; background: rgba(8,8,10,.55); border: 1px solid rgba(255,255,255,.25); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color .25s ease; }
+.ce-lb-x:hover { background: var(--c-primary); }
+.ce-lb-prev, .ce-lb-next { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 44px; height: 44px; border-radius: 999px; background: rgba(8,8,10,.55); border: 1px solid rgba(255,255,255,.25); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color .25s ease; }
+.ce-lb-prev { left: 10px; } .ce-lb-next { right: 10px; }
+.ce-lb-prev:hover, .ce-lb-next:hover { background: var(--c-primary); }
+/* Features sticky-passage — kiri pinned, kanan baris bernomor */
+.ce-fsticky { display: grid; grid-template-columns: .9fr 1.4fr; gap: clamp(36px, 6vw, 80px); align-items: start; }
+.ce-fsticky-side { position: sticky; top: 96px; }
+.ce-fsticky-row { display: grid; grid-template-columns: auto 1fr; gap: clamp(18px, 3vw, 32px); padding: clamp(24px, 3vw, 36px) 0; border-top: 1px solid var(--c-border); transition: padding-left .4s cubic-bezier(.16,1,.3,1); }
+.ce-fsticky-rows .ce-fsticky-row:last-child { border-bottom: 1px solid var(--c-border); }
+.ce-fsticky-row:hover { padding-left: 12px; }
+.ce-fsticky-num { font-family: var(--f-display); font-weight: var(--fw-display); font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; color: color-mix(in srgb, var(--c-primary) 45%, transparent); min-width: 2.2ch; font-variant-numeric: tabular-nums; transition: color .35s ease; }
+.ce-fsticky-row:hover .ce-fsticky-num { color: var(--c-primary); }
+@media (max-width: 880px) { .ce-fsticky { grid-template-columns: 1fr; } .ce-fsticky-side { position: static; } }
+/* CTA duotone — foto grayscale + tint primary (mix-blend) + tombol magnetic */
+.ce-cta-duo { position: relative; overflow: hidden; text-align: center; color: #fff; }
+.ce-cta-duo-bg { position: absolute; inset: 0; background-position: center; background-size: cover; filter: grayscale(1) contrast(1.05) brightness(.85); }
+.ce-cta-duo-tint { position: absolute; inset: 0; background: linear-gradient(120deg, var(--c-primary), #16161a 70%); mix-blend-mode: color; opacity: .6; }
+.ce-cta-duo-scrim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,12,.82), rgba(10,10,12,.58) 50%, rgba(10,10,12,.86)); }
+.ce-cta-duo.noimg .ce-cta-duo-bg { background: radial-gradient(ellipse 70% 60% at 18% 85%, color-mix(in srgb, var(--c-primary) 24%, transparent), transparent 60%), radial-gradient(ellipse 55% 45% at 85% 12%, color-mix(in srgb, var(--c-primary) 12%, transparent), transparent 55%), #101014; filter: none; }
+.ce-cta-duo.noimg .ce-cta-duo-tint, .ce-cta-duo.noimg .ce-cta-duo-scrim { display: none; }
+.ce-cta-duo-in { position: relative; z-index: 2; max-width: 820px; margin: 0 auto; padding: clamp(96px, 13vw, 160px) 24px; }
+.ce-cta-duo h2 { color: #fff; font-size: clamp(34px, 5.6vw, 64px); line-height: 1.05; margin: 0; }
+.ce-cta-duo p { color: rgba(255,255,255,.84); max-width: 52ch; margin: 18px auto 0; line-height: 1.75; }
+.ce-mag { will-change: transform; transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+@media (prefers-reduced-motion: reduce) {
+  .ce-mag { transform: none !important; }
+  .ce-lb-panel { opacity: 1; transform: none; }
+  .ce-galed figcaption { opacity: 1; }
+  .ce-tcar-track { scroll-behavior: auto; }
+}
 `
 
 // Scrim untuk teks di atas foto (legibilitas konsisten apa pun temanya).
@@ -864,13 +918,15 @@ function SectionHead({ eyebrow, title, subtitle }: { eyebrow?: string; title: st
 }
 
 // ── STATS — strip angka kredibilitas (tabular-nums) ───────────
-export function Stats({ stats }: { stats: StatItem[] }) {
+// countUp (panen flagship): SSR tetap menulis nilai final; ce-script.ts
+// menganimasikan 0→final saat band terlihat (no-JS/reduce = final).
+export function Stats({ stats, countUp }: { stats: StatItem[]; countUp?: boolean }) {
   return (
     <section style={{ background: 'var(--c-page)', padding: '64px 24px' }}>
       <div className="ce-stats-band ce-stagger" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '28px 12px' }}>
         {stats.map((s, i) => (
           <div key={i} className="ce-stat" style={{ textAlign: 'center' }}>
-            <div className="ce-stat-num" style={{ fontSize: 'clamp(34px, 5vw, 52px)' }}>{s.angka}</div>
+            <div className="ce-stat-num" data-cu={countUp || undefined} style={{ fontSize: 'clamp(34px, 5vw, 52px)' }}>{s.angka}</div>
             <div style={{ marginTop: 8, fontSize: 13, color: 'var(--c-muted)', fontWeight: 600 }}>{s.label}</div>
           </div>
         ))}
@@ -1121,7 +1177,7 @@ export function ShowcaseSignature({ showcase }: { showcase: NonNullable<Composab
 }
 
 // Stats recognition — band kolom divider border-kiri, angka serif besar.
-export function StatsRecognition({ stats }: { stats: StatItem[] }) {
+export function StatsRecognition({ stats, countUp }: { stats: StatItem[]; countUp?: boolean }) {
   const items = stats.slice(0, 4)
   if (items.length === 0) return null
   return (
@@ -1129,7 +1185,7 @@ export function StatsRecognition({ stats }: { stats: StatItem[] }) {
       <div className="ce-recog-wrap" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
         {items.map((s, i) => (
           <div key={i} className="ce-recog-stat">
-            <b className="ce-stat-num" style={{ fontSize: 'clamp(38px, 4.6vw, 58px)', display: 'block' }}>{s.angka}</b>
+            <b className="ce-stat-num" data-cu={countUp || undefined} style={{ fontSize: 'clamp(38px, 4.6vw, 58px)', display: 'block' }}>{s.angka}</b>
             <span className="ce-recog-label">{s.label}</span>
           </div>
         ))}
@@ -1140,7 +1196,9 @@ export function StatsRecognition({ stats }: { stats: StatItem[] }) {
 
 // Gallery editorial — grid 4-kolom dgn span tinggi/lebar (maks 6), foto zoom +
 // caption reveal saat hover.
-export function GalleryEditorial({ gallery }: { gallery: GalleryContent }) {
+// quicklook (panen flagship): tiap foto memicu dialog lightbox SSR tunggal
+// (ce-script.ts: focus-trap, Esc, panah). Tanpa prop → output lama byte-identik.
+export function GalleryEditorial({ gallery, quicklook }: { gallery: GalleryContent; quicklook?: boolean }) {
   const images = (gallery.images ?? []).slice(0, 6)
   if (images.length === 0) return null
   return (
@@ -1152,11 +1210,35 @@ export function GalleryEditorial({ gallery }: { gallery: GalleryContent }) {
             <figure key={i} className={i === 0 ? 'ce-galed-tall' : (i === 1 || i === 4) ? 'ce-galed-wide' : undefined}>
               <img src={img.src} alt={img.caption ?? `Galeri ${i + 1}`} loading="lazy" />
               {img.caption && <figcaption>{img.caption}</figcaption>}
+              {quicklook && (
+                <button
+                  type="button" className="ce-lb-open"
+                  aria-label={`Perbesar foto: ${img.caption ?? `galeri ${i + 1}`}`}
+                  data-src={img.src} data-title={img.caption ?? gallery.title ?? 'Galeri'}
+                />
+              )}
             </figure>
           ))}
         </div>
       </div>
+      {quicklook && <GalleryLightbox />}
     </section>
+  )
+}
+
+// Dialog quick-look tunggal (diisi ce-script.ts dari data-* trigger).
+function GalleryLightbox() {
+  return (
+    <div className="ce-lb" role="dialog" aria-modal="true" aria-label="Pratinjau foto" hidden>
+      <div className="ce-lb-back" data-lb-close aria-hidden />
+      <figure className="ce-lb-panel">
+        <button type="button" className="ce-lb-x" data-lb-close aria-label="Tutup pratinjau">×</button>
+        <div className="ce-lb-media"><img alt="" /></div>
+        <figcaption className="ce-lb-title" />
+        <button type="button" className="ce-lb-prev" aria-label="Foto sebelumnya"><ChevL /></button>
+        <button type="button" className="ce-lb-next" aria-label="Foto berikutnya"><ChevR /></button>
+      </figure>
+    </div>
   )
 }
 
@@ -1767,5 +1849,105 @@ export function Footer({ content, motif, motifColor }: { content: ComposableCont
       </div>
     </footer>
     </>
+  )
+}
+
+// ════════════════════════════════════════════════════════════
+// PANEN FLAGSHIP TOKO-ATELIER — varian interaktif (ce-script.ts).
+// Hanya dirender bila manifest memilihnya → tema lama nol regresi.
+// ════════════════════════════════════════════════════════════
+const ChevL = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+)
+const ChevR = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+)
+
+// Testimoni carousel — scroll-snap (geser native), JS hanya tombol+dot.
+// Pola aria sama dgn flagship: region carousel + slide bernomor + dot berlabel.
+export function TestimoniCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const many = testimonials.length > 1
+  return (
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 88px) 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+          <SectionHead eyebrow="Kata Mereka" title="Dipercaya Pelanggan Kami" />
+          {many && (
+            <div className="ce-tctrl" style={{ marginBottom: 40 }}>
+              <button type="button" className="ce-tbtn ce-tprev" aria-label="Testimoni sebelumnya"><ChevL /></button>
+              <button type="button" className="ce-tbtn ce-tnext" aria-label="Testimoni berikutnya"><ChevR /></button>
+            </div>
+          )}
+        </div>
+        <div className="ce-tcar" role="region" aria-roledescription="carousel" aria-label="Testimoni pelanggan">
+          <div className="ce-tcar-track" tabIndex={0} role="group" aria-label="Daftar testimoni — gulir horizontal atau pakai tombol panah">
+            {testimonials.map((t, i) => (
+              <div className="ce-tslide" key={i} role="group" aria-roledescription="slide" aria-label={`${i + 1} dari ${testimonials.length}`}>
+                <QuoteCard t={t} />
+              </div>
+            ))}
+          </div>
+          {many && (
+            <div className="ce-dots" role="group" aria-label="Pilih testimoni">
+              {testimonials.map((_, i) => (
+                <button type="button" className="ce-dot" key={i} aria-label={`Ke testimoni ${i + 1}`} aria-current={i === 0 ? 'true' : 'false'} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Features sticky-passage — kiri pinned (CSS sticky), kanan baris bernomor.
+export function FeaturesSticky({ features, heading }: { features: Feature[]; heading?: FeatHead }) {
+  return (
+    <section style={{ background: 'var(--c-page)', padding: 'var(--sec-pad-y, 96px) 24px' }}>
+      <div className="ce-fsticky" style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <div className="ce-fsticky-side">
+          <p className="ce-eyebrow" style={{ margin: 0 }}>{heading?.eyebrow ?? 'Keunggulan'}</p>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', margin: '14px 0 0', color: 'var(--c-ink)' }}>{heading?.title ?? 'Mengapa Memilih Kami'}</h2>
+          {heading?.subtitle && <p style={{ fontSize: 15, color: 'var(--c-muted)', margin: '14px 0 0', lineHeight: 1.7, maxWidth: '38ch' }}>{heading.subtitle}</p>}
+        </div>
+        <div className="ce-fsticky-rows">
+          {features.map((f, i) => (
+            <div className="ce-fsticky-row" key={i}>
+              <span className="ce-fsticky-num" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <b style={{ display: 'block', fontFamily: 'var(--f-display)', fontWeight: 700, fontSize: 'clamp(18px, 2.2vw, 23px)', color: 'var(--c-ink)' }}>{f.title}</b>
+                <p style={{ margin: '8px 0 0', fontSize: 15, color: 'var(--c-muted)', lineHeight: 1.7, maxWidth: '52ch' }}>{f.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// CTA duotone — band full-bleed: foto grayscale + tint primary (mix-blend) +
+// scrim; tombol .ce-mag (magnetic, pointer presisi saja). Tanpa foto → mesh.
+export function CTADuotone({ cta }: { cta: NonNullable<ComposableContent['cta']> }) {
+  return (
+    <section className={`ce-cta-duo${cta.image ? '' : ' noimg'}`}>
+      <div className="ce-cta-duo-bg" style={cta.image ? { backgroundImage: `url(${cta.image})` } : undefined} />
+      <div className="ce-cta-duo-tint" />
+      <div className="ce-cta-duo-scrim" />
+      <div className="ce-cta-duo-in">
+        <h2>{cta.title}</h2>
+        {cta.subtitle && <p>{cta.subtitle}</p>}
+        {cta.ctaText && (
+          <div style={{ marginTop: 38, display: 'flex', justifyContent: 'center' }}>
+            <a
+              href={cta.ctaHref ?? '#'} className="ce-btn ce-mag"
+              style={{ display: 'inline-block', padding: '16px 36px', fontWeight: 700, fontSize: 15, boxShadow: '0 14px 44px color-mix(in srgb, var(--c-primary) 35%, transparent)' }}
+            >
+              {cta.ctaText}
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
   )
 }

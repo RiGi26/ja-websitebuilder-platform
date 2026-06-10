@@ -929,3 +929,76 @@ describe('Craft round 2 (referensi situs resto)', () => {
     expect(html).toContain('href="#tim"')
   })
 })
+
+// ── Panen flagship toko-atelier → varian interaktif (ce-script.ts) ──
+// CATATAN: ENGINE_CSS ikut ter-render → assert kelas pakai bentuk markup
+// `class="..."` supaya tidak false-positive dari selector di <style>.
+describe('ComposableRenderer — panen flagship (countUp/carousel/quicklook/duotone)', () => {
+  const RICH: ComposableContent = {
+    ...CONTENT,
+    stats: [
+      { angka: '4.9', label: 'Rating' },
+      { angka: '12rb+', label: 'Terkirim' },
+      { angka: '48 jam', label: 'Kirim' },
+    ],
+    testimonials: [
+      { quote: 'Mantap sekali.', nama: 'Dewi', peran: 'Jakarta' },
+      { quote: 'Datang lagi.', nama: 'Budi', peran: 'Bandung' },
+      { quote: 'Nampol.', nama: 'Sari' },
+    ],
+    gallery: {
+      title: 'Galeri',
+      images: [
+        { src: 'https://example.com/a.jpg', caption: 'Dapur' },
+        { src: 'https://example.com/b.jpg', caption: 'Ruang' },
+        { src: 'https://example.com/c.jpg' },
+      ],
+    },
+  }
+
+  it('lux-toko: script inline sekali + countUp + carousel aria + CTA duotone magnetic', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-toko']} content={RICH} />)
+    expect(html.match(/window\.__ceInit=1/g)?.length).toBe(1) // IIFE di-inject sekali
+    expect(html.match(/data-cu="true"/g)?.length).toBe(3) // SSR tetap nilai final
+    expect(html).toContain('12rb+')
+    expect(html).toContain('aria-roledescription="carousel"')
+    expect(html).toContain('aria-label="1 dari 3"')
+    expect((html.match(/class="ce-dot"/g)?.length ?? 0)).toBe(3)
+    expect(html).toContain('class="ce-cta-duo-tint"') // lapis duotone
+    expect(html).toContain('ce-btn ce-mag') // tombol magnetic
+  })
+
+  it('lux-travel: galeri quicklook — trigger per foto + dialog tunggal aksesibel', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-travel']} content={RICH} />)
+    expect((html.match(/class="ce-lb-open"/g)?.length ?? 0)).toBe(3)
+    expect(html.match(/role="dialog"/g)?.length).toBe(1)
+    expect(html).toContain('aria-modal="true"')
+    expect(html).toContain('aria-label="Perbesar foto: Dapur"')
+  })
+
+  it('lux-klinik: features sticky-passage dirender dengan baris bernomor', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-klinik']} content={RICH} />)
+    expect(html).toContain('class="ce-fsticky-side"')
+    expect(html).toContain('class="ce-fsticky-num"')
+    expect(html).toContain('Homemade Harian')
+  })
+
+  it('CE_JS menggantikan CeReveal pada tema penyuntik (reveal tetap satu jalur)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-toko']} content={RICH} />)
+    // reveal hidup di script inline → sample statis ikut beranimasi
+    expect(html).toContain("classList.add('ce-in')")
+  })
+
+  it('regresi: manifest non-interaktif TIDAK menyuntik script — output bebas CE_JS', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['kuliner-rustic']} content={RICH} />)
+    expect(html).not.toContain('window.__ceInit')
+    expect(html).not.toContain('data-cu="true"')
+    expect(html).not.toContain('class="ce-lb-open"')
+  })
+
+  it('regresi: stats tanpa statsCountUp tidak diberi marker data-cu', () => {
+    const manifest: ThemeManifest = { ...MANIFESTS['lux-toko'], blocks: { ...MANIFESTS['lux-toko'].blocks, statsCountUp: undefined } }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={manifest} content={RICH} />)
+    expect(html).not.toContain('data-cu="true"')
+  })
+})
