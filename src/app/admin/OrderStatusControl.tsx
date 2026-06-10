@@ -145,7 +145,7 @@ export default function OrderStatusControl({
           onChange={(e) => setDeliveredCredentials(e.target.value)}
           disabled={loading}
           rows={2}
-          placeholder="Akses admin (opsional). Contoh: admin@site.com / Pass123!"
+          placeholder="Catatan akses tambahan (opsional). Login portal customer dikirim OTOMATIS via WA + email saat step Launch."
           className="w-full text-xs rounded-xl border border-black/10 p-3 focus:border-green-500 focus:outline-none resize-none disabled:opacity-50"
         />
         {deliveryChanged && (
