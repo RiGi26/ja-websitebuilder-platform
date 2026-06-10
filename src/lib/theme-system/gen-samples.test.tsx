@@ -11,19 +11,34 @@
 // ============================================================
 import { it } from 'vitest'
 import { writeFileSync, mkdirSync } from 'node:fs'
+import type { ComponentType } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
 import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
-import { MANIFESTS } from '@/lib/theme-system/manifest'
+import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
+import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
 
 // Renderer bespoke premium (Opsi A). id sintetik → render renderer khusus dgn
 // sample-content kaya. `restaurant-lux-brand` mendemokan aksen ikut warna brand.
-const LUX: Record<string, { sample: string; variant?: string; primary?: string; label: string }> = {
+// `Renderer` opsional (default RestaurantLuxRenderer → entri lama byte-identical);
+// `sw` = warna swatch kartu index.
+type BespokeEntry = {
+  sample: string
+  variant?: string
+  primary?: string
+  label: string
+  sw?: string
+  Renderer?: ComponentType<{ content: ComposableContent; variant?: string; primary?: string }>
+}
+const LUX: Record<string, BespokeEntry> = {
   'restaurant-lux': { sample: 'finedining-aurum', variant: 'aurum', label: 'Restaurant Lux — Aurum' },
   'restaurant-lux-noir': { sample: 'finedining-aurum', variant: 'noir', label: 'Restaurant Lux — Noir' },
   'restaurant-lux-brand': { sample: 'finedining-aurum', variant: 'aurum', primary: '#7FA06B', label: 'Restaurant Lux — aksen brand (hijau)' },
+  // FLAGSHIP toko/fashion (dark-launch) — lihat FLAGSHIP_ATELIER_PLAN.md.
+  'toko-atelier': { sample: 'toko-atelier', variant: 'noir', label: 'Toko Atelier — Noir (flagship fashion)', sw: '#C5A572', Renderer: TokoAtelierRenderer },
+  'toko-atelier-brand': { sample: 'toko-atelier', variant: 'noir', primary: '#7E1F2D', label: 'Toko Atelier — aksen brand (burgundy)', sw: '#7E1F2D', Renderer: TokoAtelierRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES
@@ -65,9 +80,10 @@ it.skipIf(!GEN)('generate theme sample HTML', () => {
   for (const id of luxIds) {
     const cfg = LUX[id]
     if (!cfg) continue
-    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={sampleContentForTheme(cfg.sample)} variant={cfg.variant} primary={cfg.primary} />)
+    const Renderer = cfg.Renderer ?? RestaurantLuxRenderer
+    const html = renderToStaticMarkup(<Renderer content={sampleContentForTheme(cfg.sample)} variant={cfg.variant} primary={cfg.primary} />)
     writeFileSync(`${dir}/${id}.html`, pageDoc(cfg.label, html))
-    cards.push(`<a class="card" href="${id}.html"><span class="sw" style="background:#C9A24B"></span><b>${cfg.label}</b><small>bespoke · ${id}</small><p>Renderer premium Opsi A.</p></a>`)
+    cards.push(`<a class="card" href="${id}.html"><span class="sw" style="background:${cfg.sw ?? '#C9A24B'}"></span><b>${cfg.label}</b><small>bespoke · ${id}</small><p>Renderer premium Opsi A.</p></a>`)
   }
 
   const index = pageDoc(
