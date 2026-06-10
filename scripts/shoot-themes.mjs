@@ -44,11 +44,19 @@ for (const id of ids) {
       viewport: { width, height: 900 },
       deviceScaleFactor: 1, // keep 1 — crisp enough for review, smaller files/tokens
     })
+    // Reduced-motion BEFORE load: JS-driven motion (toko-atelier count-up,
+    // smooth-scroll, magnetic) settles to final state by its own double-gate.
+    await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto(url, { waitUntil: 'networkidle' })
     // Freeze CSS entrance animations (stagger fade-up starts at opacity:0) so the
     // screenshot captures the settled state, not a mid-transition frame.
+    // `.ta-*` (toko-atelier): keyframe entrances + reveal engine forced to settled
+    // — killing animations alone would strand them at their hidden first frame.
     await page.addStyleTag({
-      content: '*,*::before,*::after{animation:none!important;transition:none!important}.ce-stagger>*{opacity:1!important;transform:none!important}',
+      content:
+        '*,*::before,*::after{animation:none!important;transition:none!important}.ce-stagger>*{opacity:1!important;transform:none!important}' +
+        '.ta-reveal{opacity:1!important;transform:none!important;filter:none!important}.ta-rule{transform:none!important}' +
+        '.ta-hero .ta-eyebrow,.ta-hero-sub,.ta-hero-meta{opacity:1!important}.ta-w>span{transform:none!important}',
     })
     const out = path.join(SAMPLES_DIR, `${id}-${name}.png`)
     await page.screenshot({ path: out, fullPage: true })
