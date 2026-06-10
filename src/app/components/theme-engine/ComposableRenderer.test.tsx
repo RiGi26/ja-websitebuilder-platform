@@ -1002,3 +1002,27 @@ describe('ComposableRenderer — panen flagship (countUp/carousel/quicklook/duot
     expect(html).not.toContain('data-cu="true"')
   })
 })
+
+// ── Band add-on (newsletter/career) — content.bands dirender additive ──
+describe('ComposableRenderer — band add-on (newsletter/career)', () => {
+  it('bands dirender dengan data-band + CTA, tanpa mengubah CTA utama', () => {
+    const c: ComposableContent = {
+      ...CONTENT,
+      bands: [
+        { preset: 'newsletter', title: 'Tetap Terhubung', subtitle: 'Promo terbaru.', ctaText: 'Berlangganan', ctaHref: 'https://wa.me/628123' },
+        { preset: 'career', title: 'Bergabung dengan Tim Kami', ctaText: 'Kirim Lamaran' },
+      ],
+    }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-corporate']} content={c} />)
+    expect(html).toContain('data-band="newsletter"')
+    expect(html).toContain('data-band="career"')
+    expect(html).toContain('Tetap Terhubung')
+    expect(html).toContain('Berlangganan')
+    expect(html).toContain('Lapar?') // CTA utama (duotone) tetap dari content.cta
+  })
+
+  it('tanpa bands → nol band (regresi)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-corporate']} content={CONTENT} />)
+    expect(html).not.toContain('data-band=')
+  })
+})

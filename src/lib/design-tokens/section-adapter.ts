@@ -23,7 +23,9 @@ export function sectionsToSiteContent(
   const heroIsi = isiOf('hero_banner')
   const aboutIsi = sections.find((s) => s.tipe_komponen === 'about')
   const featIsi = sections.find((s) => s.tipe_komponen === 'features')
-  const ctaIsi = sections.find((s) => s.tipe_komponen === 'cta')
+  // CTA utama = row cta TANPA `preset` — band add-on (newsletter/career)
+  // membawa isi_komponen.preset dan tidak boleh membajak CTA penutup.
+  const ctaIsi = sections.find((s) => s.tipe_komponen === 'cta' && !str((s.isi_komponen as Isi | undefined)?.preset))
 
   // WA terpusat: nomor tunggal dari profil (tab Profil) → semua link wa.me di
   // hero/CTA dirender ulang dari sini (cta_link build-time bisa basi).

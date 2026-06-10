@@ -5,8 +5,9 @@
 // saat me-route tema composable. Pola baca defensif sama seperti adapter lain.
 // ============================================================
 import type { PageSection, TenantProfile } from '@/types/websitebuilder'
-import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem, StatementContent } from './manifest'
+import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem, StatementContent, PresetBand } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
+import { resolveWaHref, waLink } from '@/lib/wa'
 
 // Bentuk yang dibagi Product / MenuItem / Service / (blog map). Field dasar
 // dipakai semua varian; field industri (kategori/durasi_menit/stok/penulis/
@@ -86,6 +87,11 @@ export function composableContentFromSections(
   const teamTitle = str(konten.teamTitle)
   const aboutImage = str(konten.about_image)
   const ctaImage = str(konten.cta_image)
+  // Band add-on (newsletter/career) — row `cta` ber-preset hasil injeksi
+  // B-section. CTA utama sudah mengabaikannya (section-adapter); di sini band
+  // dipetakan supaya tema composable/lux ikut merendernya (token path sudah
+  // merender row-nya via SectionRenderer).
+  const bands = buildPresetBands(sections, base.contact?.wa)
 
   return {
     nama: base.nama,
@@ -108,7 +114,25 @@ export function composableContentFromSections(
     about: base.about ? { ...base.about, image: aboutImage } : base.about,
     cta: base.cta ? { ...base.cta, image: ctaImage } : base.cta,
     contact: base.contact,
+    bands,
   }
+}
+
+// Row `cta` ber-isi_komponen.preset → PresetBand[]. Tanpa cta_link → jatuh ke
+// WA terpusat (band ini ajakan kontak: lamaran/berlangganan via WA).
+function buildPresetBands(sections: PageSection[], wa?: string): PresetBand[] | undefined {
+  const out: PresetBand[] = []
+  for (const s of sections) {
+    if (s.tipe_komponen !== 'cta') continue
+    const isi = (s.isi_komponen ?? {}) as Record<string, unknown>
+    const preset = str(isi.preset)
+    if (!preset) continue
+    const title = str(isi.title)
+    if (!title) continue
+    const href = resolveWaHref(str(isi.cta_link), wa) ?? (waLink(wa) !== '#' ? waLink(wa) : undefined)
+    out.push({ preset, title, subtitle: str(isi.subtitle), ctaText: str(isi.cta_text), ctaHref: href })
+  }
+  return out.length ? out : undefined
 }
 
 // data_konten.testimoni (bentuk form: {nama,kota,teks,bintang}) → Testimonial
