@@ -110,18 +110,20 @@ describe('TokoAtelierRenderer', () => {
   })
 
   // ── Sprint 3: stats + galeri + carousel + faq + cta ──
+  // CATATAN: CSS string ikut ter-render → assert kelas pakai bentuk markup
+  // `class="..."` supaya tidak false-positive dari selector di <style>.
   it('stats: band count-up — SSR menulis nilai final, marker data-cu terpasang', () => {
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
-    expect(html).toContain('ta-stats')
-    expect((html.match(/data-cu/g)?.length ?? 0)).toBeGreaterThanOrEqual(4)
+    expect(html).toContain('class="ta-stats"')
+    expect(html.match(/data-cu="true"/g)?.length).toBe(4)
     expect(html).toContain('12rb+') // nilai final tampil tanpa JS
     expect(html).toContain('48 jam')
   })
 
   it('galeri: mosaik + pita breakout + tiap foto memicu lightbox', () => {
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
-    expect(html).toContain('ta-gal-grid')
-    expect(html).toContain('ta-gal-break') // >4 foto → pita edge-to-edge
+    expect(html).toContain('class="ta-gal-grid"')
+    expect(html).toContain('class="ta-gal-break"') // >4 foto → pita edge-to-edge
     expect(html).toContain('Pemilihan kain')
     expect(html).toContain('data-title="Meja potong"')
     // trigger lightbox = 9 produk bergambar + 7 foto galeri
@@ -131,7 +133,7 @@ describe('TokoAtelierRenderer', () => {
   it('galeri tanpa images → section self-hide, lookbook tetap punya lightbox', () => {
     const c = { ...content, gallery: undefined }
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={c} />)
-    expect(html).not.toContain('ta-gal-grid')
+    expect(html).not.toContain('class="ta-gal-grid"')
     expect(html.match(/role="dialog"/g)?.length).toBe(1) // produk masih bergambar
   })
 
@@ -140,7 +142,7 @@ describe('TokoAtelierRenderer', () => {
     expect(html).toContain('aria-roledescription="carousel"')
     expect(html).toContain('aria-label="1 dari 4"')
     expect((html.match(/class="ta-dot"/g)?.length ?? 0)).toBe(4)
-    expect(html).toContain('ta-tprev')
+    expect(html).toContain('class="ta-tbtn ta-tprev"')
     expect(html).toContain('Sarasvati')
   })
 
@@ -148,14 +150,14 @@ describe('TokoAtelierRenderer', () => {
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
     expect((html.match(/<details/g)?.length ?? 0)).toBe(4)
     expect(html).toContain('Apakah bisa custom ukuran?')
-    expect(html).toContain('ta-qa-ic')
+    expect(html).toContain('class="ta-qa-ic"')
   })
 
   it('cta band: duotone + tombol magnetic; href #wa dipetakan ke wa.me', () => {
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
-    expect(html).toContain('ta-cta')
-    expect(html).toContain('ta-cta-tint') // lapis duotone
-    expect(html).toContain('ta-mag')
+    expect(html).toContain('class="ta-cta"')
+    expect(html).toContain('class="ta-cta-tint"') // lapis duotone
+    expect(html).toContain('ta-btn-solid ta-mag') // tombol magnetic di markup
     expect(html).toContain('Sekali Habis, Tidak Diulang')
     expect(html).not.toContain('href="#wa"') // '#wa' tidak bocor sebagai anchor mati
   })

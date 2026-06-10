@@ -1,7 +1,8 @@
 # FLAGSHIP "TOKO ATELIER" — Template Maksimal Pilot (Bespoke, Toko/Fashion)
 
-> Status: **Sprint 2 — kode SELESAI, menunggu Checkpoint B** (2026-06-10). Checkpoint A approved.
+> Status: **S1–S4 SELESAI — PR #119 open (dark-launched)** (2026-06-10). Checkpoint A approved; B+C dilebur ke review HTML final atas perintah owner ("jalankan sprint 2 3 dan 4").
 > Keputusan owner: pilot = **toko/fashion** · vehicle = **bespoke one-off renderer** (Opsi A, pola restaurant-lux; porting cost ke composable = accepted).
+> Sisa: owner review `theme-samples/toko-atelier.html` + `npm test`/`npm run shoot toko-atelier` lokal → merge → UAT swap `branding.theme='toko-atelier'` di 1 site uji. Varian ivoire + admin preview = fast-follow opsional (di luar PR ini).
 
 ## Konteks
 
