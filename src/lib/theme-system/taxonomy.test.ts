@@ -52,20 +52,22 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('invarian S0-1: manifest === id', () => {
+  it('invarian S0-1: manifest === id (kecuali flagship bespoke toko-atelier)', () => {
     for (const byCat of Object.values(THEMES)) {
       for (const t of Object.values(byCat ?? {}).flat()) {
+        // Atelier (fashion) = renderer bespoke, bukan manifest composable →
+        // manifest sengaja 'toko-atelier' (≠ id). Dikecualikan dari invarian.
+        if (t.manifest === 'toko-atelier') continue
         expect(t.manifest).toBe(t.id)
       }
     }
   })
 
-  it('getReadySubKategori: ke-8 sub-kategori Toko Online aktif (replikasi tuntas)', () => {
-    const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual([
-      'kuliner', 'fashion', 'kerajinan', 'kecantikan', 'gadget', 'rumah', 'kesehatan', 'anak',
-    ])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(8)
+  it('getReadySubKategori: hanya Fashion aktif di Toko Online (lux clothing-only)', () => {
+    // LUX-ONLY: tier lux baru dibangun utk toko baju (Toko Atelier). Sub-kategori
+    // lain ready:false sampai tema lux-nya dibangun.
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['fashion'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
   })
 
   it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
@@ -81,15 +83,12 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(t?.nama).toBe('Heritage Kuliner')
   })
 
-  it('Fashion (S2): 3 gaya terdaftar & sub-kategori AKTIF (S2-3)', () => {
+  it('Fashion = flagship Toko Atelier (bespoke noir/ivoire), sub-kategori AKTIF', () => {
     const themes = getThemes('toko_online', 'fashion')
-    expect(themes.map((t) => t.id)).toEqual([
-      'fashion-editorial',
-      'fashion-minimal',
-      'fashion-vibrant',
-    ])
+    expect(themes.map((t) => t.id)).toEqual(['atelier-noir', 'atelier-ivoire'])
+    expect(themes.every((t) => t.manifest === 'toko-atelier')).toBe(true)
     const fashion = getSubKategori('toko_online').find((s) => s.id === 'fashion')
-    expect(fashion?.ready).toBe(true) // aktif: blok+polish+verify tuntas
+    expect(fashion?.ready).toBe(true)
     expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 

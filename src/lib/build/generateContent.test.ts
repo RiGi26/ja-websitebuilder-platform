@@ -80,6 +80,48 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
   })
 })
 
+// FLAGSHIP "Toko Atelier" (toko baju) → renderer bespoke theme='toko-atelier'.
+// Dipilih saat sub-kategori 'fashion' di brief form; variant 'atelier-noir'/
+// 'atelier-ivoire' dipetakan ke palet native renderer 'noir'/'ivoire'.
+describe('generateContent — Fashion → toko-atelier (bespoke flagship)', () => {
+  const mkToko = (branding: Record<string, unknown>) =>
+    generateContent({
+      industri: 'Toko Online',
+      nama_usaha: 'Toko Baju Uji',
+      briefing_data: { industri_tipe: 'toko_online', branding },
+    })
+
+  it('atelier-noir → theme toko-atelier, variant noir, aksen brand', () => {
+    const plan = mkToko({ sub_kategori: 'fashion', variant: 'atelier-noir', primary_color: '#7E1F2D' })
+    expect(plan.theme).toBe('toko-atelier')
+    expect(plan.variant).toBe('noir')
+    expect(plan.primary).toBe('#7E1F2D')
+  })
+
+  it('atelier-ivoire → variant ivoire', () => {
+    expect(mkToko({ sub_kategori: 'fashion', variant: 'atelier-ivoire' }).variant).toBe('ivoire')
+  })
+
+  it('sub_kategori fashion tanpa variant cocok → default noir', () => {
+    const plan = mkToko({ sub_kategori: 'fashion' })
+    expect(plan.theme).toBe('toko-atelier')
+    expect(plan.variant).toBe('noir')
+  })
+
+  it('imagery enrichment aktif: products punya foto + foto_hero terisi (sample atelier)', () => {
+    const plan = mkToko({ sub_kategori: 'fashion', variant: 'atelier-noir' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
+  it('toko_online di luar fashion ("Lainnya") tetap lux-toko composable, BUKAN atelier', () => {
+    const plan = mkToko({ variant: 'lux-toko' })
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-toko')
+  })
+})
+
 // LUX TIER (Sprint 1) — composable lux jadi DEFAULT premium per industri pilot
 // (restaurant + klinik) saat briefing tak memilih variant; pilihan eksplisit
 // dihormati; Fine Dining bespoke (benchmark) tetap menang; konten produksi

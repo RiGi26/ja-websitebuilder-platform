@@ -16,14 +16,13 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#B5532A') // swatch mood rustic ter-inject
   })
 
-  it('render 3 gaya Fashion dengan nama + swatch (S2-1)', () => {
+  it('render gaya Fashion = flagship Toko Atelier (noir/ivoire)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="fashion" value="" onChange={noop} />,
     )
-    expect(html).toContain('Editorial')
-    expect(html).toContain('Minimalis')
-    expect(html).toContain('Vibrant')
-    expect(html).toContain('#5B2BE8') // swatch mood vibrant ter-inject
+    expect(html).toContain('Atelier Noir')
+    expect(html).toContain('Atelier Ivoire')
+    expect(html).toContain('#1A1614') // swatch mood noir ter-inject
   })
 
   it('render 3 gaya Kerajinan dengan motif (flagship)', () => {
@@ -51,12 +50,14 @@ describe('ThemePicker (S0-3)', () => {
 })
 
 describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
-  it('menampilkan Kuliner + opsi "Lainnya" untuk toko_online', () => {
+  it('menampilkan Fashion + opsi "Lainnya" untuk toko_online (lux clothing-only)', () => {
     const html = renderToStaticMarkup(
       <SubKategoriPicker tipe="toko_online" value="" onChange={noop} />,
     )
-    expect(html).toContain('Kuliner / Makanan')
+    expect(html).toContain('Fashion / Pakaian')
     expect(html).toContain('Lainnya (gaya umum)')
+    // Sub-kategori non-fashion kini ready:false → tak muncul di picker.
+    expect(html).not.toContain('Kuliner / Makanan')
   })
 
   it('menampilkan sub-kategori Klinik untuk tipe klinik (S6)', () => {

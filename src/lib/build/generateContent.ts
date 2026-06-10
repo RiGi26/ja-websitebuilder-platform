@@ -42,6 +42,18 @@ export function generateContent(order: OrderLike): BuildPlan {
     b.tipe === 'restaurant' &&
     (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-'))
 
+  // FLAGSHIP "Toko Atelier" (toko baju) → renderer bespoke TokoAtelierRenderer
+  // (theme 'toko-atelier'). Dipilih saat sub-kategori 'fashion' di brief form.
+  // variant brief ('atelier-noir'/'atelier-ivoire') dipetakan ke palet native
+  // renderer ('noir'/'ivoire'); warna brand klien tetap jadi aksen via primary.
+  const ATELIER_VARIANT: Record<string, 'noir' | 'ivoire'> = {
+    'atelier-noir': 'noir',
+    'atelier-ivoire': 'ivoire',
+  }
+  const isAtelier =
+    b.tipe === 'toko_online' &&
+    (b.subKategori === 'fashion' || (b.variant ?? '').startsWith('atelier-'))
+
   // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
   // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →
   // variant = lux-<industri> → theme 'composable'. Pilihan eksplisit klien tetap
@@ -60,18 +72,23 @@ export function generateContent(order: OrderLike): BuildPlan {
     jastip: 'lux-jastip',
   }
 
-  const variant = isLux
-    ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
-    : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
+  const variant = isAtelier
+    ? ATELIER_VARIANT[b.variant ?? ''] ?? 'noir'
+    : isLux
+      ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
+      : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
-  // Fine Dining → 'restaurant-lux'. Selain itu jalur lama (theme per industri).
-  const manifest = isLux ? null : getManifest(variant)
-  const theme = isLux
-    ? 'restaurant-lux'
-    : manifest
-      ? 'composable'
-      : industryToTheme(b.tipe)
+  // Toko Atelier → 'toko-atelier' (bespoke). Fine Dining → 'restaurant-lux'.
+  // Selain itu jalur lama (theme per industri).
+  const manifest = isLux || isAtelier ? null : getManifest(variant)
+  const theme = isAtelier
+    ? 'toko-atelier'
+    : isLux
+      ? 'restaurant-lux'
+      : manifest
+        ? 'composable'
+        : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
   const capabilities = capabilitiesForAddons(order.selected_addons)
@@ -93,11 +110,13 @@ export function generateContent(order: OrderLike): BuildPlan {
   // Imagery enrichment: composable pakai sample per manifest; Fine Dining bespoke
   // pinjam sample 'finedining' (foto hidangan terkurasi) supaya signature dishes &
   // hero tak kosong pada auto-build dummy.
-  const sample = isLux
-    ? sampleContentForTheme('finedining')
-    : manifest && variant
-      ? sampleContentForTheme(variant)
-      : null
+  const sample = isAtelier
+    ? sampleContentForTheme('toko-atelier')
+    : isLux
+      ? sampleContentForTheme('finedining')
+      : manifest && variant
+        ? sampleContentForTheme(variant)
+        : null
   const showcaseImgs = (sample?.showcase?.items ?? [])
     .map((it) => it.gambar)
     .filter((g): g is string => !!g)

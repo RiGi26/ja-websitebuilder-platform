@@ -47,15 +47,20 @@ export interface ThemeOption {
 // fokus Toko Online (paling banyak sub-kategori + pain pempek). Industri lain
 // menyusul via playbook.
 export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOption[]>> = {
+  // LUX-ONLY (owner 2026-06-11): hanya Fashion/Pakaian yang AKTIF — tier lux
+  // baru dibangun untuk toko baju (Toko Atelier flagship). Sub-kategori lain
+  // `ready:false` (sembunyi dari brief form) sampai tema lux-nya dibangun;
+  // tema composable lamanya tetap di registry (situs existing aman). Toko di
+  // luar fashion masuk via "Lainnya (gaya umum)" → lux-toko (SubKategoriPicker).
   toko_online: [
-    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: true },
+    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: false },
     { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
-    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: true },
-    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: true },
-    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: true },
-    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: true },
-    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
-    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
+    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: false },
+    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
+    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
+    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
+    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
+    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
   ],
   // ── RESTAURANT (Sprint 4) — jenis tempat makan. AKTIF (ready:true):
   // gerbang 3 skill + verify SSR (3 flagship: warung-rakyat/cafe-latte/
@@ -151,39 +156,33 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         manifest: 'kuliner-heritage',
       },
     ],
-    // Fashion ×3 (Sprint 2) — AKTIF (S2-3). 3 gaya otentik beragam, verified
-    // SSR + lolos gerbang 3 skill (§5.a). Deskripsi = microcopy self-select:
-    // [sifat visual] + "Untuk [jenis toko]" → pemilik cepat memilih yang pas.
+    // Fashion = FLAGSHIP "Toko Atelier" (bespoke renderer, bukan composable).
+    // 2 palet asli renderer: noir (gelap) & ivoire (terang). Warna brand klien
+    // (primary_color) jadi aksen → mereproduksi sample "-brand" (noir+burgundy).
+    // `manifest:'toko-atelier'` inert (Atelier tak ada di MANIFESTS) — di-intercept
+    // generateContent (theme='toko-atelier', variant=noir/ivoire) SEBELUM getManifest.
+    // Tema composable fashion lama (fashion-editorial/minimal/vibrant) tetap di
+    // manifest.ts untuk situs existing, hanya tak ditawarkan lagi di brief form.
     fashion: [
       {
-        id: 'fashion-editorial',
+        id: 'atelier-noir',
         subKategori: 'fashion',
-        nama: 'Editorial',
-        deskripsi: 'Gelap, dramatis, serasa majalah mode. Untuk butik, label desainer, koleksi premium.',
-        icon: 'Camera',
-        mood: '#0E0E0F',
+        nama: 'Atelier Noir',
+        deskripsi: 'Gelap mewah & sinematik, galeri butik. Untuk label premium, koleksi eksklusif.',
+        icon: 'Gem',
+        mood: '#1A1614',
         bg: 'dark',
-        manifest: 'fashion-editorial',
+        manifest: 'toko-atelier',
       },
       {
-        id: 'fashion-minimal',
+        id: 'atelier-ivoire',
         subKategori: 'fashion',
-        nama: 'Minimalis',
-        deskripsi: 'Bersih & lapang, banyak ruang kosong. Untuk basic tee, hijab polos, esensial harian.',
-        icon: 'Wind',
-        mood: '#1C1B19',
+        nama: 'Atelier Ivoire',
+        deskripsi: 'Terang gading & lapang, editorial bersih. Untuk butik minimalis, esensial harian.',
+        icon: 'Sparkles',
+        mood: '#8A6D3B',
         bg: 'light',
-        manifest: 'fashion-minimal',
-      },
-      {
-        id: 'fashion-vibrant',
-        subKategori: 'fashion',
-        nama: 'Vibrant',
-        deskripsi: 'Berani & ceria, penuh warna. Untuk distro, sneakers, brand anak muda.',
-        icon: 'Zap',
-        mood: '#5B2BE8',
-        bg: 'light',
-        manifest: 'fashion-vibrant',
+        manifest: 'toko-atelier',
       },
     ],
 
