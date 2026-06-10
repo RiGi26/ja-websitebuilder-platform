@@ -24,9 +24,12 @@ import type { Product } from '@/types/websitebuilder'
 import { ATELIER_JS } from './atelier-script'
 
 // ── Palet peran semantik (noir = default flagship) ────────────
+// `scrim` = dasar gelap overlay foto (hero/CTA). Foto SELALU di-scrim gelap +
+// teks putih, apa pun palet halaman — itu yang membuat varian terang aman.
 export interface TaPal {
   bg: string; bg2: string; surface: string; ink: string; inkDim: string
   muted: string; accent: string; onAccent: string; line: string; line2: string
+  scrim: string
 }
 export const PALETTES: Record<string, TaPal> = {
   // Noir — near-black hangat (kayu gelap & lampu sorot), aksen champagne.
@@ -34,6 +37,16 @@ export const PALETTES: Record<string, TaPal> = {
     bg: '#141210', bg2: '#191613', surface: '#201C18', ink: '#F1EAE0', inkDim: '#D8CEC0',
     muted: '#A89C8C', accent: '#C5A572', onAccent: '#181410',
     line: 'rgba(241,234,224,.10)', line2: 'rgba(241,234,224,.06)',
+    scrim: '#141210',
+  },
+  // Ivoire — gading hangat (kertas linen & cahaya pagi), aksen perunggu tua.
+  // Rasio dihitung tangan: ink/bg 15.3 · inkDim/bg2 8.3 · muted/bg2 4.8 ·
+  // accent/bg2 5.1 · putih/scrim 18.1 — semua lolos gate kontras.
+  ivoire: {
+    bg: '#F6F1E8', bg2: '#EFE8DC', surface: '#FBF8F2', ink: '#1F1A14', inkDim: '#4A4036',
+    muted: '#6E6354', accent: '#7A5C32', onAccent: '#FFFFFF',
+    line: 'rgba(31,26,20,.14)', line2: 'rgba(31,26,20,.08)',
+    scrim: '#1A150F',
   },
 }
 function getPal(variant?: string): TaPal {
@@ -97,22 +110,29 @@ function taCss(): string {
 .ta-nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1240px;margin:0 auto;padding:26px clamp(20px,4vw,48px);transition:padding .45s ${EASE}}
 .ta-scrolled .ta-nav{background:color-mix(in srgb,var(--ta-bg) 84%,transparent);backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--ta-line2)}
 .ta-scrolled .ta-nav-in{padding-top:13px;padding-bottom:13px}
-.ta-brand{font-family:${SERIF};font-size:24px;font-weight:500;letter-spacing:.02em;color:#fff}
+.ta-brand{font-family:${SERIF};font-size:24px;font-weight:500;letter-spacing:.02em;color:#fff;transition:color .3s ease}
+.ta-scrolled .ta-brand{color:var(--ta-ink)}
 .ta-brand small{display:block;font-family:${SANS};font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ta-muted);margin-top:0}
 .ta-nav-links{display:flex;gap:30px}
-.ta-nav-link{font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ta-ink-dim,#D8CEC0);position:relative;padding:4px 0;transition:color .25s ease}
+.ta-nav-link{font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);position:relative;padding:4px 0;transition:color .25s ease}
+.ta-scrolled .ta-nav-link{color:var(--ta-ink-dim,#D8CEC0)}
 .ta-nav-link::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s ${EASE}}
 .ta-nav-link:hover{color:var(--ta-accent)}
 .ta-nav-link:hover::after,.ta-nav-link:focus-visible::after{transform:scaleX(1)}
-.ta-nav-cta{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ta-accent);color:var(--ta-accent);padding:11px 22px;border-radius:2px;transition:background-color .3s,color .3s}
+.ta-nav-cta{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ta-accent);color:var(--ta-accent);padding:11px 22px;border-radius:2px;transition:background-color .3s,color .3s,border-color .3s}
 .ta-nav-cta:hover{background:var(--ta-accent);color:var(--ta-on-accent)}
+/* Ivoire: aksen perunggu gelap tak terbaca di atas foto hero → nav CTA putih
+   saat transparan, kembali ke aksen begitu nav memadat (scrolled). */
+[data-variant="ivoire"] .ta-nav-cta{border-color:rgba(255,255,255,.5);color:#fff}
+[data-variant="ivoire"].ta-scrolled .ta-nav-cta{border-color:var(--ta-accent);color:var(--ta-accent)}
+[data-variant="ivoire"] .ta-nav-cta:hover{background:var(--ta-accent);border-color:var(--ta-accent);color:var(--ta-on-accent)}
 @media(max-width:880px){.ta-nav-links{display:none}}
 /* ── hero "cover" ── */
 .ta-hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;color:#fff}
 .ta-sentinel{position:absolute;top:0;left:0;width:1px;height:140px;opacity:0;pointer-events:none}
 .ta-hero-bg{position:absolute;inset:0;background:#0d0b09 center/cover no-repeat;transform:scale(1.09);animation:taKb 16s ease-out forwards}
 @keyframes taKb{to{transform:scale(1)}}
-.ta-hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,color-mix(in srgb,var(--ta-bg) 96%,transparent) 0%,color-mix(in srgb,var(--ta-bg) 52%,transparent) 34%,transparent 66%),linear-gradient(135deg,rgba(20,18,16,.62),transparent 55%)}
+.ta-hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 96%,transparent) 0%,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 52%,transparent) 34%,transparent 66%),linear-gradient(135deg,rgba(20,18,16,.62),transparent 55%)}
 .ta-grain{position:absolute;inset:0;background:url("${GRAIN}") repeat;background-size:140px 140px;mix-blend-mode:overlay;pointer-events:none;z-index:1}
 .ta-hero-ghost{position:absolute;top:9vh;right:-2vw;z-index:1;font-family:${SERIF};font-style:italic;font-weight:300;font-size:clamp(110px,23vw,330px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(241,234,224,.08);user-select:none;pointer-events:none;white-space:nowrap}
 .ta-hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,48px) clamp(76px,11vh,116px)}
@@ -302,6 +322,9 @@ function taCss(): string {
 .ta-cta-noimg .ta-cta-bg{background:radial-gradient(ellipse 70% 60% at 18% 85%,color-mix(in srgb,var(--ta-accent) 22%,transparent),transparent 60%),radial-gradient(ellipse 55% 45% at 85% 12%,color-mix(in srgb,var(--ta-accent) 12%,transparent),transparent 55%),var(--ta-bg2);filter:none}
 .ta-cta-noimg .ta-cta-tint{display:none}
 .ta-cta-noimg .ta-cta-scrim{background:transparent}
+.ta-cta-noimg{color:var(--ta-ink)}
+.ta-cta-noimg h2{color:var(--ta-ink)}
+.ta-cta-noimg .ta-cta-sub{color:var(--ta-ink-dim,#D8CEC0)}
 .ta-cta-in{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:clamp(110px,15vw,184px) clamp(20px,4vw,48px)}
 .ta-cta h2{font-size:clamp(40px,6.4vw,82px);font-weight:400;line-height:1.02;color:#fff}
 .ta-cta-sub{color:rgba(255,255,255,.84);font-size:clamp(15px,1.6vw,18px);max-width:52ch;margin:22px auto 0;line-height:1.8}
@@ -331,7 +354,7 @@ function taCss(): string {
 /* ── footer ── */
 .ta-footer{background:color-mix(in srgb,var(--ta-bg) 84%,#000);border-top:1px solid var(--ta-line2)}
 .ta-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(32px,5vw,56px);padding:clamp(56px,8vw,84px) 0 48px}
-.ta-footer .ta-brand{font-size:30px}
+.ta-footer .ta-brand{font-size:30px;color:var(--ta-ink)}
 .ta-footer-tag{color:var(--ta-muted);font-size:14px;line-height:1.8;margin-top:14px;max-width:34ch}
 .ta-f-label{font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--ta-muted);margin-bottom:18px}
 .ta-f-rows{display:grid;gap:10px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
@@ -342,7 +365,7 @@ function taCss(): string {
 .ta-f-jam{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
 .ta-f-jam span:nth-child(odd){color:var(--ta-muted)}
 .ta-footer-markwrap{overflow:hidden;pointer-events:none}
-.ta-footer-mark{font-family:${SERIF};font-style:italic;font-weight:300;font-size:clamp(88px,17.5vw,250px);line-height:.78;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(241,234,224,.07);transform:translateY(33%);user-select:none}
+.ta-footer-mark{font-family:${SERIF};font-style:italic;font-weight:300;font-size:clamp(88px,17.5vw,250px);line-height:.78;white-space:nowrap;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-ink) 9%,transparent);transform:translateY(33%);user-select:none}
 .ta-footer-cr{border-top:1px solid var(--ta-line2);padding:22px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ta-muted)}
 @media(max-width:880px){.ta-footer-grid{grid-template-columns:1fr;gap:36px}}
 /* ── WA float ── */
@@ -417,6 +440,7 @@ export default function TokoAtelierRenderer({
     '--ta-bg': pal.bg, '--ta-bg2': pal.bg2, '--ta-surface': pal.surface, '--ta-ink': pal.ink,
     '--ta-ink-dim': pal.inkDim, '--ta-muted': pal.muted, '--ta-accent': accent,
     '--ta-on-accent': pal.onAccent, '--ta-line': pal.line, '--ta-line2': pal.line2,
+    '--ta-scrim': pal.scrim,
     background: pal.bg, color: pal.ink,
   } as CSSProperties
 
@@ -475,9 +499,11 @@ export default function TokoAtelierRenderer({
     ? content.cta.ctaHref
     : (waLink ?? '#kontak')
 
+  // Fallback tanpa foto = panggung gelap berbasis scrim (teks hero selalu
+  // putih) — aman juga untuk palet terang (ivoire).
   const heroBg: CSSProperties = content.hero.image
     ? { backgroundImage: `url(${content.hero.image})` }
-    : { background: `linear-gradient(150deg, ${pal.surface}, ${pal.bg} 70%)` }
+    : { background: `linear-gradient(150deg, color-mix(in srgb, ${pal.scrim} 82%, #fff), ${pal.scrim} 70%)` }
 
   return (
     <div className="ta-root" style={rootStyle} data-theme="toko-atelier" data-variant={variant ?? 'noir'}>

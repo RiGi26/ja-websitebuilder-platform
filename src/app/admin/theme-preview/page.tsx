@@ -37,6 +37,33 @@ export default async function ThemePreviewIndex() {
           sama dengan situs jadi — bukan mockup. Klik untuk melihat tampilan penuh dengan konten contoh.
         </p>
 
+        {/* Flagship bespoke — di luar registry composable (dark-launched),
+            tetap di-surface untuk UAT visual noir/ivoire. */}
+        <div className="mb-14">
+          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white/35 mb-6 border-b border-white/10 pb-2">
+            Flagship (bespoke)
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              { href: '/admin/theme-preview/toko-atelier', sw: '#C5A572', nama: 'Toko Atelier — Noir', desc: 'Maison gelap-hangat, aksen champagne. Renderer bespoke Opsi A.' },
+              { href: '/admin/theme-preview/toko-atelier?variant=ivoire', sw: '#7A5C32', nama: 'Toko Atelier — Ivoire', desc: 'Varian gading terang, aksen perunggu. Palet sama, panggung berlawanan.' },
+            ].map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06] hover:border-white/20 transition-colors"
+              >
+                <span className="inline-block w-8 h-8 rounded-lg mb-3" style={{ background: t.sw }} />
+                <div className="font-black text-[15px] mb-1">{t.nama}</div>
+                <div className="text-[12px] text-white/45 leading-relaxed mb-3">{t.desc}</div>
+                <span className="text-[11px] font-bold text-white/40 group-hover:text-white/70 transition-colors">
+                  Buka render →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="space-y-14">
           {industries.map(([tipe, subs]) => (
             <div key={tipe}>

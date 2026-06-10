@@ -37,8 +37,9 @@ describe('toko-atelier — kontras palet', () => {
     })
 
     it(`${name}: teks putih hero/CTA di atas scrim gelap ≥ 7`, () => {
-      // scrim band CTA/hero turun ke ~#0d0b09 — putih harus tetap AAA
-      expect(contrastRatio('#FFFFFF', pal.bg)).toBeGreaterThanOrEqual(7)
+      // Foto hero/CTA SELALU di-scrim gelap (pal.scrim) + teks putih, apa pun
+      // palet halaman — inilah yang membuat varian terang (ivoire) tetap aman.
+      expect(contrastRatio('#FFFFFF', pal.scrim)).toBeGreaterThanOrEqual(7)
     })
   }
 })
