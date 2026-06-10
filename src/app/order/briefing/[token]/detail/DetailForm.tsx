@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { Check, Loader2, Plus, Trash2 } from 'lucide-react'
+import ImageUploadField from '@/app/portal/ImageUploadField'
 
 interface TestimoniRow { nama: string; kota: string; teks: string; bintang: string }
 interface TeamRow { nama: string; peran: string; foto: string; bio: string }
@@ -121,6 +122,8 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
   const tipe = industriToTipe(industri)
   const fotoLabels = FOTO_LABELS[tipe] ?? ['Foto Utama', 'Foto Pendukung 1', 'Foto Pendukung 2']
   const hasExtra = blocks.team || blocks.pricing || blocks.process || blocks.partners || blocks.social
+  // Unggah gambar via token briefing (pra-akun) — bukan sesi portal.
+  const uploadProps = { uploadUrl: '/api/briefing/upload', extraFields: { token } }
 
   const buildInitialForm = (): DetailState => {
     const base = !existingData
@@ -325,19 +328,19 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
 
         {/* Foto Hero */}
         <Field label="Foto Utama / Hero (opsional)" hint="Foto terbaik yang mewakili bisnis Anda — tampil paling menonjol. Boleh dikosongkan & menyusul nanti.">
-          <input className={inputCls} value={form.foto_hero} onChange={e => set('foto_hero', e.target.value)}
-            placeholder="https://drive.google.com/... atau link foto lainnya" />
+          <ImageUploadField value={form.foto_hero} onChange={(url) => set('foto_hero', url)} {...uploadProps} />
         </Field>
 
         {/* Foto per kategori */}
         <div>
-          <RepeatHead label="Foto Pendukung" hint="Boleh link Google Drive (pastikan akses publik), atau URL langsung." />
+          <RepeatHead label="Foto Pendukung" hint="Unggah langsung dari galeri/HP, atau tempel link bila ada." />
           <div className="space-y-3">
             {form.foto_items.map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="text-xs font-bold text-gray-500 w-40 shrink-0">{item.label}</span>
-                <input className={inputCls} value={item.url} onChange={e => updateFotoItem(i, e.target.value)}
-                  placeholder="https://..." />
+                <div className="flex-1 min-w-0">
+                  <ImageUploadField value={item.url} onChange={(url) => updateFotoItem(i, url)} compact {...uploadProps} />
+                </div>
               </div>
             ))}
           </div>
@@ -383,7 +386,7 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
                   <input className={inputCls} placeholder="Nama" value={t.nama} onChange={e => updateRow('team', i, { nama: e.target.value })} />
                   <input className={inputCls} placeholder="Peran / Jabatan" value={t.peran} onChange={e => updateRow('team', i, { peran: e.target.value })} />
                 </div>
-                <input className={inputCls} placeholder="Link foto (opsional)" value={t.foto} onChange={e => updateRow('team', i, { foto: e.target.value })} />
+                <ImageUploadField value={t.foto} onChange={(url) => updateRow('team', i, { foto: url })} label="Foto (opsional)" compact {...uploadProps} />
                 <input className={inputCls} placeholder="Bio singkat 1 kalimat (opsional)" value={t.bio} onChange={e => updateRow('team', i, { bio: e.target.value })} />
               </div>
             ))}
@@ -441,10 +444,8 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
               <div key={i} className="bg-gray-50 rounded-[16px] p-5 mb-4 space-y-3">
                 <RowHead label={`Mitra ${i + 1}`} removable={form.partners.length > 1} onRemove={() => removeRow('partners', i)} />
                 <input className={inputCls} placeholder="Nama mitra / klien" value={p.nama} onChange={e => updateRow('partners', i, { nama: e.target.value })} />
-                <div className="grid grid-cols-2 gap-3">
-                  <input className={inputCls} placeholder="Link logo (opsional)" value={p.logo} onChange={e => updateRow('partners', i, { logo: e.target.value })} />
-                  <input className={inputCls} placeholder="Link website mitra (opsional)" value={p.href} onChange={e => updateRow('partners', i, { href: e.target.value })} />
-                </div>
+                <ImageUploadField value={p.logo} onChange={(url) => updateRow('partners', i, { logo: url })} label="Logo (opsional)" compact {...uploadProps} />
+                <input className={inputCls} placeholder="Link website mitra (opsional)" value={p.href} onChange={e => updateRow('partners', i, { href: e.target.value })} />
               </div>
             ))}
             <AddButton label="Tambah Mitra" onClick={() => addRow('partners', { ...BLANK_PARTNER })} />

@@ -9,6 +9,7 @@ import BrandingPreview from './BrandingPreview'
 import SubKategoriPicker from './SubKategoriPicker'
 import ThemePicker from './ThemePicker'
 import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
+import ImageUploadField from '@/app/portal/ImageUploadField'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
@@ -127,6 +128,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const defaultColor = INDUSTRY_COLOR[tipe] ?? '#0071E3'
   const variants = getVariants(tipe)
   const defaultVariant = variants[0]?.id ?? ''
+  // Unggah gambar via token briefing (pra-akun) — bukan sesi portal.
+  const uploadProps = { uploadUrl: '/api/briefing/upload', extraFields: { token } }
 
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<FormState>({
@@ -421,7 +424,9 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                       <input className={inputCls} placeholder="Kapasitas (7 Kursi)" value={row.kapasitas} onChange={e => updateRow('fleet', i, 'kapasitas', e.target.value)} />
                       <input className={inputCls} placeholder="Transmisi (Manual/Otomatis)" value={row.transmisi} onChange={e => updateRow('fleet', i, 'transmisi', e.target.value)} />
                       <input className={inputCls} placeholder="Harga/hari (350000)" value={row.harga} onChange={e => updateRow('fleet', i, 'harga', e.target.value)} />
-                      <input className={`${inputCls} md:col-span-3`} placeholder="Link foto kendaraan (Google Drive / URL) — opsional" value={row.foto_url} onChange={e => updateRow('fleet', i, 'foto_url', e.target.value)} />
+                      <div className="md:col-span-3">
+                        <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('fleet', i, 'foto_url', url)} label="Foto kendaraan (opsional)" compact {...uploadProps} />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -747,8 +752,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               )}
             </div>
 
-            <Field label="URL Logo (jika sudah punya)">
-              <input className={inputCls} value={form.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://drive.google.com/..." />
+            <Field label="Logo (jika sudah punya)">
+              <ImageUploadField value={form.logo_url} onChange={(url) => set('logo_url', url)} {...uploadProps} />
             </Field>
             <Field label="Referensi Website yang Disukai">
               <input className={inputCls} value={form.referensi_website} onChange={e => set('referensi_website', e.target.value)} placeholder="https://contoh.com" />
