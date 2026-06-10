@@ -7,7 +7,7 @@
 // Konvensi: semua warna/font/radius/shadow lewat var(--c-*/--f-*/--r-*/--s-*),
 // JANGAN hex hardcoded — kecuali scrim hitam untuk keterbacaan teks di atas foto.
 // ============================================================
-import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnerLogo, PartnersContent, SocialContent, SocialPlatform, StatementContent } from '@/lib/theme-system/manifest'
+import type { ComposableContent, ShowcaseItem, MotifVariant, Testimonial, StatItem, FaqItem, InfoLokasi, GalleryContent, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnerLogo, PartnersContent, SocialContent, SocialPlatform, StatementContent, PresetBand } from '@/lib/theme-system/manifest'
 
 export const ENGINE_CSS = `
 .ce-root { background: var(--c-page); color: var(--c-ink); font-family: var(--f-body); font-weight: var(--fw-body); -webkit-font-smoothing: antialiased; }
@@ -1921,6 +1921,22 @@ export function FeaturesSticky({ features, heading }: { features: Feature[]; hea
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  )
+}
+
+// Band add-on (newsletter/career) — strip CTA sekunder dari injeksi B-section.
+// Dirender ComposableRenderer di luar alur manifest; data-band utk verifikasi.
+export function AddonBand({ band }: { band: PresetBand }) {
+  return (
+    <section data-band={band.preset} style={{ background: 'var(--c-surface)', borderTop: '1px solid var(--c-border)', borderBottom: '1px solid var(--c-border)', padding: '56px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+        <div style={{ maxWidth: 640 }}>
+          <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', margin: 0, color: 'var(--c-ink)' }}>{band.title}</h2>
+          {band.subtitle && <p style={{ margin: '10px 0 0', fontSize: 15, color: 'var(--c-muted)', lineHeight: 1.7 }}>{band.subtitle}</p>}
+        </div>
+        {band.ctaText && <Btn text={band.ctaText} href={band.ctaHref} />}
       </div>
     </section>
   )

@@ -236,18 +236,25 @@ export const ADDON_CATALOG: AddonDef[] = [
   {
     id: 'career', name: 'Portal Lowongan Kerja', price: 300000, yearlyMaint: 100000,
     desc: 'Halaman karir & lamaran online.',
-    klass: 'structural', status: 'planned', industries: ['corporate'],
+    klass: 'structural', status: 'live', industries: ['corporate'],
     features: ['hasCareer'], capability: ['career'],
-    sections: [{ tipe: 'custom_html', preset: 'career', anchor: 'end' }],
-    note: 'hasCareer NOL pembaca (Temuan A). Wire jadi section (A3/B).',
+    // Dulu custom_html — tipe itu TIDAK punya pembaca di blueprintToSection
+    // (case default → null) sehingga career tak pernah terinject. Kini band
+    // `cta` ber-preset: terinject build, dirender SectionRenderer (token path)
+    // DAN ComposableRenderer via content.bands (lux path).
+    sections: [{ tipe: 'cta', preset: 'career', anchor: 'end' }],
+    note: 'v1 = band ajakan lamaran (CTA WA/email). Listing lowongan terstruktur = butuh tabel jobs (belum ada).',
   },
   {
     id: 'newsletter', name: 'Newsletter System', price: 200000, yearlyMaint: 100000,
     desc: 'Kumpulkan email database pelanggan.',
-    klass: 'structural', status: 'planned',
+    klass: 'structural', status: 'live',
     features: ['hasNewsletter'], capability: ['newsletter'],
     sections: [{ tipe: 'cta', preset: 'newsletter', anchor: 'before-cta' }],
-    note: 'hasNewsletter NOL pembaca (Temuan A). JANGAN aliaskan corp blog/email-auto ke sini (mapping korup, Temuan B).',
+    // Dulu SELALU ter-skip: dedupe per-tipe & semua template punya `cta`.
+    // Dedupe kini per tipe+preset → band newsletter masuk berdampingan dgn
+    // CTA penutup. JANGAN aliaskan corp blog/email-auto ke sini (Temuan B).
+    note: 'v1 = band berlangganan via WA (belum ada kolektor email backend).',
   },
   {
     // BARU (A1): blog hilang dari katalog order lama; corp `blog` salah dipetakan

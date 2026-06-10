@@ -174,6 +174,10 @@ export interface GalleryContent {
   pairs?: BeforeAfterPair[]
 }
 export interface StatementContent { eyebrow?: string; quote: string; cite?: string }
+// Band add-on ber-preset (newsletter/career) — dipetakan content-adapter dari
+// row page_sections `cta` yang membawa isi_komponen.preset. Dirender
+// ComposableRenderer SETELAH alur manifest (additive; absen → tak dirender).
+export interface PresetBand { preset: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
 export interface ComposableContent {
   nama: string
   hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; ctaText2?: string; ctaHref2?: string; image?: string }
@@ -205,6 +209,8 @@ export interface ComposableContent {
   partners?: PartnersContent
   social?: SocialContent
   contact?: { wa?: string; email?: string; alamat?: string }
+  // Band add-on (newsletter/career) — lihat PresetBand.
+  bands?: PresetBand[]
 }
 
 // ── Registry manifest (pilot Kuliner ×3) ──────────────────────

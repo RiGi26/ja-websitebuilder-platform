@@ -44,9 +44,31 @@ describe('mergeAddonSections — inject + dedupe per-tipe', () => {
     expect(merged.filter((s) => s.tipe_komponen === 'contact_form')).toHaveLength(1)
   })
 
-  it('cta (blueprint newsletter) DEDUPED — template sudah punya cta', () => {
+  it('newsletter TIDAK lagi tertelan cta template — dedupe per tipe+preset', () => {
     const merged = mergeAddonSections(restoSections, addonSectionBlueprints(['newsletter']))
-    expect(merged.filter((s) => s.tipe_komponen === 'cta')).toHaveLength(1)
+    const ctas = merged.filter((s) => s.tipe_komponen === 'cta')
+    expect(ctas).toHaveLength(2) // cta penutup template + band newsletter
+    expect(ctas.some((s) => s.isi_komponen.preset === 'newsletter')).toBe(true)
+    // band masuk SEBELUM cta penutup (anchor before-cta)
+    const idxBand = merged.findIndex((s) => s.isi_komponen.preset === 'newsletter')
+    const idxMain = merged.findIndex((s) => s.tipe_komponen === 'cta' && !s.isi_komponen.preset)
+    expect(idxBand).toBeLessThan(idxMain)
+  })
+
+  it('career ter-inject sebagai band cta ber-preset (dulu custom_html → null, hilang)', () => {
+    const merged = mergeAddonSections(restoSections, addonSectionBlueprints(['career']))
+    const band = merged.find((s) => s.isi_komponen.preset === 'career')
+    expect(band).toBeDefined()
+    expect(band!.tipe_komponen).toBe('cta')
+    expect(band!.isi_komponen.title).toBeTruthy()
+  })
+
+  it('newsletter + career bisa hadir bersamaan, masing-masing sekali (idempoten per preset)', () => {
+    const bps = addonSectionBlueprints(['newsletter', 'career', 'newsletter'])
+    const merged = mergeAddonSections(restoSections, bps)
+    expect(merged.filter((s) => s.isi_komponen.preset === 'newsletter')).toHaveLength(1)
+    expect(merged.filter((s) => s.isi_komponen.preset === 'career')).toHaveLength(1)
+    expect(merged.filter((s) => s.tipe_komponen === 'cta' && !s.isi_komponen.preset)).toHaveLength(1)
   })
 
   it('blueprint kosong → identik template', () => {
