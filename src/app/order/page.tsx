@@ -362,8 +362,8 @@ function OrderFormContent() {
                 <FieldRow label="Nomor WhatsApp" required>
                   <Input placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="apple-input" />
                 </FieldRow>
-                <FieldRow label="Email">
-                  <Input placeholder="Alamat email aktif" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
+                <FieldRow label="Email" required>
+                  <Input type="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
                 </FieldRow>
                 <div className="md:col-span-2">
                   <FieldRow label="Bidang Industri">
@@ -373,7 +373,7 @@ function OrderFormContent() {
               </div>
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut Pembayaran <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut Pembayaran <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}

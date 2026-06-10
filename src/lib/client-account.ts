@@ -67,3 +67,37 @@ export async function createClientAccountForTenant(
 
   return { created: true, email: targetEmail, password, userId }
 }
+
+/**
+ * Terbitkan kredensial portal yang BISA DIKIRIM (email + password plaintext) untuk
+ * sebuah tenant — dipanggil saat website LIVE (Feature C, gate=launch). Idempotent
+ * terhadap keberadaan akun: BUAT bila belum ada, RESET password bila sudah ada
+ * (password lama tak bisa dibaca dari DB). Mengembalikan null bila tak ada email
+ * valid (login berbasis email). Plaintext TIDAK disimpan — hanya dikirim.
+ */
+export async function issuePortalCredentials(
+  tenantId: string,
+  emailFallback?: string | null,
+  namaTenant?: string,
+): Promise<{ email: string; password: string } | null> {
+  const { data: tenant } = await supabaseAdmin
+    .from('tenants')
+    .select('auth_user_id, email')
+    .eq('id', tenantId)
+    .maybeSingle()
+
+  const email = (tenant?.email ?? emailFallback ?? '').trim()
+  if (!email || !email.includes('@')) return null
+
+  // Belum punya akun → buat (sekalian kembalikan password awal).
+  if (!tenant?.auth_user_id) {
+    const created = await createClientAccountForTenant(tenantId, email, namaTenant)
+    return created.created ? { email: created.email, password: created.password } : null
+  }
+
+  // Sudah punya akun → reset password (satu-satunya cara dapat plaintext baru).
+  const password = generatePassword()
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(tenant.auth_user_id, { password })
+  if (error) throw new Error(`reset password: ${error.message}`)
+  return { email, password }
+}
