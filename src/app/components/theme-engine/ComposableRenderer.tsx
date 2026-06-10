@@ -19,20 +19,21 @@ import {
 import {
   ENGINE_CSS, Nav, Footer, About, CTA, FloatingWA,
   HeroCentered, HeroSplit, HeroFullbleed, HeroCinematic,
-  FeaturesGrid, FeaturesRows, FeaturesZigzag,
+  FeaturesGrid, FeaturesRows, FeaturesZigzag, FeaturesSticky,
   ShowcaseMenuList, ShowcaseCardGrid, ShowcaseLookbook,
   ShowcaseServiceList, ShowcaseArticleFeed, ShowcaseMenuBoard, ShowcaseSignature,
-  Stats, StatsRecognition, TestimoniCards, TestimoniSpotlight, TestimoniMarquee,
+  Stats, StatsRecognition, TestimoniCards, TestimoniSpotlight, TestimoniMarquee, TestimoniCarousel,
   FAQ, InfoLokasiBlock, MasonryGallery, BeforeAfterGallery, GalleryEditorial,
   TeamGrid, TeamSpotlight, TeamHorizontal,
   AboutSplitRight, AboutSplitLeft, AboutStory,
   PricingCards, PricingTable, PricingSingle,
   ProcessHorizontal, ProcessTimeline, ProcessCards,
-  CTABanner, CTASplit,
+  CTABanner, CTASplit, CTADuotone,
   PartnersGrid, PartnersMarquee, SocialStrip,
   StatementBand,
 } from './blocks'
 import CeReveal from './CeReveal'
+import { CE_JS } from './ce-script'
 
 // Urutan section tengah DEFAULT (= perilaku lama). Tema tanpa manifest.sections
 // memakai ini → output identik dengan sebelum refactor (nol regresi 96 tema).
@@ -69,6 +70,7 @@ export default function ComposableRenderer({
     features: () => (content.features && content.features.length > 0)
       ? (B.features === 'rows' ? <FeaturesRows features={content.features} heading={featHeading} />
         : B.features === 'zigzag' ? <FeaturesZigzag features={content.features} heading={featHeading} />
+        : B.features === 'sticky' ? <FeaturesSticky features={content.features} heading={featHeading} />
         : <FeaturesGrid features={content.features} heading={featHeading} />)
       : null,
     statement: () => (B.statement && content.statement) ? <StatementBand statement={content.statement} /> : null,
@@ -87,7 +89,7 @@ export default function ComposableRenderer({
         : <ProcessHorizontal process={content.process} />)
       : null,
     stats: () => (B.stats && content.stats && content.stats.length > 0)
-      ? (B.stats === 'recognition' ? <StatsRecognition stats={content.stats} /> : <Stats stats={content.stats} />)
+      ? (B.stats === 'recognition' ? <StatsRecognition stats={content.stats} countUp={B.statsCountUp} /> : <Stats stats={content.stats} countUp={B.statsCountUp} />)
       : null,
     partners: () => (B.partners && content.partners && content.partners.logos.length > 0)
       ? (B.partners === 'marquee' ? <PartnersMarquee partners={content.partners} /> : <PartnersGrid partners={content.partners} />)
@@ -100,12 +102,14 @@ export default function ComposableRenderer({
     testimoni: () => (B.testimoni && content.testimonials && content.testimonials.length > 0)
       ? (B.testimoni === 'spotlight' ? <TestimoniSpotlight testimonials={content.testimonials} />
         : B.testimoni === 'marquee' ? <TestimoniMarquee testimonials={content.testimonials} />
+        : B.testimoni === 'carousel' ? <TestimoniCarousel testimonials={content.testimonials} />
         : <TestimoniCards testimonials={content.testimonials} />)
       : null,
     gallery: () => {
       if (B.gallery === 'before-after' && content.gallery?.pairs && content.gallery.pairs.length > 0) return <BeforeAfterGallery gallery={content.gallery} />
       if (B.gallery === 'masonry' && content.gallery?.images && content.gallery.images.length > 0) return <MasonryGallery gallery={content.gallery} />
       if (B.gallery === 'editorial' && content.gallery?.images && content.gallery.images.length > 0) return <GalleryEditorial gallery={content.gallery} />
+      if (B.gallery === 'editorial-quicklook' && content.gallery?.images && content.gallery.images.length > 0) return <GalleryEditorial gallery={content.gallery} quicklook />
       return null
     },
     info: () => (B.info && content.info) ? <InfoLokasiBlock info={content.info} /> : null,
@@ -124,6 +128,7 @@ export default function ComposableRenderer({
     cta: () => content.cta
       ? (B.cta === 'banner' ? <CTABanner cta={content.cta} />
         : B.cta === 'split' ? <CTASplit cta={content.cta} />
+        : B.cta === 'duotone' ? <CTADuotone cta={content.cta} />
         : <CTA cta={content.cta} />)
       : null,
     social: () => (B.social && content.social && content.social.links.length > 0) ? <SocialStrip social={content.social} /> : null,
@@ -131,9 +136,18 @@ export default function ComposableRenderer({
 
   const order = manifest.sections ?? DEFAULT_SECTION_ORDER
 
+  // Panen flagship: manifest dgn varian interaktif menyuntik CE_JS (IIFE inline
+  // — hidup di produksi SSR DAN sample statis; CeReveal/useEffect mati di jalur
+  // statis). CE_JS sudah memuat reveal → CeReveal tak perlu dirender ganda.
+  // Manifest tanpa varian interaktif → tanpa script → output lama byte-identik.
+  const needsScript =
+    !!B.statsCountUp || B.testimoni === 'carousel' ||
+    B.gallery === 'editorial-quicklook' || B.cta === 'duotone'
+
   return (
     <div className="ce-root" style={vars} data-theme={manifest.id} data-mood={pack.mood} data-lux={lux ? '' : undefined}>
       <style dangerouslySetInnerHTML={{ __html: ENGINE_CSS }} />
+      {needsScript && <script dangerouslySetInnerHTML={{ __html: CE_JS }} />}
 
       <Nav content={content} />
 
@@ -168,7 +182,7 @@ export default function ComposableRenderer({
 
       <Footer content={content} motif={motif} motifColor={motifColor} />
       <FloatingWA wa={content.contact?.wa} />
-      {lux && <CeReveal />}
+      {lux && !needsScript && <CeReveal />}
     </div>
   )
 }
