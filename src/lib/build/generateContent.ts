@@ -57,6 +57,15 @@ export function generateContent(order: OrderLike): BuildPlan {
   const features = addonsToFeatures(order.selected_addons)
   const capabilities = capabilitiesForAddons(order.selected_addons)
 
+  // Opsi C: konten "contoh" bila inti showcase (menu/fleet/layanan/dokter/program/
+  // produk) TIDAK diisi di briefing → template fallback dipakai. Portal pakai flag
+  // ini untuk banner onboarding "ganti konten contoh".
+  const CORE_KEYS = ['menu', 'fleet', 'layanan', 'dokter', 'program', 'produk_unggulan']
+  const kontenObj = b.konten as Record<string, unknown>
+  const contentIsSample = !CORE_KEYS.some(
+    (k) => Array.isArray(kontenObj[k]) && (kontenObj[k] as unknown[]).length > 0,
+  )
+
   // Imagery enrichment (anti-slop): dummy auto-build tak punya foto → semua jatuh
   // ke placeholder gradient. Pinjam foto Unsplash terkurasi dari sample-content
   // (per sub-kategori) HANYA utk tema composable — di situ sub-kat pasti cocok,
@@ -104,6 +113,7 @@ export function generateContent(order: OrderLike): BuildPlan {
     designTokens,
     features,
     capabilities,
+    contentIsSample,
     dataKonten,
     sections: out.sections,
     services,

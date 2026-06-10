@@ -158,6 +158,23 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
 
   const set = (key: keyof FormState, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
+  // Opsi C: item inti showcase per industri → chip kelengkapan LEMBUT (nudge, bukan
+  // blokir; form tetap bisa diteruskan lewat nav "Lanjut ke Branding").
+  const CORE_NOUN: Partial<Record<string, string>> = {
+    travel: 'armada', restaurant: 'menu', corporate: 'layanan',
+    klinik: 'dokter', sekolah: 'program', toko_online: 'produk',
+  }
+  const coreNoun = CORE_NOUN[tipe]
+  const coreList: { nama: string }[] | null =
+    tipe === 'travel' ? form.fleet
+      : tipe === 'restaurant' ? form.menu
+        : tipe === 'corporate' ? form.layanan
+          : tipe === 'klinik' ? form.dokter
+            : tipe === 'sekolah' ? form.program
+              : tipe === 'toko_online' ? form.produk_unggulan
+                : null
+  const coreCount = coreList ? coreList.filter((r) => (r.nama ?? '').trim()).length : 0
+
   // ── Draft auto-save (P0) — tab ketutup tidak hilang ───────────
   const DRAFT_KEY = `ja_briefing_draft_${token}`
 
@@ -390,19 +407,27 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">Konten Website</h2>
               <p className="text-sm text-gray-400 font-medium">
-                Bagian ini sepenuhnya opsional.
+                Ini yang tampil di website Anda. Isi minimal beberapa agar situs langsung terasa milik Anda. Yang kosong kami isi dengan contoh yang bisa diganti kapan saja.
               </p>
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-[16px] bg-blue-50/60 border border-blue-100">
               <Sparkles size={18} className="text-[#0071E3] shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-bold text-gray-900">Belum punya semua data? Tidak masalah.</p>
+                <p className="text-sm font-bold text-gray-900">Makin banyak diisi sekarang, makin sedikit revisi nanti.</p>
                 <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
-                  Isi yang sudah siap saja. Sisanya tim kami siapkan draf awal — Anda tinggal revisi nanti.
+                  Isi yang sudah siap saja. Yang kosong kami isi dengan contoh dulu, bisa Anda ganti kapan saja dari dashboard.
                 </p>
               </div>
             </div>
+
+            {coreNoun && (
+              <div className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full border ${coreCount >= 3 ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-black/[0.06] text-gray-500'}`}>
+                {coreCount >= 3 && <Check size={13} strokeWidth={3} />}
+                {coreCount}/3 {coreNoun} terisi
+                <span className="font-medium text-gray-400">· disarankan min. 3</span>
+              </div>
+            )}
 
             {/* TRAVEL / RENTAL */}
             {tipe === 'travel' && (
@@ -645,13 +670,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => setStep(2)}
-              className="w-full text-center text-sm text-gray-400 hover:text-gray-700 font-medium py-3 transition-colors"
-            >
-              Lewati — biar tim kami siapkan konten awalnya →
-            </button>
+            {/* Tombol "Lewati" dihapus (Opsi C) — nav "Lanjut ke Branding" tetap
+                meneruskan tanpa wajib isi, jadi form tetap bisa dilewati. */}
           </div>
         )}
 

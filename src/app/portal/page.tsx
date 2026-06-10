@@ -37,12 +37,13 @@ export default async function PortalPage() {
     products = (data ?? []) as Product[]
   }
 
-  const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean> }
+  const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean>; content_is_sample?: boolean }
   const hasShop = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
   const hasMenu = !!konfig.features?.hasMenu
   const hasBlog = !!konfig.features?.hasBlog
   const hasGallery = !!konfig.features?.hasGallery
+  const contentIsSample = !!konfig.content_is_sample
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
 
@@ -120,6 +121,7 @@ export default async function PortalPage() {
       hasMenu={hasMenu}
       hasBlog={hasBlog}
       hasGallery={hasGallery}
+      contentIsSample={contentIsSample}
       paymentStatus={paymentStatus}
       initialOrders={shopOrders}
       initialServices={services}

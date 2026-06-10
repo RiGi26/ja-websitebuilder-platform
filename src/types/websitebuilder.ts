@@ -82,6 +82,9 @@ export interface KonfigurasiWebsite {
   // diturunkan dari selected_addons via catalog.capabilitiesForAddons, dibaca
   // renderer untuk render UI kondisional. Beda dari `features` (flag boolean lama).
   capabilities?: string[]
+  /** Opsi C: konten halaman masih contoh template (briefing inti kosong saat build).
+   *  Portal pakai ini untuk banner onboarding. Tidak memengaruhi render situs publik. */
+  content_is_sample?: boolean
 }
 
 export type TipeKomponen =
