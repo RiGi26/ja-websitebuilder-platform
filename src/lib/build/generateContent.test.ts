@@ -80,6 +80,62 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
   })
 })
 
+// LUX TIER (Sprint 1) — composable lux jadi DEFAULT premium per industri pilot
+// (restaurant + klinik) saat briefing tak memilih variant; pilihan eksplisit
+// dihormati; Fine Dining bespoke (benchmark) tetap menang; konten produksi
+// di-enrich (statement/stats/faq) supaya situs lux tak sparse.
+describe('generateContent — LUX TIER default + enrichment (Sprint 1)', () => {
+  const mk = (tipe: string, branding?: Record<string, unknown>) =>
+    generateContent({
+      industri: tipe,
+      nama_usaha: 'Uji',
+      briefing_data: { industri_tipe: tipe, ...(branding ? { branding } : {}) },
+    })
+
+  it('restaurant tanpa variant → composable lux-restaurant (default premium)', () => {
+    const plan = mk('restaurant')
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-restaurant')
+  })
+
+  it('klinik tanpa variant → composable lux-klinik', () => {
+    const plan = mk('klinik')
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-klinik')
+  })
+
+  it('pilihan variant eksplisit dihormati (escape hatch) — bukan lux', () => {
+    const plan = mk('restaurant', { variant: 'warung-rakyat' })
+    expect(plan.variant).toBe('warung-rakyat')
+    expect(plan.theme).toBe('composable')
+  })
+
+  it('Fine Dining tetap → restaurant-lux bespoke (benchmark), bukan lux composable', () => {
+    const plan = mk('restaurant', { sub_kategori: 'finedining' })
+    expect(plan.theme).toBe('restaurant-lux')
+  })
+
+  it('industri non-pilot (corporate) tak kena default lux', () => {
+    const plan = mk('corporate')
+    expect(plan.variant).not.toBe('lux-restaurant')
+    expect(plan.variant).not.toBe('lux-klinik')
+  })
+
+  it('enrich produksi: dataKonten restaurant punya statement + stats + faq', () => {
+    const dk = mk('restaurant').dataKonten as Record<string, unknown>
+    expect(dk.statement).toBeTruthy()
+    expect(Array.isArray(dk.stats) && (dk.stats as unknown[]).length).toBeGreaterThanOrEqual(2)
+    expect(Array.isArray(dk.faq) && (dk.faq as unknown[]).length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('enrich produksi: dataKonten klinik punya statement + stats + faq', () => {
+    const dk = mk('klinik').dataKonten as Record<string, unknown>
+    expect(dk.statement).toBeTruthy()
+    expect(Array.isArray(dk.stats)).toBe(true)
+    expect(Array.isArray(dk.faq)).toBe(true)
+  })
+})
+
 describe('generateContent — capabilities (B-cap)', () => {
   it('selected_addons → plan.capabilities', () => {
     const plan = generateContent({

@@ -16,6 +16,7 @@ import { COMPANY_PACKS } from './company'
 import { TRAVEL_PACKS } from './travel'
 import { BLOG_PACKS } from './blog'
 import { JASTIP_PACKS } from './jastip'
+import { LUX_PACKS } from './lux'
 
 export const THEME_PACKS: Record<string, TokenPack> = {
   ...TOKO_PACKS,
@@ -27,4 +28,6 @@ export const THEME_PACKS: Record<string, TokenPack> = {
   ...TRAVEL_PACKS,
   ...BLOG_PACKS,
   ...JASTIP_PACKS,
+  // LUX TIER — default premium per industri (Sprint 1+). Bawa lux:{} → data-lux.
+  ...LUX_PACKS,
 }

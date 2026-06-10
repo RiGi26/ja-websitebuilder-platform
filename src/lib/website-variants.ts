@@ -16,6 +16,14 @@ export interface VariantOption {
 export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   klinik: [
     {
+      id: 'lux-klinik',
+      nama: 'Lux',
+      deskripsi: 'Premium default — ivory bersih & petrol-teal. Tepercaya, terang, berkelas.',
+      emoji: '✨',
+      mood: '#134E48',
+      bg: 'light',
+    },
+    {
       id: 'warm',
       nama: 'Warm Sanctuary',
       deskripsi: 'Hangat, personal, sage green. Seperti klinik wellness premium.',
@@ -41,6 +49,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
     },
   ],
   travel: [
+    {
+      id: 'lux-travel',
+      nama: 'Lux',
+      deskripsi: 'Premium default — indigo malam & amber senja, sinematik membangkitkan wanderlust.',
+      emoji: '✨',
+      mood: '#E0954A',
+      bg: 'dark',
+    },
     {
       id: 'bold',
       nama: 'Bold Drive',
@@ -68,6 +84,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   ],
   corporate: [
     {
+      id: 'lux-corporate',
+      nama: 'Lux',
+      deskripsi: 'Premium default — navy dalam, editorial. Otoritatif untuk B2B & konsultan.',
+      emoji: '✨',
+      mood: '#1B3A6B',
+      bg: 'light',
+    },
+    {
       id: 'editorial',
       nama: 'Bold Editorial',
       deskripsi: 'Near-black + electric amber, grafis kuat. Untuk agensi & startup.',
@@ -94,6 +118,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   ],
   restaurant: [
     {
+      id: 'lux-restaurant',
+      nama: 'Lux',
+      deskripsi: 'Premium default — fine-dining gelap hangat & emas, sinematik.',
+      emoji: '✨',
+      mood: '#C9A24B',
+      bg: 'dark',
+    },
+    {
       id: 'rustic',
       nama: 'Rustic Warm',
       deskripsi: 'Hangat, espresso & terracotta, cozy. Untuk warung, cafe, dan restoran lokal.',
@@ -111,6 +143,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
     },
   ],
   sekolah: [
+    {
+      id: 'lux-sekolah',
+      nama: 'Lux',
+      deskripsi: 'Premium default — krem hangat & crimson akademik, heritage kampus.',
+      emoji: '✨',
+      mood: '#7A2230',
+      bg: 'light',
+    },
     {
       id: 'warm',
       nama: 'Academic Heritage',
@@ -130,6 +170,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   ],
   toko_online: [
     {
+      id: 'lux-toko',
+      nama: 'Lux',
+      deskripsi: 'Premium default — monokrom boutique, editorial. Untuk fashion & lifestyle.',
+      emoji: '✨',
+      mood: '#1C1916',
+      bg: 'light',
+    },
+    {
       id: 'batik',
       nama: 'Batik Heritage',
       deskripsi: 'Tradisional, indigo & amber, autentik. Untuk produk lokal & kerajinan.',
@@ -148,6 +196,14 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
   ],
   personal: [
     {
+      id: 'lux-personal',
+      nama: 'Lux',
+      deskripsi: 'Premium default — gelap netral & clay-rose, spotlight kreator.',
+      emoji: '✨',
+      mood: '#C2766B',
+      bg: 'dark',
+    },
+    {
       id: 'minimal',
       nama: 'Minimal Portfolio',
       deskripsi: 'Bersih, focused, elegant. Untuk profesional & freelancer.',
@@ -161,6 +217,26 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
       deskripsi: 'Berani, colorful, memorable. Untuk kreator & desainer.',
       emoji: '🎨',
       mood: '#DB2777',
+      bg: 'dark',
+    },
+  ],
+  blog: [
+    {
+      id: 'lux-blog',
+      nama: 'Lux',
+      deskripsi: 'Premium default — kertas hangat & plum sastrawi, all-serif nyaman dibaca.',
+      emoji: '✨',
+      mood: '#5E3A5B',
+      bg: 'light',
+    },
+  ],
+  jastip: [
+    {
+      id: 'lux-jastip',
+      nama: 'Lux',
+      deskripsi: 'Premium default — charcoal & jade, aspirational untuk jasa titip.',
+      emoji: '✨',
+      mood: '#18684E',
       bg: 'dark',
     },
   ],

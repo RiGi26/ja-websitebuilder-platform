@@ -14,15 +14,21 @@
 import { PACKS, type TokenPack } from '@/lib/design-tokens/packs'
 import { THEME_PACKS } from './theme-packs'
 
-export type HeroVariant = 'centered' | 'split' | 'fullbleed'
+// 'cinematic' (lux) = fullbleed + ken-burns gambar + scrim sinematik + scroll cue,
+// panen dari RestaurantLuxRenderer.rl-hero. Hanya dipakai manifest lux (nol regresi).
+export type HeroVariant = 'centered' | 'split' | 'fullbleed' | 'cinematic'
 // Showcase = blok inti yang menggambarkan industri. Varian generik:
 // 'menu-list'/'card-grid'/'lookbook'. Varian KHAS-INDUSTRI (Sprint 10a) yang
 // mengonsumsi field industri dari DB → bentuk yang benar-benar berbeda:
 // 'service-list' (jasa/klinik: durasi + kategori) · 'article-feed' (blog:
 // penulis + tanggal) · 'menu-board' (resto: dikelompokkan per kategori).
+// 'signature' (lux) = beat editorial: top-N item ber-gambar tampil selang-seling
+// kiri/kanan + indeks besar + harga, sisanya daftar ringkas (panen RestaurantLux
+// rl-dish). Industri-agnostik (hidangan/produk/layanan/karya). Hanya manifest lux.
 export type ShowcaseVariant =
   | 'menu-list' | 'card-grid' | 'lookbook'
   | 'service-list' | 'article-feed' | 'menu-board'
+  | 'signature'
 export type FeaturesVariant = 'grid' | 'rows' | 'zigzag'
 // Testimoni (Sprint 5) — sosial-proof. 3 varian parametrik via token.
 // 'cards' = grid kartu quote · 'spotlight' = 1 kutipan besar berfokus ·
@@ -30,7 +36,12 @@ export type FeaturesVariant = 'grid' | 'rows' | 'zigzag'
 export type TestimoniVariant = 'cards' | 'spotlight' | 'marquee'
 // Galeri (Sprint 5b) — 'masonry' = grid foto fasilitas tinggi-rendah;
 // 'before-after' = pasangan sebelum/sesudah (cocok estetik/skincare/interior).
-export type GalleryVariant = 'masonry' | 'before-after'
+// 'editorial' (lux) = grid 4-kolom tetap dgn span tinggi/lebar (panen RestaurantLux
+// rl-gal), foto zoom + caption reveal. Hanya manifest lux (nol regresi).
+export type GalleryVariant = 'masonry' | 'before-after' | 'editorial'
+// Stats (lux) — 'band' (default, kartu ber-tint) | 'recognition' (kolom divider
+// border-kiri, angka serif besar, panen RestaurantLux rl-recog).
+export type StatsVariant = 'band' | 'recognition'
 // Motif/tekstur otentik — dipanen dari BatikTokoRenderer (S-Kerajinan). Overlay
 // halus di hero + strip footer, ditint warna primary tema. 'none' = polos
 // (default semua tema lama → nol regresi).
@@ -79,6 +90,13 @@ export type SocialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'facebook' | '
 export interface SocialLink { platform: SocialPlatform; href: string; label?: string }
 export interface SocialContent { title?: string; subtitle?: string; links: SocialLink[] }
 
+// Urutan & himpunan section TENGAH (antara hero & footer). Manifest boleh
+// menentukannya supaya RANGKA halaman beda per industri (bukan cuma kulit
+// warna). Absen → ComposableRenderer pakai urutan default (tema lama nol regresi).
+export type SectionKey =
+  | 'features' | 'statement' | 'showcase' | 'process' | 'stats' | 'partners'
+  | 'team' | 'testimoni' | 'gallery' | 'info' | 'about' | 'pricing' | 'faq' | 'cta' | 'social'
+
 export interface ThemeManifest {
   id: string // cocok dgn ThemeOption.manifest di taxonomy.ts (mis. 'kuliner-rustic')
   label: string
@@ -86,13 +104,15 @@ export interface ThemeManifest {
   colorOverrides?: Partial<TokenPack['color']>
   layoutOverrides?: Partial<TokenPack['layout']>
   motif?: MotifVariant // default 'none'
+  // Urutan section tengah (lux). Absen = urutan default (DEFAULT_SECTION_ORDER).
+  sections?: SectionKey[]
   blocks: {
     hero: HeroVariant
     features?: FeaturesVariant
     showcase: ShowcaseVariant
     // ── Balok Sprint 5 (semua opsional → tema lama nol regresi) ──
     testimoni?: TestimoniVariant // sosial-proof; absen = tak dirender
-    stats?: boolean // strip angka kredibilitas (mis. "5.000+ pelanggan")
+    stats?: boolean | StatsVariant // strip angka kredibilitas; true/'band' = kartu, 'recognition' (lux) = kolom divider
     faq?: boolean // accordion objection-handling (CSS-only <details>)
     info?: boolean // jam buka + lokasi/maps + reservasi (wajib F&B/toko fisik)
     gallery?: GalleryVariant // masonry fasilitas / before-after (Sprint 5b)
@@ -554,6 +574,79 @@ export const MANIFESTS: Record<string, ThemeManifest> = {
   'preorder-fokus': { id: 'preorder-fokus', label: 'PO Fokus', basePackId: 'preorder-fokus', blocks: { hero: 'split', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'cards', info: true, faq: true } },
   'preorder-energi': { id: 'preorder-energi', label: 'PO Energi', basePackId: 'preorder-energi', blocks: { hero: 'centered', features: 'grid', showcase: 'card-grid', stats: true, testimoni: 'marquee', info: true } },
   'preorder-malam': { id: 'preorder-malam', label: 'PO Malam', basePackId: 'preorder-malam', blocks: { hero: 'fullbleed', features: 'rows', showcase: 'card-grid', stats: true, testimoni: 'spotlight', info: true, faq: true } },
+
+  // ── LUX TIER (Sprint 1 pilot) — default premium per industri. Pakai balok
+  // lux baru (hero cinematic · showcase signature/service-list · stats
+  // recognition · gallery editorial) di atas pack lux (bawa lux:{} → data-lux).
+  // Manifest deklarasi balok PENUH: produksi merender yang ada datanya
+  // (hero/features/statement/showcase/stats/faq/info/about), sisanya (team/
+  // testimoni/gallery) self-hide sampai klien isi via portal; preview/sample
+  // menampilkan semuanya (parity shoot vs flagship). ──
+  'lux-restaurant': {
+    id: 'lux-restaurant', label: 'Lux Restaurant', basePackId: 'lux-restaurant',
+    // Food-forward: filosofi → hidangan signature → suasana → pengakuan → chef.
+    sections: ['statement', 'showcase', 'gallery', 'stats', 'team', 'testimoni', 'info', 'faq'],
+    blocks: {
+      hero: 'cinematic', showcase: 'signature', statement: true, stats: 'recognition',
+      team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true,
+    },
+  },
+  'lux-klinik': {
+    id: 'lux-klinik', label: 'Lux Klinik', basePackId: 'lux-klinik',
+    // Trust-forward: kredibilitas (angka) → alasan → layanan → komitmen → dokter.
+    sections: ['stats', 'features', 'showcase', 'statement', 'team', 'gallery', 'testimoni', 'info', 'faq'],
+    blocks: {
+      hero: 'split', features: 'rows', showcase: 'service-list', statement: true,
+      stats: 'recognition', team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial',
+      info: true, faq: true,
+    },
+  },
+
+  // ── LUX TIER Sprint 2 — 7 industri sisa. Balok lux penuh; showcase ikut
+  // sumber data per industri di SiteRenderer (corporate/sekolah/travel/personal
+  // → services; toko/jastip → products; blog → blog_posts). ──
+  'lux-corporate': {
+    id: 'lux-corporate', label: 'Lux Corporate', basePackId: 'lux-corporate',
+    // Credibility + process: angka → kapabilitas → layanan → cara kerja → tim → klien.
+    sections: ['stats', 'features', 'showcase', 'process', 'team', 'partners', 'testimoni', 'faq', 'cta'],
+    blocks: { hero: 'split', features: 'rows', showcase: 'service-list', stats: 'recognition', process: 'timeline', team: 'spotlight', partners: 'marquee', testimoni: 'spotlight', faq: true, cta: 'banner' },
+  },
+  'lux-sekolah': {
+    id: 'lux-sekolah', label: 'Lux Sekolah', basePackId: 'lux-sekolah',
+    // Proud institutional: visi → akreditasi → program → kegiatan → guru → PPDB.
+    sections: ['statement', 'stats', 'showcase', 'gallery', 'team', 'testimoni', 'faq', 'info'],
+    blocks: { hero: 'centered', showcase: 'service-list', statement: true, stats: 'recognition', team: 'spotlight', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true },
+  },
+  'lux-toko': {
+    id: 'lux-toko', label: 'Lux Toko', basePackId: 'lux-toko',
+    // Product-forward: katalog lookbook → alasan → brand → angka → ulasan → sosial.
+    sections: ['showcase', 'features', 'statement', 'stats', 'testimoni', 'faq', 'social'],
+    blocks: { hero: 'fullbleed', features: 'grid', showcase: 'lookbook', statement: true, stats: 'recognition', testimoni: 'spotlight', faq: true, social: true },
+  },
+  'lux-travel': {
+    id: 'lux-travel', label: 'Lux Travel', basePackId: 'lux-travel',
+    // Destination-forward: galeri destinasi → paket → angka → ulasan → lokasi.
+    sections: ['gallery', 'showcase', 'stats', 'testimoni', 'info', 'faq'],
+    blocks: { hero: 'cinematic', showcase: 'card-grid', stats: 'recognition', testimoni: 'spotlight', gallery: 'editorial', info: true, faq: true },
+  },
+  'lux-personal': {
+    id: 'lux-personal', label: 'Lux Personal', basePackId: 'lux-personal',
+    // Portfolio + personality: karya → cerita → angka → ulasan → galeri → sosial.
+    sections: ['showcase', 'about', 'stats', 'testimoni', 'gallery', 'social', 'faq'],
+    blocks: { hero: 'fullbleed', showcase: 'card-grid', stats: 'recognition', testimoni: 'spotlight', gallery: 'editorial', about: 'story', social: true, faq: true },
+  },
+  'lux-blog': {
+    id: 'lux-blog', label: 'Lux Blog', basePackId: 'lux-blog',
+    // Lean reading: artikel → pernyataan editorial → tentang → sosial → faq.
+    sections: ['showcase', 'statement', 'about', 'social', 'faq'],
+    blocks: { hero: 'centered', showcase: 'article-feed', statement: true, about: 'story', social: true, faq: true },
+  },
+  'lux-jastip': {
+    id: 'lux-jastip', label: 'Lux Jastip', basePackId: 'lux-jastip',
+    // Trust/process-forward: cara titip → katalog → angka → ulasan → faq → sosial.
+    sections: ['process', 'showcase', 'stats', 'testimoni', 'faq', 'social', 'info'],
+    blocks: { hero: 'split', showcase: 'card-grid', process: 'horizontal', stats: 'recognition', testimoni: 'spotlight', faq: true, social: true, info: true },
+  },
 }
 
 export function getManifest(id?: string): ThemeManifest | undefined {

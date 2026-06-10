@@ -42,9 +42,27 @@ export function generateContent(order: OrderLike): BuildPlan {
     b.tipe === 'restaurant' &&
     (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-'))
 
+  // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
+  // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →
+  // variant = lux-<industri> → theme 'composable'. Pilihan eksplisit klien tetap
+  // dihormati (escape hatch). Fine Dining bespoke (isLux, benchmark beku) menang
+  // lebih dulu; migrasi default-nya ke composable lux = Sprint 3 pasca-parity.
+  const LUX_DEFAULT: Record<string, string | undefined> = {
+    restaurant: 'lux-restaurant',
+    klinik: 'lux-klinik',
+    // Sprint 2 — 9 industri tuntas (custom tetap generik/non-lux).
+    corporate: 'lux-corporate',
+    sekolah: 'lux-sekolah',
+    toko_online: 'lux-toko',
+    travel: 'lux-travel',
+    personal: 'lux-personal',
+    blog: 'lux-blog',
+    jastip: 'lux-jastip',
+  }
+
   const variant = isLux
     ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
-    : b.variant || defaultVariant(b.tipe)
+    : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
   // Fine Dining → 'restaurant-lux'. Selain itu jalur lama (theme per industri).

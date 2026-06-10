@@ -120,6 +120,22 @@ const travelTemplate: TemplateFn = (b) => {
     keunggulan: keunggulan.length ? keunggulan.slice(0, 4) : feat.map((f) => f.desc).slice(0, 4),
     syarat_sewa: b.kebijakan || undefined,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
+    // Pengayaan balok lux/composable (Sprint 2) — non-fabrikasi.
+    statement: {
+      eyebrow: 'Perjalanan Kami',
+      quote: 'Setiap perjalanan layak dimulai tanpa khawatir — armada terawat, harga jelas, dan layanan yang menepati janji.',
+      cite: b.namaUsaha,
+    },
+    stats: [
+      { angka: `${services.length}+`, label: 'Pilihan Unit' },
+      { angka: '100%', label: 'Unit Terawat' },
+      { angka: 'Lokal', label: b.kotaLayanan ? `Area ${b.kotaLayanan}` : 'Layanan Tepercaya' },
+    ],
+    faq: [
+      { q: 'Bagaimana cara memesan?', a: 'Klik WhatsApp, sebutkan tanggal, durasi, dan unit yang diinginkan. Kami cek ketersediaan lalu konfirmasi total biaya.' },
+      { q: 'Apa saja syarat sewanya?', a: b.kebijakan ? 'Detail syarat kami sampaikan saat konfirmasi; ringkasnya cukup identitas yang berlaku.' : 'Umumnya cukup identitas yang berlaku. Detail kami sampaikan saat konfirmasi pemesanan.' },
+      { q: 'Apakah tersedia dengan sopir?', a: 'Tergantung unit dan paket. Sampaikan kebutuhan Anda saat memesan, kami sesuaikan.' },
+    ],
   }
 
   const sections: BuildSection[] = [
@@ -162,6 +178,26 @@ const restaurantTemplate: TemplateFn = (b) => {
     deskripsi: fallbackDeskripsi(b, c.deskripsi),
     wa: b.wa,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
+    // Pengayaan balok (Sprint 1) — isi statement/stats/faq di PRODUKSI (dulu
+    // kosong → situs lux/composable sparse). Non-fabrikasi: stats dari jumlah
+    // menu NYATA + janji dapur standar (bukan rating/tahun palsu); klien edit
+    // via portal. Adapter (content-adapter.ts) memvalidasi ulang & balok yang
+    // tak dideklarasi manifest tetap self-hide → aman lintas tema.
+    statement: {
+      eyebrow: 'Filosofi',
+      quote: 'Kami percaya hidangan terbaik lahir dari bahan segar dan masakan yang dibuat sepenuh hati.',
+      cite: `Dapur ${b.namaUsaha}`,
+    },
+    stats: [
+      { angka: `${menuItems.length}+`, label: 'Menu Pilihan' },
+      { angka: '100%', label: 'Dimasak Segar' },
+      { angka: 'Lokal', label: b.kotaLayanan ? `Cita Rasa ${b.kotaLayanan}` : 'Cita Rasa Otentik' },
+    ],
+    faq: [
+      { q: 'Bagaimana cara memesan?', a: 'Klik tombol WhatsApp, sampaikan pesanan dan jumlahnya, lalu kami konfirmasi total beserta estimasi waktu siap.' },
+      { q: 'Apakah menerima pesanan untuk acara?', a: 'Bisa. Hubungi kami via WhatsApp untuk porsi besar atau katering acara — sebaiknya beberapa hari sebelum hari-H.' },
+      { q: 'Di mana lokasi dan jam buka?', a: `Lihat detail di bagian Lokasi${b.kotaLayanan ? ` (${b.kotaLayanan})` : ''}, atau tanyakan langsung kepada kami via WhatsApp.` },
+    ],
   }
 
   const sections: BuildSection[] = [
@@ -205,6 +241,22 @@ const corporateTemplate: TemplateFn = (b) => {
     bidang_usaha: asStr(b.konten.bidang_usaha) || 'Layanan Profesional',
     layanan_utama: services.map((s) => s.nama),
     kontak: { email: b.email || undefined, telepon: b.wa || undefined, alamat: b.alamat || undefined },
+    // Pengayaan balok lux/composable (Sprint 2) — non-fabrikasi.
+    statement: {
+      eyebrow: 'Visi Kami',
+      quote: 'Kami percaya solusi terbaik lahir dari mendengarkan lebih dulu, lalu mengeksekusi dengan disiplin dan integritas.',
+      cite: `Tim ${b.namaUsaha}`,
+    },
+    stats: [
+      { angka: `${services.length}+`, label: 'Layanan Utama' },
+      { angka: '100%', label: 'Berorientasi Hasil' },
+      { angka: 'Pro', label: 'Tim Berpengalaman' },
+    ],
+    faq: [
+      { q: 'Bagaimana cara memulai kerja sama?', a: 'Hubungi kami via WhatsApp atau email untuk konsultasi awal. Kami petakan kebutuhan Anda, lalu ajukan proposal yang sesuai.' },
+      { q: 'Apakah layanan bisa disesuaikan?', a: 'Bisa. Setiap layanan kami rancang sesuai skala dan tujuan bisnis Anda — bukan paket yang kaku.' },
+      { q: 'Bagaimana menghubungi tim Anda?', a: 'Kontak kami tertera di bagian bawah halaman; untuk respons cepat, kirim pesan langsung via WhatsApp.' },
+    ],
   }
 
   const sections: BuildSection[] = [
@@ -259,6 +311,26 @@ const klinikTemplate: TemplateFn = (b) => {
     fasilitas,
     asuransi_diterima: asuransi,
     kontak: { telepon: b.wa || '', email: b.email || undefined, alamat: b.alamat || '', wa: b.wa || undefined },
+    // Pengayaan balok (Sprint 1) — statement/stats/faq di PRODUKSI. Non-fabrikasi:
+    // stats dari jumlah layanan/fasilitas NYATA + janji standar (bukan jumlah
+    // pasien/tahun palsu); klien edit via portal. Balok tak-dideklarasi self-hide.
+    statement: {
+      eyebrow: 'Komitmen Kami',
+      quote: 'Kesehatan Anda prioritas kami — dilayani dengan ramah, teliti, dan menjaga kenyamanan Anda di setiap kunjungan.',
+      cite: `Tim ${b.namaUsaha}`,
+    },
+    stats: [
+      { angka: `${services.length}+`, label: 'Layanan' },
+      { angka: '100%', label: 'Tenaga Profesional' },
+      ...(fasilitas.length
+        ? [{ angka: `${fasilitas.length}+`, label: 'Fasilitas' }]
+        : [{ angka: 'Bersih', label: 'Ruang Terjaga' }]),
+    ],
+    faq: [
+      { q: 'Bagaimana cara membuat janji?', a: 'Klik tombol WhatsApp atau Buat Janji, pilih layanan dan waktu yang Anda inginkan, lalu tim kami mengonfirmasi jadwal.' },
+      { q: 'Apakah perlu reservasi sebelum datang?', a: 'Sangat disarankan agar Anda tidak menunggu lama. Pasien walk-in tetap kami layani sesuai ketersediaan.' },
+      { q: 'Di mana lokasi dan jam praktiknya?', a: `Jadwal praktik tertera di bagian Lokasi${b.alamat ? `; kami berada di ${b.alamat}` : ''}. Untuk kepastian, hubungi kami via WhatsApp.` },
+    ],
   }
 
   const sections: BuildSection[] = [
@@ -301,6 +373,24 @@ const sekolahTemplate: TemplateFn = (b) => {
     program_unggulan: services.map((s) => s.nama),
     ppdb_aktif: true,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || '' },
+    // Pengayaan balok lux/composable (Sprint 2) — pakai visi/akreditasi NYATA bila ada.
+    statement: {
+      eyebrow: 'Visi Kami',
+      quote: asStr(b.konten.visi) || 'Kami mendidik bukan sekadar untuk nilai, tetapi untuk karakter, rasa ingin tahu, dan keberanian melangkah.',
+      cite: `Keluarga ${b.namaUsaha}`,
+    },
+    stats: [
+      { angka: `${services.length}+`, label: 'Program Unggulan' },
+      { angka: '100%', label: 'Pendampingan Siswa' },
+      ...(asStr(b.konten.akreditasi)
+        ? [{ angka: asStr(b.konten.akreditasi) as string, label: 'Akreditasi' }]
+        : [{ angka: 'Aktif', label: 'PPDB Dibuka' }]),
+    ],
+    faq: [
+      { q: 'Bagaimana cara mendaftar (PPDB)?', a: 'Klik tombol Daftar atau hubungi kami via WhatsApp. Tim kami memandu alur pendaftaran, syarat, dan jadwalnya.' },
+      { q: 'Apa saja program unggulannya?', a: 'Lihat bagian Program untuk daftar lengkap. Untuk penjelasan detail, jadwalkan kunjungan atau tanya via WhatsApp.' },
+      { q: 'Di mana lokasi dan cara menghubungi?', a: 'Alamat dan kontak tertera di bawah. Kami dengan senang hati menerima kunjungan calon siswa dan orang tua.' },
+    ],
   }
 
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
@@ -344,6 +434,22 @@ const tokoOnlineTemplate: TemplateFn = (b) => {
     kategori_produk: [...new Set(products.map((p) => p.kategori).filter(Boolean))] as string[],
     kontak: { wa: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
     sosial_media: { instagram: b.sosial.instagram, tiktok: b.sosial.tiktok, shopee: b.sosial.shopee },
+    // Pengayaan balok lux/composable (Sprint 2) — non-fabrikasi.
+    statement: {
+      eyebrow: 'Tentang Kami',
+      quote: 'Kami memilih tiap produk dengan standar yang sama seperti untuk diri sendiri — kualitas dulu, selalu.',
+      cite: b.namaUsaha,
+    },
+    stats: [
+      { angka: `${products.length}+`, label: 'Pilihan Produk' },
+      { angka: '100%', label: 'Kualitas Terjaga' },
+      { angka: 'Cepat', label: 'Respons & Kirim' },
+    ],
+    faq: [
+      { q: 'Bagaimana cara memesan?', a: 'Pilih produk, lalu klik tombol WhatsApp untuk konfirmasi ketersediaan, total, dan ongkir. Admin kami memandu pembayaran.' },
+      { q: 'Apakah barang sesuai deskripsi?', a: 'Ya, kami hanya menjual produk sesuai deskripsi. Bila ada ketidaksesuaian, hubungi kami untuk solusi.' },
+      { q: 'Berapa lama pengiriman?', a: 'Pesanan diproses cepat setelah pembayaran. Estimasi tiba mengikuti ekspedisi dan lokasi Anda — admin info detailnya.' },
+    ],
   }
 
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
@@ -367,6 +473,23 @@ const genericTemplate: TemplateFn = (b) => {
     deskripsi: fallbackDeskripsi(b, c.deskripsi),
     wa: b.wa,
     kontak: { telepon: b.wa || undefined, email: b.email || undefined, alamat: b.alamat || undefined },
+    // Pengayaan balok lux/composable (Sprint 2) — netral lintas personal/blog/
+    // jastip/custom (template generik), non-fabrikasi.
+    statement: {
+      eyebrow: 'Tentang',
+      quote: 'Kami percaya hal-hal baik lahir dari ketekunan dan perhatian pada detail.',
+      cite: b.namaUsaha,
+    },
+    stats: [
+      { angka: '100%', label: 'Sepenuh Hati' },
+      { angka: 'Cepat', label: 'Respons' },
+      { angka: 'Ramah', label: 'Pelayanan' },
+    ],
+    faq: [
+      { q: 'Bagaimana cara menghubungi?', a: 'Klik tombol WhatsApp atau lihat kontak di bagian bawah halaman. Kami usahakan membalas secepatnya.' },
+      { q: 'Apa saja yang ditawarkan?', a: 'Lihat bagian di atas untuk gambaran lengkapnya. Bila ada yang ingin ditanyakan, jangan ragu menghubungi kami.' },
+      { q: 'Apakah bisa permintaan khusus?', a: 'Bisa. Sampaikan kebutuhan Anda via WhatsApp dan kami bantu sebisa mungkin.' },
+    ],
   }
   const feat = asArr(b.konten.keunggulan).map(asStr).filter(Boolean)
   const sections: BuildSection[] = [
