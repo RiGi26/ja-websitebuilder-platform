@@ -10,6 +10,7 @@ import { runTemplate } from './templates'
 import { deriveDesignTokens, defaultVariant } from './designTokens'
 import { industryToTheme, addonsToFeatures } from '@/lib/websitebuilder-mapping'
 import { capabilitiesForAddons } from '@/lib/addons/catalog'
+import { addonSectionBlueprints, mergeAddonSections } from '@/lib/addons/sections'
 import { getManifest } from '@/lib/theme-system/manifest'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
 
@@ -91,6 +92,22 @@ export function generateContent(order: OrderLike): BuildPlan {
   const menuItems = withGambar(out.menuItems ?? [])
   const products = withGambar(out.products ?? [])
 
+  // B-section: seed service "Reservasi Meja" bila booking aktif TAPI industri tak
+  // menghasilkan service (resto pakai menu_items). Tanpa ini /[slug]/booking 404
+  // (route gate services.length>0). Industri jasa (klinik/travel/dll) sudah punya.
+  if (capabilities.includes('booking') && services.length === 0) {
+    services.push({
+      nama: 'Reservasi Meja',
+      deskripsi: 'Pesan meja lebih dulu agar Anda tidak perlu menunggu saat tiba.',
+      harga: 0,
+      dp_amount: 0,
+      kategori: 'Reservasi',
+    })
+  }
+
+  // B-section: injeksi section struktural add-on (cross-industri; dedupe vs native).
+  const sections = mergeAddonSections(out.sections, addonSectionBlueprints(order.selected_addons))
+
   const dataKonten: Record<string, unknown> = { ...out.dataKonten }
   if (sample) {
     if (sample.hero?.image && !dataKonten.foto_hero) dataKonten.foto_hero = sample.hero.image
@@ -115,7 +132,7 @@ export function generateContent(order: OrderLike): BuildPlan {
     capabilities,
     contentIsSample,
     dataKonten,
-    sections: out.sections,
+    sections,
     services,
     menuItems,
     products,
@@ -125,7 +142,7 @@ export function generateContent(order: OrderLike): BuildPlan {
       theme,
       variant,
       primary: b.primary,
-      nSections: out.sections.length,
+      nSections: sections.length,
       nServices: services.length,
       nMenu: menuItems.length,
       nProducts: products.length,
