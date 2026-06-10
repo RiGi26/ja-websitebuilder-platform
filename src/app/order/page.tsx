@@ -100,6 +100,11 @@ function OrderFormContent() {
     displayId: string; dpAmount: number; redirectUrl: string
   } | null>(null)
 
+  // ── Program Mitra: kode referral ─────────────────────────────────────────
+  const [referralCode, setReferralCode] = useState('')
+  const [refStatus, setRefStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle')
+  const [refInfo, setRefInfo] = useState<{ discountPercent: number; referrerName: string } | null>(null)
+
   // Pre-fill dari kalkulator ja-corp-landing
   const kalkulatorIndustri = searchParams.get('industri') ?? ''
   const kalkulatorEstimasi = searchParams.get('estimasi') ? Number(searchParams.get('estimasi')) : null
@@ -137,6 +142,43 @@ function OrderFormContent() {
       }
     }
   }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Prefill kode referral: ?ref= (link mitra / corp landing) → fallback
+  // cookie ja_ref (di-set short link /r/KODE, umur 30 hari).
+  useEffect(() => {
+    const fromParam = searchParams.get('ref')
+    if (fromParam) { setReferralCode(fromParam.toUpperCase()); return }
+    const m = document.cookie.match(/(?:^|;\s*)ja_ref=([A-Za-z0-9]+)/)
+    if (m) setReferralCode(m[1].toUpperCase())
+  }, [searchParams])
+
+  // Validasi kode (debounced). Invalid TIDAK memblokir submit — order
+  // tetap jalan tanpa diskon; server memvalidasi ulang secara otoritatif.
+  useEffect(() => {
+    const code = referralCode.trim().toUpperCase()
+    if (!code) { setRefStatus('idle'); setRefInfo(null); return }
+    if (!/^[A-Z0-9]{4,16}$/.test(code)) { setRefStatus('invalid'); setRefInfo(null); return }
+    setRefStatus('checking')
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/referral/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        })
+        const data = await res.json()
+        if (data?.valid) {
+          setRefInfo({ discountPercent: data.discountPercent, referrerName: data.referrerName })
+          setRefStatus('valid')
+        } else {
+          setRefInfo(null); setRefStatus('invalid')
+        }
+      } catch {
+        setRefInfo(null); setRefStatus('invalid')
+      }
+    }, 450)
+    return () => clearTimeout(t)
+  }, [referralCode])
 
   // Dari kalkulator → skip step addon (sudah dipilih di sana)
   const fromKalkulator = !!(kalkulatorPaket || kalkulatorEstimasi)
@@ -184,10 +226,17 @@ function OrderFormContent() {
     ? (kalkulatorMaintain ?? currentBaseRenewal)
     : currentBaseRenewal + totalAddonYearly
 
+  // Diskon referral — formula HARUS identik dengan server (payment/create):
+  // diskon dari gross, lalu seluruh math DP/pelunasan memakai NET.
+  const referralDiscount = refStatus === 'valid' && refInfo
+    ? Math.round((finalPrice * refInfo.discountPercent) / 100)
+    : 0
+  const payableTotal = finalPrice - referralDiscount
+
   const DP_THRESHOLD = 4_000_000
-  const isDP = finalPrice >= DP_THRESHOLD
-  const dpAmount = isDP ? Math.ceil(finalPrice * 0.5) : finalPrice
-  const pelunasan = isDP ? finalPrice - dpAmount : 0
+  const isDP = payableTotal >= DP_THRESHOLD
+  const dpAmount = isDP ? Math.ceil(payableTotal * 0.5) : payableTotal
+  const pelunasan = isDP ? payableTotal - dpAmount : 0
 
 
 
@@ -240,6 +289,7 @@ function OrderFormContent() {
           selected_addons: form.selectedAddons,
           total_estimasi: finalPrice,
           total_maintenance: totalYearlyMaint,
+          referral_code: refStatus === 'valid' ? referralCode.trim().toUpperCase() : null,
         }),
       })
 
@@ -501,9 +551,46 @@ function OrderFormContent() {
                                   </div>
                                   ) : null
                               })}
+                              {/* Kode Referral (Program Mitra) */}
+                              <div className="pt-4 mt-2 border-t border-black/[0.03]">
+                                  <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kode Referral (Opsional)</Label>
+                                  <div className="mt-2">
+                                      <Input
+                                        placeholder="Punya kode dari mitra kami? Masukkan di sini"
+                                        value={referralCode}
+                                        onChange={e => setReferralCode(e.target.value.toUpperCase())}
+                                        maxLength={16}
+                                        className="apple-input uppercase"
+                                      />
+                                  </div>
+                                  {refStatus === 'checking' && (
+                                      <p className="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
+                                          <Loader2 size={12} className="animate-spin" /> Memeriksa kode…
+                                      </p>
+                                  )}
+                                  {refStatus === 'valid' && refInfo && (
+                                      <p className="text-xs font-semibold text-green-600 mt-2 flex items-center gap-1.5">
+                                          <Check size={12} strokeWidth={3} /> Kode valid — diskon {refInfo.discountPercent}% dari {refInfo.referrerName}
+                                      </p>
+                                  )}
+                                  {refStatus === 'invalid' && referralCode.trim() !== '' && (
+                                      <p className="text-xs text-gray-400 mt-2">Kode tidak ditemukan — order tetap bisa dilanjutkan tanpa diskon.</p>
+                                  )}
+                              </div>
+                              {referralDiscount > 0 && (
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-green-600">
+                                      <span className="font-medium text-sm flex-1">Diskon Referral ({refInfo?.discountPercent}%)</span>
+                                      <span className="font-bold shrink-0 text-left sm:text-right">− {formatPrice(referralDiscount)}</span>
+                                  </div>
+                              )}
                               <div className="pt-6 mt-6 border-t-2 border-black/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                   <span className="text-lg sm:text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
-                                  <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">{formatPrice(finalPrice)}</span>
+                                  <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">
+                                      {referralDiscount > 0 && (
+                                          <span className="text-base text-gray-300 line-through mr-2 align-middle">{formatPrice(finalPrice)}</span>
+                                      )}
+                                      {formatPrice(payableTotal)}
+                                  </span>
                               </div>
 
                               {/* DP Breakdown — distinct payment card */}

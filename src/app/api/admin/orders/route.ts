@@ -5,6 +5,7 @@ import { notifyCustomer, type NotifyEvent } from '@/lib/fonnte'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { issuePortalCredentials } from '@/lib/client-account'
 import { sendEmail, portalLoginEmailHtml } from '@/lib/email'
+import { voidEarningForOrder } from '@/lib/referral'
 
 export async function PATCH(request: Request) {
   // 1. Security Check — verifikasi token sesi signed (bukan cookie statik)
@@ -57,6 +58,14 @@ export async function PATCH(request: Request) {
       progress_note !== undefined && progress_note !== null && progress_note !== ''
     const deliveredChanged =
       delivered_url !== undefined && delivered_url !== (current?.delivered_url ?? undefined)
+
+    // Program Mitra — order dibatalkan = komisi (pending/confirmed) di-void.
+    // Earning berstatus 'paid' tidak pernah di-void otomatis.
+    if (status === 'cancelled' && current?.status !== 'cancelled') {
+      voidEarningForOrder(id).catch((e) =>
+        console.error('[admin/orders] void referral earning failed:', e),
+      )
+    }
 
     if (stepChanged || statusChanged || noteAdded || deliveredChanged) {
       const { error: logErr } = await supabaseAdmin.from('order_progress_logs').insert({

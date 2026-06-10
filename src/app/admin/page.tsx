@@ -125,6 +125,10 @@ export default async function StudioAdminPage() {
             </div>
             
             <div className="flex items-center gap-4">
+               <Link href="/admin/mitra" className="bg-white px-6 py-4 rounded-3xl apple-shadow border border-black/5 text-center hover:border-apple-blue/30 transition-colors">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Program</p>
+                    <p className="text-sm sf-display-heavy text-apple-blue mt-1.5">Mitra →</p>
+               </Link>
                <div className="bg-white px-6 py-4 rounded-3xl apple-shadow border border-black/5 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Leads</p>
                     <p className="text-3xl sf-display-heavy text-apple-blue">{orders.length}</p>
