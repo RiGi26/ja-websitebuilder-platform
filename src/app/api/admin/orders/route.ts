@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, type NotifyEvent } from '@/lib/fonnte'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
+import { issuePortalCredentials } from '@/lib/client-account'
+import { sendEmail, portalLoginEmailHtml } from '@/lib/email'
 
 export async function PATCH(request: Request) {
   // 1. Security Check — verifikasi token sesi signed (bukan cookie statik)
@@ -23,7 +25,7 @@ export async function PATCH(request: Request) {
     // 2. Fetch current state untuk diff detection (deteksi WA notification trigger)
     const { data: current, error: fetchErr } = await supabaseAdmin
       .from('orders')
-      .select('progress_step, status, nomor_wa, nama_perusahaan, nama_usaha, delivered_url, created_at')
+      .select('progress_step, status, nomor_wa, nama_perusahaan, nama_usaha, delivered_url, created_at, tenant_id, email')
       .eq('id', id)
       .single()
 
@@ -86,15 +88,40 @@ export async function PATCH(request: Request) {
       const clientName = current.nama_perusahaan || current.nama_usaha || 'Customer'
       const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
       const trackUrl = `${base}/track?id=${id}`
+      const websiteUrl = delivered_url !== undefined ? delivered_url : current?.delivered_url ?? null
 
-      // Fire-and-forget — jangan await, jangan blok PATCH response kalau Fonnte down
+      // Feature C — saat LAUNCH: terbitkan kredensial portal (reset password fresh)
+      // lalu kirim via WA (deliveredCredentials, gantikan paste manual admin) + email
+      // (Resend, no-op tanpa RESEND_API_KEY). Catatan manual admin tetap di-append.
+      // Hanya penerbitan password yang di-await (butuh plaintext utk WA+email);
+      // pengirimannya tetap fire-and-forget.
+      let credBlock: string | null = (delivered_credentials ?? '').trim() || null
+      if (notifEvent.type === 'launch' && current.tenant_id) {
+        try {
+          const cred = await issuePortalCredentials(current.tenant_id, current.email, clientName)
+          if (cred) {
+            const loginUrl = `${base}/portal/login`
+            const portalText = `Login dashboard:\n${loginUrl}\nEmail: ${cred.email}\nPassword: ${cred.password}`
+            credBlock = credBlock ? `${credBlock}\n\n${portalText}` : portalText
+            sendEmail(
+              cred.email,
+              'Website Anda sudah live 🎉',
+              portalLoginEmailHtml({ clientName, loginUrl, email: cred.email, password: cred.password, websiteUrl }),
+            ).catch((err) => console.error('[admin/orders] email kredensial gagal:', err))
+          }
+        } catch (e) {
+          console.error('[admin/orders] issuePortalCredentials gagal:', e instanceof Error ? e.message : e)
+        }
+      }
+
+      // Fire-and-forget — jangan blok PATCH response kalau Fonnte down
       notifyCustomer(notifEvent, current.nomor_wa, {
         clientName,
         displayId,
         trackUrl,
         note: progress_note ?? null,
-        deliveredUrl: delivered_url !== undefined ? delivered_url : current?.delivered_url ?? null,
-        deliveredCredentials: delivered_credentials ?? null,
+        deliveredUrl: websiteUrl,
+        deliveredCredentials: credBlock,
       }).catch((err) => console.error('[admin/orders] WA notify failed:', err))
     }
 
