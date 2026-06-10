@@ -1968,7 +1968,32 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   preorder: JASTIP_PREORDER,
 }
 
+// LUX TIER — id 'lux-<industri>' pinjam sample industri terdekat yang KAYA
+// (statement/team/gallery/stats/testimoni/faq lengkap) → preview /admin/
+// theme-preview + imagery-borrow generateContent + parity shoot menampilkan
+// SEMUA balok lux. Split '-' biasa menghasilkan 'lux' (bukan industri) → eksplisit.
+// Sample industri pinjaman umumnya TAK punya `statement` (balok signature lux);
+// tambahkan HANYA ke alias lux (spread → sample dasar utk tema lain tak tersentuh).
+// Produksi mengisi statement via templates.ts enrichment; ini agar preview/parity
+// lux menampilkan band filosofi juga. Bila base sudah punya statement → dipakai apa adanya.
+function luxSample(base: ComposableContent, eyebrow: string, quote: string): ComposableContent {
+  return base.statement ? base : { ...base, statement: { eyebrow, quote, cite: base.nama } }
+}
+const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
+  'lux-restaurant': FINEDINING, // sudah punya statement kaya
+  'lux-klinik': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan ramah, teliti, dan menjaga kenyamanan Anda di setiap kunjungan.'),
+  // Sprint 2 — pinjam sample industri terdekat (yang paling kaya balok) + statement.
+  'lux-corporate': luxSample(COMPANY_STARTUP, 'Visi Kami', 'Kami percaya solusi terbaik lahir dari mendengarkan lebih dulu, lalu mengeksekusi dengan disiplin dan integritas.'),
+  'lux-sekolah': luxSample(SEKOLAH_REGULER, 'Visi Kami', 'Kami mendidik bukan sekadar untuk nilai, tetapi untuk karakter, rasa ingin tahu, dan keberanian melangkah.'),
+  'lux-toko': luxSample(FASHION, 'Tentang Kami', 'Kami memilih tiap produk dengan standar yang sama seperti untuk diri sendiri — kualitas dulu, selalu.'),
+  'lux-travel': luxSample(TRAVEL_WISATA, 'Perjalanan Kami', 'Setiap perjalanan layak dimulai tanpa khawatir — tepercaya, harga jelas, dan layanan yang menepati janji.'),
+  'lux-personal': luxSample(PERSONAL_KREATOR, 'Tentang', 'Kami percaya hal-hal baik lahir dari ketekunan dan perhatian pada detail.'),
+  'lux-blog': luxSample(BLOG_MEDIA, 'Redaksi', 'Kami menulis untuk memperjelas, bukan memperumit — gagasan yang layak dibaca pelan-pelan.'),
+  'lux-jastip': luxSample(JASTIP_LUAR, 'Komitmen Kami', 'Kepercayaan Anda kami jaga seperti barang titipan itu sendiri — transparan, aman, dan tepat janji.'),
+}
+
 export function sampleContentForTheme(themeId: string): ComposableContent {
+  if (LUX_SAMPLE_ALIAS[themeId]) return LUX_SAMPLE_ALIAS[themeId]
   const sub = themeId.split('-')[0]
   return BY_SUBKATEGORI[sub] ?? KULINER
 }

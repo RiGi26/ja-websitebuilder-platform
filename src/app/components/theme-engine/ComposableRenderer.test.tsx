@@ -49,8 +49,14 @@ describe('ComposableRenderer — mesin Theme System (S0-2)', () => {
       if (manifest.blocks.showcase !== 'article-feed') {
         expect(html).toContain('Rp15.000') // harga terformat
       }
-      expect(html).toContain('Homemade Harian') // features (keunggulan)
-      expect(html).toContain('Mengapa Memilih Kami') // heading features (fallback non-generik; konten bisa override)
+      // Features kini OPSIONAL per manifest (manifest.sections). Tema lux yang
+      // memimpin dengan beat lain (statement/showcase/gallery) boleh tanpa
+      // section features → cek hanya bila section ini memang dirender.
+      const hasFeatures = !manifest.sections || manifest.sections.includes('features')
+      if (hasFeatures) {
+        expect(html).toContain('Homemade Harian') // features (keunggulan)
+        expect(html).toContain('Mengapa Memilih Kami') // heading features (fallback non-generik; konten bisa override)
+      }
       expect(html).toContain('--c-primary') // token ter-inject
       expect(html).toContain(`data-theme="${id}"`)
     })
