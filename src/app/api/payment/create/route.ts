@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer } from '@/lib/fonnte'
+import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -15,7 +16,23 @@ export async function POST(request: Request) {
       client_type, nama_usaha, nama_perusahaan, nama_pic, jabatan,
       nomor_wa, email, industri, template_id, referensi_manual,
       selected_addons, total_estimasi, total_maintenance,
+      referral_code,
     } = body
+
+    // 0. Referral (Program Mitra) — server yang berwenang: kode divalidasi
+    //    ulang di sini, diskon dihitung ulang (jangan percaya angka klien),
+    //    self-referral ditolak diam-diam. Kode invalid TIDAK memblokir order.
+    const gross = Number(total_estimasi) || 0
+    let applied = null as Awaited<ReturnType<typeof lookupActiveCode>>
+    const normCode = normalizeCode(referral_code)
+    if (normCode) {
+      const ref = await lookupActiveCode(normCode)
+      if (ref && !isSelfReferral(ref, nomor_wa ?? '', email ?? '')) applied = ref
+    }
+    const referralDiscount = applied ? Math.round((gross * applied.discountPercent) / 100) : 0
+    // total_estimasi tersimpan = NET supaya seluruh math hilir (DP threshold,
+    // retry, pelunasan) tetap bekerja tanpa perubahan.
+    const netTotal = gross - referralDiscount
 
     // 1. Insert order with pending_payment status
     const { data: order, error: dbError } = await supabaseAdmin
@@ -27,10 +44,13 @@ export async function POST(request: Request) {
         nama_pic: client_type === 'perusahaan' ? nama_pic : null,
         jabatan: client_type === 'perusahaan' ? jabatan : null,
         nomor_wa, email, industri, template_id, referensi_manual,
-        selected_addons, total_estimasi, total_maintenance,
+        selected_addons, total_estimasi: netTotal, total_maintenance,
         status: 'pending_payment',
         payment_status: 'unpaid',
         type: 'new',
+        referral_code: applied?.code ?? null,
+        referrer_id: applied?.referrerId ?? null,
+        referral_discount: referralDiscount,
       }])
       .select()
       .single()
@@ -40,8 +60,8 @@ export async function POST(request: Request) {
     const year = new Date().getFullYear()
     const displayId = `JA-${year}-${order.id.slice(0, 8).toUpperCase()}`
     const DP_THRESHOLD = 4_000_000
-    const isDP = total_estimasi >= DP_THRESHOLD
-    const dpAmount = isDP ? Math.ceil(total_estimasi * 0.5) : total_estimasi
+    const isDP = netTotal >= DP_THRESHOLD
+    const dpAmount = isDP ? Math.ceil(netTotal * 0.5) : netTotal
     const clientName = client_type === 'perusahaan' ? nama_perusahaan : nama_usaha
     const midtransOrderId = `${displayId}-DP`
     const finishUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/thank-you?id=${order.id}`
@@ -113,6 +133,7 @@ export async function POST(request: Request) {
       order_id: order.id,
       display_id: displayId,
       dp_amount: dpAmount,
+      referral_discount: referralDiscount,
     })
   } catch (err: any) {
     console.error('[payment/create]', err.message)

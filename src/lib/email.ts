@@ -45,6 +45,48 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
   }
 }
 
+// Template HTML: welcome Mitra (Program Mitra) dengan kredensial login.
+export function mitraWelcomeEmailHtml(args: {
+  nama: string
+  loginUrl: string
+  email: string
+  password: string
+  refLink: string
+  code: string
+}): string {
+  const { nama, loginUrl, email, password, refLink, code } = args
+  return `<!doctype html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px">
+    <tr><td align="center">
+      <table role="presentation" width="100%" style="max-width:520px;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.06)">
+        <tr><td style="padding:32px 32px 8px">
+          <h1 style="margin:0 0 8px;font-size:22px">Selamat datang di Program Mitra 🤝</h1>
+          <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6">Halo ${nama}, akun mitra Anda sudah aktif. Bagikan link referral Anda — teman Anda dapat diskon, Anda dapat komisi dari setiap order yang dibayar.</p>
+        </td></tr>
+        <tr><td style="padding:16px 32px 8px">
+          <div style="background:#eef6ff;border-radius:16px;padding:18px;font-size:14px">
+            <p style="margin:0 0 6px;font-weight:700">Link referral Anda</p>
+            <p style="margin:0 0 6px"><a href="${refLink}" style="color:#0071E3;text-decoration:none;word-break:break-all">${refLink}</a></p>
+            <p style="margin:0;color:#64748b">Kode: <strong>${code}</strong></p>
+          </div>
+        </td></tr>
+        <tr><td style="padding:8px 32px 16px">
+          <div style="background:#f5f5f7;border-radius:16px;padding:18px;font-size:14px">
+            <p style="margin:0 0 10px;font-weight:700">Login Dashboard Mitra</p>
+            <p style="margin:0 0 4px"><strong>URL:</strong> <a href="${loginUrl}" style="color:#0071E3;text-decoration:none">${loginUrl}</a></p>
+            <p style="margin:0 0 4px"><strong>Email:</strong> ${email}</p>
+            <p style="margin:0"><strong>Password:</strong> ${password}</p>
+          </div>
+        </td></tr>
+        <tr><td style="padding:0 32px 32px">
+          <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6">Di dashboard Anda bisa pantau komisi, ajukan pencairan, dan atur rekening bank. Butuh bantuan? Balas email ini.</p>
+        </td></tr>
+      </table>
+      <p style="margin:16px 0 0;color:#94a3b8;font-size:11px">Japan Arena Studio</p>
+    </td></tr>
+  </table></body></html>`
+}
+
 // Template HTML: login portal customer saat website LIVE (Feature C).
 export function portalLoginEmailHtml(args: {
   clientName: string

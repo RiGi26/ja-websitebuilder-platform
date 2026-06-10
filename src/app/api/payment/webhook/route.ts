@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { notifyCustomer } from '@/lib/fonnte'
+import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
+import { createEarningForOrder, confirmEarningForOrder } from '@/lib/referral'
 import crypto from 'crypto'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
@@ -80,6 +81,27 @@ export async function POST(request: Request) {
               deliveredUrl: pOrder.delivered_url ?? null,
             }).catch((e) => console.error('[webhook] WA payment_lunas failed:', e))
           }
+
+          // Program Mitra — pelunasan = komisi terkonfirmasi (idempotent:
+          // predicate status='pending' hanya match sekali walau Midtrans retry).
+          if (isPaid && pOrder) {
+            try {
+              const t = await confirmEarningForOrder(pOrder.id)
+              if (t.outcome === 'confirmed' && t.referrerWa) {
+                const year = new Date(pOrder.created_at ?? Date.now()).getFullYear()
+                const displayId = `JA-${year}-${pOrder.id.slice(0, 8).toUpperCase()}`
+                const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+                notifyReferrer({ type: 'referral_earning_confirmed' }, t.referrerWa, {
+                  referrerName: t.referrerName ?? 'Mitra',
+                  amount: t.amount,
+                  displayId,
+                  mitraUrl: `${base}/mitra`,
+                }).catch((e) => console.error('[webhook] WA referral confirm failed:', e))
+              }
+            } catch (e) {
+              console.error('[webhook] referral confirm failed:', e)
+            }
+          }
         }
       } else {
         // DP: match by midtrans_order_id
@@ -102,6 +124,36 @@ export async function POST(request: Request) {
             trackUrl: `${base}/track?id=${updatedOrder.id}`,
             briefingUrl: `${base}/order/briefing/${updatedOrder.tracking_token}`,
           }).catch((e) => console.error('[webhook] WA dp_confirmed failed:', e))
+        }
+
+        // Program Mitra — DP masuk = earning dibuat (pending; langsung
+        // confirmed bila order dibayar 100% di muka). Idempotent via
+        // order_id UNIQUE + ignoreDuplicates, aman terhadap retry Midtrans.
+        if (isPaid && updatedOrder) {
+          try {
+            const t = await createEarningForOrder(updatedOrder.id)
+            if ((t.outcome === 'created' || t.outcome === 'created_confirmed') && t.referrerWa) {
+              const year = new Date(updatedOrder.created_at ?? Date.now()).getFullYear()
+              const displayId = `JA-${year}-${updatedOrder.id.slice(0, 8).toUpperCase()}`
+              const base = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+              notifyReferrer(
+                {
+                  type: t.outcome === 'created_confirmed'
+                    ? 'referral_earning_confirmed'
+                    : 'referral_earning_pending',
+                },
+                t.referrerWa,
+                {
+                  referrerName: t.referrerName ?? 'Mitra',
+                  amount: t.amount,
+                  displayId,
+                  mitraUrl: `${base}/mitra`,
+                },
+              ).catch((e) => console.error('[webhook] WA referral earning failed:', e))
+            }
+          } catch (e) {
+            console.error('[webhook] referral earning failed:', e)
+          }
         }
       }
     }

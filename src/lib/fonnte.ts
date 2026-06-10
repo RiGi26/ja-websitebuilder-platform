@@ -266,3 +266,101 @@ export async function notifyCustomer(
   }
   return sendWhatsApp(phone, message)
 }
+
+// ── Program Mitra: notifikasi ke referrer ───────────────────────────────────
+export type ReferrerNotifyEvent =
+  | { type: 'referrer_welcome' }
+  | { type: 'referral_earning_pending' }
+  | { type: 'referral_earning_confirmed' }
+  | { type: 'referral_payout_paid' }
+
+type ReferrerNotifContext = {
+  referrerName: string
+  mitraUrl: string
+  amount?: number | null
+  displayId?: string | null
+  code?: string | null
+  refLink?: string | null
+  loginEmail?: string | null
+  loginPassword?: string | null
+}
+
+const formatRp = (n: number) => `Rp ${Math.round(n).toLocaleString('id-ID')}`
+
+function referrerWelcomeTemplate(c: ReferrerNotifContext): string {
+  return [
+    `🤝 *Selamat datang di Program Mitra Japan Arena!*`,
+    ``,
+    `Halo ${c.referrerName}, akun mitra Anda sudah aktif.`,
+    ``,
+    `🔗 Link referral Anda:`,
+    c.refLink ?? '-',
+    ``,
+    `Bagikan link atau kode *${c.code ?? '-'}* — teman Anda dapat diskon, Anda dapat komisi dari setiap order yang dibayar.`,
+    ``,
+    `Login dashboard mitra:`,
+    c.mitraUrl,
+    `Email: ${c.loginEmail ?? '-'}`,
+    `Password: ${c.loginPassword ?? '-'}`,
+    ``,
+    `Simpan kredensial ini baik-baik. Ada pertanyaan? Balas pesan ini 🙌`,
+  ].join('\n')
+}
+
+function earningPendingTemplate(c: ReferrerNotifContext): string {
+  return [
+    `💰 *Komisi baru masuk!*`,
+    ``,
+    `Halo ${c.referrerName}, ada order baru lewat referral Anda${c.displayId ? ` (*${c.displayId}*)` : ''}.`,
+    ``,
+    `Komisi: *${formatRp(c.amount ?? 0)}*`,
+    `Status: menunggu pelunasan customer.`,
+    ``,
+    `Komisi bisa dicairkan setelah order dilunasi.`,
+    `Cek dashboard: ${c.mitraUrl}`,
+  ].join('\n')
+}
+
+function earningConfirmedTemplate(c: ReferrerNotifContext): string {
+  return [
+    `✅ *Komisi terkonfirmasi!*`,
+    ``,
+    `Halo ${c.referrerName}, komisi *${formatRp(c.amount ?? 0)}*${c.displayId ? ` dari order *${c.displayId}*` : ''} sudah bisa dicairkan.`,
+    ``,
+    `Saldo & pencairan: ${c.mitraUrl}`,
+  ].join('\n')
+}
+
+function payoutPaidTemplate(c: ReferrerNotifContext): string {
+  return [
+    `🎉 *Pencairan komisi berhasil!*`,
+    ``,
+    `Halo ${c.referrerName}, dana *${formatRp(c.amount ?? 0)}* sudah ditransfer ke rekening Anda.`,
+    ``,
+    `Terima kasih telah menjadi Mitra Japan Arena! 🙏`,
+    `Dashboard: ${c.mitraUrl}`,
+  ].join('\n')
+}
+
+export async function notifyReferrer(
+  event: ReferrerNotifyEvent,
+  phone: string,
+  ctx: ReferrerNotifContext,
+): Promise<FonnteResult> {
+  let message: string
+  switch (event.type) {
+    case 'referrer_welcome':
+      message = referrerWelcomeTemplate(ctx)
+      break
+    case 'referral_earning_pending':
+      message = earningPendingTemplate(ctx)
+      break
+    case 'referral_earning_confirmed':
+      message = earningConfirmedTemplate(ctx)
+      break
+    case 'referral_payout_paid':
+      message = payoutPaidTemplate(ctx)
+      break
+  }
+  return sendWhatsApp(phone, message)
+}

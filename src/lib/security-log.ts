@@ -12,6 +12,7 @@ export type SecurityEventKind =
   | 'admin_login_failed'
   | 'admin_login_ratelimited'
   | 'track_ratelimited'
+  | 'refval_ratelimited'
 
 export async function logSecurityEvent(
   kind: SecurityEventKind,
