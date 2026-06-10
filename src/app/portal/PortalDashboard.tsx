@@ -12,6 +12,7 @@ import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile 
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ImageUploadField from './ImageUploadField'
 import LivePreview from './LivePreview'
+import SampleContentBanner from './SampleContentBanner'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -57,6 +58,7 @@ type Props = {
   hasMenu: boolean
   hasBlog: boolean
   hasGallery: boolean
+  contentIsSample: boolean
   paymentStatus: PaymentStatus
   initialOrders: ShopOrderRow[]
   initialServices: Service[]
@@ -71,7 +73,7 @@ type Props = {
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, contentIsSample, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
@@ -243,6 +245,10 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               <CreditCard size={14} /> Pembayaran
             </button>
           </div>
+
+          {contentIsSample && (
+            <SampleContentBanner tenantId={tenantId} onEdit={() => setTab('konten')} />
+          )}
 
           {tab === 'konten' ? (
             <ContentPanel initial={initialSections} />
