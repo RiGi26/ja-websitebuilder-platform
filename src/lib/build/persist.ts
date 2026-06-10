@@ -48,6 +48,8 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
     features: { ...(currentKonfigurasi.features ?? {}), ...plan.features },
     // B-cap: capabilities = turunan dari order (rebuild regenerasi penuh).
     capabilities: plan.capabilities,
+    // Opsi C: tandai konten contoh (briefing inti kosong) → banner onboarding portal.
+    content_is_sample: plan.contentIsSample,
     branding: {
       ...(currentKonfigurasi.branding ?? {}),
       theme: plan.theme,

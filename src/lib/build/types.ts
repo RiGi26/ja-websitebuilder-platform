@@ -94,6 +94,9 @@ export interface BuildPlan {
   designTokens: DesignTokens
   features: FeatureFlags
   capabilities: string[]
+  /** Opsi C: true bila konten inti showcase TIDAK diisi di briefing → build pakai
+   *  contoh template. Portal pakai ini untuk banner "ganti konten contoh". */
+  contentIsSample: boolean
   dataKonten: Record<string, unknown>
   sections: BuildSection[]
   services: BuildRowService[]
