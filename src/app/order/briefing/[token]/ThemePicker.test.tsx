@@ -59,22 +59,12 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
-  it('menampilkan sub-kategori Klinik untuk tipe klinik (S6)', () => {
-    const html = renderToStaticMarkup(
-      <SubKategoriPicker tipe="klinik" value="" onChange={noop} />,
-    )
-    expect(html).toContain('Klinik Umum / Gigi')
-    expect(html).toContain('Skincare / Estetik')
-    expect(html).toContain('Fisio / Wellness')
-  })
-
-  it('menampilkan sub-kategori Sekolah untuk tipe sekolah (S7)', () => {
-    const html = renderToStaticMarkup(
-      <SubKategoriPicker tipe="sekolah" value="" onChange={noop} />,
-    )
-    expect(html).toContain('Sekolah Umum (SD/SMP/SMA)')
-    expect(html).toContain('Sekolah Islami / Pesantren')
-    expect(html).toContain('Kursus / Bimbel')
+  it('non-toko (klinik/sekolah) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
+    // ready:false utk semua sub-kat non-toko → SubKategoriPicker null → brief form
+    // langsung tampilkan variant grid (satu kartu Lux), tanpa langkah sub-kategori.
+    expect(renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="" onChange={noop} />)).toBe('')
+    expect(renderToStaticMarkup(<SubKategoriPicker tipe="sekolah" value="" onChange={noop} />)).toBe('')
+    expect(renderToStaticMarkup(<SubKategoriPicker tipe="restaurant" value="" onChange={noop} />)).toBe('')
   })
 
   it('tetap dormant untuk industri tanpa sub-kategori (mis. custom)', () => {

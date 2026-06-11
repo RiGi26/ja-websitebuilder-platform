@@ -57,59 +57,51 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
   ],
-  // ── RESTAURANT (Sprint 4) — jenis tempat makan. AKTIF (ready:true):
-  // gerbang 3 skill + verify SSR (3 flagship: warung-rakyat/cafe-latte/
-  // finedining-aurum) tuntas, 127/127 test + build bersih.
+  // ── NON-TOKO industri — sub-kategori DISEMBUNYIKAN dari brief form (keputusan
+  // owner 2026-06-11): tema composable lama (warung/cafe/finedining ×3 dll) usang
+  // & membingungkan. ready:false → SubKategoriPicker null → brief form langsung
+  // tampilkan SATU kartu Lux (variant grid). Tema composable tetap di THEMES utk
+  // situs existing, hanya tak ditawarkan lagi. Restaurant Lux → RestaurantLuxRenderer
+  // bespoke (lihat generateContent isLux). Industri lain → composable lux-<industri>.
   restaurant: [
-    { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: true },
-    { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: true },
-    { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: true },
+    { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: false },
+    { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: false },
+    { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: false },
   ],
-  // ── KLINIK (Sprint 6) — jenis layanan kesehatan. AKTIF (ready:true):
-  // gerbang 3 skill + verify SSR (flagship umum-bluecare/estetik-rosegold/
-  // wellness-sage) tuntas, test + build bersih.
   klinik: [
-    { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
-    { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
-    { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
+    { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: false },
+    { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: false },
+    { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: false },
   ],
-  // ── SEKOLAH (Sprint 7) — jenis institusi pendidikan. AKTIF (ready:true):
-  // pipeline visual (ui-ux-pro-max DB + Playwright scorecard) + gerbang 3 skill
-  // pada flagship tuntas.
   sekolah: [
-    { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: true },
-    { id: 'islami', nama: 'Sekolah Islami / Pesantren', deskripsi: 'Madrasah, pesantren, sekolah Islam terpadu.', icon: 'BookOpen', ready: true },
-    { id: 'kursus', nama: 'Kursus / Bimbel', deskripsi: 'Bimbel, kursus bahasa, skill, course online.', icon: 'PencilRuler', ready: true },
+    { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: false },
+    { id: 'islami', nama: 'Sekolah Islami / Pesantren', deskripsi: 'Madrasah, pesantren, sekolah Islam terpadu.', icon: 'BookOpen', ready: false },
+    { id: 'kursus', nama: 'Kursus / Bimbel', deskripsi: 'Bimbel, kursus bahasa, skill, course online.', icon: 'PencilRuler', ready: false },
   ],
-  // ── PERSONAL / PORTFOLIO (Sprint 8a) — personal branding. AKTIF.
   personal: [
-    { id: 'kreator', nama: 'Kreator / Influencer', deskripsi: 'Content creator, YouTuber, selebgram, seniman.', icon: 'Video', ready: true },
-    { id: 'profesional', nama: 'Profesional / Expert', deskripsi: 'Konsultan, freelancer, dokter, pengacara, portofolio.', icon: 'Briefcase', ready: true },
-    { id: 'coach', nama: 'Coach / Mentor', deskripsi: 'Coach, trainer, pembicara, mentor bisnis.', icon: 'Compass', ready: true },
+    { id: 'kreator', nama: 'Kreator / Influencer', deskripsi: 'Content creator, YouTuber, selebgram, seniman.', icon: 'Video', ready: false },
+    { id: 'profesional', nama: 'Profesional / Expert', deskripsi: 'Konsultan, freelancer, dokter, pengacara, portofolio.', icon: 'Briefcase', ready: false },
+    { id: 'coach', nama: 'Coach / Mentor', deskripsi: 'Coach, trainer, pembicara, mentor bisnis.', icon: 'Compass', ready: false },
   ],
-  // ── COMPANY / CORPORATE (Sprint 8b) — profil perusahaan. AKTIF.
   corporate: [
-    { id: 'startup', nama: 'Startup / Tech', deskripsi: 'Startup, SaaS, aplikasi, perusahaan teknologi.', icon: 'Rocket', ready: true },
-    { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: true },
-    { id: 'korporat', nama: 'Korporat / Manufaktur', deskripsi: 'Perusahaan mapan, manufaktur, distributor, B2B.', icon: 'Building2', ready: true },
+    { id: 'startup', nama: 'Startup / Tech', deskripsi: 'Startup, SaaS, aplikasi, perusahaan teknologi.', icon: 'Rocket', ready: false },
+    { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: false },
+    { id: 'korporat', nama: 'Korporat / Manufaktur', deskripsi: 'Perusahaan mapan, manufaktur, distributor, B2B.', icon: 'Building2', ready: false },
   ],
-  // ── TRAVEL / RENTAL (Sprint 9) — perjalanan & sewa. AKTIF.
   travel: [
-    { id: 'kendaraan', nama: 'Rental Kendaraan', deskripsi: 'Sewa mobil, motor, bus, lepas kunci & dengan sopir.', icon: 'Car', ready: true },
-    { id: 'wisata', nama: 'Wisata / Tour', deskripsi: 'Open trip, paket wisata, travel agent, tour guide.', icon: 'Palmtree', ready: true },
-    { id: 'akomodasi', nama: 'Akomodasi / Sewa', deskripsi: 'Villa, homestay, kos, guest house, penginapan.', icon: 'BedDouble', ready: true },
+    { id: 'kendaraan', nama: 'Rental Kendaraan', deskripsi: 'Sewa mobil, motor, bus, lepas kunci & dengan sopir.', icon: 'Car', ready: false },
+    { id: 'wisata', nama: 'Wisata / Tour', deskripsi: 'Open trip, paket wisata, travel agent, tour guide.', icon: 'Palmtree', ready: false },
+    { id: 'akomodasi', nama: 'Akomodasi / Sewa', deskripsi: 'Villa, homestay, kos, guest house, penginapan.', icon: 'BedDouble', ready: false },
   ],
-  // ── BLOG / MEDIA (Sprint 9) — konten & publikasi. AKTIF.
   blog: [
-    { id: 'jurnal', nama: 'Blog Pribadi', deskripsi: 'Blog personal, jurnal, catatan, opini.', icon: 'NotebookPen', ready: true },
-    { id: 'media', nama: 'Media / Berita', deskripsi: 'Portal berita, majalah online, media digital.', icon: 'Newspaper', ready: true },
-    { id: 'niche', nama: 'Blog Niche', deskripsi: 'Blog tema khusus: kuliner, teknologi, traveling, gaya hidup.', icon: 'Hash', ready: true },
+    { id: 'jurnal', nama: 'Blog Pribadi', deskripsi: 'Blog personal, jurnal, catatan, opini.', icon: 'NotebookPen', ready: false },
+    { id: 'media', nama: 'Media / Berita', deskripsi: 'Portal berita, majalah online, media digital.', icon: 'Newspaper', ready: false },
+    { id: 'niche', nama: 'Blog Niche', deskripsi: 'Blog tema khusus: kuliner, teknologi, traveling, gaya hidup.', icon: 'Hash', ready: false },
   ],
-  // ── JASTIP (Sprint 9) — jasa titip & preorder. AKTIF.
   jastip: [
-    { id: 'luar', nama: 'Jastip Luar Negeri', deskripsi: 'Titip beli dari LN: branded, skincare, gadget.', icon: 'Plane', ready: true },
-    { id: 'lokal', nama: 'Jastip Lokal / UMKM', deskripsi: 'Titip beli dalam negeri, oleh-oleh, produk UMKM.', icon: 'Store', ready: true },
-    { id: 'preorder', nama: 'Preorder / PO', deskripsi: 'Sistem PO terjadwal, ready stock batch, grup buy.', icon: 'PackageCheck', ready: true },
+    { id: 'luar', nama: 'Jastip Luar Negeri', deskripsi: 'Titip beli dari LN: branded, skincare, gadget.', icon: 'Plane', ready: false },
+    { id: 'lokal', nama: 'Jastip Lokal / UMKM', deskripsi: 'Titip beli dalam negeri, oleh-oleh, produk UMKM.', icon: 'Store', ready: false },
+    { id: 'preorder', nama: 'Preorder / PO', deskripsi: 'Sistem PO terjadwal, ready stock batch, grup buy.', icon: 'PackageCheck', ready: false },
   ],
 }
 

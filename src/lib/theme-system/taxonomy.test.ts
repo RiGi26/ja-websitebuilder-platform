@@ -93,12 +93,12 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 
-  it('Restaurant (S4): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+  it('Restaurant: sub-kategori terdaftar tapi DISEMBUNYIKAN dari brief form (lux-only)', () => {
     expect(hasSubKategori('restaurant')).toBe(true)
     const subs = getSubKategori('restaurant')
     expect(subs.map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
-    // Aktif: gerbang 3 skill + verify SSR tuntas → muncul di brief form.
-    expect(getReadySubKategori('restaurant').map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
+    // Non-toko lux-only: sub-kategori lama ready:false → tak muncul di brief form.
+    expect(getReadySubKategori('restaurant')).toEqual([])
   })
 
   it('Restaurant (S4): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
@@ -122,11 +122,11 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('restaurant', 'cafe-roastery')?.nama).toBe('Roastery')
   })
 
-  it('Klinik (S6): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+  it('Klinik: sub-kategori terdaftar tapi DISEMBUNYIKAN dari brief form (lux-only)', () => {
     expect(hasSubKategori('klinik')).toBe(true)
     const subs = getSubKategori('klinik')
     expect(subs.map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
-    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
+    expect(getReadySubKategori('klinik')).toEqual([])
   })
 
   it('Klinik (S6): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
@@ -148,11 +148,11 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('klinik', 'estetik-noir')?.nama).toBe('Noir')
   })
 
-  it('Sekolah (S7): 3 sub-kategori terdaftar & AKTIF (ready:true)', () => {
+  it('Sekolah: sub-kategori terdaftar tapi DISEMBUNYIKAN dari brief form (lux-only)', () => {
     expect(hasSubKategori('sekolah')).toBe(true)
     const subs = getSubKategori('sekolah')
     expect(subs.map((s) => s.id)).toEqual(['reguler', 'islami', 'kursus'])
-    expect(getReadySubKategori('sekolah').map((s) => s.id)).toEqual(['reguler', 'islami', 'kursus'])
+    expect(getReadySubKategori('sekolah')).toEqual([])
   })
 
   it('Sekolah (S7): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
@@ -174,9 +174,9 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('sekolah', 'kursus-malam')?.nama).toBe('Malam')
   })
 
-  it('Personal (S8a): 3 sub-kategori AKTIF + 9 tema, VARIASI bg gelap↔terang', () => {
+  it('Personal: 9 tema terdaftar (DISEMBUNYIKAN dari brief form), VARIASI bg gelap↔terang', () => {
     expect(hasSubKategori('personal')).toBe(true)
-    expect(getReadySubKategori('personal').map((s) => s.id)).toEqual(['kreator', 'profesional', 'coach'])
+    expect(getReadySubKategori('personal')).toEqual([])
     const all = getThemes('personal', 'kreator')
       .concat(getThemes('personal', 'profesional'), getThemes('personal', 'coach'))
     expect(new Set(all.map((t) => t.id)).size).toBe(9)
@@ -190,9 +190,9 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('Company (S8b): 3 sub-kategori AKTIF + 9 tema, VARIASI bg gelap↔terang', () => {
+  it('Company: 9 tema terdaftar (DISEMBUNYIKAN dari brief form), VARIASI bg gelap↔terang', () => {
     expect(hasSubKategori('corporate')).toBe(true)
-    expect(getReadySubKategori('corporate').map((s) => s.id)).toEqual(['startup', 'agency', 'korporat'])
+    expect(getReadySubKategori('corporate')).toEqual([])
     const all = getThemes('corporate', 'startup')
       .concat(getThemes('corporate', 'agency'), getThemes('corporate', 'korporat'))
     expect(new Set(all.map((t) => t.id)).size).toBe(9)
@@ -214,7 +214,7 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
     for (const [tipe, subs] of Object.entries(expected)) {
       expect(hasSubKategori(tipe)).toBe(true)
-      expect(getReadySubKategori(tipe).map((s) => s.id)).toEqual(subs)
+      expect(getReadySubKategori(tipe)).toEqual([]) // lux-only: disembunyikan dari brief form
       const all = subs.flatMap((s) => getThemes(tipe, s))
       expect(new Set(all.map((t) => t.id)).size).toBe(9)
       expect(all.every((t) => t.manifest === t.id)).toBe(true)
