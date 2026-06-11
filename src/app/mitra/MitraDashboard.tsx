@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { FLAT_BUYER_DISCOUNT, FLAT_REFERRER_COMMISSION } from '@/lib/referral-tier'
 import {
   Copy, Check, Wallet, Clock, CheckCircle2, Banknote,
   LogOut, Loader2, AlertCircle, Landmark, Users, MessageCircle,
@@ -80,7 +81,7 @@ export default function MitraDashboard({
   const canRequest = stats.payableRp >= payoutMin && !hasPendingPayout && bankCompleteSaved
 
   const waShareText = encodeURIComponent(
-    `Halo! Mau punya website profesional untuk bisnismu? Pesan di Japan Arena pakai kode referral saya *${code}* — dapat diskon ${discountPercent}%! 🎉\n\n${refLink}`,
+    `Halo! Mau punya website profesional untuk bisnismu? Pesan di Japan Arena pakai kode referral saya *${code}* — langsung dapat potongan harga! 🎉\n\n${refLink}`,
   )
 
   const copyText = async (text: string, which: 'link' | 'code') => {
@@ -180,8 +181,10 @@ export default function MitraDashboard({
               </button>
               <p className="text-sm text-gray-500 mt-2 break-all">{refLink}</p>
               <p className="text-xs font-semibold text-gray-600 mt-3">
-                Teman Anda dapat <span className="text-green-600">diskon {discountPercent}%</span> · Anda dapat{' '}
-                <span className="text-[#0071E3]">komisi {commissionPercent}%</span> dari setiap order yang dibayar.
+                Order ≥ Rp 1 juta: teman Anda dapat <span className="text-green-600">diskon {discountPercent}%</span>, Anda dapat{' '}
+                <span className="text-[#0071E3]">komisi {commissionPercent}%</span> dari nilai order.
+                Order di bawah Rp 1 juta: teman Anda dapat <span className="text-green-600">diskon {rp(FLAT_BUYER_DISCOUNT)}</span>, Anda dapat{' '}
+                <span className="text-[#0071E3]">komisi {rp(FLAT_REFERRER_COMMISSION)}</span> — berlaku untuk setiap order yang dibayar.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0">

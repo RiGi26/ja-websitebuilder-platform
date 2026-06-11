@@ -29,7 +29,8 @@ MITRA                    CALON CUSTOMER                      SISTEM
   │                            │                                │
   │                            │ submit → POST /api/payment/create
   │                            │   server VALIDASI ULANG kode   │
-  │                            │   hitung ulang diskon (Math.round(gross*pct/100))
+  │                            │   hitung ulang diskon (referralDiscountFor —
+  │                            │     gross < 1jt: flat 25rb · ≥ 1jt: round(gross*pct/100))
   │                            │   tolak self-referral (WA/email == mitra)
   │                            │   insert orders: total_estimasi = NET,
   │                            │     referral_code, referrer_id, referral_discount
@@ -84,7 +85,7 @@ notifikasi tidak dobel (notif hanya saat helper melaporkan transisi nyata).
 |---|---|---|
 | `referrers` | `user_id` UNIQUE→auth.users, `commission_percent` (10), `buyer_discount_percent` (5), `bank_*`, `status` active/suspended | suspend = blokir atribusi BARU, komisi lama tetap |
 | `referral_codes` | `code` UNIQUE CHECK `^[A-Z0-9]{4,16}$`, `referrer_id` | 1 kode default per mitra (slug nama + 3 acak) |
-| `referral_earnings` | `order_id` UNIQUE, `order_total` (NET snapshot), `commission_percent` (snapshot), `amount`, `status`, `payout_id` | snapshot = perubahan % tidak mengubah komisi lama |
+| `referral_earnings` | `order_id` UNIQUE, `order_total` (NET snapshot), `commission_percent` (snapshot; **0 = earning tier flat**), `amount`, `status`, `payout_id` | snapshot = perubahan % tidak mengubah komisi lama |
 | `referral_payouts` | `amount`, `status` requested/paid/rejected, `bank_snapshot` jsonb, `admin_note`, `transfer_proof_url` | bank di-snapshot saat pengajuan |
 | `orders` (+kolom) | `referral_code`, `referrer_id`, `referral_discount` | **`total_estimasi` = NET setelah diskon** |
 
@@ -157,8 +158,12 @@ webhook/response. Email no-op bila `RESEND_API_KEY` kosong.
 1. **`orders.total_estimasi` = NET** (setelah diskon). Semua math hilir
    (ambang DP 4jt, `payment/retry`, pelunasan) bergantung pada ini.
    `referral_discount` hanya audit; gross = net + discount.
-2. **Formula diskon identik client & server**: `Math.round(gross * pct / 100)`.
-   Ubah satu = ubah dua (order/page.tsx ↔ payment/create).
+2. **Formula diskon & komisi hidup HANYA di `src/lib/referral-tier.ts`**
+   (modul pure, client-safe) — diimpor order/page.tsx, payment/create, dan
+   referral.ts. Dua tier: gross < Rp 1jt = FLAT paten (diskon 25rb, komisi
+   50rb, setting % per-mitra diabaikan); gross ≥ Rp 1jt = persen per-mitra.
+   Tier ditentukan dari GROSS (pakai NET sirkular). Jangan tulis ulang
+   formula inline di tempat lain.
 3. **`dp_paid` di-set di DUA tempat** (webhook + confirm) → earning HARUS
    selalu dibuat lewat `createEarningForOrder()` (upsert idempotent), jangan
    insert langsung.
@@ -192,8 +197,11 @@ webhook/response. Email no-op bila `RESEND_API_KEY` kosong.
 
 | Apa | Nilai | Lokasi |
 |---|---|---|
-| Komisi default | 10% | kolom DB `referrers.commission_percent` (default) |
-| Diskon buyer default | 5% | kolom DB `referrers.buyer_discount_percent` (default) |
+| Komisi default (order ≥ 1jt) | 10% | kolom DB `referrers.commission_percent` (default) |
+| Diskon buyer default (order ≥ 1jt) | 5% | kolom DB `referrers.buyer_discount_percent` (default) |
+| Ambang tier flat | gross < Rp 1.000.000 | `FLAT_TIER_MAX` di `src/lib/referral-tier.ts` |
+| Diskon flat (paten) | Rp 25.000 | `FLAT_BUYER_DISCOUNT` di `src/lib/referral-tier.ts` |
+| Komisi flat (paten) | Rp 50.000 | `FLAT_REFERRER_COMMISSION` di `src/lib/referral-tier.ts` |
 | Minimal payout | Rp 100.000 | `PAYOUT_MIN` di `src/lib/referral.ts` |
 | Cookie atribusi | `ja_ref`, 30 hari, bukan httpOnly | `REFERRAL_COOKIE` di `src/lib/referral.ts` |
 | Format kode | `^[A-Z0-9]{4,16}$` | CHECK DB + `normalizeCode()` + RefCapture |

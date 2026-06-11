@@ -16,6 +16,7 @@ import { Label } from '@/app/components/ui/label'
 import { templatesData } from '@/data/templates'
 import { orderAddons, aliasToId } from '@/lib/addons/catalog'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
+import { referralDiscountFor, isFlatTier, FLAT_BUYER_DISCOUNT } from '@/lib/referral-tier'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 
@@ -226,10 +227,10 @@ function OrderFormContent() {
     ? (kalkulatorMaintain ?? currentBaseRenewal)
     : currentBaseRenewal + totalAddonYearly
 
-  // Diskon referral — formula HARUS identik dengan server (payment/create):
-  // diskon dari gross, lalu seluruh math DP/pelunasan memakai NET.
+  // Diskon referral — formula identik dengan server lewat modul bersama
+  // referral-tier (flat < Rp 1jt / persen ≥ Rp 1jt); math DP/pelunasan pakai NET.
   const referralDiscount = refStatus === 'valid' && refInfo
-    ? Math.round((finalPrice * refInfo.discountPercent) / 100)
+    ? referralDiscountFor(finalPrice, refInfo.discountPercent)
     : 0
   const payableTotal = finalPrice - referralDiscount
 
@@ -570,7 +571,7 @@ function OrderFormContent() {
                                   )}
                                   {refStatus === 'valid' && refInfo && (
                                       <p className="text-xs font-semibold text-green-600 mt-2 flex items-center gap-1.5">
-                                          <Check size={12} strokeWidth={3} /> Kode valid — diskon {refInfo.discountPercent}% dari {refInfo.referrerName}
+                                          <Check size={12} strokeWidth={3} /> Kode valid — diskon {isFlatTier(finalPrice) ? formatPrice(FLAT_BUYER_DISCOUNT) : `${refInfo.discountPercent}%`} dari {refInfo.referrerName}
                                       </p>
                                   )}
                                   {refStatus === 'invalid' && referralCode.trim() !== '' && (
@@ -579,7 +580,7 @@ function OrderFormContent() {
                               </div>
                               {referralDiscount > 0 && (
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-green-600">
-                                      <span className="font-medium text-sm flex-1">Diskon Referral ({refInfo?.discountPercent}%)</span>
+                                      <span className="font-medium text-sm flex-1">Diskon Referral{isFlatTier(finalPrice) ? '' : ` (${refInfo?.discountPercent}%)`}</span>
                                       <span className="font-bold shrink-0 text-left sm:text-right">− {formatPrice(referralDiscount)}</span>
                                   </div>
                               )}

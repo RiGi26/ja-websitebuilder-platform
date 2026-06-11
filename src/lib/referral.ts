@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { normalizeWa } from '@/lib/fonnte'
+import { commissionForOrder, isFlatTier } from '@/lib/referral-tier'
 
 // ============================================================
 // Program Mitra — helper referral (service role only).
@@ -99,7 +100,7 @@ const SKIPPED: EarningTransition = { outcome: 'skipped' }
 export async function createEarningForOrder(orderId: string): Promise<EarningTransition> {
   const { data: order, error: orderErr } = await supabaseAdmin
     .from('orders')
-    .select('id, referrer_id, total_estimasi, dp_amount, type, status')
+    .select('id, referrer_id, total_estimasi, referral_discount, dp_amount, type, status')
     .eq('id', orderId)
     .maybeSingle()
 
@@ -122,9 +123,11 @@ export async function createEarningForOrder(orderId: string): Promise<EarningTra
     return SKIPPED
   }
 
+  // total_estimasi = NET; tier ditentukan dari GROSS (lihat referral-tier.ts).
   const net = Number(order.total_estimasi) || 0
+  const gross = net + (Number(order.referral_discount) || 0)
   const pct = Number(referrer.commission_percent) || 0
-  const amount = Math.round((net * pct) / 100)
+  const amount = commissionForOrder(gross, net, pct)
   const fullUpfront = Number(order.dp_amount) >= net
 
   const { data: inserted, error: insErr } = await supabaseAdmin
@@ -135,7 +138,8 @@ export async function createEarningForOrder(orderId: string): Promise<EarningTra
           referrer_id: referrer.id,
           order_id: order.id,
           order_total: net,
-          commission_percent: pct,
+          // 0 = earning tier flat (komisi paten, persen tidak berlaku).
+          commission_percent: isFlatTier(gross) ? 0 : pct,
           amount,
           status: fullUpfront ? 'confirmed' : 'pending',
           confirmed_at: fullUpfront ? new Date().toISOString() : null,

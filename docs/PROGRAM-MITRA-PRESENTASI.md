@@ -18,19 +18,31 @@ Dua-duanya untung.
 
 ## Keuntungannya
 
-| Untuk Anda (Mitra) | Untuk Teman Anda (Pembeli) |
-|---|---|
-| Komisi **10%** dari nilai order | Diskon **5%** dari harga website |
-| Dibayar ke rekening pribadi Anda | Diskon langsung terlihat saat order |
-| Tanpa target, tanpa kewajiban | Tidak perlu kode kupon ribet — otomatis dari link |
+Besarnya keuntungan mengikuti nilai order teman Anda:
+
+| Nilai Order | Untuk Anda (Mitra) | Untuk Teman Anda (Pembeli) |
+|---|---|---|
+| **≥ Rp 1.000.000** | Komisi **10%** dari nilai order | Diskon **5%** dari harga website |
+| **Di bawah Rp 1.000.000** | Komisi **Rp 50.000** (tetap) | Diskon **Rp 25.000** (tetap) |
+
+Selain itu:
+
+- Komisi dibayar ke rekening pribadi Anda
+- Tanpa target, tanpa kewajiban
+- Teman Anda tidak perlu kode kupon ribet — diskon otomatis dari link
 
 Contoh nyata:
 
-> Teman Anda memesan website seharga **Rp 3.000.000**.
+> **Order besar** — teman Anda memesan website seharga **Rp 3.000.000**:
 > - Teman Anda hemat: **Rp 150.000** (diskon 5%) → bayar Rp 2.850.000
 > - Anda dapat komisi: **Rp 285.000** (10% dari nilai akhir)
 >
-> Satu order saja sudah terasa. Lima order = Rp 1.425.000.
+> **Order kecil** — teman Anda memesan website seharga **Rp 750.000**:
+> - Teman Anda hemat: **Rp 25.000** → bayar Rp 725.000
+> - Anda dapat komisi: **Rp 50.000** — dan karena order kecil dibayar lunas
+>   di muka, komisi ini **langsung bisa dicairkan**
+>
+> Satu order saja sudah terasa. Lima order besar = Rp 1.425.000.
 
 ---
 
@@ -54,7 +66,7 @@ ada tombol **"Bagikan via WhatsApp"** yang teksnya sudah jadi, tinggal kirim.
 ### 3. Teman Anda order seperti biasa
 - Klik link Anda → masuk ke website Japan Arena → pilih paket → isi form order.
 - Kode Anda **terisi otomatis** di form (atau bisa diketik manual).
-- Diskon 5% langsung muncul di rincian harga sebelum bayar.
+- Diskonnya langsung muncul di rincian harga sebelum bayar.
 
 ### 4. Komisi masuk ke dashboard Anda
 Begitu teman Anda membayar, komisi tercatat otomatis. Anda dapat
@@ -99,7 +111,8 @@ Semua transparan — Anda bisa pantau kapan saja dari HP.
 
 ## Ketentuan Singkat (Fair Use)
 
-1. Komisi dihitung dari **nilai akhir order setelah diskon**.
+1. Order ≥ Rp 1 juta: komisi dihitung dari **nilai akhir order setelah diskon**.
+   Order di bawah Rp 1 juta: berlaku **tarif tetap** (diskon Rp 25.000, komisi Rp 50.000) yang tidak bisa diubah.
 2. Kode referral **tidak bisa dipakai untuk order sendiri** (nomor WA/email sama).
 3. Jika order **dibatalkan/refund**, komisi order itu hangus.
 4. Komisi berlaku untuk **order website baru**. Upgrade dan perpanjangan tahunan belum termasuk.
