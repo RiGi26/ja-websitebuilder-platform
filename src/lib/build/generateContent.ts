@@ -38,9 +38,13 @@ export function generateContent(order: OrderLike): BuildPlan {
     'finedining-hearth': 'hearth',
     'finedining-nordic': 'noir',
   }
+  // Restaurant "Lux" SELALU = renderer bespoke RestaurantLuxRenderer (keputusan
+  // owner 2026-06-11): brief form non-toko kini menampilkan satu kartu Lux saja
+  // (sub-kategori lama disembunyikan), variant = 'lux-restaurant'. Itu + jalur
+  // finedining lama → bespoke. LUX_PALETTE tak punya 'lux-restaurant' → default 'aurum'.
   const isLux =
     b.tipe === 'restaurant' &&
-    (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-'))
+    (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-') || b.variant === 'lux-restaurant')
 
   // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
   // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →
@@ -127,6 +131,9 @@ export function generateContent(order: OrderLike): BuildPlan {
   const sections = mergeAddonSections(out.sections, addonSectionBlueprints(order.selected_addons))
 
   const dataKonten: Record<string, unknown> = { ...out.dataKonten }
+  // Foto hero/background dari brief form MENANG atas sample (situs selaras dgn
+  // yang diisi klien). Sample hanya mengisi yang masih kosong (di bawah).
+  if (b.heroImage && !dataKonten.foto_hero) dataKonten.foto_hero = b.heroImage
   if (sample) {
     if (sample.hero?.image && !dataKonten.foto_hero) dataKonten.foto_hero = sample.hero.image
     if (sample.about?.image && !dataKonten.about_image) dataKonten.about_image = sample.about.image

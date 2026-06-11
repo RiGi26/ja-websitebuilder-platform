@@ -78,6 +78,19 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
     })
     expect(plan.theme).not.toBe('restaurant-lux')
   })
+
+  // Lux-only brief form (non-toko): sub-kategori disembunyikan → restaurant memilih
+  // satu kartu Lux → variant 'lux-restaurant'. Itu kini juga = bespoke restaurant-lux.
+  it('lux-restaurant (kartu Lux brief form) → theme restaurant-lux, variant aurum', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      briefing_data: { industri_tipe: 'restaurant', branding: { variant: 'lux-restaurant', primary_color: '#1f7a3d' } },
+    })
+    expect(plan.theme).toBe('restaurant-lux')
+    expect(plan.variant).toBe('aurum')
+    expect(plan.primary).toBe('#1f7a3d')
+  })
 })
 
 // LUX TIER (Sprint 1) — composable lux jadi DEFAULT premium per industri pilot
@@ -154,5 +167,53 @@ describe('generateContent — capabilities (B-cap)', () => {
       briefing_data: { industri_tipe: 'restaurant' },
     })
     expect(plan.capabilities).toEqual([])
+  })
+})
+
+// Konten + gambar dari brief form HARUS dipakai apa adanya (situs selaras dgn
+// yang diisi klien); sample hanya mengisi yang kosong.
+describe('generateContent — gambar & hero dari brief form (selaras)', () => {
+  const FOTO = 'https://cdn.example.com/menu-rendang.jpg'
+  const HERO = 'https://cdn.example.com/hero-dapur.jpg'
+
+  it('foto_url menu dari brief → menuItems[].gambar (tak ditimpa sample)', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      briefing_data: {
+        industri_tipe: 'restaurant',
+        branding: { variant: 'lux-restaurant', foto_hero: HERO },
+        konten: { menu: [{ nama: 'Rendang', harga: '65000', foto_url: FOTO }] },
+      },
+    })
+    const rendang = plan.menuItems.find((m) => m.nama === 'Rendang')
+    expect(rendang?.gambar).toBe(FOTO)
+  })
+
+  it('foto_hero dari brief → dataKonten.foto_hero (menang atas sample)', () => {
+    const plan = generateContent({
+      industri: 'Restaurant',
+      nama_usaha: 'Resto Uji',
+      briefing_data: {
+        industri_tipe: 'restaurant',
+        branding: { variant: 'lux-restaurant', foto_hero: HERO },
+        konten: { menu: [{ nama: 'Rendang', harga: '65000' }] },
+      },
+    })
+    expect(plan.dataKonten.foto_hero).toBe(HERO)
+  })
+
+  it('foto_url produk toko dari brief → products[].gambar', () => {
+    const plan = generateContent({
+      industri: 'Toko Online',
+      nama_usaha: 'Toko Uji',
+      briefing_data: {
+        industri_tipe: 'toko_online',
+        branding: { variant: 'lux-toko' },
+        konten: { produk_unggulan: [{ nama: 'Kemeja', harga: '150000', foto_url: FOTO }] },
+      },
+    })
+    const kemeja = plan.products.find((p) => p.nama === 'Kemeja')
+    expect(kemeja?.gambar).toBe(FOTO)
   })
 })

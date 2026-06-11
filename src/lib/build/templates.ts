@@ -103,6 +103,7 @@ const travelTemplate: TemplateFn = (b) => {
           deskripsi: asStr(o.deskripsi) || detail || undefined,
           harga: asNum(o.harga),
           kategori: asStr(o.kategori) || undefined,
+          gambar: asStr(o.foto_url) || undefined, // foto dari brief form (sebelumnya dibuang)
         }
       })
     : [
@@ -162,6 +163,7 @@ const restaurantTemplate: TemplateFn = (b) => {
           deskripsi: asStr(o.deskripsi) || undefined,
           harga: asNum(o.harga),
           kategori: asStr(o.kategori) || undefined,
+          gambar: asStr(o.foto_url) || undefined, // foto menu dari brief form
         }
       })
     : [
@@ -223,6 +225,7 @@ const corporateTemplate: TemplateFn = (b) => {
           deskripsi: asStr(o.deskripsi) || undefined,
           harga: asNum(o.harga),
           kategori: asStr(o.kategori) || undefined,
+          gambar: asStr(o.foto_url) || undefined, // foto layanan dari brief form
         }
       })
     : [
@@ -289,6 +292,7 @@ const klinikTemplate: TemplateFn = (b) => {
           harga: asNum(o.biaya) || 150000,
           dp_amount: 0,
           kategori: spesialis || 'Konsultasi',
+          gambar: asStr(o.foto_url) || undefined, // foto dokter dari brief form
         }
       })
     : [
@@ -305,7 +309,7 @@ const klinikTemplate: TemplateFn = (b) => {
     spesialisasi: dokter.map((d) => asStr(asObj(d).spesialis)).filter(Boolean),
     dokter: dokter.map((d) => {
       const o = asObj(d)
-      return { nama: asStr(o.nama), spesialis: asStr(o.spesialis), jadwal: asStr(o.jadwal) }
+      return { nama: asStr(o.nama), spesialis: asStr(o.spesialis), jadwal: asStr(o.jadwal), foto: asStr(o.foto_url) || undefined }
     }),
     jam_operasional: b.jamOperasional || undefined,
     fasilitas,
@@ -358,6 +362,7 @@ const sekolahTemplate: TemplateFn = (b) => {
           harga: asNum(o.biaya),
           dp_amount: 0,
           kategori: 'Program',
+          gambar: asStr(o.foto_url) || undefined, // foto program dari brief form
         }
       })
     : [
@@ -419,6 +424,7 @@ const tokoOnlineTemplate: TemplateFn = (b) => {
           harga: asNum(o.harga),
           kategori: asStr(o.kategori) || undefined,
           stok: asNum(o.stok) || 10,
+          gambar: asStr(o.foto_url) || undefined, // foto produk dari brief form
         }
       })
     : [

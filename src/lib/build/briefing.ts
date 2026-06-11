@@ -75,6 +75,7 @@ export function normalizeBriefing(order: OrderLike): NormalizedBriefing {
     variant: asStr(branding.variant) || undefined,
     subKategori: asStr(branding.sub_kategori) || undefined,
     logoUrl: asStr(branding.logo_url) || undefined,
+    heroImage: asStr(branding.foto_hero) || undefined,
     referensi: asStr(branding.referensi_website) || undefined,
     sosial: {
       instagram: asStr(sosial.instagram) || undefined,

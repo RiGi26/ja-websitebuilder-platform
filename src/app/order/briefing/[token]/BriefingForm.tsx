@@ -13,11 +13,11 @@ import ImageUploadField from '@/app/portal/ImageUploadField'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
-interface MenuRow { nama: string; kategori: string; harga: string; deskripsi: string }
-interface LayananRow { nama: string; deskripsi: string }
-interface DokterRow { nama: string; spesialis: string; jadwal: string }
-interface ProgramRow { nama: string; deskripsi: string; biaya: string }
-interface ProdukRow { nama: string; harga: string }
+interface MenuRow { nama: string; kategori: string; harga: string; deskripsi: string; foto_url: string }
+interface LayananRow { nama: string; deskripsi: string; foto_url: string }
+interface DokterRow { nama: string; spesialis: string; jadwal: string; foto_url: string }
+interface ProgramRow { nama: string; deskripsi: string; biaya: string; foto_url: string }
+interface ProdukRow { nama: string; harga: string; foto_url: string }
 
 interface FormState {
   // Step 0 — Identitas
@@ -56,6 +56,7 @@ interface FormState {
   variant: string
   primary_color: string
   logo_url: string
+  foto_hero: string
   referensi_website: string
   instagram: string
   tiktok: string
@@ -66,20 +67,20 @@ const INIT: FormState = {
   nama_usaha: '', tagline: '', deskripsi: '', wa: '', email: '',
   alamat: '', jam_operasional: '', kota_layanan: '',
   fleet: [{ nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '', foto_url: '' }],
-  menu: [{ nama: '', kategori: '', harga: '', deskripsi: '' }],
-  layanan: [{ nama: '', deskripsi: '' }],
+  menu: [{ nama: '', kategori: '', harga: '', deskripsi: '', foto_url: '' }],
+  layanan: [{ nama: '', deskripsi: '', foto_url: '' }],
   bidang_usaha: '', tahun_berdiri: '', klien_unggulan: '',
-  dokter: [{ nama: '', spesialis: '', jadwal: '' }],
+  dokter: [{ nama: '', spesialis: '', jadwal: '', foto_url: '' }],
   fasilitas: '', asuransi: '',
-  program: [{ nama: '', deskripsi: '', biaya: '' }],
+  program: [{ nama: '', deskripsi: '', biaya: '', foto_url: '' }],
   akreditasi: '', visi: '', ppdb_aktif: false,
-  kategori_produk: '', produk_unggulan: [{ nama: '', harga: '' }], sosmed_marketplace: '',
+  kategori_produk: '', produk_unggulan: [{ nama: '', harga: '', foto_url: '' }], sosmed_marketplace: '',
   bio: '', topik: '',
   keunggulan: ['', '', ''],
   syarat_sewa: '',
   sub_kategori: '',
   variant: '',
-  primary_color: '#0071E3', logo_url: '', referensi_website: '',
+  primary_color: '#0071E3', logo_url: '', foto_hero: '', referensi_website: '',
   instagram: '', tiktok: '', shopee: '',
 }
 
@@ -251,6 +252,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         variant: form.variant,
         primary_color: form.primary_color,
         logo_url: form.logo_url,
+        foto_hero: form.foto_hero,
         referensi_website: form.referensi_website,
       },
       sosial_media: {
@@ -503,10 +505,13 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                       <input className={inputCls} placeholder="Kategori (Main, Appetizer)" value={row.kategori} onChange={e => updateRow('menu', i, 'kategori', e.target.value)} />
                       <input className={inputCls} placeholder="Harga (35000)" value={row.harga} onChange={e => updateRow('menu', i, 'harga', e.target.value)} />
                       <input className={`${inputCls} col-span-2 md:col-span-3`} placeholder="Deskripsi singkat" value={row.deskripsi} onChange={e => updateRow('menu', i, 'deskripsi', e.target.value)} />
+                      <div className="col-span-2 md:col-span-3">
+                        <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('menu', i, 'foto_url', url)} label="Foto menu (opsional)" compact {...uploadProps} />
+                      </div>
                     </div>
                   </div>
                 ))}
-                <button onClick={() => addRow('menu', { nama: '', kategori: '', harga: '', deskripsi: '' })}
+                <button onClick={() => addRow('menu', { nama: '', kategori: '', harga: '', deskripsi: '', foto_url: '' })}
                   className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                   <Plus size={16} /> Tambah Menu
                 </button>
@@ -530,15 +535,21 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <div>
                   <p className="text-sm font-bold text-gray-700 mb-3">Layanan Utama</p>
                   {form.layanan.map((row, i) => (
-                    <div key={i} className="flex gap-3 mb-3">
-                      <input className={inputCls} placeholder="Nama layanan" value={row.nama} onChange={e => updateRow('layanan', i, 'nama', e.target.value)} />
-                      <input className={inputCls} placeholder="Deskripsi singkat" value={row.deskripsi} onChange={e => updateRow('layanan', i, 'deskripsi', e.target.value)} />
-                      {form.layanan.length > 1 && (
-                        <button onClick={() => removeRow('layanan', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>
-                      )}
+                    <div key={i} className="bg-gray-50 rounded-[16px] p-4 mb-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Layanan {i + 1}</span>
+                        {form.layanan.length > 1 && (
+                          <button onClick={() => removeRow('layanan', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>
+                        )}
+                      </div>
+                      <div className="flex gap-3">
+                        <input className={inputCls} placeholder="Nama layanan" value={row.nama} onChange={e => updateRow('layanan', i, 'nama', e.target.value)} />
+                        <input className={inputCls} placeholder="Deskripsi singkat" value={row.deskripsi} onChange={e => updateRow('layanan', i, 'deskripsi', e.target.value)} />
+                      </div>
+                      <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('layanan', i, 'foto_url', url)} label="Foto layanan (opsional)" compact {...uploadProps} />
                     </div>
                   ))}
-                  <button onClick={() => addRow('layanan', { nama: '', deskripsi: '' })}
+                  <button onClick={() => addRow('layanan', { nama: '', deskripsi: '', foto_url: '' })}
                     className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                     <Plus size={16} /> Tambah Layanan
                   </button>
@@ -561,10 +572,13 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                         <input className={inputCls} placeholder="Nama dokter" value={row.nama} onChange={e => updateRow('dokter', i, 'nama', e.target.value)} />
                         <input className={inputCls} placeholder="Spesialisasi" value={row.spesialis} onChange={e => updateRow('dokter', i, 'spesialis', e.target.value)} />
                         <input className={`${inputCls} col-span-2 sm:col-span-1`} placeholder="Jadwal praktik" value={row.jadwal} onChange={e => updateRow('dokter', i, 'jadwal', e.target.value)} />
+                        <div className="col-span-2 sm:col-span-3">
+                          <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('dokter', i, 'foto_url', url)} label="Foto dokter (opsional)" compact {...uploadProps} />
+                        </div>
                       </div>
                     </div>
                   ))}
-                  <button onClick={() => addRow('dokter', { nama: '', spesialis: '', jadwal: '' })}
+                  <button onClick={() => addRow('dokter', { nama: '', spesialis: '', jadwal: '', foto_url: '' })}
                     className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                     <Plus size={16} /> Tambah Dokter
                   </button>
@@ -598,14 +612,20 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <div>
                   <p className="text-sm font-bold text-gray-700 mb-3">Program / Jurusan</p>
                   {form.program.map((row, i) => (
-                    <div key={i} className="flex gap-3 mb-3">
-                      <input className={inputCls} placeholder="Nama program" value={row.nama} onChange={e => updateRow('program', i, 'nama', e.target.value)} />
-                      <input className={inputCls} placeholder="Deskripsi" value={row.deskripsi} onChange={e => updateRow('program', i, 'deskripsi', e.target.value)} />
-                      <input className={inputCls} placeholder="Biaya (5000000)" value={row.biaya} onChange={e => updateRow('program', i, 'biaya', e.target.value)} />
-                      {form.program.length > 1 && <button onClick={() => removeRow('program', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>}
+                    <div key={i} className="bg-gray-50 rounded-[16px] p-4 mb-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Program {i + 1}</span>
+                        {form.program.length > 1 && <button onClick={() => removeRow('program', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>}
+                      </div>
+                      <div className="flex gap-3">
+                        <input className={inputCls} placeholder="Nama program" value={row.nama} onChange={e => updateRow('program', i, 'nama', e.target.value)} />
+                        <input className={inputCls} placeholder="Deskripsi" value={row.deskripsi} onChange={e => updateRow('program', i, 'deskripsi', e.target.value)} />
+                        <input className={inputCls} placeholder="Biaya (5000000)" value={row.biaya} onChange={e => updateRow('program', i, 'biaya', e.target.value)} />
+                      </div>
+                      <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('program', i, 'foto_url', url)} label="Foto program (opsional)" compact {...uploadProps} />
                     </div>
                   ))}
-                  <button onClick={() => addRow('program', { nama: '', deskripsi: '', biaya: '' })}
+                  <button onClick={() => addRow('program', { nama: '', deskripsi: '', biaya: '', foto_url: '' })}
                     className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                     <Plus size={16} /> Tambah Program
                   </button>
@@ -622,13 +642,19 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <div>
                   <p className="text-sm font-bold text-gray-700 mb-3">Produk Unggulan</p>
                   {form.produk_unggulan.map((row, i) => (
-                    <div key={i} className="flex gap-3 mb-3">
-                      <input className={inputCls} placeholder="Nama produk" value={row.nama} onChange={e => updateRow('produk_unggulan', i, 'nama', e.target.value)} />
-                      <input className={inputCls} placeholder="Harga (250000)" value={row.harga} onChange={e => updateRow('produk_unggulan', i, 'harga', e.target.value)} />
-                      {form.produk_unggulan.length > 1 && <button onClick={() => removeRow('produk_unggulan', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>}
+                    <div key={i} className="bg-gray-50 rounded-[16px] p-4 mb-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Produk {i + 1}</span>
+                        {form.produk_unggulan.length > 1 && <button onClick={() => removeRow('produk_unggulan', i)} className="text-red-400 shrink-0"><Trash2 size={14} /></button>}
+                      </div>
+                      <div className="flex gap-3">
+                        <input className={inputCls} placeholder="Nama produk" value={row.nama} onChange={e => updateRow('produk_unggulan', i, 'nama', e.target.value)} />
+                        <input className={inputCls} placeholder="Harga (250000)" value={row.harga} onChange={e => updateRow('produk_unggulan', i, 'harga', e.target.value)} />
+                      </div>
+                      <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('produk_unggulan', i, 'foto_url', url)} label="Foto produk (opsional)" compact {...uploadProps} />
                     </div>
                   ))}
-                  <button onClick={() => addRow('produk_unggulan', { nama: '', harga: '' })}
+                  <button onClick={() => addRow('produk_unggulan', { nama: '', harga: '', foto_url: '' })}
                     className="flex items-center gap-2 text-[#0071E3] text-sm font-bold hover:underline">
                     <Plus size={16} /> Tambah Produk
                   </button>
@@ -774,6 +800,10 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
 
             <Field label="Logo (jika sudah punya)">
               <ImageUploadField value={form.logo_url} onChange={(url) => set('logo_url', url)} {...uploadProps} />
+            </Field>
+            <Field label="Foto Hero / Background Website">
+              <ImageUploadField value={form.foto_hero} onChange={(url) => set('foto_hero', url)} {...uploadProps} />
+              <p className="text-[11px] text-gray-400 font-medium mt-1">Foto utama yang tampil besar di bagian atas website. Kosongkan untuk pakai contoh.</p>
             </Field>
             <Field label="Referensi Website yang Disukai">
               <input className={inputCls} value={form.referensi_website} onChange={e => set('referensi_website', e.target.value)} placeholder="https://contoh.com" />
