@@ -7,7 +7,7 @@ import BespokeLightbox from './BespokeLightbox'
 // ============================================================
 // TANAH LOKA — Toko Kerajinan Bespoke Lux Renderer
 // Cinzel (display) + Raleway (body) | Forest #1E3A2F ·
-// Parchment #F7F0E3 · Bronze #C8902A | Kawung motif | ns: kr-*
+// Parchment #F7F0E3 · Bronze #C8962A | Kawung motif | ns: kr-*
 // Interaksi via LUX_JS bersama (hook `.lx-*`); STYLING pakai namespace `.kr-*`.
 // ============================================================
 
@@ -21,7 +21,7 @@ export const PALETTES: Record<string, KrPal> = {
   tanah: {
     bg: '#F7F0E3', bg2: '#EDE5D4', surface: '#FDFAF5',
     ink: '#1E1208', inkDim: '#3D2812', muted: '#6B5540',
-    accent: '#1E3A2F', onAccent: '#F7F0E3', gold: '#C8902A',
+    accent: '#1E3A2F', onAccent: '#F7F0E3', gold: '#C8962A',
     line: 'rgba(30,18,8,.10)', line2: 'rgba(30,18,8,.06)', scrim: '#0E0905',
   },
 }
@@ -32,7 +32,7 @@ const BODY = '"Raleway","Helvetica Neue",sans-serif'
 const EASE = 'cubic-bezier(.16,1,.3,1)'
 
 // Kawung batik motif — 4 tangent circles form the classic petal pattern
-const KW_DARK = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ccircle cx='0' cy='0' r='70' fill='none' stroke='%23C8902A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='160' cy='0' r='70' fill='none' stroke='%23C8902A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='0' cy='160' r='70' fill='none' stroke='%23C8902A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='160' cy='160' r='70' fill='none' stroke='%23C8902A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='80' cy='80' r='26' fill='none' stroke='%23C8902A' stroke-width='.8' opacity='.12'/%3E%3C/svg%3E`
+const KW_DARK = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ccircle cx='0' cy='0' r='70' fill='none' stroke='%23C8962A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='160' cy='0' r='70' fill='none' stroke='%23C8962A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='0' cy='160' r='70' fill='none' stroke='%23C8962A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='160' cy='160' r='70' fill='none' stroke='%23C8962A' stroke-width='1.2' opacity='.18'/%3E%3Ccircle cx='80' cy='80' r='26' fill='none' stroke='%23C8962A' stroke-width='.8' opacity='.12'/%3E%3C/svg%3E`
 const KW_LIGHT = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ccircle cx='0' cy='0' r='70' fill='none' stroke='%231E3A2F' stroke-width='1' opacity='.05'/%3E%3Ccircle cx='160' cy='0' r='70' fill='none' stroke='%231E3A2F' stroke-width='1' opacity='.05'/%3E%3Ccircle cx='0' cy='160' r='70' fill='none' stroke='%231E3A2F' stroke-width='1' opacity='.05'/%3E%3Ccircle cx='160' cy='160' r='70' fill='none' stroke='%231E3A2F' stroke-width='1' opacity='.05'/%3E%3C/svg%3E`
 
 function krCss(): string {
