@@ -59,10 +59,11 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('getReadySubKategori: Toko Online hanya Fashion (lux-only, flagship Atelier)', () => {
-    const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual(['fashion'])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
+  it('getReadySubKategori: hanya sub-kategori lux ber-renderer yang aktif di Toko Online', () => {
+    // LUX bespoke yang sudah ship: Kuliner (Toko Dapur) + Fashion (Atelier).
+    // Sisanya ready:false sampai renderer bespoke-nya dibangun (urutan = registry).
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(2)
   })
 
   it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
