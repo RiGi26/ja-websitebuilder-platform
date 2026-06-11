@@ -34,8 +34,10 @@ export default function SubKategoriPicker({
         {subs.map((s) => (
           <SubCard key={s.id} icon={s.icon} nama={s.nama} active={value === s.id} onClick={() => onChange(s.id)} />
         ))}
-        {/* Escape hatch: toko di luar kategori kurasi → gaya umum (variant lama). */}
-        <SubCard icon="LayoutGrid" nama="Lainnya (gaya umum)" active={!value} onClick={() => onChange('')} />
+        {/* Escape hatch: toko di luar kategori kurasi → gaya umum (variant lama).
+            Pakai sentinel 'umum' (bukan '') supaya state awal "belum pilih" tetap
+            kosong — kartu gaya hanya muncul setelah user memilih tipe. */}
+        <SubCard icon="LayoutGrid" nama="Lainnya (gaya umum)" active={value === 'umum'} onClick={() => onChange('umum')} />
       </div>
     </div>
   )

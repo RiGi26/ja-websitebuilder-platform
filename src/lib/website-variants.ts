@@ -70,12 +70,15 @@ export const INDUSTRY_VARIANTS: Record<string, VariantOption[]> = {
       bg: 'light',
     },
   ],
+  // Toko: "Lux" boutique kini eksklusif Fashion (flagship Atelier, lihat
+  // taxonomy.ts). Kartu generik ini = jalur "Lainnya (gaya umum)" untuk toko di
+  // luar kategori khusus → gaya composable serbaguna, BUKAN dilabeli "Lux".
   toko_online: [
     {
       id: 'lux-toko',
-      nama: 'Lux',
-      deskripsi: 'Premium default — monokrom boutique, editorial. Untuk fashion & lifestyle.',
-      emoji: '✨',
+      nama: 'Umum / Simple',
+      deskripsi: 'Gaya bersih & serbaguna untuk toko di luar kategori khusus.',
+      emoji: '🛍️',
       mood: '#1C1916',
       bg: 'light',
     },

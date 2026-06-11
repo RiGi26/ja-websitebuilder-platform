@@ -46,6 +46,18 @@ export function generateContent(order: OrderLike): BuildPlan {
     b.tipe === 'restaurant' &&
     (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-') || b.variant === 'lux-restaurant')
 
+  // Toko Fashion "Lux" = renderer bespoke TokoAtelierRenderer (flagship Atelier,
+  // theme 'toko-atelier'). Brief form menyimpan id 'atelier-noir'/'atelier-ivoire'
+  // di branding.variant → di-map ke varian renderer 'noir'/'ivoire'. Sub-kategori
+  // toko lain tetap composable (lux-toko). Mirror jalur isLux restaurant.
+  const ATELIER_VARIANT: Record<string, 'noir' | 'ivoire'> = {
+    'atelier-noir': 'noir',
+    'atelier-ivoire': 'ivoire',
+  }
+  const isAtelier =
+    b.tipe === 'toko_online' &&
+    (b.subKategori === 'fashion' || (b.variant ?? '').startsWith('atelier-'))
+
   // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
   // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →
   // variant = lux-<industri> → theme 'composable'. Pilihan eksplisit klien tetap
@@ -66,16 +78,20 @@ export function generateContent(order: OrderLike): BuildPlan {
 
   const variant = isLux
     ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
-    : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
+    : isAtelier
+      ? ATELIER_VARIANT[b.variant ?? ''] ?? 'noir'
+      : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
-  // Fine Dining → 'restaurant-lux'. Selain itu jalur lama (theme per industri).
-  const manifest = isLux ? null : getManifest(variant)
+  // Fine Dining → 'restaurant-lux'; Fashion → 'toko-atelier'. Selain itu jalur lama.
+  const manifest = isLux || isAtelier ? null : getManifest(variant)
   const theme = isLux
     ? 'restaurant-lux'
-    : manifest
-      ? 'composable'
-      : industryToTheme(b.tipe)
+    : isAtelier
+      ? 'toko-atelier'
+      : manifest
+        ? 'composable'
+        : industryToTheme(b.tipe)
   const designTokens = deriveDesignTokens(b.tipe, b.primary)
   const features = addonsToFeatures(order.selected_addons)
   const capabilities = capabilitiesForAddons(order.selected_addons)
@@ -99,9 +115,11 @@ export function generateContent(order: OrderLike): BuildPlan {
   // hero tak kosong pada auto-build dummy.
   const sample = isLux
     ? sampleContentForTheme('finedining')
-    : manifest && variant
-      ? sampleContentForTheme(variant)
-      : null
+    : isAtelier
+      ? sampleContentForTheme('toko-atelier')
+      : manifest && variant
+        ? sampleContentForTheme(variant)
+        : null
   const showcaseImgs = (sample?.showcase?.items ?? [])
     .map((it) => it.gambar)
     .filter((g): g is string => !!g)
@@ -134,6 +152,8 @@ export function generateContent(order: OrderLike): BuildPlan {
   // Foto hero/background dari brief form MENANG atas sample (situs selaras dgn
   // yang diisi klien). Sample hanya mengisi yang masih kosong (di bawah).
   if (b.heroImage && !dataKonten.foto_hero) dataKonten.foto_hero = b.heroImage
+  // Titik fokus foto hero (object/background-position) dari brief form.
+  if (b.heroImageFocus && !dataKonten.foto_hero_focus) dataKonten.foto_hero_focus = b.heroImageFocus
   if (sample) {
     if (sample.hero?.image && !dataKonten.foto_hero) dataKonten.foto_hero = sample.hero.image
     if (sample.about?.image && !dataKonten.about_image) dataKonten.about_image = sample.about.image

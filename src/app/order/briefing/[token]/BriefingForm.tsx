@@ -57,6 +57,7 @@ interface FormState {
   primary_color: string
   logo_url: string
   foto_hero: string
+  foto_hero_focus: string
   referensi_website: string
   instagram: string
   tiktok: string
@@ -80,7 +81,7 @@ const INIT: FormState = {
   syarat_sewa: '',
   sub_kategori: '',
   variant: '',
-  primary_color: '#0071E3', logo_url: '', foto_hero: '', referensi_website: '',
+  primary_color: '#0071E3', logo_url: '', foto_hero: '', foto_hero_focus: '', referensi_website: '',
   instagram: '', tiktok: '', shopee: '',
 }
 
@@ -121,6 +122,48 @@ interface Props {
   email: string
   industri: string
   selectedAddons: string[]
+}
+
+// Pemilih titik fokus foto hero (3×3). Foto hero dirender "cover" (mengisi penuh)
+// sehingga sebagian terpotong; customer memilih bagian yang HARUS selalu terlihat.
+// value = CSS position "x% y%" (dipakai background/object-position di renderer).
+function HeroFocusPicker({ image, value, onChange }: { image: string; value: string; onChange: (pos: string) => void }) {
+  const cur = value || '50% 50%'
+  const positions = [
+    '0% 0%', '50% 0%', '100% 0%',
+    '0% 50%', '50% 50%', '100% 50%',
+    '0% 100%', '50% 100%', '100% 100%',
+  ]
+  return (
+    <div className="mt-3">
+      <p className="text-[11px] text-gray-400 font-medium mb-1.5">Titik fokus foto — klik bagian yang ingin selalu terlihat</p>
+      <div
+        className="relative w-full max-w-[260px] rounded-[14px] overflow-hidden border border-black/10 bg-gray-100"
+        style={{ aspectRatio: '16 / 9', backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: cur }}
+      >
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+          {positions.map((pos) => (
+            <button
+              key={pos}
+              type="button"
+              aria-label={`Fokus ${pos}`}
+              aria-pressed={cur === pos}
+              onClick={() => onChange(pos)}
+              className="group flex items-center justify-center hover:bg-black/10 transition-colors"
+            >
+              <span
+                className={`w-3 h-3 rounded-full border-2 shadow transition-transform ${
+                  cur === pos
+                    ? 'bg-white border-[#0071E3] scale-125'
+                    : 'bg-white/25 border-white/70 group-hover:bg-white/60'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri }: Props) {
@@ -253,6 +296,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
         primary_color: form.primary_color,
         logo_url: form.logo_url,
         foto_hero: form.foto_hero,
+        foto_hero_focus: form.foto_hero_focus,
         referensi_website: form.referensi_website,
       },
       sosial_media: {
@@ -730,14 +774,12 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               value={form.sub_kategori}
               onChange={(id) => {
                 set('sub_kategori', id)
-                if (id) {
-                  const first = getThemes(tipe, id)[0]
-                  if (first) {
-                    set('variant', first.id)
-                    set('primary_color', first.mood)
-                  }
+                const themes = id ? getThemes(tipe, id) : []
+                if (themes.length) {
+                  set('variant', themes[0].id)
+                  set('primary_color', themes[0].mood)
                 } else {
-                  // "Lainnya" → kembali ke gaya umum (variant lama).
+                  // "Lainnya"/umum → gaya umum (variant generik composable).
                   const v = variants[0]
                   if (v) {
                     set('variant', v.id)
@@ -763,6 +805,11 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                     if (t) set('primary_color', t.mood)
                   }}
                 />
+              ) : tipe === 'toko_online' && !form.sub_kategori ? (
+                <div className="p-5 rounded-[16px] bg-gray-50 border-2 border-dashed border-gray-200 text-center">
+                  <p className="text-sm font-bold text-gray-600">Pilih Tipe Toko dulu</p>
+                  <p className="text-xs text-gray-400 font-medium mt-1">Gaya visual website akan muncul setelah kamu memilih jenis tokomu di atas.</p>
+                </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {variants.map(v => (
@@ -804,6 +851,13 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             <Field label="Foto Hero / Background Website">
               <ImageUploadField value={form.foto_hero} onChange={(url) => set('foto_hero', url)} {...uploadProps} />
               <p className="text-[11px] text-gray-400 font-medium mt-1">Foto utama yang tampil besar di bagian atas website. Kosongkan untuk pakai contoh.</p>
+              {form.foto_hero && (
+                <HeroFocusPicker
+                  image={form.foto_hero}
+                  value={form.foto_hero_focus}
+                  onChange={(pos) => set('foto_hero_focus', pos)}
+                />
+              )}
             </Field>
             <Field label="Referensi Website yang Disukai">
               <input className={inputCls} value={form.referensi_website} onChange={e => set('referensi_website', e.target.value)} placeholder="https://contoh.com" />

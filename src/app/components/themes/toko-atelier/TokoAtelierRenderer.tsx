@@ -502,7 +502,7 @@ export default function TokoAtelierRenderer({
   // Fallback tanpa foto = panggung gelap berbasis scrim (teks hero selalu
   // putih) — aman juga untuk palet terang (ivoire).
   const heroBg: CSSProperties = content.hero.image
-    ? { backgroundImage: `url(${content.hero.image})` }
+    ? { backgroundImage: `url(${content.hero.image})`, backgroundPosition: content.hero.imagePosition || 'center' }
     : { background: `linear-gradient(150deg, color-mix(in srgb, ${pal.scrim} 82%, #fff), ${pal.scrim} 70%)` }
 
   return (
