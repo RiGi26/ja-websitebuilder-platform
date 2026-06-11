@@ -434,9 +434,9 @@ export function Nav({ content }: { content: ComposableContent }) {
 type Hero = ComposableContent['hero']
 
 // Latar hero: foto + scrim kalau ada gambar; gradient token kalau tidak.
-function heroBg(image?: string): React.CSSProperties {
+function heroBg(image?: string, position?: string): React.CSSProperties {
   if (image) {
-    return { backgroundImage: `${HERO_BRAND_WASH}, ${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    return { backgroundImage: `${HERO_BRAND_WASH}, ${HERO_SCRIM}, url(${image})`, backgroundSize: 'cover', backgroundPosition: position || 'center' }
   }
   // Gradient MESH (bukan flat): 2 radial aksen + linear dasar → ada kedalaman.
   return {
@@ -452,7 +452,7 @@ const heroInk = (image?: string) => (image ? '#FFFFFF' : 'var(--c-hero-ink)')
 export function HeroCentered({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
-    <section style={{ ...heroBg(hero.image), color: ink, padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ ...heroBg(hero.image, hero.imagePosition), color: ink, padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
       <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} />
       <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
         {hero.eyebrow && <p className="ce-eyebrow" style={{ marginBottom: 16, color: hero.image ? '#FFFFFF' : 'var(--c-primary)' }}>{hero.eyebrow}</p>}
@@ -480,7 +480,7 @@ export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama:
           {hero.subtitle && <p style={{ marginTop: 24, fontSize: 18, color: 'var(--c-muted)', lineHeight: 1.7, maxWidth: 520 }}>{hero.subtitle}</p>}
           {hero.ctaText && <div style={{ marginTop: 36 }}><Btn text={hero.ctaText} href={hero.ctaHref} /></div>}
         </div>
-        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...(hero.image ? { backgroundImage: `${HERO_BRAND_WASH}, url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))` }) }}>
+        <div style={{ position: 'relative', minHeight: 420, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--c-border)', boxShadow: 'var(--s-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...(hero.image ? { backgroundImage: `${HERO_BRAND_WASH}, url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: hero.imagePosition || 'center' } : { background: `linear-gradient(150deg, var(--c-hero-from), var(--c-hero-to))` }) }}>
           {!hero.image && (
             <span style={{ fontFamily: 'var(--f-display)', fontWeight: 'var(--fw-display)' as unknown as number, fontSize: 'clamp(120px, 18vw, 220px)', lineHeight: 1, color: 'var(--c-hero-ink)', opacity: .9 }}>
               {(nama.trim()[0] ?? 'A').toUpperCase()}
@@ -495,7 +495,7 @@ export function HeroSplit({ hero, nama, motif, motifColor }: { hero: Hero; nama:
 export function HeroFullbleed({ hero, motif, motifColor }: { hero: Hero; motif?: MotifVariant; motifColor?: string }) {
   const ink = heroInk(hero.image)
   return (
-    <section className="ce-hero-fb" style={{ ...heroBg(hero.image), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
+    <section className="ce-hero-fb" style={{ ...heroBg(hero.image, hero.imagePosition), color: ink, minHeight: '90vh', display: 'flex', alignItems: 'flex-end', position: 'relative', overflow: 'hidden', padding: '0 24px 80px' }}>
       <MotifOverlay motif={motif} color={hero.image ? '#FFFFFF' : motifColor ?? '#C8922A'} opacity={0.07} />
       <span className="ce-hero-cue" aria-hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>

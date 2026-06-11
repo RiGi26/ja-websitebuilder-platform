@@ -22,6 +22,7 @@ export interface NormalizedBriefing {
   subKategori?: string // Theme System: jenis toko (mem-filter tema). Kosong = jalur lama.
   logoUrl?: string
   heroImage?: string // foto hero/background dari brief form (branding.foto_hero)
+  heroImageFocus?: string // titik fokus foto hero (CSS position, mis. '50% 30%')
   referensi?: string
   sosial: {
     instagram?: string

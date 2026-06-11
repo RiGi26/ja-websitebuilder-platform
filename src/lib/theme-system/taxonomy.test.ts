@@ -60,12 +60,10 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('getReadySubKategori: ke-8 sub-kategori Toko Online aktif (replikasi tuntas)', () => {
+  it('getReadySubKategori: Toko Online hanya Fashion (lux-only, flagship Atelier)', () => {
     const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual([
-      'kuliner', 'fashion', 'kerajinan', 'kecantikan', 'gadget', 'rumah', 'kesehatan', 'anak',
-    ])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(8)
+    expect(ready.map((s) => s.id)).toEqual(['fashion'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
   })
 
   it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
@@ -81,15 +79,14 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(t?.nama).toBe('Heritage Kuliner')
   })
 
-  it('Fashion (S2): 3 gaya terdaftar & sub-kategori AKTIF (S2-3)', () => {
+  it('Fashion → flagship Atelier (boutique bespoke): varian noir/ivoire, AKTIF', () => {
     const themes = getThemes('toko_online', 'fashion')
     expect(themes.map((t) => t.id)).toEqual([
-      'fashion-editorial',
-      'fashion-minimal',
-      'fashion-vibrant',
+      'atelier-noir',
+      'atelier-ivoire',
     ])
     const fashion = getSubKategori('toko_online').find((s) => s.id === 'fashion')
-    expect(fashion?.ready).toBe(true) // aktif: blok+polish+verify tuntas
+    expect(fashion?.ready).toBe(true)
     expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 

@@ -180,7 +180,7 @@ export interface StatementContent { eyebrow?: string; quote: string; cite?: stri
 export interface PresetBand { preset: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string }
 export interface ComposableContent {
   nama: string
-  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; ctaText2?: string; ctaHref2?: string; image?: string }
+  hero: { eyebrow?: string; title: string; subtitle?: string; ctaText?: string; ctaHref?: string; ctaText2?: string; ctaHref2?: string; image?: string; imagePosition?: string }
   // Heading section "keunggulan" dari konten (bukan hardcode generik). Opsional →
   // fallback non-generik di FeatHeading.
   featuresEyebrow?: string

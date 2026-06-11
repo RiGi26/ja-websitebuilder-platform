@@ -58,6 +58,10 @@ export function composableContentFromSections(
   const fotoHero = typeof konten.foto_hero === 'string' && konten.foto_hero.trim()
     ? konten.foto_hero.trim()
     : undefined
+  // Titik fokus foto hero (CSS background/object-position) dari brief form.
+  const fotoHeroFocus = typeof konten.foto_hero_focus === 'string' && konten.foto_hero_focus.trim()
+    ? konten.foto_hero_focus.trim()
+    : undefined
 
   // Info/Lokasi (balok Sprint 5) — dirakit dari profil bisnis bila ada data
   // jam/alamat. Manifest yang mengaktifkan `info` (mis. tema restaurant) akan
@@ -95,7 +99,7 @@ export function composableContentFromSections(
 
   return {
     nama: base.nama,
-    hero: { ...base.hero, image: fotoHero },
+    hero: { ...base.hero, image: fotoHero, imagePosition: fotoHeroFocus },
     features: base.features,
     showcase,
     info,
