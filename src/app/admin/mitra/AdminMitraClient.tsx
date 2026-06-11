@@ -231,6 +231,10 @@ export default function AdminMitraClient({ referrers, payouts, earnings }: {
                 onChange={(e) => setForm((f) => ({ ...f, diskon: e.target.value }))} required className={inputCls} />
             </div>
             <div className="md:col-span-2 lg:col-span-5">
+              <p className="text-[11px] text-gray-400 mb-3">
+                Persentase hanya berlaku untuk order ≥ Rp 1 juta. Order di bawah Rp 1 juta selalu pakai
+                tarif paten: diskon buyer Rp 25.000 + komisi mitra Rp 50.000 (tidak bisa diubah).
+              </p>
               <button type="submit" disabled={creating}
                 className="flex items-center gap-2 px-7 h-12 bg-apple-blue hover:bg-blue-600 text-white text-sm font-bold rounded-2xl transition-all shadow-lg disabled:opacity-50 active:scale-[0.96]">
                 {creating ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
@@ -339,7 +343,7 @@ export default function AdminMitraClient({ referrers, payouts, earnings }: {
                         )}
                       </div>
                       <p className="text-xs text-gray-500 mt-1 truncate">
-                        {r.email} · {r.nomorWa} · komisi {r.commissionPercent}% · diskon buyer {r.buyerDiscountPercent}%
+                        {r.email} · {r.nomorWa} · komisi {r.commissionPercent}% · diskon buyer {r.buyerDiscountPercent}% (order ≥ Rp 1 jt)
                       </p>
                       <p className="text-xs text-gray-500 mt-1 tabular-nums">
                         {r.stats.orders} order · pending {rp(r.stats.pendingRp)} · payable{' '}

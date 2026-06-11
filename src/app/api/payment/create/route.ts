@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer } from '@/lib/fonnte'
 import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
+import { referralDiscountFor } from '@/lib/referral-tier'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
       const ref = await lookupActiveCode(normCode)
       if (ref && !isSelfReferral(ref, nomor_wa ?? '', email ?? '')) applied = ref
     }
-    const referralDiscount = applied ? Math.round((gross * applied.discountPercent) / 100) : 0
+    const referralDiscount = applied ? referralDiscountFor(gross, applied.discountPercent) : 0
     // total_estimasi tersimpan = NET supaya seluruh math hilir (DP threshold,
     // retry, pelunasan) tetap bekerja tanpa perubahan.
     const netTotal = gross - referralDiscount
