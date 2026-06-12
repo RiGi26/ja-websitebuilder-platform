@@ -38,8 +38,9 @@ export async function POST(request: Request) {
     // content-adapter (composable). Adapter tetap memvalidasi ulang (defensif).
     if (order.tenant_id) {
       const d = detail_data as Record<string, any>
-      const { foto_hero, foto_items, testimoni, kebijakan } = d as {
+      const { foto_hero, foto_hero_focus, foto_items, testimoni, kebijakan } = d as {
         foto_hero?: string
+        foto_hero_focus?: string
         foto_items?: { label: string; url: string }[]
         testimoni?: { nama: string; kota: string; teks: string; bintang: number }[]
         kebijakan?: string
@@ -60,6 +61,10 @@ export async function POST(request: Request) {
 
         const updates: Record<string, unknown> = {}
         if (foto_hero?.trim()) updates.foto_hero = foto_hero.trim()
+        // Titik fokus foto hero — CSS position "x% y%" (0-100), divalidasi ketat.
+        if (typeof foto_hero_focus === 'string' && /^\d{1,3}% \d{1,3}%$/.test(foto_hero_focus.trim())) {
+          updates.foto_hero_focus = foto_hero_focus.trim()
+        }
         if (validFotoItems?.length) updates.foto_items = validFotoItems
         if (validTestimoni?.length) updates.testimoni = validTestimoni
         if (kebijakan?.trim()) updates.kebijakan = kebijakan.trim()

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
 import { Check, Loader2, Plus, Trash2 } from 'lucide-react'
 import ImageUploadField from '@/app/portal/ImageUploadField'
+import HeroImageField from '@/app/portal/HeroImageField'
 
 interface TestimoniRow { nama: string; kota: string; teks: string; bintang: string }
 interface TeamRow { nama: string; peran: string; foto: string; bio: string }
@@ -19,6 +20,7 @@ export interface ActiveBlocks {
 
 interface DetailState {
   foto_hero: string
+  foto_hero_focus: string
   foto_items: { label: string; url: string }[]
   testimoni: TestimoniRow[]
   team: TeamRow[]
@@ -40,6 +42,7 @@ const SOCIAL_OPTIONS = ['instagram', 'tiktok', 'youtube', 'facebook', 'whatsapp'
 
 const INIT: DetailState = {
   foto_hero: '',
+  foto_hero_focus: '',
   foto_items: [{ label: '', url: '' }],
   testimoni: [
     { nama: '', kota: '', teks: '', bintang: '5' },
@@ -132,6 +135,7 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
           const ex = existingData as Partial<DetailState>
           return {
             foto_hero: (ex.foto_hero as string) ?? '',
+            foto_hero_focus: (ex.foto_hero_focus as string) ?? '',
             foto_items: fotoLabels.map((label, i) => ({
               label,
               url: ((ex.foto_items as { label: string; url: string }[])?.[i]?.url) ?? '',
@@ -192,6 +196,7 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
     try {
       const detail_data: Record<string, unknown> = {
         foto_hero: form.foto_hero,
+        foto_hero_focus: form.foto_hero_focus,
         foto_items: form.foto_items.filter(f => f.url.trim()),
         testimoni: form.testimoni.filter(t => t.nama.trim() && t.teks.trim()).map(t => ({
           ...t,
@@ -328,7 +333,13 @@ export default function DetailForm({ token, orderId, namaKlien, industri, existi
 
         {/* Foto Hero */}
         <Field label="Foto Utama / Hero (opsional)" hint="Foto terbaik yang mewakili bisnis Anda — tampil paling menonjol. Boleh dikosongkan & menyusul nanti.">
-          <ImageUploadField value={form.foto_hero} onChange={(url) => set('foto_hero', url)} {...uploadProps} />
+          <HeroImageField
+            value={form.foto_hero}
+            focus={form.foto_hero_focus}
+            onChange={(url) => set('foto_hero', url)}
+            onFocusChange={(pos) => set('foto_hero_focus', pos)}
+            {...uploadProps}
+          />
         </Field>
 
         {/* Foto per kategori */}
