@@ -162,12 +162,14 @@ describe('addon catalog — census audit (kunci kesimpulan §B)', () => {
   })
 })
 
-describe('A1 — triage visibility (keputusan user 2026-06-09)', () => {
+describe('A1 — triage visibility (keputusan user 2026-06-09; revisi kejujuran 2026-06-12)', () => {
   const NOT_OFFERED = [
     'protection', 'email-biz', 'client-portal', // drop snake-oil
     'lms', 'membership', 'cert-auto', 'lang-multi', // hide heavy-unbuilt
   ]
-  const STILL_OFFERED = ['delivery', 'newsletter', 'career', 'ads-tracking'] // wire nanti
+  // Kebijakan owner 2026-06-12: yang masih 'planned' TIDAK dijual sampai dibangun.
+  const PLANNED_HIDDEN = ['ongkir', 'katalog-pro', 'variant', 'delivery', 'ads-tracking', 'video-meeting']
+  const STILL_OFFERED = ['newsletter', 'career'] // sudah live (#123)
 
   it('7 SKU di-drop/hide tak ditawarkan', () => {
     for (const id of NOT_OFFERED) {
@@ -177,7 +179,16 @@ describe('A1 — triage visibility (keputusan user 2026-06-09)', () => {
     }
   })
 
-  it('4 SKU "wire nanti" TETAP ditawarkan', () => {
+  it('SKU planned disembunyikan dari order & upgrade sampai kapabilitasnya dibangun', () => {
+    for (const id of PLANNED_HIDDEN) {
+      expect(getAddon(id), id).toBeDefined() // tetap SKU kanonik di katalog
+      expect(isOffered(id), id).toBe(false)
+      expect(orderAddons().some((a) => a.id === id), id).toBe(false)
+      expect(upgradeAddons().some((a) => a.id === id), id).toBe(false)
+    }
+  })
+
+  it('SKU live tetap ditawarkan', () => {
     for (const id of STILL_OFFERED) {
       expect(isOffered(id), id).toBe(true)
       expect(orderAddons().some((a) => a.id === id), id).toBe(true)
@@ -195,7 +206,11 @@ describe('A1 — dual-tier harga (nol perubahan ke customer)', () => {
   })
 
   it('SKU tanpa override upgrade → fallback ke harga order', () => {
-    expect(upgradeAddons().find((a) => a.id === 'ongkir')?.price).toBe(250000)
+    expect(upgradeAddons().find((a) => a.id === 'career')?.price).toBe(300000)
+  })
+
+  it('harga seo selaras corp-landing (keputusan owner 2026-06-12)', () => {
+    expect(orderAddons().find((a) => a.id === 'seo')?.price).toBe(150000)
   })
 })
 
@@ -272,7 +287,8 @@ describe('A2 — gating dependency + relevansi industri', () => {
   })
 
   it('orderAddons membawa requires + industries utk gating', () => {
-    expect(orderAddons().find((a) => a.id === 'variant')?.requires).toContain('shop')
+    // variant kini planned-hidden → cek requires di katalog; industries via SKU live.
+    expect(getAddon('variant')?.requires).toContain('shop')
     expect(orderAddons().find((a) => a.id === 'qr-menu')?.industries).toContain('restaurant')
   })
 })
@@ -280,12 +296,12 @@ describe('A2 — gating dependency + relevansi industri', () => {
 describe('Merge video — telemedicine + live-session → video-meeting (Temuan D)', () => {
   const offeredIds = new Set(orderAddons().map((a) => a.id))
 
-  it('video-meeting = SKU kanonik & ditawarkan', () => {
+  it('video-meeting = SKU kanonik, tapi planned → TAK ditawarkan sampai dibangun (2026-06-12)', () => {
     const vm = getAddon('video-meeting')
     expect(vm).toBeDefined()
     expect(vm?.capability).toContain('video-meeting')
-    expect(isOffered('video-meeting')).toBe(true)
-    expect(offeredIds.has('video-meeting')).toBe(true)
+    expect(isOffered('video-meeting')).toBe(false)
+    expect(offeredIds.has('video-meeting')).toBe(false)
   })
 
   it('telemedicine & live-session bukan lagi SKU kanonik', () => {
