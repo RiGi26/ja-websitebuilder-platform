@@ -22,7 +22,7 @@ import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
 import TokenDrivenRenderer from '@/app/components/themes/universal/TokenDrivenRenderer'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
 import { getManifest } from '@/lib/theme-system/manifest'
-import { composableContentFromSections, type ShowcaseSourceItem } from '@/lib/theme-system/content-adapter'
+import { composableContentFromSections, articlesFromBlogPosts, type ShowcaseSourceItem } from '@/lib/theme-system/content-adapter'
 import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
@@ -131,6 +131,13 @@ export async function renderSite({
     const content = composableContentFromSections(
       page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, showcaseTitle,
     )
+    // Add-on blog lintas-industri (B-section): alur manifest tak punya slot
+    // artikel → petakan additive (pola bands). Industri blog tidak lewat sini
+    // (showcase utamanya sudah article-feed dari blog_posts).
+    if (tipe !== 'blog' && sections.some((s) => s.tipe_komponen === 'blog_list')) {
+      const posts = await fetchBlogPostsByPage(client, page.id)
+      content.articles = articlesFromBlogPosts(sections, posts)
+    }
     const renderer = <ComposableRenderer manifest={manifest} content={content} />
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
   }

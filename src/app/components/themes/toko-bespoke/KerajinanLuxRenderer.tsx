@@ -175,6 +175,9 @@ function krCss(): string {
 .kr-cta-ghost:hover{border-color:rgba(247,240,227,.6)}
 
 /* FOOTER */
+.kr-band{background:var(--kr-surface);border-top:1px solid var(--kr-line);border-bottom:1px solid var(--kr-line);padding:3.5rem 5vw;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem}
+.kr-band .kr-heading{font-size:clamp(1.5rem,2.4vw,2.1rem)}
+.kr-band-sub{color:var(--kr-muted);font-size:.95rem;line-height:1.7;margin-top:.6rem;max-width:56ch}
 .kr-footer{background:var(--kr-inkDim);color:var(--kr-onAccent);padding:3.5rem 5vw 2rem}
 .kr-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
 .kr-footer-brand{font-family:${DISPLAY};font-size:1.1rem;font-weight:700;letter-spacing:.05em;margin-bottom:.75rem}
@@ -293,7 +296,12 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
         {hero.image && (
           <div className="kr-hero-media">
             <div className="kr-hero-frame">
-              <img src={hero.image} alt={c.nama ?? 'Kerajinan'} loading="eager" />
+              <img
+                src={hero.image}
+                alt={c.nama ?? 'Kerajinan'}
+                loading="eager"
+                style={hero.imagePosition ? { objectPosition: hero.imagePosition } : undefined}
+              />
               {stats[0] && (
                 <div className="kr-hero-badge">{stats[0].angka} {stats[0].label}</div>
               )}
@@ -480,6 +488,19 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
           </div>
         </section>
       )}
+
+      {/* BAND ADD-ON (newsletter/career) — additive, hadir hanya bila adapter
+          menemukan row cta ber-preset (injeksi B-section). Pola sama
+          ComposableRenderer; data-band utk verifikasi. */}
+      {(c.bands ?? []).map((b, i) => (
+        <section className="kr-band" data-band={b.preset} key={`${b.preset}-${i}`}>
+          <div>
+            <h2 className="kr-heading">{b.title}</h2>
+            {b.subtitle && <p className="kr-band-sub">{b.subtitle}</p>}
+          </div>
+          {b.ctaText && <a className="kr-btn-primary" href={b.ctaHref ?? waUrl}>{b.ctaText}</a>}
+        </section>
+      ))}
 
       {/* FOOTER */}
       <footer className="kr-footer">

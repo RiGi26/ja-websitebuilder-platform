@@ -1026,3 +1026,24 @@ describe('ComposableRenderer — band add-on (newsletter/career)', () => {
     expect(html).not.toContain('data-band=')
   })
 })
+
+// ── Artikel add-on blog — content.articles dirender additive (pola bands) ──
+describe('ComposableRenderer — artikel add-on blog (content.articles)', () => {
+  it('articles → article-feed additive di industri non-blog', () => {
+    const c: ComposableContent = {
+      ...CONTENT,
+      articles: {
+        title: 'Artikel & Berita',
+        items: [{ nama: 'Tips Merawat Batik Tulis', desc: 'Ringkasan singkat.', penulis: 'Admin', tanggal: '2026-01-02' }],
+      },
+    }
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-corporate']} content={c} />)
+    expect(html).toContain('Artikel & Berita')
+    expect(html).toContain('Tips Merawat Batik Tulis')
+  })
+
+  it('tanpa articles → tak dirender (nol regresi)', () => {
+    const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-corporate']} content={CONTENT} />)
+    expect(html).not.toContain('Tips Merawat Batik Tulis')
+  })
+})
