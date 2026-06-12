@@ -23,14 +23,10 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('custom', 'apapun')).toBeUndefined()
   })
 
-  it('Kuliner = pilot dengan 3 gaya', () => {
+  it('Kuliner = flagship lux bespoke (Tungku/Pamor)', () => {
     const themes = getThemes('toko_online', 'kuliner')
-    expect(themes).toHaveLength(3)
-    expect(themes.map((t) => t.id)).toEqual([
-      'kuliner-rustic',
-      'kuliner-modern',
-      'kuliner-heritage',
-    ])
+    expect(themes.map((t) => t.id)).toEqual(['kuliner-tungku', 'kuliner-pamor'])
+    expect(themes.every((t) => t.manifest === 'toko-kuliner')).toBe(true)
   })
 
   it('setiap tema mereferensi sub-kategori yang terdaftar di industrinya', () => {
@@ -55,15 +51,19 @@ describe('theme-system taxonomy (S0-1)', () => {
   it('invarian S0-1: manifest === id', () => {
     for (const byCat of Object.values(THEMES)) {
       for (const t of Object.values(byCat ?? {}).flat()) {
+        // Bespoke toko (atelier/kuliner/…) = renderer bespoke, bukan manifest
+        // composable → manifest sengaja 'toko-<key>' (≠ id). Dikecualikan.
+        if (t.manifest.startsWith('toko-')) continue
         expect(t.manifest).toBe(t.id)
       }
     }
   })
 
-  it('getReadySubKategori: Toko Online hanya Fashion (lux-only, flagship Atelier)', () => {
-    const ready = getReadySubKategori('toko_online')
-    expect(ready.map((s) => s.id)).toEqual(['fashion'])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(1)
+  it('getReadySubKategori: hanya sub-kategori lux ber-renderer yang aktif di Toko Online', () => {
+    // LUX bespoke yang sudah ship: Kuliner (Toko Dapur) + Fashion (Atelier).
+    // Sisanya ready:false sampai renderer bespoke-nya dibangun (urutan = registry).
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(2)
   })
 
   it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
@@ -75,8 +75,8 @@ describe('theme-system taxonomy (S0-1)', () => {
   })
 
   it('getTheme menemukan tema lintas sub-kategori', () => {
-    const t = getTheme('toko_online', 'kuliner-heritage')
-    expect(t?.nama).toBe('Heritage Kuliner')
+    const t = getTheme('toko_online', 'kerajinan-pusaka')
+    expect(t?.nama).toBe('Pusaka')
   })
 
   it('Fashion → flagship Atelier (boutique bespoke): varian noir/ivoire, AKTIF', () => {

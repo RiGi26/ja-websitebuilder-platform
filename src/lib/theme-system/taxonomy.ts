@@ -52,7 +52,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
   // dari brief form sampai tema lux-nya dibangun (composable lama tetap render
   // untuk situs existing — renderer baca branding.variant, bukan daftar ini).
   toko_online: [
-    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: false },
+    { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: true },
     { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
     { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: false },
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
@@ -115,36 +115,31 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
 // (S0-2) — aman karena belum ada yang membaca registry ini.
 export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>> = {
   toko_online: {
+    // Kuliner = FLAGSHIP lux bespoke "Toko Dapur" (KulinerLuxRenderer, bukan
+    // composable). 2 varian: tungku (terang hangat) & pamor (gelap heritage).
+    // manifest:'toko-kuliner' inert (di-intercept generateContent SEBELUM
+    // getManifest). Tema composable lama (kuliner-rustic/modern/heritage) tetap
+    // di manifest.ts untuk situs existing, hanya tak ditawarkan lagi di brief form.
     kuliner: [
       {
-        id: 'kuliner-rustic',
+        id: 'kuliner-tungku',
         subKategori: 'kuliner',
-        nama: 'Rustic Hangat',
-        deskripsi: 'Warung homemade, hangat & menggugah. Cocok untuk pempek, kue, masakan rumahan.',
+        nama: 'Tungku',
+        deskripsi: 'Hangat & rumahan, krem dan bara terracotta. Untuk warung, kue, frozen, masakan rumahan.',
         icon: 'Flame',
-        mood: '#B5532A',
+        mood: '#A8381A',
         bg: 'warm',
-        manifest: 'kuliner-rustic',
+        manifest: 'toko-kuliner',
       },
       {
-        id: 'kuliner-modern',
+        id: 'kuliner-pamor',
         subKategori: 'kuliner',
-        nama: 'Modern Appetite',
-        deskripsi: 'Brand F&B kekinian, bersih & cerah. Untuk kopi, dessert, snack modern.',
-        icon: 'CupSoda',
-        mood: '#E2582B',
-        bg: 'light',
-        manifest: 'kuliner-modern',
-      },
-      {
-        id: 'kuliner-heritage',
-        subKategori: 'kuliner',
-        nama: 'Heritage Kuliner',
-        deskripsi: 'Kuliner premium/tradisional, elegan & berkelas. Untuk oleh-oleh khas & signature dish.',
+        nama: 'Pamor',
+        deskripsi: 'Gelap heritage & emas, dramatis sinematik. Untuk kuliner premium, signature, oleh-oleh khas.',
         icon: 'Crown',
-        mood: '#7B2D3E',
+        mood: '#C9A24A',
         bg: 'dark',
-        manifest: 'kuliner-heritage',
+        manifest: 'toko-kuliner',
       },
     ],
     // Fashion → FLAGSHIP Atelier (boutique bespoke). 2 varian maison; brief form

@@ -244,6 +244,112 @@ const TOKO_ATELIER: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@kala-atelier.id', alamat: 'Bandung, Jawa Barat' },
 }
 
+// ── Toko Kuliner (FLAGSHIP bespoke lux — KulinerLuxRenderer) ────
+// Sample dedikasi untuk renderer 'toko-kuliner' (varian tungku/pamor). Konten
+// ditulis untuk rangka lux kuliner: menu-board ber-kategori + stok, galeri proses
+// dapur, statement filosofi, stats campur untuk count-up. JANGAN dipinjam tema lain.
+const KULINER_LUX: ComposableContent = {
+  nama: 'Dapur Tungku',
+  hero: {
+    eyebrow: 'Masakan Rumahan Sejak 2012',
+    title: 'Rasa Rumah, Dimasak dari Tungku',
+    subtitle:
+      'Resep keluarga turun-temurun, bumbu diulek tangan, dimasak segar tiap hari. Dari dapur kami untuk meja Anda.',
+    ctaText: 'Lihat Menu',
+    ctaHref: '#menu',
+    ctaText2: 'Pesan via WhatsApp',
+    ctaHref2: '#wa',
+    image: IMG('photo-1565299624946-b28f40a0ae38'),
+  },
+  features: [
+    { title: 'Dimasak Segar Harian', desc: 'Tanpa pengawet, tanpa stok lama — diolah pagi, habis hari itu juga.' },
+    { title: 'Bumbu Diulek Tangan', desc: 'Rempah utuh diulek manual, bukan bumbu instan. Aroma dan rasa beda.' },
+    { title: 'Frozen & Kirim Aman', desc: 'Dikemas vacuum, tahan 1 bulan, sampai ke seluruh Indonesia tetap utuh.' },
+  ],
+  featuresEyebrow: 'Mengapa Kami',
+  featuresTitle: 'Resep di balik kepercayaan ribuan pelanggan',
+  statement: {
+    eyebrow: 'Filosofi Dapur',
+    quote: 'Makanan yang baik tidak terburu-buru. Kami memasak seperti memasak untuk keluarga sendiri — sabar, jujur, dan penuh rasa.',
+    cite: 'Bu Asih — Pendiri Dapur Tungku',
+  },
+  showcase: {
+    title: 'Menu Andalan',
+    subtitle: 'Favorit pelanggan, dimasak dari resep keluarga yang dijaga puluhan tahun.',
+    items: [
+      { nama: 'Rendang Daging Sapi', kategori: 'Lauk Utama', harga: 65000, desc: 'Dimasak 6 jam di atas tungku, empuk dan kaya rempah.', gambar: IMG('photo-1565299624946-b28f40a0ae38', 900), stok: 8 },
+      { nama: 'Ayam Bakar Bumbu Bali', kategori: 'Lauk Utama', harga: 38000, desc: 'Dibakar arang, dilumuri bumbu bali pedas-manis.', gambar: IMG('photo-1504674900247-0877df9cc836', 900) },
+      { nama: 'Pempek Kapal Selam', kategori: 'Frozen', harga: 15000, desc: 'Telur utuh di dalam, cuko racikan turun-temurun.', gambar: IMG('photo-1567620905732-2d1ec7ab7445', 900), stok: 3 },
+      { nama: 'Dimsum Ayam Udang', kategori: 'Frozen', harga: 35000, desc: 'Isi 10, tinggal kukus 8 menit di rumah.', gambar: IMG('photo-1542435503-956c469947f6', 900) },
+      { nama: 'Brownies Kukus Legit', kategori: 'Kue & Manis', harga: 55000, desc: 'Lembut, cokelat pekat, tanpa pengawet.', gambar: IMG('photo-1490645935967-10de6ba17061', 900) },
+      { nama: 'Klepon Gula Aren', kategori: 'Kue & Manis', harga: 25000, desc: 'Isi 12, gula aren asli yang meleleh.', gambar: IMG('photo-1551024506-0bccd828d307', 900), stok: 5 },
+      { nama: 'Es Kopi Susu Gula Aren', kategori: 'Minuman', harga: 22000, desc: 'Kopi robusta lokal, gula aren, susu segar.', gambar: IMG('photo-1461023058943-07fcbe16d735', 900) },
+      { nama: 'Paket Keluarga Komplit', kategori: 'Paket', harga: 150000, desc: 'Rendang, ayam, sayur, sambal, nasi untuk 4 orang.', gambar: IMG('photo-1556740738-b6a63e27c4df', 900) },
+    ],
+  },
+  about: {
+    title: 'Dari Satu Tungku di Belakang Rumah',
+    body: 'Dapur Tungku berawal tahun 2012 dari satu tungku arang di belakang rumah Bu Asih. Berbekal resep rendang warisan nenek dan tekad memasak jujur, kabar dari mulut ke mulut membawa pesanan demi pesanan.\n\nHari ini kami tetap memasak dengan cara yang sama — bumbu diulek tangan, dimasak perlahan, tanpa penyedap buatan. Yang berubah hanya jumlah keluarga yang kami layani.',
+    image: IMG('photo-1556740738-b6a63e27c4df'),
+    ctaText: 'Kenali kami lebih dekat',
+    ctaHref: '#kontak',
+  },
+  cta: {
+    title: 'Lapar Masakan Rumahan Asli?',
+    subtitle: 'Pesan sekarang, kami masak segar dan kirim ke alamat Anda hari ini juga.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+    image: IMG('photo-1504674900247-0877df9cc836'),
+  },
+  stats: [
+    { angka: '4.9', label: 'Rating pelanggan' },
+    { angka: '15rb+', label: 'Porsi terjual' },
+    { angka: '12 thn', label: 'Melayani' },
+    { angka: '100%', label: 'Tanpa pengawet' },
+  ],
+  gallery: {
+    title: 'Dari Dapur Kami',
+    subtitle: 'Tiap hidangan lahir dari proses yang sabar.',
+    images: [
+      { src: IMG('photo-1565299624946-b28f40a0ae38', 800), caption: 'Rendang dimasak perlahan' },
+      { src: IMG('photo-1556740738-b6a63e27c4df', 800), caption: 'Bumbu diulek tangan' },
+      { src: IMG('photo-1542435503-956c469947f6', 800), caption: 'Dimsum dibentuk satu per satu' },
+      { src: IMG('photo-1490645935967-10de6ba17061', 800), caption: 'Brownies baru keluar kukusan' },
+      { src: IMG('photo-1461023058943-07fcbe16d735', 800), caption: 'Kopi gula aren diseduh' },
+      { src: IMG('photo-1504674900247-0877df9cc836', 800), caption: 'Siap diantar ke meja Anda' },
+    ],
+  },
+  testimonials: [
+    { quote: 'Rendangnya juara, empuk dan bumbunya meresap sampai dalam. Serasa masakan nenek sendiri.', nama: 'Bu Hesti', peran: 'Pelanggan setia' },
+    { quote: 'Frozen-nya dikirim ke Jakarta sampai rapi, dikukus di rumah rasanya tetap seperti baru masak.', nama: 'Andi', peran: 'Pelanggan Jakarta' },
+    { quote: 'Pesan paket keluarga tiap akhir pekan. Anak-anak paling suka ayam bakar bumbu bali-nya.', nama: 'Pak Rudi', peran: 'Langganan mingguan' },
+    { quote: 'Yang bikin beda: kerasa masakan rumahan beneran, bukan rasa restoran. Bumbunya jujur.', nama: 'Maya', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah bisa kirim ke luar kota?', a: 'Bisa. Menu frozen dikemas vacuum dan tahan 1 bulan — aman dikirim ke seluruh Indonesia dengan ekspedisi pilihan Anda.' },
+    { q: 'Berapa lama pengiriman untuk masakan matang?', a: 'Masakan matang (rendang, ayam bakar, paket keluarga) kami antar hari yang sama untuk area dalam kota. Pesan sebelum jam 14.00.' },
+    { q: 'Bagaimana cara memesan?', a: 'Klik tombol WhatsApp, pilih menu dan jumlah. Kami konfirmasi ketersediaan, ongkir, dan total. Pembayaran setelah konfirmasi.' },
+  ],
+  social: {
+    title: 'Ikuti & Pesan di',
+    links: [
+      { platform: 'instagram', href: '#', label: '@dapurtungku' },
+      { platform: 'tiktok', href: '#' },
+      { platform: 'whatsapp', href: '#wa' },
+      { platform: 'shopee', href: '#' },
+    ],
+  },
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '08.00–20.00' },
+      { hari: 'Minggu', jam: '08.00–16.00' },
+    ],
+    alamat: 'Jl. Kaliurang KM 7, Yogyakarta',
+    mapsQuery: 'Jl. Kaliurang KM 7 Yogyakarta',
+  },
+  contact: { wa: '6281296917963', email: 'halo@dapurtungku.id', alamat: 'Yogyakarta' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2106,6 +2212,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   // FLAGSHIP bespoke (Opsi A) — sample dedikasi, BUKAN pinjaman. Tanpa entri ini
   // prefix-split 'toko-atelier' → 'toko' dan jatuh ke sample toko generik.
   'toko-atelier': TOKO_ATELIER,
+  // Bespoke lux kuliner (KulinerLuxRenderer) — sample dedikasi kaya (menu-board,
+  // galeri proses, statement). Dipakai gen-samples + imagery-borrow generateContent.
+  'kuliner-lux': KULINER_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

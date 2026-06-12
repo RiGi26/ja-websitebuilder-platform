@@ -93,6 +93,59 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
   })
 })
 
+// FLAGSHIP bespoke toko (registry theme key). Tabel TOKO_BESPOKE_VARIANTS (SSOT)
+// memetakan id ThemeOption brief → { theme key, palet variant native, sample }.
+// Brief form SELALU menyetel variant saat sub-kategori dipilih → intercept
+// berbasis id variant (bukan sub_kategori).
+describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () => {
+  const mkToko = (branding: Record<string, unknown>) =>
+    generateContent({
+      industri: 'Toko Online',
+      nama_usaha: 'Toko Uji',
+      briefing_data: { industri_tipe: 'toko_online', branding },
+    })
+
+  it('atelier-noir → theme toko-atelier, variant noir, aksen brand', () => {
+    const plan = mkToko({ sub_kategori: 'fashion', variant: 'atelier-noir', primary_color: '#7E1F2D' })
+    expect(plan.theme).toBe('toko-atelier')
+    expect(plan.variant).toBe('noir')
+    expect(plan.primary).toBe('#7E1F2D')
+  })
+
+  it('atelier-ivoire → variant ivoire', () => {
+    expect(mkToko({ sub_kategori: 'fashion', variant: 'atelier-ivoire' }).variant).toBe('ivoire')
+  })
+
+  it('fashion tanpa variant dikenal → fallback Atelier noir (paritas isAtelier lama)', () => {
+    const plan = mkToko({ sub_kategori: 'fashion' })
+    expect(plan.theme).toBe('toko-atelier')
+    expect(plan.variant).toBe('noir')
+  })
+
+  it('kuliner-tungku → theme toko-kuliner, variant tungku', () => {
+    const plan = mkToko({ sub_kategori: 'kuliner', variant: 'kuliner-tungku' })
+    expect(plan.theme).toBe('toko-kuliner')
+    expect(plan.variant).toBe('tungku')
+  })
+
+  it('kuliner-pamor → variant pamor', () => {
+    expect(mkToko({ sub_kategori: 'kuliner', variant: 'kuliner-pamor' }).variant).toBe('pamor')
+  })
+
+  it('imagery enrichment aktif: products punya foto + foto_hero terisi (sample kuliner-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'kuliner', variant: 'kuliner-tungku' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
+  it('toko_online di luar bespoke ("Lainnya" → lux-toko) tetap composable', () => {
+    const plan = mkToko({ variant: 'lux-toko' })
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-toko')
+  })
+})
+
 // LUX TIER (Sprint 1) — composable lux jadi DEFAULT premium per industri pilot
 // (restaurant + klinik) saat briefing tak memilih variant; pilihan eksplisit
 // dihormati; Fine Dining bespoke (benchmark) tetap menang; konten produksi

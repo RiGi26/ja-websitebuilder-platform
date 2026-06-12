@@ -16,6 +16,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
 import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
 import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
+import KulinerLuxRenderer from '@/app/components/themes/toko-bespoke/KulinerLuxRenderer'
 import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
@@ -39,6 +40,9 @@ const LUX: Record<string, BespokeEntry> = {
   // FLAGSHIP toko/fashion (dark-launch) — lihat FLAGSHIP_ATELIER_PLAN.md.
   'toko-atelier': { sample: 'toko-atelier', variant: 'noir', label: 'Toko Atelier — Noir (flagship fashion)', sw: '#C5A572', Renderer: TokoAtelierRenderer },
   'toko-atelier-brand': { sample: 'toko-atelier', variant: 'noir', primary: '#7E1F2D', label: 'Toko Atelier — aksen brand (burgundy)', sw: '#7E1F2D', Renderer: TokoAtelierRenderer },
+  // FLAGSHIP lux kuliner (KulinerLuxRenderer) — 2 varian art-direction.
+  'kuliner-tungku': { sample: 'kuliner-lux', variant: 'tungku', label: 'Toko Kuliner — Tungku (terang hangat)', sw: '#A8381A', Renderer: KulinerLuxRenderer },
+  'kuliner-pamor': { sample: 'kuliner-lux', variant: 'pamor', label: 'Toko Kuliner — Pamor (gelap heritage)', sw: '#C9A24A', Renderer: KulinerLuxRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES

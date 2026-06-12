@@ -6,14 +6,13 @@ import SubKategoriPicker from './SubKategoriPicker'
 const noop = () => {}
 
 describe('ThemePicker (S0-3)', () => {
-  it('render 3 gaya Kuliner dengan nama + swatch warna', () => {
+  it('render gaya Kuliner = flagship lux (Tungku/Pamor)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="kuliner" value="" onChange={noop} />,
     )
-    expect(html).toContain('Rustic Hangat')
-    expect(html).toContain('Modern Appetite')
-    expect(html).toContain('Heritage Kuliner')
-    expect(html).toContain('#B5532A') // swatch mood rustic ter-inject
+    expect(html).toContain('Tungku')
+    expect(html).toContain('Pamor')
+    expect(html).toContain('#A8381A') // swatch mood tungku ter-inject
   })
 
   it('render varian Fashion → Atelier (Noir/Ivoire) dengan nama + swatch', () => {
@@ -43,21 +42,23 @@ describe('ThemePicker (S0-3)', () => {
 
   it('menandai tema terpilih (aria-pressed)', () => {
     const html = renderToStaticMarkup(
-      <ThemePicker tipe="toko_online" subKategori="kuliner" value="kuliner-modern" onChange={noop} />,
+      <ThemePicker tipe="toko_online" subKategori="kuliner" value="kuliner-tungku" onChange={noop} />,
     )
     expect(html).toContain('aria-pressed="true"')
   })
 })
 
 describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
-  it('menampilkan Fashion (lux-ready) + opsi "Lainnya" untuk toko_online', () => {
+  it('menampilkan sub-kategori lux yang ready + opsi "Lainnya" untuk toko_online', () => {
     const html = renderToStaticMarkup(
       <SubKategoriPicker tipe="toko_online" value="" onChange={noop} />,
     )
+    // Lux bespoke yang sudah ship: Kuliner + Fashion. Sisanya ready:false (sembunyi).
+    expect(html).toContain('Kuliner / Makanan')
     expect(html).toContain('Fashion / Pakaian')
     expect(html).toContain('Lainnya (gaya umum)')
     // Sub-kategori non-lux disembunyikan (ready:false)
-    expect(html).not.toContain('Kuliner / Makanan')
+    expect(html).not.toContain('Kerajinan / Heritage')
   })
 
   it('non-toko (klinik/sekolah) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {

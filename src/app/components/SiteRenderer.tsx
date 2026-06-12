@@ -11,8 +11,8 @@ import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
-import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
 import AtelierCartButton from '@/app/components/themes/toko-atelier/AtelierCartButton'
+import { TOKO_BESPOKE } from '@/app/components/themes/toko-bespoke/registry'
 import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
 import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRenderer'
@@ -68,21 +68,23 @@ export async function renderSite({
     return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} capabilities={konfig.capabilities} />
   }
 
-  // ── Bespoke FLAGSHIP: Toko Atelier (Opsi A, toko/fashion) ──
-  // Dark-launch: hanya via branding.theme==='toko-atelier' (tak ada di taxonomy)
-  // → dormant, nol regresi. Reuse fetch products + composableContentFromSections;
-  // products mentah ikut diteruskan untuk pencocokan tombol keranjang per item
+  // ── Bespoke FLAGSHIP toko (registry: Atelier/Kuliner/…) ──
+  // Theme System lux bespoke per sub-kategori toko. SATU lookup registry (bukan
+  // cabang if per tema). Reuse fetch products + composableContentFromSections;
+  // products mentah diteruskan untuk pencocokan tombol keranjang per item
   // (AtelierCartButton di-inject via slot supaya renderer bebas modul cart).
-  if (theme === 'toko-atelier') {
+  const bespoke = theme ? TOKO_BESPOKE[theme] : undefined
+  if (bespoke) {
     const [products, profile] = await Promise.all([
       fetchProductsByPage(client, page.id),
       fetchTenantProfile(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, 'Koleksi Kami',
+      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Koleksi Kami',
     )
+    const Renderer = bespoke.Renderer
     const renderer = (
-      <TokoAtelierRenderer
+      <Renderer
         content={content}
         variant={variant}
         primary={primary}
