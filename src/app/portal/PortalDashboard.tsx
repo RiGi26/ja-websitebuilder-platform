@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
-  FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette,
+  FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette, Lock,
 } from 'lucide-react'
+import { getAddon } from '@/lib/addons/catalog'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ImageUploadField from './ImageUploadField'
@@ -61,6 +62,7 @@ type Props = {
   hasGallery: boolean
   contentIsSample: boolean
   paymentStatus: PaymentStatus
+  paymentEntitled: boolean
   initialOrders: ShopOrderRow[]
   initialServices: Service[]
   initialBookings: BookingRow[]
@@ -75,7 +77,7 @@ type Props = {
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, contentIsSample, paymentStatus, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, contentIsSample, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
@@ -247,7 +249,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               <Store size={14} /> Profil
             </button>
             <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
-              <CreditCard size={14} /> Pembayaran
+              {paymentEntitled ? <CreditCard size={14} /> : <Lock size={14} />} Pembayaran
             </button>
           </div>
 
@@ -260,7 +262,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           ) : tab === 'tampilan' ? (
             <TampilanPanel initial={initialTampilan} />
           ) : tab === 'pembayaran' ? (
-            <PaymentPanel initial={paymentStatus} />
+            paymentEntitled ? <PaymentPanel initial={paymentStatus} /> : <PaymentLockedPanel namaTenant={namaTenant} />
           ) : tab === 'pesanan' ? (
             <OrdersPanel initial={initialOrders} />
           ) : tab === 'layanan' ? (
@@ -344,6 +346,47 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
 }
 
 // ── Panel konfigurasi pembayaran (Midtrans milik klien) ──────────
+// Tab Pembayaran TANPA add-on `midtrans` → panel terkunci + ajakan upgrade
+// (keputusan owner: terlihat tapi terkunci, bukan disembunyikan — jadi
+// channel upsell). API /api/portal/payment ikut menolak (403) — gate UI
+// ini bukan satu-satunya pagar.
+function PaymentLockedPanel({ namaTenant }: { namaTenant: string }) {
+  const addon = getAddon('midtrans')
+  const harga = `Rp ${(addon?.price ?? 400000).toLocaleString('id-ID')}`
+  const maint = `Rp ${(addon?.yearlyMaint ?? 150000).toLocaleString('id-ID')}`
+  const adminWa = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
+  const waText = encodeURIComponent(
+    `Halo Admin Japan Arena, saya ingin mengaktifkan add-on Payment Gateway (Midtrans) untuk website saya (${namaTenant}).`,
+  )
+  return (
+    <div className="bg-white rounded-[32px] p-10 apple-shadow border border-black/[0.03] text-center">
+      <div className="w-14 h-14 rounded-full bg-blue-50 text-apple-blue flex items-center justify-center mx-auto mb-5">
+        <Lock size={22} />
+      </div>
+      <p className="text-[11px] font-black uppercase tracking-widest text-apple-blue mb-2">Add-on Berbayar</p>
+      <h2 className="text-lg font-bold text-gray-900 mb-2">{addon?.name ?? 'Payment Gateway (Midtrans)'}</h2>
+      <p className="text-sm text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+        Terima pembayaran otomatis langsung di website Anda — QRIS, transfer bank, dan e-wallet.
+        Pembeli bayar, status pesanan terupdate sendiri, dana masuk ke rekening Anda.
+      </p>
+      <p className="text-sm font-bold text-gray-900 mt-4">
+        {harga}<span className="text-gray-400 font-medium"> aktivasi · {maint}/thn maintenance</span>
+      </p>
+      <a
+        href={`https://wa.me/${adminWa}?text=${waText}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 mt-6 px-8 h-12 rounded-full bg-[#0071E3] hover:bg-[#005BB5] text-white text-sm font-bold transition-colors active:scale-[0.96]"
+      >
+        Aktifkan via WhatsApp
+      </a>
+      <p className="text-[11px] text-gray-400 font-medium mt-4">
+        Fitur ini belum termasuk dalam paket Anda. Tim kami siap membantu aktivasi.
+      </p>
+    </div>
+  )
+}
+
 function PaymentPanel({ initial }: { initial: PaymentStatus }) {
   const [status, setStatus] = useState<PaymentStatus>(initial)
   const [serverKey, setServerKey] = useState('')
