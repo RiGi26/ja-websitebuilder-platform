@@ -13,6 +13,7 @@ import { capabilitiesForAddons } from '@/lib/addons/catalog'
 import { addonSectionBlueprints, mergeAddonSections } from '@/lib/addons/sections'
 import { getManifest } from '@/lib/theme-system/manifest'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
+import { TOKO_BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
 
 type OrderLike = {
   industri?: string | null
@@ -46,17 +47,17 @@ export function generateContent(order: OrderLike): BuildPlan {
     b.tipe === 'restaurant' &&
     (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-') || b.variant === 'lux-restaurant')
 
-  // Toko Fashion "Lux" = renderer bespoke TokoAtelierRenderer (flagship Atelier,
-  // theme 'toko-atelier'). Brief form menyimpan id 'atelier-noir'/'atelier-ivoire'
-  // di branding.variant → di-map ke varian renderer 'noir'/'ivoire'. Sub-kategori
-  // toko lain tetap composable (lux-toko). Mirror jalur isLux restaurant.
-  const ATELIER_VARIANT: Record<string, 'noir' | 'ivoire'> = {
-    'atelier-noir': 'noir',
-    'atelier-ivoire': 'ivoire',
-  }
-  const isAtelier =
-    b.tipe === 'toko_online' &&
-    (b.subKategori === 'fashion' || (b.variant ?? '').startsWith('atelier-'))
+  // FLAGSHIP bespoke toko (Toko Atelier/Kuliner/…) → renderer bespoke via theme
+  // key di registry SiteRenderer. Tabel TOKO_BESPOKE_VARIANTS (SSOT) memetakan id
+  // ThemeOption brief → { theme key, palet variant native, sample imagery }.
+  // Warna brand klien tetap jadi aksen via primary di renderer.
+  // Sub-kategori fashion tanpa variant dikenal → Atelier noir (paritas jalur
+  // isAtelier lama: fashion SELALU bespoke, tak boleh jatuh ke lux-toko).
+  const bespoke =
+    b.tipe === 'toko_online'
+      ? (b.variant ? TOKO_BESPOKE_VARIANTS[b.variant] : undefined) ??
+        (b.subKategori === 'fashion' ? TOKO_BESPOKE_VARIANTS['atelier-noir'] : undefined)
+      : undefined
 
   // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
   // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →
@@ -76,19 +77,20 @@ export function generateContent(order: OrderLike): BuildPlan {
     jastip: 'lux-jastip',
   }
 
-  const variant = isLux
-    ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
-    : isAtelier
-      ? ATELIER_VARIANT[b.variant ?? ''] ?? 'noir'
+  const variant = bespoke
+    ? bespoke.variant
+    : isLux
+      ? LUX_PALETTE[b.variant ?? ''] ?? 'aurum'
       : b.variant || LUX_DEFAULT[b.tipe] || defaultVariant(b.tipe)
   // Theme System: bila variant = id manifest composable (mis. 'kuliner-rustic'),
   // tandai theme 'composable' supaya SiteRenderer me-route ke ComposableRenderer.
-  // Fine Dining → 'restaurant-lux'; Fashion → 'toko-atelier'. Selain itu jalur lama.
-  const manifest = isLux || isAtelier ? null : getManifest(variant)
-  const theme = isLux
-    ? 'restaurant-lux'
-    : isAtelier
-      ? 'toko-atelier'
+  // Bespoke toko → theme key registry (mis. 'toko-atelier'/'toko-kuliner').
+  // Fine Dining → 'restaurant-lux'. Selain itu jalur lama (theme per industri).
+  const manifest = isLux || bespoke ? null : getManifest(variant)
+  const theme = bespoke
+    ? bespoke.theme
+    : isLux
+      ? 'restaurant-lux'
       : manifest
         ? 'composable'
         : industryToTheme(b.tipe)
@@ -113,10 +115,10 @@ export function generateContent(order: OrderLike): BuildPlan {
   // Imagery enrichment: composable pakai sample per manifest; Fine Dining bespoke
   // pinjam sample 'finedining' (foto hidangan terkurasi) supaya signature dishes &
   // hero tak kosong pada auto-build dummy.
-  const sample = isLux
-    ? sampleContentForTheme('finedining')
-    : isAtelier
-      ? sampleContentForTheme('toko-atelier')
+  const sample = bespoke
+    ? sampleContentForTheme(bespoke.sample)
+    : isLux
+      ? sampleContentForTheme('finedining')
       : manifest && variant
         ? sampleContentForTheme(variant)
         : null
