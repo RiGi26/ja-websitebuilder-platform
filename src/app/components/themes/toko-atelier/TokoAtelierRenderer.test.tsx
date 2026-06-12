@@ -79,6 +79,32 @@ describe('TokoAtelierRenderer', () => {
     expect(html).toContain('data-cat="Aksesori"')
   })
 
+  // Koleksi tipis (<3 item) → mode simetris: tanpa spread unggulan + tanpa
+  // stagger, supaya halaman tidak terlihat timpang/kosong sebelah kanan.
+  // Catatan: assert bentuk markup class="..." — nama kelas juga muncul di CSS string.
+  it('koleksi 2 item → grid duo simetris, TANPA spread unggulan', () => {
+    const c = { ...content, showcase: { ...content.showcase!, items: content.showcase!.items.slice(0, 2) } }
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={c} />)
+    expect(html).toContain('class="ta-look-grid ta-look-duo"')
+    expect(html).not.toContain('class="ta-look-feat ta-reveal"')
+    // kedua item tetap dirender sebagai kartu
+    expect((html.match(/class="ta-card ta-reveal"/g)?.length ?? 0)).toBe(2)
+  })
+
+  it('koleksi 1 item → grid solo terpusat', () => {
+    const c = { ...content, showcase: { ...content.showcase!, items: content.showcase!.items.slice(0, 1) } }
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={c} />)
+    expect(html).toContain('class="ta-look-grid ta-look-solo"')
+    expect(html).not.toContain('class="ta-look-feat ta-reveal"')
+  })
+
+  it('koleksi penuh (≥3) → editorial offset tak berubah (tanpa kelas duo/solo)', () => {
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
+    expect(html).toContain('class="ta-look-feat ta-reveal"')
+    expect(html).not.toContain('class="ta-look-grid ta-look-duo"')
+    expect(html).not.toContain('class="ta-look-grid ta-look-solo"')
+  })
+
   it('lightbox: dialog tunggal aksesibel + trigger quick-look ber-data', () => {
     const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
     expect(html.match(/role="dialog"/g)?.length).toBe(1)

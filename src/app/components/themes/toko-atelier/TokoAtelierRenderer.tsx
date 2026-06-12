@@ -178,6 +178,10 @@ function taCss(): string {
 .ta-look-feat-body>p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.75;max-width:44ch}
 .ta-look-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,30px);align-items:start}
 .ta-look-grid .ta-card:nth-child(3n+2){margin-top:52px}
+/* koleksi tipis (<3): simetris, tanpa stagger — editorial offset butuh koleksi penuh */
+.ta-look-duo{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,3.4vw,44px);max-width:920px;margin:0 auto}
+.ta-look-solo{grid-template-columns:minmax(0,1fr);max-width:520px;margin:0 auto}
+.ta-look-duo .ta-card:nth-child(3n+2),.ta-look-solo .ta-card:nth-child(3n+2){margin-top:0}
 .ta-card-media{position:relative;overflow:hidden;aspect-ratio:3/4;background:linear-gradient(160deg,var(--ta-surface),var(--ta-bg2))}
 .ta-card-media img{width:100%;height:100%;object-fit:cover;filter:grayscale(.85) contrast(1.02);transform:scale(1.01);transition:filter .7s ease,transform .95s ${EASE}}
 .ta-card:hover .ta-card-media img,.ta-card:focus-within .ta-card-media img{filter:grayscale(0) contrast(1);transform:scale(1.06)}
@@ -200,6 +204,8 @@ function taCss(): string {
 .ta-look-grid .ta-card{margin-top:0}
 .ta-look-grid .ta-card:nth-child(3n+2){margin-top:0}
 .ta-look-grid .ta-card:nth-child(2n){margin-top:36px}
+.ta-look-duo .ta-card:nth-child(2n),.ta-look-solo .ta-card:nth-child(2n){margin-top:0}
+.ta-look-solo{grid-template-columns:1fr}
 }
 /* ── statement ── */
 .ta-statement{background:var(--ta-bg2);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2)}
@@ -453,8 +459,11 @@ export default function TokoAtelierRenderer({
   const ghost = content.nama.trim().split(/\s+/)[0]
 
   // Lookbook: item pertama bergambar dipromosikan jadi spread unggulan.
+  // Koleksi tipis (<3 item) → mode simetris: tanpa spread + tanpa stagger,
+  // karena layout editorial offset terlihat timpang saat item sedikit.
   const items = (content.showcase?.items ?? []).slice(0, 12)
-  const feat = items.length > 0 && items[0].gambar ? items[0] : null
+  const sparse = items.length > 0 && items.length < 3
+  const feat = !sparse && items.length > 0 && items[0].gambar ? items[0] : null
   const rest = feat ? items.slice(1) : items
   const cats = Array.from(new Set(items.map((it) => it.kategori).filter((k): k is string => !!k)))
 
@@ -610,7 +619,7 @@ export default function TokoAtelierRenderer({
               )}
 
               {rest.length > 0 && (
-                <div className="ta-look-grid">
+                <div className={`ta-look-grid${sparse ? (rest.length === 1 ? ' ta-look-solo' : ' ta-look-duo') : ''}`}>
                   {rest.map((it, i) => (
                     <article className="ta-card ta-reveal" data-cat={it.kategori ?? ''} key={i} style={{ '--ta-d': `${(i % 3) * 90}ms` } as CSSProperties}>
                       <div className="ta-card-media">
