@@ -216,7 +216,8 @@ export const ADDON_CATALOG: AddonDef[] = [
     note: 'Kontak WA muncul via CTA section (template), bukan flag. Flag hasWhatsApp hanya dibaca RentalRenderer.',
   },
   {
-    id: 'seo', name: 'SEO Optimization', price: 200000, yearlyMaint: 100000,
+    // Harga diselaraskan dgn corp-landing (150k) — keputusan owner 2026-06-12.
+    id: 'seo', name: 'SEO Optimization', price: 150000, yearlyMaint: 100000,
     desc: 'Optimasi agar muncul di halaman 1 Google.',
     klass: 'capability', status: 'backend', features: ['hasSEO'], capability: ['seo'],
     note: 'Meta kemungkinan via generateMetadata [slug], bukan flag. Konfirmasi terpisah.',
@@ -330,15 +331,17 @@ const UPGRADE_PRICE: Record<string, [number, number]> = {
 // Merge-video (2026-06-09): live-session DIHAPUS sbg SKU → di-merge ke
 //   'video-meeting' (requires 'booking', bukan lms) shg tak lagi orphan; id lama
 //   jadi alias. telemedicine juga lebur ke video-meeting (lihat grup Booking).
-// 4 SKU "wire" (delivery/newsletter/career/ads-tracking) TETAP ditawarkan
-// (kapabilitasnya digarap Sprint B).
+// KEBIJAKAN BARU (owner, 2026-06-12 — kejujuran jualan): SKU ber-status
+//   'planned' TIDAK ditawarkan di order/upgrade sampai kapabilitasnya benar-benar
+//   dibangun (flip status → otomatis muncul lagi). Mencabut kebijakan lama
+//   "4 SKU wire tetap ditawarkan" — jangan jual yang belum ada kodenya.
 const NOT_OFFERED = new Set<string>([
   'protection', 'email-biz', 'client-portal',
   'lms', 'membership', 'cert-auto', 'lang-multi',
 ])
 
 export function isOffered(id: string): boolean {
-  return BY_ID[id] != null && !NOT_OFFERED.has(id)
+  return BY_ID[id] != null && !NOT_OFFERED.has(id) && BY_ID[id].status !== 'planned'
 }
 
 // Bentuk ringkas yang dikonsumsi UI order/marketplace (gantikan const ADDONS lokal).
