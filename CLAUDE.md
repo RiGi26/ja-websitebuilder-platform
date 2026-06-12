@@ -12,11 +12,12 @@ Website builder Japan Arena: customer order + bayar (Midtrans) → platform auto
 | Area | Dokumen |
 |---|---|
 | Roadmap teknis | `UPGRADE_PLAN.md` |
-| Sistem tema composable | `THEME_SYSTEM_PLAN.md` |
+| Sistem tema composable (LEGACY — arah produk = bespoke, keputusan owner 2026-06-12) | `THEME_SYSTEM_PLAN.md` |
 | Add-on (SSOT: `catalog.ts`) | `ADDON_ARCHITECTURE_PLAN.md` |
 | E-commerce klien (checkout/Midtrans tenant) | `PLAN_ECOMMERCE.md` |
 | Tema flagship Atelier | `FLAGSHIP_ATELIER_PLAN.md` |
-| Review visual tema | `THEME_VISUAL_PIPELINE.md` |
+| Review visual tema — gerbang bespoke = §7 | `THEME_VISUAL_PIPELINE.md` |
+| Identitas visual antar tema bespoke (anti-duplikat + pelajaran UAT) | `DESIGN_LEDGER.md` |
 | SOP build situs | `SOP_WEBSITE_BUILD_V2.md`, `SOP_CUSTOM_BUILD.md` |
 
 ## Alur kerja wajib
@@ -32,9 +33,11 @@ Website builder Japan Arena: customer order + bayar (Midtrans) → platform auto
 - Fitur / API / DB / multi-file = **PR** (jangan direct push). Hanya perubahan ≤3 baris non-logic yang boleh direct push ke `master`.
 - Setelah push: pantau CI + Vercel sampai **Ready/Error** — jangan lapor selesai saat masih Building.
 
-**Perubahan visual tema:**
-- Generate HTML sample (`npm run samples` — dijalankan user) untuk review sebelum lanjut ke tahap berikutnya. HTML saja, tanpa screenshot.
-- Tema baru wajib lolos `/ui-design` + `/make-interfaces-feel-better` + `/website-review` sebelum diaktifkan.
+**Perubahan visual tema (gerbang lengkap di THEME_VISUAL_PIPELINE.md §7):**
+- Tema bespoke baru: cek `DESIGN_LEDGER.md` saat DEFINE (font/hero/motif/signature tak boleh duplikat) + tambah baris ledger di PR tema yang sama.
+- Tema baru wajib lolos `/ui-design` + `/make-interfaces-feel-better` + `/website-review` (gerbang kode) **dan** gerbang pixel: `npm run shoot:chrome -- <id>` (Claude bisa jalankan + baca PNG sendiri; mode fold utk detail, `--full` utk komposisi) → scorecard §3.2, iterate ≤2×.
+- HTML sample tetap dikirim ke user untuk review final sebelum aktivasi (`npm run samples` user-run, atau runner tsc+node).
+- Temuan UAT visual → catat di `DESIGN_LEDGER.md` §Pelajaran + tanam aturannya di `design-rules/<mood>.md`/checklist terkait.
 - Ingat: perubahan renderer hanya berdampak ke **build baru** — situs klien lama tidak otomatis ter-rebuild.
 
 **Checklist UI sebelum PR:** ukuran image wajar, kontras teks (gray-400 → 600), `aria-label` pada button ikon, hierarki heading benar.

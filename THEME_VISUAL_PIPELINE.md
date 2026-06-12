@@ -4,6 +4,11 @@
 > (`ui-ux-pro-max`, Playwright visual-review) plug into the existing 7-step playbook (§5)
 > and 3-skill gate (§5.a) — to fix the recurring "UI kurang menarik" problem.
 > Disusun 2026-06-07.
+>
+> **⚠️ ERA BESPOKE (2026-06-12): baca §7 dulu.** Library 96 composable = legacy
+> (keputusan owner); pipeline ini kini menjadi **gerbang kelahiran setiap tema
+> BESPOKE baru**. §1–§6 tetap berlaku sebagai mekanika dasar; §7 mendefinisikan
+> scope baru + jalur capture yang bisa dijalankan agen secara mandiri + ledger.
 
 ---
 
@@ -195,3 +200,55 @@ DB → palet/pairing 9 gaya (kontras ≥4.5:1). Back: shoot 6 gaya ×3 viewport 
 - The §5.a 3-skill gate still runs (code lenses) **and** the pixel scorecard passes
   (the 4th lens, "terbukti").
 - Net cost stayed within §4 budget.
+
+---
+
+## 7. ERA BESPOKE (2026-06-12) — scope baru + jalur agen mandiri
+
+**Konteks:** owner memutuskan library 96 composable tidak dipakai sebagai arah produk
+(terlalu generik). Semua kerja tema = **bespoke renderer** (quality bar = Toko Atelier),
+1 tema/sub-kategori/sprint. Pipeline ini menjadi **gerbang wajib kelahiran tiap tema
+bespoke** — bukan alat audit library lama.
+
+### 7.1 Apa yang berubah dari §1–§6
+
+| Aspek | Dulu (composable) | Sekarang (bespoke) |
+|---|---|---|
+| Unit kerja | 3 gaya / sub-kategori | **1 tema** / sub-kategori (workflow owner 2026-06-11) |
+| Token store | `theme-packs.ts` | CSS vars di renderer tema (`--ta-*`, `--kl-*`, …) |
+| Generator HTML | `gen-samples.test.tsx` (vitest, user-run) | **+ runner tsc+node** (agen-mandiri): pola `scripts/gen-atelier-entry.tsx` + `scripts/run-gen.cjs` |
+| Capture | `npm run shoot` (Playwright, user-run) | **+ `npm run shoot:chrome`** (Chrome terpasang, agen-mandiri) |
+| Anti-duplikat | VARIASI antar 3 gaya | **`DESIGN_LEDGER.md`** — cek di DEFINE, tambah baris di PR tema |
+
+### 7.2 Loop agen-mandiri (terbukti end-to-end 2026-06-12 pada toko-atelier)
+
+```
+1. GEN    npx tsc -p scripts/tsconfig.gen-<tema>.json
+          node [.tmp-gen-<tema>/]scripts/gen-<tema>-entry.js   (alias @/ → pakai run-gen.cjs)
+2. SHOOT  npm run shoot:chrome -- <id>          → fold view 375/768/1440 (detail per-section)
+          npm run shoot:chrome -- <id> --full   → full-page overview (100vh dipatok 820px)
+3. READ   agen MEMBACA PNG → scorecard §3.2 (CRITICAL/HIGH wajib hijau)
+4. FIX    iterate ≤2× (batas §3.3), re-shoot hanya yang berubah
+```
+
+Catatan: `--full` untuk komposisi keseluruhan; **penilaian detail (kontras, typography,
+touch target) pakai mode fold** — gambar full-page ter-downscale saat dibaca agen.
+`npm run shoot` (Playwright) tetap ada untuk verifikasi user di mesin lokal.
+
+### 7.3 Urutan gerbang tiap sprint tema bespoke
+
+```
+DEFINE   riset arah unik → CEK DESIGN_LEDGER.md (font/hero/motif/signature belum terpakai)
+         → ui-ux-pro-max DB utk kandidat palet+pairing → kontrak design-rules/<mood>.md
+BUILD    renderer bespoke (+ mode sparse — pelajaran #132) + contrast self-test
+GATE-1   3-skill (kode): /ui-design + /make-interfaces-feel-better + /website-review
+GATE-2   pixel (§7.2): shoot → scorecard → iterate ≤2×
+LEDGER   tambah baris tema di DESIGN_LEDGER.md (dalam PR yang sama)
+REVIEW   HTML sample + screenshot ke owner → PR → CI → merge atas perintah owner
+```
+
+### 7.4 Loop pelajaran (UAT → aturan)
+
+Temuan visual/UX dari UAT atau order nyata → catat di `DESIGN_LEDGER.md`
+§Pelajaran **sekaligus** tanam aturannya di `design-rules/<mood>.md` / checklist
+brief / renderer. Pelajaran yang tidak ditanam = akan terulang.
