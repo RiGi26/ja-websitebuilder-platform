@@ -24,4 +24,6 @@ export const TOKO_BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // Kuliner — Toko Dapur (Tungku terang-hangat / Pamor gelap-heritage).
   'kuliner-tungku': { theme: 'toko-kuliner', variant: 'tungku', sample: 'kuliner-lux' },
   'kuliner-pamor': { theme: 'toko-kuliner', variant: 'pamor', sample: 'kuliner-lux' },
+  // Kerajinan — Tanah Loka (forest/parchment/bronze, kawung motif).
+  'kerajinan-tanah': { theme: 'toko-kerajinan', variant: 'tanah', sample: 'kerajinan-lux' },
 }

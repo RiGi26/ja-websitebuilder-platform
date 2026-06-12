@@ -8,6 +8,7 @@ import type { ComponentType } from 'react'
 import type { BespokeTokoProps } from './types'
 import TokoAtelierRenderer from '../toko-atelier/TokoAtelierRenderer'
 import KulinerLuxRenderer from './KulinerLuxRenderer'
+import KerajinanLuxRenderer from './KerajinanLuxRenderer'
 
 export interface BespokeEntry {
   Renderer: ComponentType<BespokeTokoProps>
@@ -18,4 +19,5 @@ export interface BespokeEntry {
 export const TOKO_BESPOKE: Record<string, BespokeEntry> = {
   'toko-atelier': { Renderer: TokoAtelierRenderer, showcaseTitle: 'Koleksi Kami' },
   'toko-kuliner': { Renderer: KulinerLuxRenderer, showcaseTitle: 'Menu Kami' },
+  'toko-kerajinan': { Renderer: KerajinanLuxRenderer, showcaseTitle: 'Koleksi Kerajinan' },
 }

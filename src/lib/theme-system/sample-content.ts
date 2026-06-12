@@ -350,6 +350,87 @@ const KULINER_LUX: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@dapurtungku.id', alamat: 'Yogyakarta' },
 }
 
+// ── Toko Kerajinan (FLAGSHIP bespoke lux — KerajinanLuxRenderer) ──
+// Sample dedikasi renderer 'toko-kerajinan' varian tanah. Konten tulis untuk
+// rangka lux: card-grid showcase, kawung story, statement artisan, stats buatan
+// tangan. JANGAN dipinjam tema composable lain.
+const KERAJINAN_LUX: ComposableContent = {
+  nama: 'Tanah Loka',
+  hero: {
+    eyebrow: 'Kerajinan Tangan Nusantara',
+    title: 'Karya Tangan yang Melampaui Waktu',
+    subtitle: 'Batik tulis, anyaman rotan, gerabah, dan ukiran kayu dari perajin terbaik Nusantara — tradisi yang dirawat, dipersembahkan untuk ruang modern.',
+    ctaText: 'Lihat Koleksi',
+    ctaHref: '#koleksi',
+    ctaText2: 'Kontak Sanggar',
+    ctaHref2: '#sanggar',
+    image: IMG('photo-1582738411706-bfc8e691d1c2'),
+  },
+  statement: {
+    eyebrow: 'Filosofi Sanggar',
+    quote: 'Tiap goresan canting adalah meditasi — bukan sekadar produksi. Kami tidak terburu-buru, karena karya tangan yang tulus tidak bisa dipercepat.',
+    cite: 'Mbak Sri — Pendiri Tanah Loka',
+  },
+  features: [
+    { title: 'Perajin Mitra', desc: '47 perajin dari Pekalongan, Jepara, Lombok, dan Kalimantan — tiap nama kami kenal, tiap karya bisa ditelusuri.' },
+    { title: 'Pewarna Alami', desc: 'Indigo, soga, mengkudu, dan kulit manggis — warna yang semakin matang bersama usia kain.' },
+    { title: 'Edisi Terbatas', desc: 'Tidak ada dua lembar yang identik persis. Ketidaksempurnaan kecil itu tanda karya manusia, bukan cacat.' },
+  ],
+  featuresEyebrow: 'Mengapa Tanah Loka',
+  featuresTitle: 'Kerajinan bukan suvenir — ini warisan yang hidup',
+  showcase: {
+    title: 'Koleksi Pilihan',
+    subtitle: 'Karya terpilih dari sanggar mitra kami.',
+    items: [
+      { nama: 'Batik Tulis Kawung Sutra', harga: 1250000, desc: 'Motif kawung keraton pada sutra premium. Dicanting 14 hari penuh.', gambar: IMG('photo-1582738411706-bfc8e691d1c2', 900) },
+      { nama: 'Gerabah Ukir Majapahit', harga: 480000, desc: 'Tanah liat pilihan, dibakar kayu jati. Relief motif Majapahit.', gambar: IMG('photo-1567016508124-4f849a7da43a', 900) },
+      { nama: 'Anyaman Rotan Lombok', harga: 350000, desc: 'Rotan lokal dikupas dan dianyam silang — kuat, ringan, rapi.', gambar: IMG('photo-1606744837616-56c9a5c6a6eb', 900) },
+      { nama: 'Topeng Wayang Panji', harga: 1800000, desc: 'Kayu pule, diukir tangan, dicat cat alam campuran. Koleksi sanggar.', gambar: IMG('photo-1519941583-fb59de7c67a5', 900) },
+      { nama: 'Tenun Ikat Sumba', harga: 950000, desc: 'Pewarna alami, motif kuda sumba. Ditenun 3 minggu.', gambar: IMG('photo-1610701596007-11502861dcfa', 900) },
+      { nama: 'Ukiran Kayu Jepara', harga: 780000, desc: 'Kayu jati tua, motif sulur daun. Satu blok solid tanpa sambungan.', gambar: IMG('photo-1526170375885-4d8ecf77b99f', 900) },
+    ],
+  },
+  about: {
+    title: 'Sanggar Tanah Loka',
+    body: 'Tanah Loka berawal dari perjalanan Sri Rahayu ke pelosok Pekalongan, 2011. Di sana ia bertemu perajin batik yang karya-karyanya tidak pernah menemukan pasar yang layak.\n\nSejak itu misi Tanah Loka sederhana: menjadi jembatan antara tangan perajin dan tangan pembeli — tanpa perantara yang memangkas harga, tanpa kemasan yang merendahkan nilai.',
+    image: IMG('photo-1528459801416-a9e53bbf4e17'),
+    ctaText: 'Kunjungi Sanggar',
+    ctaHref: '#sanggar',
+  },
+  cta: {
+    title: 'Miliki Satu Karya, Dukung Satu Perajin',
+    subtitle: 'Setiap pembelian langsung mendukung keluarga perajin mitra kami.',
+    ctaText: 'Hubungi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '47', label: 'Perajin mitra' },
+    { angka: '12 thn', label: 'Melestarikan' },
+    { angka: '4.9', label: 'Rating' },
+    { angka: '100%', label: 'Buatan tangan' },
+  ],
+  testimonials: [
+    { quote: 'Batik tulisnya beda kelas. Terasa bedanya dari yang printing — aura dan teksturnya benar-benar lain.', nama: 'Ibu Dewi', peran: 'Kolektor batik' },
+    { quote: 'Anyaman rotannya rapi dan kuat. Sudah 2 tahun dipakai, tidak ada yang copot. Layak harganya.', nama: 'Mas Bayu', peran: 'Interior designer' },
+    { quote: 'Dikemas sangat cantik, disertakan kartu cerita perajin. Hadiah yang berkesan untuk siapapun.', nama: 'Nadia K.', peran: 'Pelanggan' },
+    { quote: 'Akhirnya ketemu tempat yang jual kerajinan asli. Motif dan pewarnanya benar-benar autentik.', nama: 'Prof. Santoso', peran: 'Pengamat budaya' },
+  ],
+  faq: [
+    { q: 'Apakah ini kerajinan buatan tangan asli?', a: 'Ya, seluruh koleksi dibuat manual oleh perajin mitra kami. Setiap karya dilengkapi kartu identitas perajin.' },
+    { q: 'Bisakah pesan motif khusus?', a: 'Bisa — untuk batik tulis dan ukiran kayu tersedia pesanan khusus dengan waktu pengerjaan 3–6 minggu tergantung kompleksitas.' },
+    { q: 'Bagaimana merawat batik tulis?', a: 'Cuci dengan lerak atau deterjen lembut khusus batik, jangan diperas, jemur di tempat teduh jauh dari sinar matahari langsung.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '09.00–17.00' },
+      { hari: 'Minggu', jam: 'Appointment' },
+    ],
+    alamat: 'Jl. Malioboro, Yogyakarta',
+    mapsQuery: 'Malioboro Yogyakarta',
+  },
+  contact: { wa: '6281296917963', email: 'halo@tanahloka.id', alamat: 'Yogyakarta, DI Yogyakarta' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2215,6 +2296,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   // Bespoke lux kuliner (KulinerLuxRenderer) — sample dedikasi kaya (menu-board,
   // galeri proses, statement). Dipakai gen-samples + imagery-borrow generateContent.
   'kuliner-lux': KULINER_LUX,
+  // Bespoke lux kerajinan (KerajinanLuxRenderer) — sample dedikasi card-grid artisan.
+  'kerajinan-lux': KERAJINAN_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
