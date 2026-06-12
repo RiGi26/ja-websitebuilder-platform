@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "samples": "cross-env GEN_SAMPLES=all vitest run src/lib/theme-system/gen-samples.test.tsx",
-    "shoot": "node scripts/shoot-themes.mjs"
+    "shoot": "node scripts/shoot-themes.mjs",
+    "shoot:chrome": "node scripts/shoot-chrome.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.3",
