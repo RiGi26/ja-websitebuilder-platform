@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
+import { paymentEntitled } from '@/lib/addons/portal-tabs'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 import type { EditableSection } from './ContentPanel'
@@ -52,6 +53,9 @@ export default async function PortalPage() {
   const contentIsSample = !!konfig.content_is_sample
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
+  // Tab Pembayaran = add-on `midtrans` (flag hasPayment); tenant yang sudah
+  // terlanjur konfigurasi di-grandfather (lihat lib/addons/portal-tabs).
+  const hasPaymentTab = paymentEntitled(konfig.features, paymentStatus.configured)
 
   // Pesanan masuk (toko) — terbaru dulu, dengan item-nya.
   let shopOrders: ShopOrderRow[] = []
@@ -129,6 +133,7 @@ export default async function PortalPage() {
       hasGallery={hasGallery}
       contentIsSample={contentIsSample}
       paymentStatus={paymentStatus}
+      paymentEntitled={hasPaymentTab}
       initialOrders={shopOrders}
       initialServices={services}
       initialBookings={bookings}
