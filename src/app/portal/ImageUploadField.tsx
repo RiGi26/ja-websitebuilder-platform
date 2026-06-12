@@ -7,7 +7,7 @@ import { Loader2, Upload, Image as ImageIcon, X } from 'lucide-react'
 // ATAU tempel URL (fallback). Mengganti input URL polos di seluruh panel portal.
 export default function ImageUploadField({
   value, onChange, label, compact = false,
-  uploadUrl = '/api/portal/upload', extraFields,
+  uploadUrl = '/api/portal/upload', extraFields, hidePreview = false,
 }: {
   value: string
   onChange: (url: string) => void
@@ -18,6 +18,9 @@ export default function ImageUploadField({
   uploadUrl?: string
   /** Field tambahan di-append ke FormData (mis. { token } untuk briefing). */
   extraFields?: Record<string, string>
+  /** Sembunyikan thumbnail kecil (pemanggil merender preview-nya sendiri,
+   *  mis. HeroImageField dengan grid titik fokus). */
+  hidePreview?: boolean
 }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -69,7 +72,7 @@ export default function ImageUploadField({
           )}
           {err && <p className="text-[11px] text-red-500">{err}</p>}
         </div>
-        {thumb}
+        {!hidePreview && thumb}
       </div>
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = '' }} />

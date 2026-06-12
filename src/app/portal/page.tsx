@@ -24,7 +24,7 @@ export default async function PortalPage() {
 
   const { data: page } = await supabaseAdmin
     .from('landing_pages')
-    .select('id, nama_website, slug, status, tipe_industri, konfigurasi')
+    .select('id, nama_website, slug, status, tipe_industri, konfigurasi, data_konten')
     .eq('tenant_id', tenantId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -38,6 +38,12 @@ export default async function PortalPage() {
   }
 
   const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean>; content_is_sample?: boolean }
+  // Tab Tampilan — foto hero + titik fokus dari data_konten (whitelist).
+  const dataKonten = (page?.data_konten ?? {}) as Record<string, unknown>
+  const initialTampilan = {
+    foto_hero: typeof dataKonten.foto_hero === 'string' ? dataKonten.foto_hero : '',
+    foto_hero_focus: typeof dataKonten.foto_hero_focus === 'string' ? dataKonten.foto_hero_focus : '',
+  }
   const hasShop = !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
   const hasMenu = !!konfig.features?.hasMenu
@@ -131,6 +137,7 @@ export default async function PortalPage() {
       initialGallery={gallery}
       initialProfile={profile}
       initialSections={sections}
+      initialTampilan={initialTampilan}
     />
   )
 }
