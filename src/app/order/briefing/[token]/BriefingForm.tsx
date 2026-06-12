@@ -10,6 +10,7 @@ import SubKategoriPicker from './SubKategoriPicker'
 import ThemePicker from './ThemePicker'
 import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
 import ImageUploadField from '@/app/portal/ImageUploadField'
+import HeroImageField from '@/app/portal/HeroImageField'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
@@ -122,48 +123,6 @@ interface Props {
   email: string
   industri: string
   selectedAddons: string[]
-}
-
-// Pemilih titik fokus foto hero (3×3). Foto hero dirender "cover" (mengisi penuh)
-// sehingga sebagian terpotong; customer memilih bagian yang HARUS selalu terlihat.
-// value = CSS position "x% y%" (dipakai background/object-position di renderer).
-function HeroFocusPicker({ image, value, onChange }: { image: string; value: string; onChange: (pos: string) => void }) {
-  const cur = value || '50% 50%'
-  const positions = [
-    '0% 0%', '50% 0%', '100% 0%',
-    '0% 50%', '50% 50%', '100% 50%',
-    '0% 100%', '50% 100%', '100% 100%',
-  ]
-  return (
-    <div className="mt-3">
-      <p className="text-[11px] text-gray-400 font-medium mb-1.5">Titik fokus foto — klik bagian yang ingin selalu terlihat</p>
-      <div
-        className="relative w-full max-w-[260px] rounded-[14px] overflow-hidden border border-black/10 bg-gray-100"
-        style={{ aspectRatio: '16 / 9', backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: cur }}
-      >
-        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
-          {positions.map((pos) => (
-            <button
-              key={pos}
-              type="button"
-              aria-label={`Fokus ${pos}`}
-              aria-pressed={cur === pos}
-              onClick={() => onChange(pos)}
-              className="group flex items-center justify-center hover:bg-black/10 transition-colors"
-            >
-              <span
-                className={`w-3 h-3 rounded-full border-2 shadow transition-transform ${
-                  cur === pos
-                    ? 'bg-white border-[#0071E3] scale-125'
-                    : 'bg-white/25 border-white/70 group-hover:bg-white/60'
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
 }
 
 export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri }: Props) {
@@ -849,15 +808,14 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               <ImageUploadField value={form.logo_url} onChange={(url) => set('logo_url', url)} {...uploadProps} />
             </Field>
             <Field label="Foto Hero / Background Website">
-              <ImageUploadField value={form.foto_hero} onChange={(url) => set('foto_hero', url)} {...uploadProps} />
+              <HeroImageField
+                value={form.foto_hero}
+                focus={form.foto_hero_focus}
+                onChange={(url) => set('foto_hero', url)}
+                onFocusChange={(pos) => set('foto_hero_focus', pos)}
+                {...uploadProps}
+              />
               <p className="text-[11px] text-gray-400 font-medium mt-1">Foto utama yang tampil besar di bagian atas website. Kosongkan untuk pakai contoh.</p>
-              {form.foto_hero && (
-                <HeroFocusPicker
-                  image={form.foto_hero}
-                  value={form.foto_hero_focus}
-                  onChange={(pos) => set('foto_hero_focus', pos)}
-                />
-              )}
             </Field>
             <Field label="Referensi Website yang Disukai">
               <input className={inputCls} value={form.referensi_website} onChange={e => set('referensi_website', e.target.value)} placeholder="https://contoh.com" />
