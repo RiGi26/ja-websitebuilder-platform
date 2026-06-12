@@ -17,6 +17,7 @@ import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer
 import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
 import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
 import KulinerLuxRenderer from '@/app/components/themes/toko-bespoke/KulinerLuxRenderer'
+import KerajinanLuxRenderer from '@/app/components/themes/toko-bespoke/KerajinanLuxRenderer'
 import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
@@ -43,6 +44,8 @@ const LUX: Record<string, BespokeEntry> = {
   // FLAGSHIP lux kuliner (KulinerLuxRenderer) — 2 varian art-direction.
   'kuliner-tungku': { sample: 'kuliner-lux', variant: 'tungku', label: 'Toko Kuliner — Tungku (terang hangat)', sw: '#A8381A', Renderer: KulinerLuxRenderer },
   'kuliner-pamor': { sample: 'kuliner-lux', variant: 'pamor', label: 'Toko Kuliner — Pamor (gelap heritage)', sw: '#C9A24A', Renderer: KulinerLuxRenderer },
+  // FLAGSHIP lux kerajinan (KerajinanLuxRenderer) — Tanah Loka heritage artisan.
+  'kerajinan-tanah': { sample: 'kerajinan-lux', variant: 'tanah', label: 'Toko Kerajinan — Tanah Loka (batik & wastra heritage)', sw: '#1E3A2F', Renderer: KerajinanLuxRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES

@@ -54,7 +54,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
   toko_online: [
     { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: true },
     { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
-    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: false },
+    { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: true },
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
     { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
@@ -173,19 +173,9 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
     // ── KERAJINAN / HERITAGE ×3 (flagship) — motif & tekstur ──────
     kerajinan: [
       {
-        id: 'kerajinan-pusaka', subKategori: 'kerajinan', nama: 'Pusaka',
-        deskripsi: 'Gelap mewah dengan motif kawung emas. Untuk batik tulis, songket, koleksi warisan.',
-        icon: 'Gem', mood: '#C8922A', bg: 'dark', manifest: 'kerajinan-pusaka',
-      },
-      {
-        id: 'kerajinan-tenun', subKategori: 'kerajinan', nama: 'Tenun',
-        deskripsi: 'Hangat bertekstur anyaman, terasa buatan tangan. Untuk tenun, rotan, gerabah, anyaman.',
-        icon: 'Grid2x2', mood: '#A8512C', bg: 'warm', manifest: 'kerajinan-tenun',
-      },
-      {
-        id: 'kerajinan-galeri', subKategori: 'kerajinan', nama: 'Galeri',
-        deskripsi: 'Terang & lapang seperti galeri seni. Untuk ukiran, keramik, karya yang ingin menonjol.',
-        icon: 'Frame', mood: '#8A6D3B', bg: 'light', manifest: 'kerajinan-galeri',
+        id: 'kerajinan-tanah', subKategori: 'kerajinan', nama: 'Tanah Loka',
+        deskripsi: 'Heritage botanical — motif kawung, palet hutan dan perkamen. Untuk batik tulis, tenun, anyaman, ukiran.',
+        icon: 'Palette', mood: '#1E3A2F', bg: 'dark', manifest: 'toko-kerajinan',
       },
     ],
 
