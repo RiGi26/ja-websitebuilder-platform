@@ -42,6 +42,14 @@ export async function POST(request: Request) {
     }
     const gross = price.gross
     const serverMaintenance = price.maintenance ?? (Number(total_maintenance) || 0)
+    // Fidelity fulfillment: simpan add-on MENTAH dari kalkulator corp. Add-on
+    // "manual" (g-sheets/invoice-auto/api/email-auto) tak punya SKU WB → ke-drop
+    // dari selected_addons saat mapping, padahal sudah ditagih. Disimpan di sini
+    // supaya tim tetap melihatnya. Null utk order non-kalkulator.
+    const requestedAddons =
+      (from_kalkulator || paket) && kalkulator_addons
+        ? String(kalkulator_addons).split(',').map((s: string) => s.trim()).filter(Boolean)
+        : null
     const claimedGross = Number(total_estimasi) || 0
     if (claimedGross !== gross) {
       console.warn(
@@ -73,7 +81,8 @@ export async function POST(request: Request) {
         nama_pic: client_type === 'perusahaan' ? nama_pic : null,
         jabatan: client_type === 'perusahaan' ? jabatan : null,
         nomor_wa, email, industri, template_id, referensi_manual,
-        selected_addons, total_estimasi: netTotal, total_maintenance: serverMaintenance,
+        selected_addons, requested_addons: requestedAddons,
+        total_estimasi: netTotal, total_maintenance: serverMaintenance,
         status: 'pending_payment',
         payment_status: 'unpaid',
         type: 'new',
