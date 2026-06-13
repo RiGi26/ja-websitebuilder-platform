@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { BespokeTokoProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
@@ -44,20 +44,23 @@ function krCss(): string {
 
 /* NAV */
 .kr-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 5vw;display:flex;align-items:center;justify-content:space-between;transition:background .35s,box-shadow .35s}
-.kr-nav.scrolled{background:var(--kr-bg);box-shadow:0 1px 0 var(--kr-line)}
+.kr-root.lx-scrolled .kr-nav{background:var(--kr-bg);box-shadow:0 1px 0 var(--kr-line)}
 .kr-nav-logo{font-family:${DISPLAY};font-weight:700;letter-spacing:.05em;color:var(--kr-onAccent);font-size:1rem;text-decoration:none}
-.kr-nav.scrolled .kr-nav-logo{color:var(--kr-ink)}
+.kr-root.lx-scrolled .kr-nav-logo{color:var(--kr-ink)}
 .kr-nav-cta{background:var(--kr-gold);color:var(--kr-scrim);font-family:${BODY};font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.25rem;border-radius:2px;text-decoration:none;transition:opacity .2s}
 .kr-nav-cta:hover{opacity:.85}
-.kr-nav.scrolled .kr-nav-cta{background:var(--kr-accent);color:var(--kr-onAccent)}
+.kr-root.lx-scrolled .kr-nav-cta{background:var(--kr-accent);color:var(--kr-onAccent)}
+.lx-sentinel{position:absolute;top:0;left:0;width:1px;height:120px;opacity:0;pointer-events:none}
 
 /* HERO */
-.kr-hero{min-height:100svh;background:var(--kr-accent);background-image:url('${KW_DARK}');background-size:160px 160px;display:grid;grid-template-columns:55% 45%;align-items:center;padding-top:5rem}
+.kr-hero{position:relative;min-height:100svh;background:var(--kr-accent);background-image:url('${KW_DARK}');background-size:160px 160px;display:grid;grid-template-columns:55% 45%;align-items:center;padding-top:5rem}
 .kr-hero-text{padding:4rem 2rem 4rem 5vw}
 .kr-hero-ew{font-family:${BODY};font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--kr-gold);margin-bottom:1.25rem}
 .kr-hero-title{font-family:${DISPLAY};font-size:clamp(2.2rem,4.5vw,4rem);font-weight:700;line-height:1.1;color:var(--kr-onAccent);margin-bottom:1.25rem;letter-spacing:-.01em}
-.kr-hero-title span{display:inline;opacity:0;transform:translateY(.35em);transition:opacity .5s ${EASE},transform .5s ${EASE}}
-.kr-hero-title span.vis{opacity:1;transform:none}
+/* Stagger kata via CSS animation murni (base = TAMPIL): hidup di sample statis
+   tanpa hydration, dan freeze/no-anim jatuh ke keadaan terlihat. */
+.kr-hero-title span{display:inline;opacity:1;animation:krFade .55s ${EASE} both;animation-delay:var(--kr-d,0ms)}
+@keyframes krFade{from{opacity:0}to{opacity:1}}
 .kr-hero-sub{font-size:1rem;color:var(--kr-onAccent);opacity:.78;margin-bottom:2rem;max-width:42ch;line-height:1.75}
 .kr-hero-btns{display:flex;gap:.75rem;flex-wrap:wrap}
 .kr-btn-primary{background:var(--kr-gold);color:var(--kr-scrim);font-family:${BODY};font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.85rem 1.75rem;border-radius:2px;text-decoration:none;transition:opacity .2s}
@@ -175,7 +178,8 @@ function krCss(): string {
 .kr-cta-ghost:hover{border-color:rgba(247,240,227,.6)}
 
 /* FOOTER */
-.kr-band{background:var(--kr-surface);border-top:1px solid var(--kr-line);border-bottom:1px solid var(--kr-line);padding:3.5rem 5vw;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem}
+.kr-band{background:var(--kr-surface);background-image:url('${KW_LIGHT}');background-size:160px 160px;border-top:1px solid rgba(200,150,42,.45);border-bottom:1px solid var(--kr-line);padding:3.5rem 5vw;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem}
+.kr-band-ew{font-family:${BODY};font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--kr-gold);margin-bottom:.6rem}
 .kr-band .kr-heading{font-size:clamp(1.5rem,2.4vw,2.1rem)}
 .kr-band-sub{color:var(--kr-muted);font-size:.95rem;line-height:1.7;margin-top:.6rem;max-width:56ch}
 .kr-footer{background:var(--kr-inkDim);color:var(--kr-onAccent);padding:3.5rem 5vw 2rem}
@@ -188,9 +192,12 @@ function krCss(): string {
 .kr-footer-copy{border-top:1px solid rgba(247,240,227,.1);padding-top:1.5rem;font-size:.75rem;color:var(--kr-onAccent);opacity:.38;text-align:center}
 @media(max-width:768px){.kr-footer-grid{grid-template-columns:1fr;gap:2rem}}
 
-/* REVEAL */
-.kr-rv{opacity:0;transform:translateY(18px);transition:opacity .6s ${EASE},transform .6s ${EASE}}
-.kr-rv.vis{opacity:1;transform:none}
+/* REVEAL — via primitive LUX_JS (.lx-reveal → .lx-in), digate .lx-js sesuai
+   kontrak lux-script: tanpa JS / sample statis = konten tampil penuh.
+   (Dulu React IntersectionObserver + .kr-rv tanpa gate → halaman kosong di
+   sample statis; pelajaran DESIGN_LEDGER.) */
+.lx-js .kr-rv{opacity:0;transform:translateY(18px);transition:opacity .6s ${EASE},transform .6s ${EASE}}
+.lx-js .kr-rv.lx-in{opacity:1;transform:none}
 .kr-rv-d1{transition-delay:.08s}.kr-rv-d2{transition-delay:.16s}.kr-rv-d3{transition-delay:.24s}
 
 /* LIGHTBOX — kr-root overrides for lx-lb palette */
@@ -220,29 +227,11 @@ const MQ_ITEMS = ['BATIK TULIS', 'TENUN IKAT', 'GERABAH', 'ANYAMAN ROTAN', 'UKIR
 
 export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: BespokeTokoProps) {
   const p = PALETTES[variant] ?? PALETTES.tanah
-  const [scrolled, setScrolled] = useState(false)
-  const [titleVis, setTitleVis] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', h, { passive: true })
-    return () => window.removeEventListener('scroll', h)
-  }, [])
-
-  useEffect(() => {
-    const t = setTimeout(() => setTitleVis(true), 250)
-    return () => clearTimeout(t)
-  }, [])
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('vis') }),
-      { threshold: 0.12 },
-    )
-    document.querySelectorAll('.kr-rv').forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
-  }, [])
+  // Reveal/nav/title TIDAK lagi via React state — pakai primitive LUX_JS
+  // (.lx-reveal + .lx-sentinel) & CSS animation murni supaya hidup di sample
+  // statis tanpa hydration DAN aman no-JS (kontrak lux-script.ts).
 
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#wa'
@@ -267,18 +256,19 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       <style dangerouslySetInnerHTML={{ __html: krCss() }} />
 
       {/* NAV */}
-      <nav className={`kr-nav${scrolled ? ' scrolled' : ''}`} aria-label="Navigasi utama">
+      <nav className="kr-nav" aria-label="Navigasi utama">
         <span className="kr-nav-logo">{c.nama ?? 'Tanah Loka'}</span>
         <a href={waUrl} className="kr-nav-cta">Hubungi Kami</a>
       </nav>
 
       {/* HERO */}
       <section className="kr-hero" id="beranda" aria-label="Hero">
+        <span className="lx-sentinel" aria-hidden />
         <div className="kr-hero-text">
           {hero.eyebrow && <p className="kr-hero-ew">{hero.eyebrow}</p>}
           <h1 className="kr-hero-title" aria-label={hero.title}>
             {words.map((w, i) => (
-              <span key={i} className={titleVis ? 'vis' : ''} style={{ transitionDelay: `${i * 75}ms` }}>
+              <span key={i} style={{ '--kr-d': `${250 + i * 75}ms` } as React.CSSProperties}>
                 {w}{' '}
               </span>
             ))}
@@ -323,14 +313,14 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {(c.features?.length ?? 0) > 0 && (
         <section className="kr-section kr-features" id="keunggulan">
           {(c.featuresEyebrow || c.featuresTitle) && (
-            <div className="kr-sec-hdr kr-rv">
+            <div className="kr-sec-hdr kr-rv lx-reveal">
               {c.featuresEyebrow && <p className="kr-eyebrow">{c.featuresEyebrow}</p>}
               {c.featuresTitle && <h2 className="kr-heading">{c.featuresTitle}</h2>}
             </div>
           )}
           <div className="kr-feat-grid">
             {c.features!.map((f, i) => (
-              <div key={i} className={`kr-feat kr-rv kr-rv-d${i + 1}`}>
+              <div key={i} className={`kr-feat kr-rv lx-reveal kr-rv-d${i + 1}`}>
                 <div className="kr-feat-num">0{i + 1}</div>
                 <h3 className="kr-feat-title">{f.title}</h3>
                 <p className="kr-feat-desc">{f.desc}</p>
@@ -342,7 +332,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
 
       {/* STATEMENT */}
       {c.statement && (
-        <div className="kr-statement kr-rv">
+        <div className="kr-statement kr-rv lx-reveal">
           {c.statement.eyebrow && <p className="kr-stmt-ew">{c.statement.eyebrow}</p>}
           <blockquote className="kr-stmt-quote">"{c.statement.quote}"</blockquote>
           {c.statement.cite && <cite className="kr-stmt-cite">— {c.statement.cite}</cite>}
@@ -352,7 +342,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {/* SHOWCASE */}
       {items.length > 0 && (
         <section className="kr-section kr-showcase" id="koleksi">
-          <div className="kr-sec-hdr kr-rv">
+          <div className="kr-sec-hdr kr-rv lx-reveal">
             <p className="kr-eyebrow">Koleksi</p>
             {c.showcase?.title && <h2 className="kr-heading">{c.showcase.title}</h2>}
             {c.showcase?.subtitle && <p className="kr-subtext">{c.showcase.subtitle}</p>}
@@ -361,7 +351,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
             {items.map((item, i) => (
               <article
                 key={i}
-                className={`kr-card lx-lb-open kr-rv${i === 0 ? ' kr-card-feat' : ''}`}
+                className={`kr-card lx-lb-open kr-rv lx-reveal${i === 0 ? ' kr-card-feat' : ''}`}
                 style={{ transitionDelay: `${(i % 3) * 0.08}s` }}
                 data-src={item.gambar ?? ''}
                 data-title={item.nama}
@@ -393,7 +383,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {c.about && (
         <section className="kr-section kr-about" id="sanggar">
           <div className="kr-about-inner">
-            <div className="kr-rv">
+            <div className="kr-rv lx-reveal">
               <p className="kr-eyebrow">Sanggar</p>
               <h2 className="kr-heading">{c.about.title}</h2>
               <p className="kr-about-body">{c.about.body}</p>
@@ -404,7 +394,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
               )}
             </div>
             {c.about.image && (
-              <div className="kr-about-img kr-rv kr-rv-d2">
+              <div className="kr-about-img kr-rv lx-reveal kr-rv-d2">
                 <div className="kr-about-frame">
                   <img src={c.about.image} alt={c.about.title} loading="lazy" />
                 </div>
@@ -420,7 +410,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
         <section className="kr-section kr-stats">
           <div className="kr-stats-grid">
             {stats.map((s, i) => (
-              <div key={i} className={`kr-rv kr-rv-d${i + 1}`} style={{ textAlign: 'center' }}>
+              <div key={i} className={`kr-rv lx-reveal kr-rv-d${i + 1}`} style={{ textAlign: 'center' }}>
                 <div className="kr-stat-num">{s.angka}</div>
                 <div className="kr-stat-label">{s.label}</div>
               </div>
@@ -432,7 +422,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {/* TESTIMONIALS */}
       {testimonials.length > 0 && (
         <section className="kr-section kr-testimonials" id="ulasan">
-          <div className="kr-sec-hdr kr-rv">
+          <div className="kr-sec-hdr kr-rv lx-reveal">
             <p className="kr-eyebrow">Ulasan</p>
             <h2 className="kr-heading">Kata Mereka</h2>
           </div>
@@ -454,7 +444,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {/* FAQ */}
       {faqs.length > 0 && (
         <section className="kr-section kr-faq" id="faq">
-          <div className="kr-sec-hdr kr-rv">
+          <div className="kr-sec-hdr kr-rv lx-reveal">
             <p className="kr-eyebrow">Pertanyaan</p>
             <h2 className="kr-heading">Sering Ditanyakan</h2>
           </div>
@@ -495,6 +485,7 @@ export default function KerajinanLuxRenderer({ content: c, variant = 'tanah' }: 
       {(c.bands ?? []).map((b, i) => (
         <section className="kr-band" data-band={b.preset} key={`${b.preset}-${i}`}>
           <div>
+            <p className="kr-band-ew">{b.preset === 'career' ? 'Karier' : b.preset === 'newsletter' ? 'Buletin' : 'Info'}</p>
             <h2 className="kr-heading">{b.title}</h2>
             {b.subtitle && <p className="kr-band-sub">{b.subtitle}</p>}
           </div>
