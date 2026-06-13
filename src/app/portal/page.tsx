@@ -2,10 +2,11 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
-import { paymentEntitled } from '@/lib/addons/portal-tabs'
-import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
+import { paymentEntitled, themeContentTabs, kontenBrandEditable } from '@/lib/addons/portal-tabs'
+import type { KonfigurasiWebsite, Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 import type { EditableSection } from './ContentPanel'
+import type { KontenBrandData } from './KontenBrandPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +39,7 @@ export default async function PortalPage() {
     products = (data ?? []) as Product[]
   }
 
-  const konfig = (page?.konfigurasi ?? {}) as { features?: Record<string, boolean>; content_is_sample?: boolean }
+  const konfig = (page?.konfigurasi ?? {}) as KonfigurasiWebsite
   // Tab Tampilan — foto hero + titik fokus dari data_konten (whitelist).
   const dataKonten = (page?.data_konten ?? {}) as Record<string, unknown>
   const initialTampilan = {
@@ -51,6 +52,40 @@ export default async function PortalPage() {
   const hasBlog = !!konfig.features?.hasBlog
   const hasGallery = !!konfig.features?.hasGallery
   const contentIsSample = !!konfig.content_is_sample
+
+  // Tab konten yang HARUS terbuka karena tema situs merender datanya tanpa
+  // syarat add-on (bespoke/lux) — OR dengan flag add-on. Pesanan/Reservasi
+  // (transaksi) tetap murni di-gate flag add-on.
+  const themeTabs = themeContentTabs(konfig.branding, page?.tipe_industri)
+  const showProduk = hasShop || themeTabs.produk
+  const showLayanan = hasBooking || themeTabs.layanan
+  const showMenu = hasMenu || themeTabs.menu
+  const showBlog = hasBlog || themeTabs.blog
+  const showGallery = hasGallery || themeTabs.galeri
+
+  // Konten brand (stats/faq/statement) — editable hanya untuk tema yang
+  // membacanya dari data_konten (bespoke/lux/composable).
+  const brandFlags = kontenBrandEditable(konfig.branding)
+  const sstr = (v: unknown) => (typeof v === 'string' ? v : '')
+  const rawStatement = dataKonten.statement as Record<string, unknown> | null | undefined
+  const initialKontenBrand: KontenBrandData = {
+    flags: brandFlags,
+    stats: Array.isArray(dataKonten.stats)
+      ? (dataKonten.stats as unknown[])
+          .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+          .map((r) => ({ angka: sstr(r.angka), label: sstr(r.label) }))
+          .slice(0, 4)
+      : [],
+    faq: Array.isArray(dataKonten.faq)
+      ? (dataKonten.faq as unknown[])
+          .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+          .map((r) => ({ q: sstr(r.q), a: sstr(r.a) }))
+          .slice(0, 10)
+      : [],
+    statement: rawStatement && typeof rawStatement === 'object'
+      ? { eyebrow: sstr(rawStatement.eyebrow), quote: sstr(rawStatement.quote), cite: sstr(rawStatement.cite) }
+      : { eyebrow: '', quote: '', cite: '' },
+  }
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
   // Tab Pembayaran = add-on `midtrans` (flag hasPayment); tenant yang sudah
@@ -69,21 +104,23 @@ export default async function PortalPage() {
     shopOrders = (data ?? []) as ShopOrderRow[]
   }
 
-  // Layanan + reservasi (booking) — kalau fitur booking aktif.
+  // Layanan (tab terbuka bila tema merendernya) + reservasi (murni add-on booking).
   let services: Service[] = []
+  if (showLayanan && page?.id) {
+    const { data } = await supabaseAdmin
+      .from('services').select('*').eq('page_id', page.id).order('urutan', { ascending: true })
+    services = (data ?? []) as Service[]
+  }
   let bookings: BookingRow[] = []
   if (hasBooking && page?.id) {
-    const [{ data: svc }, { data: bk }] = await Promise.all([
-      supabaseAdmin.from('services').select('*').eq('page_id', page.id).order('urutan', { ascending: true }),
-      supabaseAdmin.from('bookings').select('*, services(nama)').eq('page_id', page.id).order('created_at', { ascending: false }).limit(100),
-    ])
-    services = (svc ?? []) as Service[]
-    bookings = (bk ?? []) as BookingRow[]
+    const { data } = await supabaseAdmin
+      .from('bookings').select('*, services(nama)').eq('page_id', page.id).order('created_at', { ascending: false }).limit(100)
+    bookings = (data ?? []) as BookingRow[]
   }
 
-  // Menu (resto) — kalau fitur menu aktif.
+  // Menu (resto) — kalau tab menu tampil.
   let menu: MenuItem[] = []
-  if (hasMenu && page?.id) {
+  if (showMenu && page?.id) {
     const { data } = await supabaseAdmin
       .from('menu_items').select('*').eq('page_id', page.id).order('urutan', { ascending: true })
     menu = (data ?? []) as MenuItem[]
@@ -91,13 +128,13 @@ export default async function PortalPage() {
 
   // Blog & galeri & profil bisnis (customer-editable).
   let blog: BlogPost[] = []
-  if (hasBlog && page?.id) {
+  if (showBlog && page?.id) {
     const { data } = await supabaseAdmin
       .from('blog_posts').select('*').eq('page_id', page.id).order('created_at', { ascending: false })
     blog = (data ?? []) as BlogPost[]
   }
   let gallery: GalleryImage[] = []
-  if (hasGallery && page?.id) {
+  if (showGallery && page?.id) {
     const { data } = await supabaseAdmin
       .from('gallery_images').select('*').eq('page_id', page.id).order('urutan', { ascending: true })
     gallery = (data ?? []) as GalleryImage[]
@@ -128,10 +165,13 @@ export default async function PortalPage() {
       initialProducts={products}
       hasShop={hasShop}
       hasBooking={hasBooking}
-      hasMenu={hasMenu}
-      hasBlog={hasBlog}
-      hasGallery={hasGallery}
+      showProduk={showProduk}
+      showLayanan={showLayanan}
+      hasMenu={showMenu}
+      hasBlog={showBlog}
+      hasGallery={showGallery}
       contentIsSample={contentIsSample}
+      kontenBrand={initialKontenBrand}
       paymentStatus={paymentStatus}
       paymentEntitled={hasPaymentTab}
       initialOrders={shopOrders}

@@ -59,6 +59,31 @@ describe('composableContentFromSections (S0-4)', () => {
   })
 })
 
+// ── Galeri gabungan gallery_images (tab Galeri portal) + foto_items ──
+describe('composableContentFromSections — galeri galleryRows + foto_items', () => {
+  const kontenFoto = { foto_items: [{ label: 'Etalase', url: 'https://x.test/a.jpg' }] }
+
+  it('galleryRows di depan, foto_items menyusul, dedupe per URL', () => {
+    const rows = [
+      { url: 'https://x.test/b.jpg', caption: 'Dapur' },
+      { url: 'https://x.test/a.jpg', caption: 'Versi tab Galeri' }, // URL sama dgn foto_items
+    ]
+    const c = composableContentFromSections('Toko', sections, [], null, kontenFoto, 'Produk Kami', rows)
+    expect(c.gallery?.images?.map((i) => i.src)).toEqual(['https://x.test/b.jpg', 'https://x.test/a.jpg'])
+    expect(c.gallery?.images?.[1].caption).toBe('Versi tab Galeri') // row menang atas foto_items
+  })
+
+  it('tanpa galleryRows → perilaku lama foto_items (nol regresi)', () => {
+    const c = composableContentFromSections('Toko', sections, [], null, kontenFoto)
+    expect(c.gallery?.images).toEqual([{ src: 'https://x.test/a.jpg', caption: 'Etalase' }])
+  })
+
+  it('row tanpa url dibuang; dua sumber kosong → gallery undefined', () => {
+    const c = composableContentFromSections('Toko', sections, [], null, {}, 'Produk Kami', [{ url: '' }, { url: '   ' }])
+    expect(c.gallery).toBeUndefined()
+  })
+})
+
 // ── Wire konten Sprint A/B dari data_konten (pasca-DP) ────────
 const sectionsAboutCta = [
   { tipe_komponen: 'hero_banner', isi_komponen: { title: 'Klinik X' } },
