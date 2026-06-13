@@ -1038,7 +1038,7 @@ describe('ComposableRenderer — artikel add-on blog (content.articles)', () => 
       },
     }
     const html = renderToStaticMarkup(<ComposableRenderer manifest={MANIFESTS['lux-corporate']} content={c} />)
-    expect(html).toContain('Artikel & Berita')
+    expect(html).toContain('Artikel &amp; Berita') // '&' di-escape renderToStaticMarkup
     expect(html).toContain('Tips Merawat Batik Tulis')
   })
 
