@@ -26,6 +26,9 @@ export interface ShowcaseSourceItem {
   tanggal?: string | null       // blog (dipetakan dari blog_posts.published_at)
 }
 
+// Baris tabel gallery_images yang relevan untuk galeri (tab Galeri portal).
+export interface GalleryRow { url: string; caption?: string | null }
+
 export function composableContentFromSections(
   nama: string,
   sections: PageSection[],
@@ -33,6 +36,7 @@ export function composableContentFromSections(
   profile: TenantProfile | null,
   konten: Record<string, unknown> = {},
   showcaseTitle = 'Produk Kami',
+  galleryRows?: GalleryRow[],
 ): ComposableContent {
   const base = sectionsToSiteContent(nama, sections, profile, konten)
 
@@ -79,8 +83,10 @@ export function composableContentFromSections(
   const social = parseSocial(konten.social)
   // Testimoni & foto pendukung sudah dikumpulkan form "Lengkapi Website"
   // (data_konten.testimoni / .foto_items) — petakan ke balok composable.
+  // Galeri = gabungan tabel gallery_images (dikelola customer via tab Galeri
+  // portal — urutannya menang) + foto_items lama, dedupe per URL.
   const testimonials = parseTestimoni(konten.testimoni)
-  const gallery = galleryFromFotoItems(konten.foto_items)
+  const gallery = mergeGallery(galleryRows, konten.foto_items)
   const stats = parseStats(konten.stats)
   const faq = parseFaq(konten.faq)
   // Signature band (filosofi/posisi) — dipakai tema craft/bespoke (mis. restaurant-lux).
@@ -205,6 +211,26 @@ function galleryFromFotoItems(v: unknown): GalleryContent | undefined {
     if (!src) continue
     images.push({ src, caption: str(r.label) ?? str(r.caption) })
   }
+  return images.length ? { images } : undefined
+}
+
+// gallery_images (customer-managed, sudah terurut `urutan`) di depan, lalu
+// foto_items legacy dari form "Lengkapi Website" — dedupe per URL supaya foto
+// yang dimigrasi manual tidak dobel. Dua sumber kosong → undefined (self-hide).
+function mergeGallery(rows: GalleryRow[] | undefined, fotoItems: unknown): GalleryContent | undefined {
+  const fromRows: GalleryImage[] = []
+  for (const r of rows ?? []) {
+    const src = str(r?.url)
+    if (!src) continue
+    fromRows.push({ src, caption: str(r?.caption) })
+  }
+  const fromKonten = galleryFromFotoItems(fotoItems)?.images ?? []
+  const seen = new Set<string>()
+  const images = [...fromRows, ...fromKonten].filter((i) => {
+    if (seen.has(i.src)) return false
+    seen.add(i.src)
+    return true
+  })
   return images.length ? { images } : undefined
 }
 

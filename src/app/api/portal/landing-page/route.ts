@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-// Tab Tampilan portal — baca/ubah field tampilan di landing_pages.data_konten
-// milik tenant sendiri. Whitelist KETAT (hanya foto_hero & foto_hero_focus);
-// jangan pernah menerima data_konten bebas dari klien. Tulis via service role
-// SETELAH verifikasi kepemilikan (konsisten dgn route portal lain).
+// Tab Tampilan + kartu "Angka, FAQ & Filosofi" portal — baca/ubah field
+// whitelist di landing_pages.data_konten milik tenant sendiri. Whitelist KETAT
+// (foto_hero, foto_hero_focus, stats, faq, statement — tiap field divalidasi
+// bentuk & panjangnya); jangan pernah menerima data_konten bebas dari klien.
+// Tulis via service role SETELAH verifikasi kepemilikan (konsisten dgn route
+// portal lain).
 
 async function getSessionTenantId(): Promise<string | null> {
   const supabase = await createServerSupabaseClient()
@@ -33,6 +35,58 @@ function validFocus(v: string): boolean {
   return !!m && Number(m[1]) <= 100 && Number(m[2]) <= 100
 }
 
+// ── Validator konten brand (stats/faq/statement) ────────────────
+// Bentuk mengikuti parser content-adapter.ts (parseStats/parseFaq/
+// parseStatement). Batas panjang menjaga payload tetap konten wajar.
+function cleanStr(v: unknown, max: number): string | null {
+  if (typeof v !== 'string') return null
+  const s = v.trim()
+  return s && s.length <= max ? s : null
+}
+
+// stats: array ≤4 dari {angka ≤30, label ≤80}. [] = hapus (section self-hide).
+function parseStatsInput(v: unknown): { angka: string; label: string }[] | null {
+  if (!Array.isArray(v) || v.length > 4) return null
+  const out: { angka: string; label: string }[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+    const r = raw as Record<string, unknown>
+    const angka = cleanStr(r.angka, 30)
+    const label = cleanStr(r.label, 80)
+    if (!angka || !label) return null
+    out.push({ angka, label })
+  }
+  return out
+}
+
+// faq: array ≤10 dari {q ≤200, a ≤1000}. [] = hapus.
+function parseFaqInput(v: unknown): { q: string; a: string }[] | null {
+  if (!Array.isArray(v) || v.length > 10) return null
+  const out: { q: string; a: string }[] = []
+  for (const raw of v) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+    const r = raw as Record<string, unknown>
+    const q = cleanStr(r.q, 200)
+    const a = cleanStr(r.a, 1000)
+    if (!q || !a) return null
+    out.push({ q, a })
+  }
+  return out
+}
+
+// statement: null = hapus; objek {quote wajib ≤300, eyebrow ≤60, cite ≤120}.
+// Sentinel 'invalid' membedakan input rusak dari nilai null yang sah.
+function parseStatementInput(v: unknown): { eyebrow?: string; quote: string; cite?: string } | null | 'invalid' {
+  if (v === null) return null
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return 'invalid'
+  const r = v as Record<string, unknown>
+  const quote = cleanStr(r.quote, 300)
+  if (!quote) return 'invalid'
+  const eyebrow = cleanStr(r.eyebrow, 60)
+  const cite = cleanStr(r.cite, 120)
+  return { quote, ...(eyebrow ? { eyebrow } : {}), ...(cite ? { cite } : {}) }
+}
+
 export async function GET() {
   const tenantId = await getSessionTenantId()
   if (!tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,6 +97,9 @@ export async function GET() {
     return NextResponse.json({
       foto_hero: typeof k.foto_hero === 'string' ? k.foto_hero : '',
       foto_hero_focus: typeof k.foto_hero_focus === 'string' ? k.foto_hero_focus : '',
+      stats: Array.isArray(k.stats) ? k.stats : [],
+      faq: Array.isArray(k.faq) ? k.faq : [],
+      statement: k.statement && typeof k.statement === 'object' ? k.statement : null,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown'
@@ -50,14 +107,17 @@ export async function GET() {
   }
 }
 
-// PATCH { foto_hero?, foto_hero_focus? } — string kosong = hapus.
+// PATCH { foto_hero?, foto_hero_focus?, stats?, faq?, statement? } —
+// string kosong / array kosong / null = hapus (section self-hide di renderer).
 export async function PATCH(request: Request) {
   const tenantId = await getSessionTenantId()
   if (!tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const body = await request.json().catch(() => ({}))
-    const { foto_hero, foto_hero_focus } = (body ?? {}) as { foto_hero?: unknown; foto_hero_focus?: unknown }
+    const { foto_hero, foto_hero_focus, stats, faq, statement } = (body ?? {}) as {
+      foto_hero?: unknown; foto_hero_focus?: unknown; stats?: unknown; faq?: unknown; statement?: unknown
+    }
 
     const updates: Record<string, unknown> = {}
     if (foto_hero !== undefined) {
@@ -79,6 +139,21 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: 'Titik fokus tidak valid (format "x% y%")' }, { status: 400 })
       }
       updates.foto_hero_focus = focus
+    }
+    if (stats !== undefined) {
+      const parsed = parseStatsInput(stats)
+      if (!parsed) return NextResponse.json({ error: 'stats tidak valid (maks 4, angka & label wajib)' }, { status: 400 })
+      updates.stats = parsed
+    }
+    if (faq !== undefined) {
+      const parsed = parseFaqInput(faq)
+      if (!parsed) return NextResponse.json({ error: 'faq tidak valid (maks 10, pertanyaan & jawaban wajib)' }, { status: 400 })
+      updates.faq = parsed
+    }
+    if (statement !== undefined) {
+      const parsed = parseStatementInput(statement)
+      if (parsed === 'invalid') return NextResponse.json({ error: 'statement tidak valid (kutipan wajib, maks 300 karakter)' }, { status: 400 })
+      updates.statement = parsed
     }
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Tak ada perubahan' }, { status: 400 })

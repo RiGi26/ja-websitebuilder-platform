@@ -12,6 +12,7 @@ import { getAddon } from '@/lib/addons/catalog'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ImageUploadField from './ImageUploadField'
+import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
 import LivePreview from './LivePreview'
 import SampleContentBanner from './SampleContentBanner'
 import TampilanPanel, { type TampilanData } from './TampilanPanel'
@@ -57,10 +58,16 @@ type Props = {
   initialProducts: Product[]
   hasShop: boolean
   hasBooking: boolean
+  // Tab etalase (Produk/Layanan) terbuka bila tema merender datanya ATAU
+  // add-on aktif — dihitung server (themeContentTabs). hasShop/hasBooking
+  // tetap menggate tab transaksi (Pesanan/Reservasi).
+  showProduk: boolean
+  showLayanan: boolean
   hasMenu: boolean
   hasBlog: boolean
   hasGallery: boolean
   contentIsSample: boolean
+  kontenBrand: KontenBrandData
   paymentStatus: PaymentStatus
   paymentEntitled: boolean
   initialOrders: ShopOrderRow[]
@@ -77,12 +84,13 @@ type Props = {
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, hasMenu, hasBlog, hasGallery, contentIsSample, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
-  const hasContent = initialSections.length > 0
-  const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : hasShop ? 'produk' : hasBooking ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
+  const hasBrand = kontenBrand.flags.stats || kontenBrand.flags.faq || kontenBrand.flags.statement
+  const hasContent = initialSections.length > 0 || hasBrand
+  const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : showProduk ? 'produk' : showLayanan ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
   const [editId, setEditId] = useState<string | null>(null)
@@ -210,7 +218,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <button onClick={() => setTab('tampilan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'tampilan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <Palette size={14} /> Tampilan
             </button>
-            {hasShop && (
+            {showProduk && (
               <button onClick={() => setTab('produk')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'produk' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
                 <ShoppingBag size={14} /> Produk
               </button>
@@ -220,7 +228,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 <Receipt size={14} /> Pesanan
               </button>
             )}
-            {hasBooking && (
+            {showLayanan && (
               <button onClick={() => setTab('layanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'layanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
                 <Briefcase size={14} /> Layanan
               </button>
@@ -258,7 +266,10 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           )}
 
           {tab === 'konten' ? (
-            <ContentPanel initial={initialSections} />
+            <div className="space-y-6">
+              {initialSections.length > 0 && <ContentPanel initial={initialSections} />}
+              {hasBrand && <KontenBrandPanel initial={kontenBrand} />}
+            </div>
           ) : tab === 'tampilan' ? (
             <TampilanPanel initial={initialTampilan} />
           ) : tab === 'pembayaran' ? (

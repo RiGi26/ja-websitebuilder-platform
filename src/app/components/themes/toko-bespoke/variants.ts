@@ -27,3 +27,20 @@ export const TOKO_BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // Kerajinan — Tanah Loka (forest/parchment/bronze, kawung motif).
   'kerajinan-tanah': { theme: 'toko-kerajinan', variant: 'tanah', sample: 'kerajinan-lux' },
 }
+
+// Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
+// (cek pemakaian content.social / content.gallery di renderer-nya). Dipakai
+// detail-form (gate blok input) + portal (gate tab Galeri) supaya permukaan edit
+// hanya muncul untuk konten yang benar-benar dirender. Semua renderer bespoke
+// juga mengonsumsi stats/faq/statement/about/testimoni/foto_hero + products —
+// itu konstanta, tak perlu dideklarasikan per tema di sini.
+export interface BespokeRenderedBlocks {
+  social?: boolean
+  gallery?: boolean
+}
+
+export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
+  'toko-atelier': { social: true, gallery: true },
+  'toko-kuliner': { social: true, gallery: true },
+  'toko-kerajinan': {},
+}

@@ -58,12 +58,13 @@ export async function renderSite({
   // yang SAMA (reuse menu fetch + composableContentFromSections). variant = preset
   // palet (aurum/noir/hearth); primary = aksen brand. Coexist, nol regresi.
   if (theme === 'restaurant-lux') {
-    const [source, profile] = await Promise.all([
+    const [source, profile, galleryRows] = await Promise.all([
       fetchMenuItemsByPage(client, page.id),
       fetchTenantProfile(client, page.id),
+      fetchGalleryByPage(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami',
+      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami', galleryRows,
     )
     return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} capabilities={konfig.capabilities} />
   }
@@ -75,12 +76,13 @@ export async function renderSite({
   // (AtelierCartButton di-inject via slot supaya renderer bebas modul cart).
   const bespoke = theme ? TOKO_BESPOKE[theme] : undefined
   if (bespoke) {
-    const [products, profile] = await Promise.all([
+    const [products, profile, galleryRows] = await Promise.all([
       fetchProductsByPage(client, page.id),
       fetchTenantProfile(client, page.id),
+      fetchGalleryByPage(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Koleksi Kami',
+      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Koleksi Kami', galleryRows,
     )
     const Renderer = bespoke.Renderer
     const renderer = (
@@ -124,12 +126,13 @@ export async function renderSite({
                 : tipe === 'jastip' ? 'Katalog Titipan'
                   : SERVICE_INDUSTRI.includes(tipe) ? 'Layanan Kami'
                     : 'Produk Kami'
-    const [source, profile] = await Promise.all([
+    const [source, profile, galleryRows] = await Promise.all([
       fetchSource,
       fetchTenantProfile(client, page.id),
+      fetchGalleryByPage(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, showcaseTitle,
+      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, showcaseTitle, galleryRows,
     )
     const renderer = <ComposableRenderer manifest={manifest} content={content} />
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
