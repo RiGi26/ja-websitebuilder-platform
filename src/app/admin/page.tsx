@@ -27,6 +27,15 @@ import ClientAccountButton from './ClientAccountButton'
 
 export const dynamic = 'force-dynamic'
 
+// Add-on kalkulator corp yang butuh setup MANUAL tim (tak punya SKU WB → tak
+// muncul di selected_addons, tapi tetap dibayar). Sumber: corp services.ts.
+const CORP_MANUAL_SETUP: Record<string, string> = {
+  'g-sheets': 'Google Sheets Integration',
+  'invoice-auto': 'Invoice Automation',
+  api: 'API Integration',
+  'email-auto': 'Email Automation',
+}
+
 async function getOrders() {
   const { data, error } = await supabaseAdmin
     .from('orders')
@@ -300,6 +309,34 @@ export default async function StudioAdminPage() {
                           )}
                         </div>
                       </div>
+
+                      {/* Add-on mentah dari kalkulator corp (fidelity fulfillment).
+                          Highlight yang butuh setup MANUAL — sering hilang dari
+                          selected_addons padahal sudah dibayar. */}
+                      {(order as any).requested_addons && (order as any).requested_addons.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                            Add-on Kalkulator <span className="text-amber-600 normal-case">(cek setup manual)</span>
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {((order as any).requested_addons as string[]).map((id: string) => {
+                              const manualLabel = CORP_MANUAL_SETUP[id]
+                              return (
+                                <span
+                                  key={id}
+                                  className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 border ${
+                                    manualLabel
+                                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                      : 'bg-white text-gray-500 border-black/5'
+                                  }`}
+                                >
+                                  {manualLabel ? `${manualLabel} · setup manual` : id}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Financial Summary & Controls */}
