@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { generateContent } from '@/lib/build/generateContent'
 import { applyBuildPlan } from '@/lib/build/persist'
+import { isOrderPaid } from '@/lib/payment-state'
 import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 
 // F1-3 — Bangun website otomatis dari order.
@@ -30,9 +31,11 @@ export async function POST(
 
     // publish default true; kirim { publish: false } untuk build sebagai draft.
     let publish = true
+    let force = false
     try {
       const body = await request.json()
       if (body && typeof body.publish === 'boolean') publish = body.publish
+      if (body && body.force === true) force = true
     } catch {
       // body kosong -> pakai default
     }
@@ -45,6 +48,16 @@ export async function POST(
       .single()
     if (orderErr || !order) {
       return NextResponse.json({ error: 'Order tidak ditemukan' }, { status: 404 })
+    }
+
+    // Payment gate (audit 2026-06-13): jangan PUBLISH (situs jadi live) sebelum
+    // bayar DP/lunas. Build draft (publish:false) tetap diizinkan utk persiapan.
+    // Override eksplisit via { force: true }.
+    if (publish && !force && !isOrderPaid(order.payment_status)) {
+      return NextResponse.json(
+        { error: 'Pembayaran belum dikonfirmasi (DP/lunas) — tidak bisa publish situs. Build draft (publish:false) tetap diizinkan.' },
+        { status: 409 },
+      )
     }
 
     // 2. Wajib sudah di-provision (tenant + landing page). Kalau belum, arahkan
