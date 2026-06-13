@@ -107,7 +107,33 @@ export async function POST(request: Request) {
       })
       .select()
       .single()
-    if (tenantErr) throw tenantErr
+    if (tenantErr) {
+      // Race (audit 2026-06-13): panggilan provisioning konkuren utk order yang
+      // sama sudah membuat tenant (dijaga UNIQUE tenants.order_id, code 23505).
+      // Perlakukan sebagai sudah-provisioned alih-alih membuat tenant orphan.
+      if ((tenantErr as { code?: string }).code === '23505') {
+        const { data: existingTenant } = await supabaseAdmin
+          .from('tenants')
+          .select('id')
+          .eq('order_id', orderId)
+          .maybeSingle()
+        const { data: existingPage } = existingTenant
+          ? await supabaseAdmin
+              .from('landing_pages')
+              .select('*')
+              .eq('tenant_id', existingTenant.id)
+              .order('created_at', { ascending: true })
+              .limit(1)
+              .maybeSingle()
+          : { data: null }
+        return NextResponse.json({
+          tenantId: existingTenant?.id ?? null,
+          page: existingPage,
+          alreadyProvisioned: true,
+        })
+      }
+      throw tenantErr
+    }
 
     // 4. Buat landing page awal (status draft)
     const slug = await uniqueSlug(slugify(namaKlien))

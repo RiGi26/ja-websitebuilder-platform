@@ -104,11 +104,19 @@ export async function POST(request: Request) {
           }
         }
       } else {
-        // DP: match by midtrans_order_id
+        // DP: match by midtrans_order_id.
+        // Terminal-state guard (audit 2026-06-13): paid states (dp_paid, lunas)
+        // tidak boleh ditimpa. Midtrans bisa kirim notifikasi telat/duplikat/
+        // out-of-order (mis. 'expire'/'deny'/'pending' setelah 'settlement', atau
+        // settlement DP basi setelah pelunasan). Tanpa guard, order yang sudah
+        // dibayar bisa turun ke failed/awaiting_payment (atau lunas→dp_paid)
+        // diam-diam. Predikat ini juga membuat transisi MASUK dp_paid hanya sekali
+        // (anti double-fire WA dari sisi webhook).
         const { data: updatedOrder, error } = await supabaseAdmin
           .from('orders')
           .update(update)
           .eq('midtrans_order_id', order_id)
+          .not('payment_status', 'in', '("dp_paid","lunas")')
           .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
           .maybeSingle()
 
