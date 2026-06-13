@@ -112,6 +112,7 @@ function OrderFormContent() {
   const kalkulatorMaintain = searchParams.get('maintain') ? Number(searchParams.get('maintain')) : null
   const kalkulatorPaket = searchParams.get('paket') ?? ''
   const kalkulatorAddons = searchParams.get('addons') ?? ''
+  const kalkulatorBundle = searchParams.get('bundle') ?? ''
 
   // Mapping corp-landing addon IDs → order form addon IDs
   // Alias id corp-landing → id kanonik, diturunkan dari SSOT (.aliases).
@@ -291,6 +292,12 @@ function OrderFormContent() {
           total_estimasi: finalPrice,
           total_maintenance: totalYearlyMaint,
           referral_code: refStatus === 'valid' ? referralCode.trim().toUpperCase() : null,
+          // Konteks kalkulator corp → server hitung ulang harga otoritatif
+          // (total_estimasi di atas hanya utk tampilan, tak dipakai menagih).
+          from_kalkulator: fromKalkulator,
+          paket: kalkulatorPaket || null,
+          kalkulator_addons: fromKalkulator ? kalkulatorAddons : null,
+          bundle: kalkulatorBundle || null,
         }),
       })
 

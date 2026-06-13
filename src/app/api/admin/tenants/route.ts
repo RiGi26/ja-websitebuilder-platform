@@ -7,6 +7,7 @@ import { industriToTipe, addonsToFeatures, slugify, industryToTheme } from '@/li
 import { createClientAccountForTenant } from '@/lib/client-account'
 import { generateContent } from '@/lib/build/generateContent'
 import { applyBuildPlan } from '@/lib/build/persist'
+import { isOrderPaid } from '@/lib/payment-state'
 import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 
 async function requireAdmin() {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { orderId } = await request.json()
+    const { orderId, force } = await request.json()
     if (!orderId) return NextResponse.json({ error: 'orderId wajib' }, { status: 400 })
 
     // 1. Ambil order
@@ -76,6 +77,17 @@ export async function POST(request: Request) {
         page: existingPage,
         alreadyProvisioned: true,
       })
+    }
+
+    // Payment gate (audit 2026-06-13): jangan provision + auto-build untuk order
+    // yang belum bayar (invariant pendapatan). Provisioning memicu auto-build +
+    // pembuatan akun login klien, jadi normalnya hanya setelah DP/lunas. Override
+    // eksplisit via { force: true } untuk pengecualian (mis. prep draft manual).
+    if (!force && !isOrderPaid(order.payment_status)) {
+      return NextResponse.json(
+        { error: 'Pembayaran belum dikonfirmasi (DP/lunas). Provisioning ditahan. Kirim { force: true } untuk override.' },
+        { status: 409 },
+      )
     }
 
     const namaKlien = order.nama_perusahaan || order.nama_usaha || 'Klien Tanpa Nama'
