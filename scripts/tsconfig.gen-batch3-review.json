@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "noEmit": false,
+    "outDir": "../.tmp-gen-batch3",
+    "rootDir": "..",
+    "baseUrl": "..",
+    "paths": { "@/*": ["src/*"] },
+    "resolveJsonModule": true,
+    "types": ["node", "react"]
+  },
+  "include": ["gen-batch3-review-entry.tsx"]
+}

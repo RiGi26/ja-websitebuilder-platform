@@ -221,6 +221,11 @@ function rlCss(): string {
 .rl-map{aspect-ratio:1/1;border-radius:3px;overflow:hidden;border:1px solid var(--rl-line);background:linear-gradient(135deg,var(--rl-surface),var(--rl-bg2))}
 .rl-map iframe{width:100%;height:100%;border:0;filter:grayscale(1) invert(.9) contrast(.85)}
 @media(max-width:780px){.rl-visit .rl-wrap{grid-template-columns:1fr}.rl-map{aspect-ratio:16/10}}
+/* band add-on (newsletter/career) */
+.rl-band{background:var(--rl-surface);border-top:1px solid var(--rl-line2);border-bottom:1px solid var(--rl-line2);padding:clamp(48px,6vw,72px) 0}
+.rl-band-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.rl-band h2{font-size:clamp(24px,3.2vw,34px)}
+.rl-band p{color:var(--rl-muted);margin-top:10px;font-size:15px;max-width:56ch}
 /* footer + wa */
 .rl-footer{background:color-mix(in srgb,var(--rl-bg) 80%,#000);border-top:1px solid var(--rl-line2);padding:56px 0 40px}
 .rl-footer .rl-wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;align-items:center}
@@ -290,8 +295,13 @@ export default function RestaurantLuxRenderer({
   if (gallery.length) nav.push({ label: 'Galeri', href: '#galeri' })
   if (content.info) nav.push({ label: 'Kunjungi', href: '#kunjungi' })
 
+  // Titik fokus foto hero (foto_hero_focus dari tab Tampilan) — override
+  // backgroundPosition default 'center' di .rl-hero-bg bila klien menyetelnya.
   const heroBg: CSSProperties = content.hero.image
-    ? { backgroundImage: `url(${content.hero.image})` }
+    ? {
+        backgroundImage: `url(${content.hero.image})`,
+        ...(content.hero.imagePosition ? { backgroundPosition: content.hero.imagePosition } : {}),
+      }
     : { background: `linear-gradient(135deg, ${pal.surface}, ${pal.bg})` }
 
   return (
@@ -533,6 +543,21 @@ export default function RestaurantLuxRenderer({
           </div>
         </section>
       )}
+
+      {/* BAND ADD-ON (newsletter/career) — additive, hadir hanya bila adapter
+          menemukan row cta ber-preset (injeksi B-section). Pola sama
+          ComposableRenderer; data-band utk verifikasi. */}
+      {(content.bands ?? []).map((b, i) => (
+        <section className="rl-band" data-band={b.preset} key={`${b.preset}-${i}`}>
+          <div className="rl-wrap rl-band-in">
+            <div>
+              <h2>{b.title}</h2>
+              {b.subtitle && <p>{b.subtitle}</p>}
+            </div>
+            {b.ctaText && <a className="rl-btn rl-btn-gold" href={b.ctaHref ?? waLink ?? '#kunjungi'}>{b.ctaText}</a>}
+          </div>
+        </section>
+      ))}
 
       {/* FOOTER */}
       <footer className="rl-footer">

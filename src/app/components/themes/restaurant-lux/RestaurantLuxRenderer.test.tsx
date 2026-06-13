@@ -84,3 +84,27 @@ describe('RestaurantLuxRenderer — B-cap capabilities (add-on → UI kondisiona
     expect(html).not.toContain('/booking')
   })
 })
+
+describe('RestaurantLuxRenderer — band add-on + fokus hero (batch 3)', () => {
+  it('content.bands dirender dengan data-band + CTA (sebelumnya hanya composable)', () => {
+    const c = {
+      ...content,
+      bands: [{ preset: 'newsletter', title: 'Tetap Terhubung', subtitle: 'Promo terbaru.', ctaText: 'Berlangganan', ctaHref: 'https://wa.me/628123' }],
+    }
+    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={c} />)
+    expect(html).toContain('data-band="newsletter"')
+    expect(html).toContain('Tetap Terhubung')
+    expect(html).toContain('Berlangganan')
+  })
+
+  it('tanpa bands → nol band (regresi)', () => {
+    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={content} />)
+    expect(html).not.toContain('data-band=')
+  })
+
+  it('hero.imagePosition (foto_hero_focus) → backgroundPosition hero', () => {
+    const c = { ...content, hero: { ...content.hero, image: 'https://x.test/hero.jpg', imagePosition: '30% 20%' } }
+    const html = renderToStaticMarkup(<RestaurantLuxRenderer content={c} />)
+    expect(html).toContain('background-position:30% 20%')
+  })
+})
