@@ -325,6 +325,11 @@ function klCss(): string {
 .lx-lb-prev{left:10px}.lx-lb-next{right:10px}
 .lx-lb-prev:hover,.lx-lb-next:hover{background:var(--kl-accent);color:var(--kl-on-accent);border-color:var(--kl-accent)}
 @media(max-width:760px){.lx-lb-panel{grid-template-columns:1fr;overflow:auto}.lx-lb-media{min-height:0;aspect-ratio:4/3}}
+/* ── band add-on (newsletter/career) ── */
+.kl-band{background:var(--kl-surface);border-top:1px solid var(--kl-line2);border-bottom:1px solid var(--kl-line2);padding:clamp(46px,6vw,68px) 0}
+.kl-band-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.kl-band h2{font-size:clamp(24px,3.2vw,32px)}
+.kl-band p{color:var(--kl-muted);margin-top:10px;font-size:14px;max-width:56ch}
 /* ── footer ── */
 .kl-footer{background:color-mix(in srgb,var(--kl-bg) 70%,var(--kl-scrim));border-top:1px solid var(--kl-line2)}
 .kl-footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:clamp(30px,5vw,52px);padding:clamp(52px,7vw,80px) 0 44px}
@@ -422,8 +427,13 @@ export default function KulinerLuxRenderer({
   const galImgs = (content.gallery?.images ?? []).slice(0, 8)
   const ctaHref = content.cta?.ctaHref && content.cta.ctaHref !== '#wa' ? content.cta.ctaHref : (waLink ?? '#kontak')
 
+  // Titik fokus foto hero (foto_hero_focus dari tab Tampilan) — override
+  // backgroundPosition default bila klien menyetelnya.
   const heroBg: CSSProperties = content.hero.image
-    ? { backgroundImage: `url(${content.hero.image})` }
+    ? {
+        backgroundImage: `url(${content.hero.image})`,
+        ...(content.hero.imagePosition ? { backgroundPosition: content.hero.imagePosition } : {}),
+      }
     : { background: `linear-gradient(150deg, color-mix(in srgb, ${pal.scrim} 78%, ${accent}), ${pal.scrim} 72%)` }
 
   return (
@@ -743,6 +753,21 @@ export default function KulinerLuxRenderer({
             </div>
           </section>
         )}
+
+        {/* BAND ADD-ON (newsletter/career) — additive, hadir hanya bila adapter
+            menemukan row cta ber-preset (injeksi B-section). Pola sama
+            ComposableRenderer; data-band utk verifikasi. */}
+        {(content.bands ?? []).map((b, i) => (
+          <section className="kl-band" data-band={b.preset} key={`${b.preset}-${i}`}>
+            <div className="kl-wrap kl-band-in">
+              <div>
+                <h2>{b.title}</h2>
+                {b.subtitle && <p>{b.subtitle}</p>}
+              </div>
+              {b.ctaText && <a className="kl-btn kl-btn-solid" href={b.ctaHref ?? waLink ?? '#kontak'}>{b.ctaText}</a>}
+            </div>
+          </section>
+        ))}
       </main>
 
       {/* FOOTER */}

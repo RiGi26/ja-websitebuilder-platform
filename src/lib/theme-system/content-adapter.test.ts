@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { PageSection, Product } from '@/types/websitebuilder'
-import { composableContentFromSections } from './content-adapter'
+import { composableContentFromSections, articlesFromBlogPosts } from './content-adapter'
 import { generateContent } from '@/lib/build/generateContent'
 
 const sections = [
@@ -335,5 +335,37 @@ describe('generateContent — routing tema composable (S0-4)', () => {
       },
     })
     expect(plan.theme).not.toBe('composable')
+  })
+})
+
+// ── Artikel add-on blog (articlesFromBlogPosts, pola bands) ───
+describe('articlesFromBlogPosts — add-on blog lintas-industri (additive)', () => {
+  const withBlogList = [
+    { tipe_komponen: 'hero_banner', isi_komponen: { title: 'PT X' } },
+    { tipe_komponen: 'blog_list', isi_komponen: { title: 'Kabar & Wawasan' } },
+  ] as unknown as PageSection[]
+  const posts = [
+    { judul: 'Tips Memilih Vendor', ringkasan: 'Ringkas.', cover_url: 'https://x.test/c.jpg', penulis: 'Admin', published_at: '2026-01-02' },
+    { judul: 'Tanpa Cover', ringkasan: null, cover_url: null, penulis: null, published_at: null },
+  ]
+
+  it('section blog_list + posts → articles (judul dari isi_komponen section)', () => {
+    const a = articlesFromBlogPosts(withBlogList, posts)
+    expect(a?.title).toBe('Kabar & Wawasan')
+    expect(a?.items).toHaveLength(2)
+    expect(a?.items[0]).toMatchObject({ nama: 'Tips Memilih Vendor', penulis: 'Admin', gambar: 'https://x.test/c.jpg' })
+  })
+
+  it('tanpa section blog_list → undefined (nol regresi)', () => {
+    expect(articlesFromBlogPosts(sections, posts)).toBeUndefined()
+  })
+
+  it('blog_list tanpa post → undefined (self-hide sampai customer menulis artikel)', () => {
+    expect(articlesFromBlogPosts(withBlogList, [])).toBeUndefined()
+  })
+
+  it('maksimal 6 artikel', () => {
+    const many = Array.from({ length: 9 }, (_, i) => ({ judul: `Artikel ${i + 1}` }))
+    expect(articlesFromBlogPosts(withBlogList, many)?.items).toHaveLength(6)
   })
 })

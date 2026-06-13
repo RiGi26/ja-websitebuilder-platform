@@ -208,3 +208,21 @@ describe('TokoAtelierRenderer', () => {
     expect(html).toContain('pointer:fine') // magnetic digate pointer presisi
   })
 })
+
+describe('TokoAtelierRenderer — band add-on (batch 3)', () => {
+  it('content.bands dirender dengan data-band + CTA (sebelumnya hanya composable)', () => {
+    const c = {
+      ...content,
+      bands: [{ preset: 'career', title: 'Bergabung dengan Tim Kami', ctaText: 'Kirim Lamaran', ctaHref: 'https://wa.me/628123' }],
+    }
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={c} />)
+    expect(html).toContain('data-band="career"')
+    expect(html).toContain('Bergabung dengan Tim Kami')
+    expect(html).toContain('Kirim Lamaran')
+  })
+
+  it('tanpa bands → nol band (regresi)', () => {
+    const html = renderToStaticMarkup(<TokoAtelierRenderer content={content} />)
+    expect(html).not.toContain('data-band=')
+  })
+})

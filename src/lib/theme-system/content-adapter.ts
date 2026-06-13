@@ -335,6 +335,41 @@ function parseSocial(v: unknown): SocialContent | undefined {
   return { title: str(o.title), subtitle: str(o.subtitle), links: links.slice(0, 12) }
 }
 
+// ── Artikel add-on blog (additive, pola bands) ────────────────
+// Add-on `blog` menginjeksi section blog_list lintas-industri (B-section), tapi
+// alur manifest composable tak punya slot artikel. SiteRenderer memetakannya di
+// luar composableContentFromSections (signature adapter tetap stabil) →
+// content.articles → dirender additive oleh ComposableRenderer. Industri blog
+// sendiri tidak lewat jalur ini (showcase utamanya sudah article-feed).
+export interface BlogPostRow {
+  judul: string
+  ringkasan?: string | null
+  cover_url?: string | null
+  penulis?: string | null
+  published_at?: string | null
+}
+
+export function articlesFromBlogPosts(
+  sections: PageSection[],
+  posts: BlogPostRow[],
+): ComposableContent['articles'] {
+  const row = sections.find((s) => s.tipe_komponen === 'blog_list')
+  if (!row) return undefined
+  const items: ShowcaseItem[] = (posts ?? [])
+    .filter((p) => p?.judul)
+    .slice(0, 6)
+    .map((p) => ({
+      nama: p.judul,
+      desc: p.ringkasan ?? undefined,
+      gambar: p.cover_url ?? undefined,
+      penulis: p.penulis ?? undefined,
+      tanggal: p.published_at ?? undefined,
+    }))
+  if (!items.length) return undefined
+  const isi = (row.isi_komponen ?? {}) as Record<string, unknown>
+  return { title: str(isi.title) ?? 'Artikel & Berita', items }
+}
+
 // Profil bisnis → InfoLokasi. Jam = string bebas (1 baris). mapsQuery dari
 // alamat untuk embed Google Maps tanpa API key. Reservasi default ke WA.
 function buildInfoLokasi(profile: TenantProfile | null): InfoLokasi | undefined {

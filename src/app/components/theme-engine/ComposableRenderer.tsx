@@ -180,6 +180,11 @@ export default function ComposableRenderer({
         return out
       })}
 
+      {/* Artikel add-on blog — additive di luar alur manifest (pola bands);
+          diisi SiteRenderer dari section blog_list hasil injeksi B-section.
+          Absen → tak dirender (nol regresi). */}
+      {content.articles && <ShowcaseArticleFeed showcase={content.articles} />}
+
       {/* Band add-on (newsletter/career) — additive di luar alur manifest;
           hadir hanya bila adapter menemukan row cta ber-preset (hasil injeksi
           B-section). Absen → tak dirender (nol regresi). */}

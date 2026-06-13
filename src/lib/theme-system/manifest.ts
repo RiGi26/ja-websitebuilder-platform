@@ -211,6 +211,11 @@ export interface ComposableContent {
   contact?: { wa?: string; email?: string; alamat?: string }
   // Band add-on (newsletter/career) — lihat PresetBand.
   bands?: PresetBand[]
+  // Artikel add-on blog (additive, pola bands). Diisi SiteRenderer bila section
+  // blog_list (injeksi B-section) ada di halaman industri NON-blog; dirender
+  // ShowcaseArticleFeed setelah alur manifest. Industri blog tidak memakainya
+  // (showcase utamanya sudah article-feed).
+  articles?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
 }
 
 // ── Registry manifest (pilot Kuliner ×3) ──────────────────────

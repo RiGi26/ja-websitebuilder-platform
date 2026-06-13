@@ -357,6 +357,11 @@ function taCss(): string {
 .ta-lb-prev{left:-22px}.ta-lb-next{right:-22px}
 .ta-lb-prev:hover,.ta-lb-next:hover{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
 @media(max-width:780px){.ta-lb-panel{grid-template-columns:1fr;overflow:auto;max-height:92vh}.ta-lb-media{min-height:0;aspect-ratio:4/3}.ta-lb-prev{left:10px;top:31vw}.ta-lb-next{right:10px;top:31vw}}
+/* ── band add-on (newsletter/career) ── */
+.ta-band{background:var(--ta-surface);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2);padding:clamp(46px,6vw,68px) 0}
+.ta-band-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.ta-band h2{font-size:clamp(24px,3.2vw,32px)}
+.ta-band p{color:var(--ta-muted);margin-top:10px;font-size:14px;max-width:56ch}
 /* ── footer ── */
 .ta-footer{background:color-mix(in srgb,var(--ta-bg) 84%,#000);border-top:1px solid var(--ta-line2)}
 .ta-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(32px,5vw,56px);padding:clamp(56px,8vw,84px) 0 48px}
@@ -860,6 +865,21 @@ export default function TokoAtelierRenderer({
             </div>
           </section>
         )}
+
+        {/* BAND ADD-ON (newsletter/career) — additive, hadir hanya bila adapter
+            menemukan row cta ber-preset (injeksi B-section). Pola sama
+            ComposableRenderer; data-band utk verifikasi. */}
+        {(content.bands ?? []).map((b, i) => (
+          <section className="ta-band" data-band={b.preset} key={`${b.preset}-${i}`}>
+            <div className="ta-wrap ta-band-in">
+              <div>
+                <h2>{b.title}</h2>
+                {b.subtitle && <p>{b.subtitle}</p>}
+              </div>
+              {b.ctaText && <a className="ta-btn ta-btn-solid" href={b.ctaHref ?? waLink ?? '#kontak'}>{b.ctaText}</a>}
+            </div>
+          </section>
+        ))}
       </main>
 
       {/* FOOTER — wordmark raksasa ter-crop */}
