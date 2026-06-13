@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import { updateLandingPage, publishPage } from '@/lib/supabase/websitebuilder'
+import { orderPaidForTenant } from '@/lib/payment-state'
 import type { InsertLandingPageInput } from '@/types/websitebuilder'
 
 async function requireAdmin() {
@@ -19,8 +20,28 @@ export async function PATCH(request: Request) {
 
   try {
     const body = await request.json()
-    const { id, action, ...rest } = body
+    const { id, action, force, ...rest } = body
     if (!id) return NextResponse.json({ error: 'id wajib' }, { status: 400 })
+
+    // Payment gate (audit 2026-06-13): jangan terbitkan situs (status published)
+    // sebelum order-nya bayar DP/lunas. Berlaku utk action 'publish' DAN update
+    // field status:'published'. Page tanpa order tertaut (demo/internal) tak
+    // diblokir. Override eksplisit via { force: true }.
+    const isPublishing = action === 'publish' || (action !== 'unpublish' && rest.status === 'published')
+    if (isPublishing && force !== true) {
+      const { data: pg } = await supabaseAdmin
+        .from('landing_pages')
+        .select('tenant_id')
+        .eq('id', id)
+        .maybeSingle()
+      const paid = pg?.tenant_id ? await orderPaidForTenant(supabaseAdmin, pg.tenant_id) : true
+      if (!paid) {
+        return NextResponse.json(
+          { error: 'Pembayaran belum dikonfirmasi (DP/lunas) — tidak bisa publish situs.' },
+          { status: 409 },
+        )
+      }
+    }
 
     if (action === 'publish') {
       const page = await publishPage(supabaseAdmin, id)

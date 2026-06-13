@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer } from '@/lib/fonnte'
 import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
 import { referralDiscountFor } from '@/lib/referral-tier'
+import { computeServerPrice } from '@/lib/pricing/server-price'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -18,12 +19,39 @@ export async function POST(request: Request) {
       nomor_wa, email, industri, template_id, referensi_manual,
       selected_addons, total_estimasi, total_maintenance,
       referral_code,
+      // Konteks kalkulator corp (untuk recompute harga server-side bila order
+      // datang dari handoff "Rakit Website"). Diabaikan utk billing kalau kosong.
+      from_kalkulator, paket, kalkulator_addons, bundle,
     } = body
+
+    // SECURITY: JANGAN pernah percaya harga dari klien. Sebelumnya gross =
+    // Number(total_estimasi) langsung jadi gross_amount Midtrans → bisa di-tamper
+    // (POST total_estimasi=1000 → bayar Rp1.000 utk build mahal). Sekarang harga
+    // dihitung ulang otoritatif dari sumber tepercaya (templatesData + katalog
+    // untuk native; mirror harga corp untuk handoff kalkulator). total_estimasi
+    // klien hanya dipakai utk deteksi selisih/log, bukan utk menagih.
+    const price = computeServerPrice({
+      template_id, selected_addons,
+      from_kalkulator, paket, kalkulator_addons, bundle,
+    })
+    if (price.gross == null) {
+      return NextResponse.json(
+        { error: 'Tidak bisa menentukan harga pesanan. Silakan ulang dari kalkulator atau hubungi tim kami.' },
+        { status: 400 },
+      )
+    }
+    const gross = price.gross
+    const serverMaintenance = price.maintenance ?? (Number(total_maintenance) || 0)
+    const claimedGross = Number(total_estimasi) || 0
+    if (claimedGross !== gross) {
+      console.warn(
+        `[payment/create] price mismatch (charging server value): client=${claimedGross} server=${gross} path=${price.path} paket=${paket ?? ''} bundle=${bundle ?? ''} template=${template_id ?? ''}`,
+      )
+    }
 
     // 0. Referral (Program Mitra) — server yang berwenang: kode divalidasi
     //    ulang di sini, diskon dihitung ulang (jangan percaya angka klien),
     //    self-referral ditolak diam-diam. Kode invalid TIDAK memblokir order.
-    const gross = Number(total_estimasi) || 0
     let applied = null as Awaited<ReturnType<typeof lookupActiveCode>>
     const normCode = normalizeCode(referral_code)
     if (normCode) {
@@ -45,7 +73,7 @@ export async function POST(request: Request) {
         nama_pic: client_type === 'perusahaan' ? nama_pic : null,
         jabatan: client_type === 'perusahaan' ? jabatan : null,
         nomor_wa, email, industri, template_id, referensi_manual,
-        selected_addons, total_estimasi: netTotal, total_maintenance,
+        selected_addons, total_estimasi: netTotal, total_maintenance: serverMaintenance,
         status: 'pending_payment',
         payment_status: 'unpaid',
         type: 'new',
