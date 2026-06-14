@@ -71,13 +71,18 @@ function StepHeader({ title, desc }: { title: string; desc: string }) {
   )
 }
 
-function FieldRow({ label, required, htmlFor, children }: { label: string; required?: boolean; htmlFor?: string; children: React.ReactNode }) {
+function FieldRow({ label, required, htmlFor, error, children }: { label: string; required?: boolean; htmlFor?: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={htmlFor} className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2 ml-1">
         {label}{required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children}
+      {error && (
+        <p id={htmlFor ? `${htmlFor}-error` : undefined} className="text-xs font-medium text-red-500 mt-1.5 ml-1">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
@@ -112,6 +117,10 @@ function OrderFormContent() {
     displayId: string; dpAmount: number; redirectUrl: string
   } | null>(null)
   const hydratedRef = useRef(false)
+  // Validasi inline: tandai field yang sudah disentuh, tampilkan error saat blur
+  // (ganti "tombol mati senyap" jadi pesan jelas) — tombol Lanjut tetap di-gate.
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const touch = (k: string) => setTouched(t => (t[k] ? t : { ...t, [k]: true }))
 
   // ── Program Mitra: kode referral ─────────────────────────────────────────
   const [referralCode, setReferralCode] = useState('')
@@ -224,6 +233,23 @@ function OrderFormContent() {
   const fromKalkulator = !!(kalkulatorPaket || kalkulatorEstimasi)
 
   const set = (key: keyof FormData, val: any) => setForm(f => ({ ...f, [key]: val }))
+
+  // Pesan error per-field (hanya muncul setelah field disentuh).
+  const fieldError = (k: string): string => {
+    if (!touched[k]) return ''
+    switch (k) {
+      case 'namaUsaha': return form.namaUsaha.trim() ? '' : 'Nama usaha wajib diisi'
+      case 'namaPerusahaan': return form.namaPerusahaan.trim() ? '' : 'Nama perusahaan wajib diisi'
+      case 'namapic': return form.namapic.trim() ? '' : 'Nama PIC wajib diisi'
+      case 'nomorWa':
+        if (!form.nomorWa.trim()) return 'Nomor WhatsApp wajib diisi'
+        return form.nomorWa.replace(/\D/g, '').length >= 8 ? '' : 'Nomor WhatsApp belum lengkap'
+      case 'email':
+        if (!form.email.trim()) return 'Email wajib diisi'
+        return /^\S+@\S+\.\S+$/.test(form.email) ? '' : 'Format email belum benar (contoh: nama@email.com)'
+      default: return ''
+    }
+  }
 
   const handleNext = () => {
     if (fromKalkulator && step === 1) {
@@ -448,24 +474,24 @@ function OrderFormContent() {
               <StepHeader title="Informasi Identitas" desc="Lengkapi detail kontak dan nama bisnis Anda." />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {form.clientType === 'individu' ? (
-                  <FieldRow label="Nama Usaha / Brand" htmlFor="order-nama-usaha" required>
-                    <Input id="order-nama-usaha" placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="apple-input" />
+                  <FieldRow label="Nama Usaha / Brand" htmlFor="order-nama-usaha" required error={fieldError('namaUsaha')}>
+                    <Input id="order-nama-usaha" placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} onBlur={() => touch('namaUsaha')} aria-invalid={!!fieldError('namaUsaha')} className="apple-input" />
                   </FieldRow>
                 ) : (
                   <>
-                    <FieldRow label="Nama Perusahaan" htmlFor="order-nama-perusahaan" required>
-                      <Input id="order-nama-perusahaan" placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama Perusahaan" htmlFor="order-nama-perusahaan" required error={fieldError('namaPerusahaan')}>
+                      <Input id="order-nama-perusahaan" placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} onBlur={() => touch('namaPerusahaan')} aria-invalid={!!fieldError('namaPerusahaan')} className="apple-input" />
                     </FieldRow>
-                    <FieldRow label="Nama PIC" htmlFor="order-nama-pic" required>
-                      <Input id="order-nama-pic" placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama PIC" htmlFor="order-nama-pic" required error={fieldError('namapic')}>
+                      <Input id="order-nama-pic" placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} onBlur={() => touch('namapic')} aria-invalid={!!fieldError('namapic')} className="apple-input" />
                     </FieldRow>
                   </>
                 )}
-                <FieldRow label="Nomor WhatsApp" htmlFor="order-wa" required>
-                  <Input id="order-wa" type="tel" inputMode="numeric" autoComplete="tel" placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="apple-input" />
+                <FieldRow label="Nomor WhatsApp" htmlFor="order-wa" required error={fieldError('nomorWa')}>
+                  <Input id="order-wa" type="tel" inputMode="numeric" autoComplete="tel" placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} onBlur={() => touch('nomorWa')} aria-invalid={!!fieldError('nomorWa')} className="apple-input" />
                 </FieldRow>
-                <FieldRow label="Email" htmlFor="order-email" required>
-                  <Input id="order-email" type="email" autoComplete="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
+                <FieldRow label="Email" htmlFor="order-email" required error={fieldError('email')}>
+                  <Input id="order-email" type="email" autoComplete="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} onBlur={() => touch('email')} aria-invalid={!!fieldError('email')} className="apple-input" />
                 </FieldRow>
                 <div className="md:col-span-2">
                   <FieldRow label="Bidang Industri" required>
