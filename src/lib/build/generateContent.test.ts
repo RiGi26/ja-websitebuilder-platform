@@ -165,6 +165,15 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
   })
 
+  it('gadget tanpa variant dikenal → fallback composable lux-toko (BUKAN bespoke, sengaja)', () => {
+    // Berbeda dari fashion (selalu Atelier noir): gadget tak punya fallback
+    // bespoke per-sub-kategori. Variant kosong/typo → turun ke composable
+    // lux-toko, bukan diam-diam ke Onyx. Mengunci keputusan ini.
+    const plan = mkToko({ sub_kategori: 'gadget' })
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-toko')
+  })
+
   it('toko_online di luar bespoke ("Lainnya" → lux-toko) tetap composable', () => {
     const plan = mkToko({ variant: 'lux-toko' })
     expect(plan.theme).toBe('composable')

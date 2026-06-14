@@ -158,7 +158,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .gd-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s ${EASE}}
 .gd-card:hover .gd-card-img img{transform:scale(1.06)}
 .gd-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(6,9,14,.55));opacity:.9}
-.gd-card-cat{position:absolute;top:.7rem;left:.7rem;z-index:2;font-family:${MONO};font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gd-accent);background:rgba(6,9,14,.7);border:1px solid var(--gd-line);padding:.3rem .55rem;border-radius:6px;backdrop-filter:blur(4px)}
+.gd-card-cat{position:absolute;top:.7rem;left:.7rem;z-index:2;font-family:${MONO};font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gd-accent);background:rgba(6,9,14,.9);border:1px solid var(--gd-line);padding:.3rem .55rem;border-radius:6px;backdrop-filter:blur(4px)}
 .gd-card-body{padding:1.25rem}
 .gd-card-name{font-family:${DISPLAY};font-size:1.1rem;font-weight:600;color:var(--gd-ink);margin-bottom:.4rem;line-height:1.25}
 .gd-card-desc{font-size:.82rem;color:var(--gd-muted);margin-bottom:.9rem;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -475,7 +475,7 @@ export default function GadgetLuxRenderer({ content: c, variant = 'onyx' }: Besp
                 <div className="gd-about-frame">
                   <img src={c.about.image} alt={c.about.title} loading="lazy" />
                 </div>
-                <div className="gd-about-tag gd-mono">// est.</div>
+                <div className="gd-about-tag gd-mono">// kurasi</div>
               </div>
             )}
           </div>

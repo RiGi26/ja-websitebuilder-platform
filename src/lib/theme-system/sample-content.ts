@@ -549,8 +549,8 @@ const GADGET_LUX: ComposableContent = {
       { nama: 'Smartwatch AMOLED', harga: 699000, desc: 'Pantau detak & tidur, layar AMOLED terang, tahan air.', gambar: IMG('photo-1572569511254-d8f925fe2cbb', 900), kategori: 'Wearable' },
       { nama: 'Keyboard Mekanik', harga: 549000, desc: 'Hot-swap, RGB per-key, switch taktil yang renyah.', gambar: IMG('photo-1546435770-a3e426bf472b', 900), kategori: 'Setup' },
       { nama: 'Powerbank 20.000mAh', harga: 279000, desc: 'Fast charging 22.5W, tiga port, ringkas dibawa.', gambar: IMG('photo-1498049794561-7780e7231661', 900), kategori: 'Daya' },
-      { nama: 'Charger GaN 65W', harga: 229000, desc: 'Mungil tapi bertenaga — isi laptop & HP sekaligus.', gambar: IMG('photo-1498049794561-7780e7231661', 900), kategori: 'Daya' },
-      { nama: 'Hub USB-C 7-in-1', harga: 319000, desc: 'HDMI 4K, USB 3.0, card reader — satu colok untuk semua.', gambar: IMG('photo-1511707171634-5f897ff02aa9', 900), kategori: 'Konektivitas' },
+      { nama: 'Charger GaN 65W', harga: 229000, desc: 'Mungil tapi bertenaga — isi laptop & HP sekaligus.', gambar: IMG('photo-1556910103-1c02745aae4d', 900), kategori: 'Daya' },
+      { nama: 'Hub USB-C 7-in-1', harga: 319000, desc: 'HDMI 4K, USB 3.0, card reader — satu colok untuk semua.', gambar: IMG('photo-1581091226825-a6a2a5aee158', 900), kategori: 'Konektivitas' },
     ],
   },
   about: {
