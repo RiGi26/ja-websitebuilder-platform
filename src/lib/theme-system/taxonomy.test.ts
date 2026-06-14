@@ -70,24 +70,25 @@ describe('theme-system taxonomy (S0-1)', () => {
 
   it('getReadySubKategori: hanya sub-kategori lux ber-renderer yang aktif di Toko Online', () => {
     // LUX bespoke yang sudah ship: Kuliner (Toko Dapur) + Fashion (Atelier) +
-    // Kerajinan (Tanah Loka) + Kecantikan (Embun) + Gadget (Onyx, Wave 1). Sisanya
-    // ready:false sampai renderer bespoke-nya dibangun (urutan = registry/roadmap).
-    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion', 'kerajinan', 'kecantikan', 'gadget'])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(5)
+    // Kerajinan (Tanah Loka) + Kecantikan (Embun) + Gadget (Onyx) + Rumah (Selaras,
+    // Wave 1). Sisanya ready:false sampai renderer bespoke-nya dibangun (urutan = registry/roadmap).
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion', 'kerajinan', 'kecantikan', 'gadget', 'rumah'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(6)
   })
 
   it('sub-kategori toko yang belum bespoke punya 3 gaya composable, subKategori cocok, id unik', () => {
-    // kecantikan ("Embun") + gadget ("Onyx") kini bespoke (1 varian) → keluar dari daftar 3-gaya.
-    for (const sub of ['rumah', 'kesehatan', 'anak']) {
+    // kecantikan ("Embun") + gadget ("Onyx") + rumah ("Selaras") kini bespoke (1 varian) → keluar dari daftar 3-gaya.
+    for (const sub of ['kesehatan', 'anak']) {
       const themes = getThemes('toko_online', sub)
       expect(themes).toHaveLength(3)
       expect(themes.every((t) => t.subKategori === sub)).toBe(true)
     }
   })
 
-  it('getTheme menemukan tema lintas sub-kategori (bespoke kecantikan-embun + gadget-onyx)', () => {
+  it('getTheme menemukan tema lintas sub-kategori (bespoke kecantikan-embun + gadget-onyx + rumah-selaras)', () => {
     expect(getTheme('toko_online', 'kecantikan-embun')?.nama).toBe('Embun')
     expect(getTheme('toko_online', 'gadget-onyx')?.nama).toBe('Onyx')
+    expect(getTheme('toko_online', 'rumah-selaras')?.nama).toBe('Selaras')
   })
 
   it('Fashion → flagship Atelier (boutique bespoke): varian noir/ivoire, AKTIF', () => {

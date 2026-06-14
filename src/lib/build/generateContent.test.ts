@@ -165,6 +165,19 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
   })
 
+  it('rumah-selaras → theme toko-rumah, variant selaras (Wave 1)', () => {
+    const plan = mkToko({ sub_kategori: 'rumah', variant: 'rumah-selaras' })
+    expect(plan.theme).toBe('toko-rumah')
+    expect(plan.variant).toBe('selaras')
+  })
+
+  it('imagery enrichment aktif: products rumah punya foto (sample rumah-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'rumah', variant: 'rumah-selaras' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
   it('gadget tanpa variant dikenal → fallback composable lux-toko (BUKAN bespoke, sengaja)', () => {
     // Berbeda dari fashion (selalu Atelier noir): gadget tak punya fallback
     // bespoke per-sub-kategori. Variant kosong/typo → turun ke composable

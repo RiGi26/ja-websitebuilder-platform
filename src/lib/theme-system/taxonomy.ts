@@ -57,7 +57,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: true },
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: true },
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: true },
-    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
+    { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: true },
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
   ],
@@ -206,22 +206,17 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
       },
     ],
 
-    // ── RUMAH & DEKOR / FURNITURE ×3 — natural/lapang ────────────
+    // ── RUMAH & DEKOR (flagship bespoke "Selaras") ───────────────
+    // RumahLuxRenderer (Japandi light-calm, signature arched-alcove + bayangan
+    // natural). 1 varian default: selaras. manifest:'toko-rumah' inert (di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (rumah-natural/
+    // japandi/walnut di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     rumah: [
       {
-        id: 'rumah-natural', subKategori: 'rumah', nama: 'Natural',
-        deskripsi: 'Kayu hangat & organik, lapang. Untuk mebel, dekor kayu, perabot rumah.',
-        icon: 'Armchair', mood: '#9C6B3F', bg: 'light', manifest: 'rumah-natural',
-      },
-      {
-        id: 'rumah-japandi', subKategori: 'rumah', nama: 'Japandi',
-        deskripsi: 'Minimalis greige, tenang & lega. Untuk dekor minimalis, keramik, tanaman.',
-        icon: 'Wind', mood: '#6B6657', bg: 'light', manifest: 'rumah-japandi',
-      },
-      {
-        id: 'rumah-walnut', subKategori: 'rumah', nama: 'Walnut',
-        deskripsi: 'Walnut gelap moody, premium. Untuk furnitur kelas atas, pencahayaan, interior mewah.',
-        icon: 'Lamp', mood: '#C49A6C', bg: 'dark', manifest: 'rumah-walnut',
+        id: 'rumah-selaras', subKategori: 'rumah', nama: 'Selaras',
+        deskripsi: 'Japandi tenang & lapang, greige hangat dengan aksen sage. Untuk mebel, dekorasi, keramik, tanaman.',
+        icon: 'Armchair', mood: '#6F7A66', bg: 'light', manifest: 'toko-rumah',
       },
     ],
 

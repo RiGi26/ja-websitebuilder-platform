@@ -10,11 +10,12 @@ dulu** sebelum bangun tema. Dokumen ini = SSOT roadmap; resume kerja: `lanjut <s
 
 ## Status
 
-**Bespoke live (6):** `toko/fashion`→`toko-atelier` · `toko/kuliner`→`toko-kuliner` ·
+**Bespoke live (7):** `toko/fashion`→`toko-atelier` · `toko/kuliner`→`toko-kuliner` ·
 `toko/kerajinan`→`toko-kerajinan` · `toko/kecantikan`→`toko-kecantikan` ("Embun", Wave 1) ·
-`toko/gadget`→`toko-gadget` ("Onyx", Wave 1) · `restaurant/finedining`→`restaurant-lux`.
+`toko/gadget`→`toko-gadget` ("Onyx", Wave 1) · `toko/rumah`→`toko-rumah` ("Selaras", Wave 1) ·
+`restaurant/finedining`→`restaurant-lux`.
 
-**Celah (26 sub-kategori):** toko (rumah, kesehatan, anak) · restaurant
+**Celah (25 sub-kategori):** toko (kesehatan, anak) · restaurant
 (warung, cafe) · klinik · sekolah · personal · corporate · travel · blog · jastip (masing-masing 3).
 
 ## Engine (S0 — SELESAI, PR `feat/bespoke-engine-universal`)
@@ -44,7 +45,7 @@ cek anti-duplikat `DESIGN_LEDGER.md`.** Default 1 palet/tema (owner boleh minta 
 
 | Wave | Sub-kategori | Source etalase |
 |---|---|---|
-| 1 — Toko | ~~kecantikan ("Embun", DONE)~~ · ~~gadget ("Onyx", DONE)~~ · rumah · kesehatan · anak | products |
+| 1 — Toko | ~~kecantikan ("Embun", DONE)~~ · ~~gadget ("Onyx", DONE)~~ · ~~rumah ("Selaras", DONE)~~ · kesehatan · anak | products |
 | 2 — Jasa & makan | klinik (umum/estetik/wellness) · restaurant (warung/cafe) | services / menu |
 | 3 — Edukasi & bisnis | sekolah (reguler/islami/kursus) · corporate (startup/agency/korporat) | services |
 | 4 — Travel & personal | travel (kendaraan/wisata/akomodasi) · personal (kreator/profesional/coach) | services |
