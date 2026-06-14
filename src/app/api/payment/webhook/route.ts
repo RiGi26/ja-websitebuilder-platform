@@ -18,21 +18,30 @@ export async function POST(request: Request) {
       fraud_status,
     } = body
 
+    // Body Midtrans wajib punya order_id. Tanpa itu tak ada yang bisa diproses
+    // (return 200 supaya Midtrans tak retry input rusak).
+    if (!order_id || typeof order_id !== 'string') {
+      return NextResponse.json({ received: true, note: 'missing_order_id' })
+    }
+
     // Identitas environment order ini. Webhook bisa untuk DP (midtrans_order_id)
     // atau pelunasan (pelunasan_midtrans_order_id, suffix -LUNAS).
     const isPelunasan = order_id.endsWith('-LUNAS')
     const matchColumn = isPelunasan ? 'pelunasan_midtrans_order_id' : 'midtrans_order_id'
 
-    // Resolve mode order = environment saat transaksinya dibuat. Verifikasi tanda
-    // tangan HANYA terhadap key mode itu (lihat verifyMidtransSignature) supaya
-    // notifikasi sandbox tak bisa menyelesaikan order produksi. Order legacy
-    // (midtrans_mode null) → mode legacy (NEXT_PUBLIC_MIDTRANS_ENV).
+    // Resolve mode order = environment saat transaksinya dibuat. DP & pelunasan
+    // punya kolom mode sendiri (bisa beda bila admin flip di antaranya). Verifikasi
+    // tanda tangan HANYA terhadap key mode itu (lihat verifyMidtransSignature) supaya
+    // notifikasi sandbox tak bisa menyelesaikan order produksi. Order legacy (mode
+    // null) → mode legacy (NEXT_PUBLIC_MIDTRANS_ENV).
     const { data: modeRow } = await supabaseAdmin
       .from('orders')
-      .select('midtrans_mode')
+      .select('midtrans_mode, pelunasan_midtrans_mode')
       .eq(matchColumn, order_id)
       .maybeSingle()
-    const orderMode = normalizeOrderMode(modeRow?.midtrans_mode)
+    const orderMode = normalizeOrderMode(
+      isPelunasan ? modeRow?.pelunasan_midtrans_mode : modeRow?.midtrans_mode,
+    )
 
     // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
     if (

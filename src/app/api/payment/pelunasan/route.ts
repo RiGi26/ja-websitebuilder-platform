@@ -63,11 +63,12 @@ export async function POST(request: Request) {
     const snapData = await snapRes.json()
     if (!snapRes.ok) throw new Error(snapData.error_messages?.join(', ') || 'Midtrans error')
 
-    // Simpan id transaksi pelunasan + environment-nya (midtrans_mode) untuk
-    // verifikasi webhook -LUNAS terhadap key yang benar.
+    // Simpan id transaksi pelunasan + environment-nya di kolom TERPISAH
+    // (pelunasan_midtrans_mode) supaya tak menimpa midtrans_mode milik DP —
+    // webhook -LUNAS verifikasi terhadap kolom ini.
     await supabaseAdmin
       .from('orders')
-      .update({ pelunasan_midtrans_order_id: midtransOrderId, midtrans_mode: MIDTRANS_MODE })
+      .update({ pelunasan_midtrans_order_id: midtransOrderId, pelunasan_midtrans_mode: MIDTRANS_MODE })
       .eq('id', order.id)
 
     return NextResponse.json({
