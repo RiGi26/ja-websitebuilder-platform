@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "samples": "cross-env GEN_SAMPLES=all vitest run src/lib/theme-system/gen-samples.test.tsx",
     "shoot": "node scripts/shoot-themes.mjs",
-    "shoot:chrome": "node scripts/shoot-chrome.mjs"
+    "shoot:chrome": "node scripts/shoot-chrome.mjs",
+    "build:theme-registry": "tsc -p scripts/tsconfig.gen-theme-registry.json && node scripts/run-gen.cjs .tmp-gen-registry .tmp-gen-registry/scripts/build-theme-registry-entry.js && node -e \"require('fs').rmSync('.tmp-gen-registry',{recursive:true,force:true})\"",
+    "sync:corp-preview": "npm run build:theme-registry && node scripts/sync-corp-preview.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.3",
@@ -79,6 +81,7 @@
     "eslint": "^8",
     "eslint-config-next": "15.3.2",
     "playwright": "^1.60.0",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^2.1.9"
