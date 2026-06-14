@@ -494,7 +494,7 @@ function OrderFormContent() {
               </div>
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || !form.industri || (form.clientType === 'individu' ? !form.namaUsaha : (!form.namaPerusahaan || !form.namapic))} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">{fromKalkulator ? 'Lanjut ke Konfirmasi' : 'Lanjut ke Fitur Tambahan'} <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || !form.industri || (form.clientType === 'individu' ? !form.namaUsaha : (!form.namaPerusahaan || !form.namapic))} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg glow-button">{fromKalkulator ? 'Lanjut ke Konfirmasi' : 'Lanjut ke Fitur Tambahan'} <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -561,7 +561,7 @@ function OrderFormContent() {
 
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
+                <Button onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg glow-button">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -735,7 +735,7 @@ function OrderFormContent() {
                   <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                     <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
                     <Button disabled={!form.agreedToTerms || isSubmitting} onClick={handleSubmit} 
-                        className="w-full md:w-auto rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl flex items-center justify-center gap-3">
+                        className="w-full md:w-auto rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl glow-button flex items-center justify-center gap-3">
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="animate-spin" size={20} /> Memproses Pesanan...
