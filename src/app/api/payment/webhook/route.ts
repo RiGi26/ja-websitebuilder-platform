@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder, confirmEarningForOrder } from '@/lib/referral'
-import crypto from 'crypto'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
+import { verifyMidtransSignature } from '@/lib/platform-midtrans'
 
 // Midtrans requires HTTP 200 always — non-200 triggers retries
 // Signature check still happens; invalid ones are logged and ignored
@@ -20,13 +18,17 @@ export async function POST(request: Request) {
       fraud_status,
     } = body
 
-    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
-    const expected = crypto
-      .createHash('sha512')
-      .update(`${order_id}${status_code}${gross_amount}${SERVER_KEY}`)
-      .digest('hex')
-
-    if (signature_key !== expected) {
+    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry).
+    // Dicocokkan terhadap KEDUA server key (sandbox + production): transaksi yang
+    // dibuat sebelum mode di-switch tetap valid, jadi notifikasi in-flight tak hilang.
+    if (
+      !verifyMidtransSignature({
+        orderId: order_id,
+        statusCode: status_code,
+        grossAmount: gross_amount,
+        signatureKey: signature_key,
+      })
+    ) {
       console.warn('[webhook] Invalid signature for order:', order_id)
       return NextResponse.json({ received: true, note: 'signature_mismatch' })
     }

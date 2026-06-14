@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const SNAP_API = IS_PROD
-  ? 'https://app.midtrans.com/snap/v1/transactions'
-  : 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
     const { order_id } = await request.json()
     if (!order_id) return NextResponse.json({ error: 'order_id wajib' }, { status: 400 })
+
+    // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API } = await getPlatformMidtrans()
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')

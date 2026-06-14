@@ -2,12 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder } from '@/lib/referral'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const STATUS_API = IS_PROD
-  ? 'https://api.midtrans.com/v2'
-  : 'https://api.sandbox.midtrans.com/v2'
+import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
@@ -15,6 +10,9 @@ export async function POST(request: Request) {
     if (!order_id || !midtrans_order_id) {
       return NextResponse.json({ error: 'Missing params' }, { status: 400 })
     }
+
+    // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
+    const { serverKey: SERVER_KEY, statusApiUrl: STATUS_API } = await getPlatformMidtrans()
 
     // Verify transaction status directly from Midtrans
     const auth = Buffer.from(`${SERVER_KEY}:`).toString('base64')

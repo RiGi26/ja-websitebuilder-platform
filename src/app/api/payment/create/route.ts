@@ -4,16 +4,15 @@ import { notifyCustomer } from '@/lib/fonnte'
 import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
 import { referralDiscountFor } from '@/lib/referral-tier'
 import { computeServerPrice } from '@/lib/pricing/server-price'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const SNAP_API = IS_PROD
-  ? 'https://app.midtrans.com/snap/v1/transactions'
-  : 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    // Mode + kredensial Midtrans dipilih runtime dari DB (platform_settings) —
+    // bisa di-switch sandbox/production dari /admin tanpa redeploy. Dipanggil
+    // sebelum insert order supaya misconfig gagal jelas tanpa order yatim.
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API } = await getPlatformMidtrans()
     const {
       client_type, nama_usaha, nama_perusahaan, nama_pic, jabatan,
       nomor_wa, email, industri, template_id, referensi_manual,
