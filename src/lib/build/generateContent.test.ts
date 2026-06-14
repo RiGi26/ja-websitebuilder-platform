@@ -152,6 +152,19 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
   })
 
+  it('gadget-onyx → theme toko-gadget, variant onyx (Wave 1)', () => {
+    const plan = mkToko({ sub_kategori: 'gadget', variant: 'gadget-onyx' })
+    expect(plan.theme).toBe('toko-gadget')
+    expect(plan.variant).toBe('onyx')
+  })
+
+  it('imagery enrichment aktif: products gadget punya foto (sample gadget-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'gadget', variant: 'gadget-onyx' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
   it('toko_online di luar bespoke ("Lainnya" → lux-toko) tetap composable', () => {
     const plan = mkToko({ variant: 'lux-toko' })
     expect(plan.theme).toBe('composable')
