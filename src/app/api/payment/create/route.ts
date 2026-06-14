@@ -6,6 +6,7 @@ import { referralDiscountFor } from '@/lib/referral-tier'
 import { computeServerPrice } from '@/lib/pricing/server-price'
 import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 import { getPlatformMidtrans } from '@/lib/platform-midtrans'
+import { BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +28,18 @@ export async function POST(request: Request) {
       // Konteks kalkulator corp (untuk recompute harga server-side bila order
       // datang dari handoff "Rakit Website"). Diabaikan utk billing kalau kosong.
       from_kalkulator, paket, kalkulator_addons, bundle,
+      // Handoff tema dari galeri preview corp (Fase 3): tema pilihan customer.
+      // Disimpan sbg default brief (briefing_data.preselect), TIDAK memengaruhi harga.
+      preselect_subkat, preselect_theme,
     } = body
+
+    // Validasi otoritatif: hanya tema bespoke terdaftar yang dihormati (jangan
+    // percaya klien). Tema tak dikenal → preselect diabaikan (brief pakai default).
+    const validPreselectTheme =
+      preselect_theme && BESPOKE_VARIANTS[String(preselect_theme)] ? String(preselect_theme) : null
+    const preselect = validPreselectTheme
+      ? { variant: validPreselectTheme, sub_kategori: preselect_subkat ? String(preselect_subkat) : null }
+      : null
 
     // SECURITY: JANGAN pernah percaya harga dari klien. Sebelumnya gross =
     // Number(total_estimasi) langsung jadi gross_amount Midtrans → bisa di-tamper
@@ -94,6 +106,9 @@ export async function POST(request: Request) {
         referral_code: applied?.code ?? null,
         referrer_id: applied?.referrerId ?? null,
         referral_discount: referralDiscount,
+        // Tema pilihan dari galeri corp → default brief form (dibaca briefing page).
+        // Ditulis ulang penuh saat briefing disubmit; "done" dicek via briefing_submitted_at.
+        ...(preselect && { briefing_data: { preselect } }),
       }])
       .select()
       .single()
