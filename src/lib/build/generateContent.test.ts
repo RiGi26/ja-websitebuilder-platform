@@ -152,6 +152,28 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
   })
 
+  it('gadget-onyx → theme toko-gadget, variant onyx (Wave 1)', () => {
+    const plan = mkToko({ sub_kategori: 'gadget', variant: 'gadget-onyx' })
+    expect(plan.theme).toBe('toko-gadget')
+    expect(plan.variant).toBe('onyx')
+  })
+
+  it('imagery enrichment aktif: products gadget punya foto (sample gadget-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'gadget', variant: 'gadget-onyx' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
+  it('gadget tanpa variant dikenal → fallback composable lux-toko (BUKAN bespoke, sengaja)', () => {
+    // Berbeda dari fashion (selalu Atelier noir): gadget tak punya fallback
+    // bespoke per-sub-kategori. Variant kosong/typo → turun ke composable
+    // lux-toko, bukan diam-diam ke Onyx. Mengunci keputusan ini.
+    const plan = mkToko({ sub_kategori: 'gadget' })
+    expect(plan.theme).toBe('composable')
+    expect(plan.variant).toBe('lux-toko')
+  })
+
   it('toko_online di luar bespoke ("Lainnya" → lux-toko) tetap composable', () => {
     const plan = mkToko({ variant: 'lux-toko' })
     expect(plan.theme).toBe('composable')

@@ -19,6 +19,7 @@ import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelie
 import KulinerLuxRenderer from '@/app/components/themes/toko-bespoke/KulinerLuxRenderer'
 import KerajinanLuxRenderer from '@/app/components/themes/toko-bespoke/KerajinanLuxRenderer'
 import KecantikanLuxRenderer from '@/app/components/themes/toko-bespoke/KecantikanLuxRenderer'
+import GadgetLuxRenderer from '@/app/components/themes/toko-bespoke/GadgetLuxRenderer'
 import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
@@ -49,6 +50,8 @@ const LUX: Record<string, BespokeEntry> = {
   'kerajinan-tanah': { sample: 'kerajinan-lux', variant: 'tanah', label: 'Toko Kerajinan — Tanah Loka (batik & wastra heritage)', sw: '#1E3A2F', Renderer: KerajinanLuxRenderer },
   // FLAGSHIP lux kecantikan (KecantikanLuxRenderer) — Embun, light-luminous glow.
   'kecantikan-embun': { sample: 'kecantikan-lux', variant: 'embun', label: 'Toko Kecantikan — Embun (skincare luminous glow)', sw: '#B5566B', Renderer: KecantikanLuxRenderer },
+  // FLAGSHIP lux gadget (GadgetLuxRenderer) — Onyx, dark-tech blueprint + spec HUD.
+  'gadget-onyx': { sample: 'gadget-lux', variant: 'onyx', label: 'Toko Gadget — Onyx (elektronik dark-tech)', sw: '#22D3EE', Renderer: GadgetLuxRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES

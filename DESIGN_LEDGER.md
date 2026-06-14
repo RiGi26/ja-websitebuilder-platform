@@ -15,6 +15,7 @@
 | `toko-kuliner` (PR #126) | toko_online / kuliner | tungku · pamor | Newsreader + Plus Jakarta Sans | krem + terracotta (tungku) / espresso + emas (pamor) | geometri membulat | menu-board ber-leader titik | galeri film-strip |
 | `toko-kerajinan` (PR #128) | toko_online / kerajinan | tanah | Cinzel + Raleway | Forest `#1E3A2F` · Parchment `#F7F0E3` · Bronze `#C8962A` | batik Kawung (SVG inline, ter-tint) | — | motif kawung sebagai identitas |
 | `toko-kecantikan` (PR #152) | toko_online / kecantikan | embun | Italiana + Mulish | Porcelain `#FBF7F5` · Blush `#F4E7E4` · Rose `#B5566B`/`#A8455C` | glow bloom (radial-gradient CSS, bernapas) | asimetris terang, produk + halo glow di belakang | radial **glow halo** yang bernapas + **ritual stepper** bernomor |
+| `toko-gadget` (Wave 1) | toko_online / gadget | onyx | Space Grotesk + IBM Plex Sans/Mono | Onyx `#0A0E14` · Surface `#131B25` · Cyan `#22D3EE` | blueprint grid + corner-bracket + node dots | dark blueprint-grid, device-frame ber-scanline | **spec-readout HUD** (kartu mono ber-corner-bracket + garis sirkuit) |
 
 ## Aturan pakai
 
