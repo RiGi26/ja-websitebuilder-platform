@@ -38,6 +38,12 @@ interface ViewportThumbs {
   tablet: string
   desktop: string
 }
+/** Screenshot HALAMAN PENUH (tinggi penuh, bukan crop hero) — dipakai lightbox
+ *  "Lihat preview" di galeri CORP. Hanya desktop + mobile (toggle modal). */
+interface FullThumbs {
+  desktop: string
+  mobile: string
+}
 interface ThemePreviewEntry {
   themeId: string
   themeKey: string
@@ -50,6 +56,7 @@ interface ThemePreviewEntry {
   icon: string
   status: Status
   thumbs: ViewportThumbs | null
+  fullThumbs: FullThumbs | null
   liveDemoUrl?: string
   /** INTERNAL (WB-only): id file PNG di theme-samples/ (≠ themeId utk tema legacy).
    *  Dialirkan ke sync-corp-preview.mjs, di-STRIP sebelum ditulis ke registry CORP. */
@@ -108,6 +115,12 @@ function thumbUrls(tipe: string, subkat: string, themeId: string): ViewportThumb
   return { mobile: `${base}-mobile.webp`, tablet: `${base}-tablet.webp`, desktop: `${base}-desktop.webp` }
 }
 
+/** URL webp halaman penuh (suffix `-full`) untuk lightbox. Path persis dipateri sync. */
+function fullThumbUrls(tipe: string, subkat: string, themeId: string): FullThumbs {
+  const base = `/theme-previews/${tipe}/${subkat}/${themeId}`
+  return { desktop: `${base}-desktop-full.webp`, mobile: `${base}-mobile-full.webp` }
+}
+
 // Tema lama ter-shot dgn id sampel ≠ themeId (mis. Atelier noir = `toko-atelier`).
 // Peta ini memetakan themeId → id file PNG di theme-samples/ supaya shot lama
 // dikenali tanpa re-shoot. Default (tak terdaftar) = themeId. Tema bespoke baru
@@ -151,6 +164,7 @@ for (const [tipeStr, subs] of Object.entries(INDUSTRY_SUBKATEGORI)) {
         icon: t.icon,
         status: shot ? 'live' : 'live-noshot',
         thumbs: shot ? thumbUrls(tipeStr, sub.id, t.id) : null,
+        fullThumbs: shot ? fullThumbUrls(tipeStr, sub.id, t.id) : null,
         _shootId: shootId,
       })
     }
@@ -189,6 +203,7 @@ for (const [tipeStr, subs] of Object.entries(INDUSTRY_SUBKATEGORI)) {
     icon: 'Wine',
     status: shot ? 'live' : 'live-noshot',
     thumbs: shot ? thumbUrls(tipe, subkat, themeId) : null,
+    fullThumbs: shot ? fullThumbUrls(tipe, subkat, themeId) : null,
     _shootId: shootId,
   }
   const group: SubKategoriGroup = { id: subkat, nama: 'Fine Dining', icon: 'UtensilsCrossed', themes: [entry] }
