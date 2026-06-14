@@ -16,6 +16,8 @@ import { Label } from '@/app/components/ui/label'
 import { templatesData } from '@/data/templates'
 import { orderAddons, aliasToId } from '@/lib/addons/catalog'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
+import { BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
+import { THEMES } from '@/lib/theme-system/taxonomy'
 import { referralDiscountFor, isFlatTier, FLAT_BUYER_DISCOUNT } from '@/lib/referral-tier'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
@@ -284,6 +286,18 @@ function OrderFormContent() {
   const kalkulatorAddons = searchParams.get('addons') ?? ''
   const kalkulatorBundle = searchParams.get('bundle') ?? ''
 
+  // Handoff tema dari galeri preview corp (Fase 3): ?subkat=&theme=. Hanya tema
+  // bespoke terdaftar yang dihormati (server payment/create validasi ulang).
+  // Disimpan ke order → jadi default brief form (sub-kat + varian) pasca-bayar.
+  const handoffSubkat = searchParams.get('subkat') ?? ''
+  const handoffTheme = searchParams.get('theme') ?? ''
+  const validHandoffTheme = handoffTheme && BESPOKE_VARIANTS[handoffTheme] ? handoffTheme : ''
+  const handoffThemeNama = validHandoffTheme
+    ? (Object.values(THEMES)
+        .flatMap((byKat) => Object.values(byKat ?? {}).flat())
+        .find((t) => t.id === validHandoffTheme)?.nama ?? validHandoffTheme)
+    : ''
+
   // Mapping corp-landing addon IDs → order form addon IDs
   // Alias id corp-landing → id kanonik, diturunkan dari SSOT (.aliases).
   // Gantikan mapping hardcode lama yang korup (blog→newsletter, track-pack→
@@ -511,6 +525,9 @@ function OrderFormContent() {
           paket: kalkulatorPaket || null,
           kalkulator_addons: fromKalkulator ? kalkulatorAddons : null,
           bundle: kalkulatorBundle || null,
+          // Handoff tema (Fase 3) → disimpan sbg default brief; server validasi ulang.
+          preselect_subkat: validHandoffTheme ? (handoffSubkat || null) : null,
+          preselect_theme: validHandoffTheme || null,
         }),
       })
 
@@ -586,7 +603,7 @@ function OrderFormContent() {
       </div>
 
       {/* Banner dari kalkulator */}
-      {(kalkulatorEstimasi || kalkulatorAddons) && (
+      {(kalkulatorEstimasi || kalkulatorAddons || handoffThemeNama) && (
         <div className="bg-blue-50 border border-blue-100 rounded-[28px] p-5 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-[#0071E3] rounded-2xl flex items-center justify-center text-white shrink-0">
             <Sparkles size={20} />
@@ -597,6 +614,9 @@ function OrderFormContent() {
               {kalkulatorIndustri && <>Industri: <strong>{kalkulatorIndustri}</strong></>}
               {kalkulatorPaket && <> · Paket: <strong>{kalkulatorPaket}</strong></>}
             </p>
+            {handoffThemeNama && (
+              <p className="text-xs text-blue-600 mt-1">Tema pilihan: <strong>{handoffThemeNama}</strong> · bisa diubah saat isi brief</p>
+            )}
             {form.selectedAddons.length > 0 && (
               <p className="text-xs text-blue-600 mt-1">
                 Fitur pre-selected: <strong>{form.selectedAddons.map(id => ADDONS.find(a => a.id === id)?.name ?? id).join(', ')}</strong>

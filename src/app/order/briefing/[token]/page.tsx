@@ -30,6 +30,12 @@ export default async function BriefingPage({ params }: { params: Promise<{ token
 
   const namaKlien = order.nama_perusahaan || order.nama_usaha || 'Customer'
 
+  // Handoff tema dari galeri corp (Fase 3): default sub-kat + varian brief form.
+  // Disetel payment/create saat insert; null untuk order tanpa handoff.
+  const preselect = (order.briefing_data as Record<string, unknown> | null)?.preselect as
+    | { sub_kategori?: string | null; variant?: string }
+    | undefined
+
   // Sudah submit — tampilkan readonly summary
   if (order.briefing_submitted_at) {
     return (
@@ -72,6 +78,7 @@ export default async function BriefingPage({ params }: { params: Promise<{ token
           email={order.email ?? ''}
           industri={order.industri ?? ''}
           selectedAddons={order.selected_addons ?? []}
+          preselect={preselect}
         />
       </main>
     </div>
