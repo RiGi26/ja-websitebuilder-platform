@@ -139,6 +139,19 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
   })
 
+  it('kecantikan-embun → theme toko-kecantikan, variant embun (Wave 1)', () => {
+    const plan = mkToko({ sub_kategori: 'kecantikan', variant: 'kecantikan-embun' })
+    expect(plan.theme).toBe('toko-kecantikan')
+    expect(plan.variant).toBe('embun')
+  })
+
+  it('imagery enrichment aktif: products kecantikan punya foto (sample kecantikan-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'kecantikan', variant: 'kecantikan-embun' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
   it('toko_online di luar bespoke ("Lainnya" → lux-toko) tetap composable', () => {
     const plan = mkToko({ variant: 'lux-toko' })
     expect(plan.theme).toBe('composable')

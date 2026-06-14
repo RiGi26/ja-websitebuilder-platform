@@ -18,6 +18,7 @@ import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/Restau
 import TokoAtelierRenderer from '@/app/components/themes/toko-atelier/TokoAtelierRenderer'
 import KulinerLuxRenderer from '@/app/components/themes/toko-bespoke/KulinerLuxRenderer'
 import KerajinanLuxRenderer from '@/app/components/themes/toko-bespoke/KerajinanLuxRenderer'
+import KecantikanLuxRenderer from '@/app/components/themes/toko-bespoke/KecantikanLuxRenderer'
 import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
@@ -46,6 +47,8 @@ const LUX: Record<string, BespokeEntry> = {
   'kuliner-pamor': { sample: 'kuliner-lux', variant: 'pamor', label: 'Toko Kuliner — Pamor (gelap heritage)', sw: '#C9A24A', Renderer: KulinerLuxRenderer },
   // FLAGSHIP lux kerajinan (KerajinanLuxRenderer) — Tanah Loka heritage artisan.
   'kerajinan-tanah': { sample: 'kerajinan-lux', variant: 'tanah', label: 'Toko Kerajinan — Tanah Loka (batik & wastra heritage)', sw: '#1E3A2F', Renderer: KerajinanLuxRenderer },
+  // FLAGSHIP lux kecantikan (KecantikanLuxRenderer) — Embun, light-luminous glow.
+  'kecantikan-embun': { sample: 'kecantikan-lux', variant: 'embun', label: 'Toko Kecantikan — Embun (skincare luminous glow)', sw: '#B5566B', Renderer: KecantikanLuxRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES
