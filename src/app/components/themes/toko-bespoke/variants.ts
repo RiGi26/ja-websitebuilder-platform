@@ -32,6 +32,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'kuliner-pamor': { theme: 'toko-kuliner', variant: 'pamor', sample: 'kuliner-lux' },
   // Kerajinan — Tanah Loka (forest/parchment/bronze, kawung motif).
   'kerajinan-tanah': { theme: 'toko-kerajinan', variant: 'tanah', sample: 'kerajinan-lux' },
+  // Kecantikan — Embun (porcelain/blush/rose, signature glow halo).
+  'kecantikan-embun': { theme: 'toko-kecantikan', variant: 'embun', sample: 'kecantikan-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -49,4 +51,5 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'toko-atelier': { social: true, gallery: true },
   'toko-kuliner': { social: true, gallery: true },
   'toko-kerajinan': {},
+  'toko-kecantikan': {},
 }
