@@ -52,13 +52,15 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     const html = renderToStaticMarkup(
       <SubKategoriPicker tipe="toko_online" value="" onChange={noop} />,
     )
-    // Lux bespoke yang sudah ship: Kuliner + Fashion + Kerajinan. Sisanya ready:false (sembunyi).
+    // Lux bespoke yang sudah ship: Kuliner + Fashion + Kerajinan + Kecantikan (Embun).
+    // Sisanya ready:false (sembunyi).
     expect(html).toContain('Kuliner / Makanan')
     expect(html).toContain('Fashion / Pakaian')
     expect(html).toContain('Kerajinan / Heritage')
+    expect(html).toContain('Kecantikan / Skincare')
     expect(html).toContain('Lainnya (gaya umum)')
-    // Sub-kategori non-lux disembunyikan (ready:false)
-    expect(html).not.toContain('Kecantikan / Skincare')
+    // Sub-kategori yang belum bespoke disembunyikan (ready:false)
+    expect(html).not.toContain('Elektronik / Gadget')
   })
 
   it('non-toko (klinik/sekolah) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
