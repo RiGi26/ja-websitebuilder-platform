@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder } from '@/lib/referral'
-import { getPlatformMidtrans } from '@/lib/platform-midtrans'
+import { midtransConfigForMode, normalizeOrderMode } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
@@ -11,8 +11,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing params' }, { status: 400 })
     }
 
-    // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
-    const { serverKey: SERVER_KEY, statusApiUrl: STATUS_API } = await getPlatformMidtrans()
+    // Poll status pakai environment tempat transaksi DIBUAT (orders.midtrans_mode),
+    // bukan mode toggle current — kalau admin flip mode di antara pembuatan order
+    // dan poll thank-you, polling tetap mengarah ke environment yang benar. Order
+    // legacy (null) → mode legacy. (Webhook tetap jalur settlement otoritatif.)
+    const { data: orderRow } = await supabaseAdmin
+      .from('orders')
+      .select('midtrans_mode')
+      .eq('id', order_id)
+      .maybeSingle()
+    const { serverKey: SERVER_KEY, statusApiUrl: STATUS_API } = midtransConfigForMode(
+      normalizeOrderMode(orderRow?.midtrans_mode),
+    )
 
     // Verify transaction status directly from Midtrans
     const auth = Buffer.from(`${SERVER_KEY}:`).toString('base64')

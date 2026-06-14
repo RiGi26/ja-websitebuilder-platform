@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder, confirmEarningForOrder } from '@/lib/referral'
-import { verifyMidtransSignature } from '@/lib/platform-midtrans'
+import { verifyMidtransSignature, normalizeOrderMode } from '@/lib/platform-midtrans'
 
 // Midtrans requires HTTP 200 always — non-200 triggers retries
 // Signature check still happens; invalid ones are logged and ignored
@@ -18,15 +18,30 @@ export async function POST(request: Request) {
       fraud_status,
     } = body
 
-    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry).
-    // Dicocokkan terhadap KEDUA server key (sandbox + production): transaksi yang
-    // dibuat sebelum mode di-switch tetap valid, jadi notifikasi in-flight tak hilang.
+    // Identitas environment order ini. Webhook bisa untuk DP (midtrans_order_id)
+    // atau pelunasan (pelunasan_midtrans_order_id, suffix -LUNAS).
+    const isPelunasan = order_id.endsWith('-LUNAS')
+    const matchColumn = isPelunasan ? 'pelunasan_midtrans_order_id' : 'midtrans_order_id'
+
+    // Resolve mode order = environment saat transaksinya dibuat. Verifikasi tanda
+    // tangan HANYA terhadap key mode itu (lihat verifyMidtransSignature) supaya
+    // notifikasi sandbox tak bisa menyelesaikan order produksi. Order legacy
+    // (midtrans_mode null) → mode legacy (NEXT_PUBLIC_MIDTRANS_ENV).
+    const { data: modeRow } = await supabaseAdmin
+      .from('orders')
+      .select('midtrans_mode')
+      .eq(matchColumn, order_id)
+      .maybeSingle()
+    const orderMode = normalizeOrderMode(modeRow?.midtrans_mode)
+
+    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
     if (
       !verifyMidtransSignature({
         orderId: order_id,
         statusCode: status_code,
         grossAmount: gross_amount,
         signatureKey: signature_key,
+        mode: orderMode,
       })
     ) {
       console.warn('[webhook] Invalid signature for order:', order_id)
@@ -50,9 +65,6 @@ export async function POST(request: Request) {
       update.payment_status = 'failed'
       update.status = 'pending_payment'
     }
-
-    // Deteksi apakah ini transaksi pelunasan (suffix -LUNAS)
-    const isPelunasan = order_id.endsWith('-LUNAS')
 
     if (Object.keys(update).length > 0) {
       if (isPelunasan) {

@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     if (!order_id) return NextResponse.json({ error: 'order_id wajib' }, { status: 400 })
 
     // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
-    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API } = await getPlatformMidtrans()
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API, mode: MIDTRANS_MODE } = await getPlatformMidtrans()
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
@@ -61,10 +61,10 @@ export async function POST(request: Request) {
     const snapData = await snapRes.json()
     if (!snapRes.ok) throw new Error(snapData.error_messages?.join(', ') || 'Midtrans error')
 
-    // Update midtrans_order_id + reset status ke awaiting_payment
+    // Update midtrans_order_id + reset status ke awaiting_payment + environment transaksi
     await supabaseAdmin
       .from('orders')
-      .update({ midtrans_order_id: retryOrderId, payment_status: 'awaiting_payment', dp_amount: dpAmount })
+      .update({ midtrans_order_id: retryOrderId, payment_status: 'awaiting_payment', dp_amount: dpAmount, midtrans_mode: MIDTRANS_MODE })
       .eq('id', order.id)
 
     return NextResponse.json({

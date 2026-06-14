@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
+import { logSecurityEvent } from '@/lib/security-log'
 import {
   getMidtransMode,
   getMidtransKeyStatus,
@@ -20,6 +20,8 @@ function clientIp(request: Request): string | null {
 }
 
 // GET — mode Midtrans platform aktif + status konfigurasi key per-mode.
+// Tidak dipakai UI (state awal datang dari server props di /admin); disediakan
+// untuk ops/debug manual.
 export async function GET() {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const mode = await getMidtransMode()
@@ -31,11 +33,12 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
-    const { mode } = (await request.json()) as { mode?: string }
+    const body = await request.json().catch(() => null)
+    const mode = (body as { mode?: string } | null)?.mode
     if (mode !== 'sandbox' && mode !== 'production') {
       return NextResponse.json({ error: "mode harus 'sandbox' atau 'production'" }, { status: 400 })
     }
-    const next = mode as MidtransMode
+    const next: MidtransMode = mode
 
     const keys = getMidtransKeyStatus()
     if (!keys[next]) {
@@ -54,17 +57,11 @@ export async function POST(request: Request) {
 
     await setMidtransMode(next)
 
-    // Audit — perubahan ini menyangkut uang nyata, catat siapa/kapan.
-    await supabaseAdmin
-      .from('security_events')
-      .insert({
-        kind: 'midtrans_mode_change',
-        ip: clientIp(request),
-        detail: { from: prev, to: next },
-      })
-      .then(({ error }) => {
-        if (error) console.error('[admin/payment-mode] audit insert failed:', error.message)
-      })
+    // Audit — perubahan ini menyangkut uang nyata, catat siapa/kapan (non-fatal).
+    await logSecurityEvent('midtrans_mode_change', {
+      ip: clientIp(request) ?? undefined,
+      detail: { from: prev, to: next },
+    })
 
     return NextResponse.json({ mode: next, changed: true, keys })
   } catch (err) {

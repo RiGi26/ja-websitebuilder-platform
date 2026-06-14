@@ -56,28 +56,39 @@ export function serverKeyForMode(mode: MidtransMode): string | null {
   return null
 }
 
-// Mode aktif. Sumber kebenaran = DB. Bila baris belum ada / nilai invalid,
-// fallback ke perilaku legacy (NEXT_PUBLIC_MIDTRANS_ENV) supaya tak ada
-// perubahan perilaku sebelum admin pertama kali menge-set lewat UI.
+// Mode aktif. Sumber kebenaran = DB. Bila baris belum ada / nilai invalid / DB
+// error, fallback ke perilaku legacy (NEXT_PUBLIC_MIDTRANS_ENV). Error DB di-LOG
+// (jangan ditelan diam-diam) — ini field yang memilih sandbox vs production.
 export async function getMidtransMode(): Promise<MidtransMode> {
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from('platform_settings')
     .select('value')
     .eq('key', 'midtrans_mode')
     .maybeSingle()
+  if (error) {
+    console.error(
+      `[platform-midtrans] gagal baca midtrans_mode, fallback ke NEXT_PUBLIC_MIDTRANS_ENV (${legacyMode()}): ${error.message}`,
+    )
+  }
   const v = data?.value
   if (v === 'production' || v === 'sandbox') return v
-  return process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production' ? 'production' : 'sandbox'
+  return legacyMode()
 }
 
-// Konfigurasi penuh untuk mode aktif. Throw bila server key untuk mode itu
-// belum di-set (lebih baik gagal jelas daripada 401 misterius dari Midtrans).
-export async function getPlatformMidtrans(): Promise<PlatformMidtrans> {
-  const mode = await getMidtransMode()
+// Normalisasi mode tersimpan di order (kolom orders.midtrans_mode). Null/invalid
+// (order legacy pra-toggle) → mode legacy. Dipakai webhook & confirm untuk
+// memverifikasi/poll terhadap environment tempat transaksi DIBUAT.
+export function normalizeOrderMode(stored: string | null | undefined): MidtransMode {
+  return stored === 'production' || stored === 'sandbox' ? stored : legacyMode()
+}
+
+// Konfigurasi penuh untuk SEBUAH mode (murni, tanpa baca DB). Throw bila server
+// key untuk mode itu belum di-set (lebih baik gagal jelas daripada 401 misterius).
+export function midtransConfigForMode(mode: MidtransMode): PlatformMidtrans {
   const serverKey = serverKeyForMode(mode)
   if (!serverKey) {
     throw new Error(
-      `Midtrans mode '${mode}' aktif tapi server key-nya belum di-set. ` +
+      `Midtrans mode '${mode}' dipakai tapi server key-nya belum di-set. ` +
         `Set MIDTRANS_SERVER_KEY_${mode.toUpperCase()} di environment, atau ganti mode di /admin.`,
     )
   }
@@ -88,6 +99,12 @@ export async function getPlatformMidtrans(): Promise<PlatformMidtrans> {
     snapApiUrl: SNAP_API[mode],
     statusApiUrl: STATUS_API[mode],
   }
+}
+
+// Konfigurasi untuk mode AKTIF (dari DB). Dipakai saat MEMBUAT transaksi baru
+// (create/retry/pelunasan).
+export async function getPlatformMidtrans(): Promise<PlatformMidtrans> {
+  return midtransConfigForMode(await getMidtransMode())
 }
 
 // Status konfigurasi key per-mode untuk ditampilkan di UI admin (tanpa membuka
@@ -110,10 +127,8 @@ export async function setMidtransMode(mode: MidtransMode): Promise<void> {
   if (error) throw new Error(`setMidtransMode: ${error.message}`)
 }
 
-// Semua server key terkonfigurasi (unik). Dipakai webhook untuk verifikasi
-// tanda tangan terhadap KEDUA env — transaksi yang dibuat di sandbox tetap
-// terverifikasi walau mode platform sudah di-flip ke production (atau sebaliknya),
-// sehingga notifikasi in-flight tidak hilang saat owner menukar mode.
+// Semua server key terkonfigurasi (unik). Hanya jaring pengaman terakhir saat
+// mode sebuah order tak bisa ditentukan DAN key mode-nya tak terkonfigurasi.
 export function midtransServerKeys(): string[] {
   const keys = [serverKeyForMode('production'), serverKeyForMode('sandbox')].filter(
     (k): k is string => !!k,
@@ -121,20 +136,28 @@ export function midtransServerKeys(): string[] {
   return Array.from(new Set(keys))
 }
 
-// Verifikasi tanda tangan webhook Midtrans terhadap semua server key yang
-// terkonfigurasi (lihat midtransServerKeys). Timing-safe.
+// Verifikasi tanda tangan webhook Midtrans. PENTING (money-safety): dicocokkan
+// HANYA terhadap key dari `mode` order tsb — environment tempat transaksi DIBUAT —
+// supaya notifikasi yang ditandatangani key environment LAIN (mis. sandbox untuk
+// order produksi, yang midtrans_order_id-nya bisa ditebak dari displayId publik)
+// DITOLAK. `mode` di-resolve dari orders.midtrans_mode via normalizeOrderMode.
+// Hanya bila key mode itu tak terkonfigurasi, jatuh ke semua key sebagai jaring
+// pengaman (degenerate). Timing-safe + length-guarded.
 export function verifyMidtransSignature(args: {
   orderId: string
   statusCode: string
   grossAmount: string
   signatureKey: string
+  mode: MidtransMode
 }): boolean {
-  const { orderId, statusCode, grossAmount, signatureKey } = args
+  const { orderId, statusCode, grossAmount, signatureKey, mode } = args
+  const key = serverKeyForMode(mode)
+  const candidates = key ? [key] : midtransServerKeys()
   const sigBuf = Buffer.from(signatureKey ?? '')
-  return midtransServerKeys().some((key) => {
+  return candidates.some((k) => {
     const expected = crypto
       .createHash('sha512')
-      .update(`${orderId}${statusCode}${grossAmount}${key}`)
+      .update(`${orderId}${statusCode}${grossAmount}${k}`)
       .digest('hex')
     const expBuf = Buffer.from(expected)
     return sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf)

@@ -13,6 +13,7 @@ export type SecurityEventKind =
   | 'admin_login_ratelimited'
   | 'track_ratelimited'
   | 'refval_ratelimited'
+  | 'midtrans_mode_change'
 
 export async function logSecurityEvent(
   kind: SecurityEventKind,

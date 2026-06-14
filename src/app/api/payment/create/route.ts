@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     // Mode + kredensial Midtrans dipilih runtime dari DB (platform_settings) —
     // bisa di-switch sandbox/production dari /admin tanpa redeploy. Dipanggil
     // sebelum insert order supaya misconfig gagal jelas tanpa order yatim.
-    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API } = await getPlatformMidtrans()
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API, mode: MIDTRANS_MODE } = await getPlatformMidtrans()
     const {
       client_type, nama_usaha, nama_perusahaan, nama_pic, jabatan,
       nomor_wa, email, industri, template_id, referensi_manual,
@@ -147,10 +147,11 @@ export async function POST(request: Request) {
       throw new Error(snapData.error_messages?.join(', ') || `Midtrans error: ${snapRes.status}`)
     }
 
-    // 3. Persist midtrans_order_id & dp_amount
+    // 3. Persist midtrans_order_id & dp_amount + environment transaksi (midtrans_mode)
+    //    supaya webhook/confirm memverifikasi & poll terhadap key yang benar.
     await supabaseAdmin
       .from('orders')
-      .update({ midtrans_order_id: midtransOrderId, dp_amount: dpAmount })
+      .update({ midtrans_order_id: midtransOrderId, dp_amount: dpAmount, midtrans_mode: MIDTRANS_MODE })
       .eq('id', order.id)
 
     // 4. WA post-order ke customer (fire-and-forget)
