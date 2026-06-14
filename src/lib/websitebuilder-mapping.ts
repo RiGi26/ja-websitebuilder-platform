@@ -13,16 +13,24 @@ export function industriToTipe(industri: string | null | undefined): TipeIndustr
   const s = (industri ?? '').toLowerCase()
   if (!s.trim()) return 'custom'
 
+  // PENTING (audit 2026-06-13): cocokkan kategori SPESIFIK lebih dulu. Kata
+  // generik 'bisnis' (catch-all corp "Bisnis Jasa & Lainnya") harus dievaluasi
+  // PALING AKHIR, supaya mis. "Bisnis Kuliner" → restaurant, bukan corporate.
   if (s.includes('toko') || s.includes('online') || s.includes('jual') || s.includes('ecommerce') || s.includes('e-commerce')) return 'toko_online'
-  if (s.includes('perusahaan') || s.includes('corporate') || s.includes('company') || s.includes('bisnis')) return 'corporate'
-  if (s.includes('sekolah') || s.includes('kampus') || s.includes('pendidikan') || s.includes('school')) return 'sekolah'
-  if (s.includes('klinik') || s.includes('dokter') || s.includes('kesehatan') || s.includes('rumah sakit') || s.includes('clinic')) return 'klinik'
-  if (s.includes('travel') || s.includes('wisata') || s.includes('tour') || s.includes('rental') || s.includes('sewa') || s.includes('rent')) return 'travel'
-  if (s.includes('resto') || s.includes('restaurant') || s.includes('cafe') || s.includes('kuliner') || s.includes('makan')) return 'restaurant'
-  if (s.includes('personal') || s.includes('pribadi') || s.includes('portfolio') || s.includes('cv')) return 'personal'
-  if (s.includes('blog') || s.includes('berita') || s.includes('news')) return 'blog'
   if (s.includes('jastip') || s.includes('titip')) return 'jastip'
+  if (s.includes('resto') || s.includes('restaurant') || s.includes('cafe') || s.includes('kuliner') || s.includes('makan')) return 'restaurant'
+  if (s.includes('klinik') || s.includes('dokter') || s.includes('kesehatan') || s.includes('rumah sakit') || s.includes('clinic') || s.includes('spa')) return 'klinik'
+  if (s.includes('sekolah') || s.includes('kampus') || s.includes('pendidikan') || s.includes('school') || s.includes('lpk') || s.includes('kursus')) return 'sekolah'
+  if (s.includes('travel') || s.includes('wisata') || s.includes('tour') || s.includes('rental') || s.includes('sewa') || s.includes('rent')) return 'travel'
+  if (s.includes('blog') || s.includes('berita') || s.includes('news') || s.includes('media')) return 'blog'
+  // Studio/kreatif/fotografer/agency + personal branding → portfolio personal.
+  if (s.includes('studio') || s.includes('kreatif') || s.includes('fotografer') || s.includes('photo') || s.includes('desain') || s.includes('agency') || s.includes('agensi') || s.includes('personal') || s.includes('pribadi') || s.includes('portfolio') || s.includes('portofolio') || s.includes('cv')) return 'personal'
+  // Institusi/lembaga/organisasi → profil korporat (fit terdekat; belum ada tipe khusus).
+  if (s.includes('institusi') || s.includes('lembaga') || s.includes('organisasi') || s.includes('yayasan') || s.includes('komunitas')) return 'corporate'
+  // Generik PALING AKHIR: perusahaan/corporate + catch-all bisnis/jasa.
+  if (s.includes('perusahaan') || s.includes('corporate') || s.includes('company') || s.includes('bisnis') || s.includes('jasa')) return 'corporate'
 
+  console.warn(`[industriToTipe] industri tak terpetakan → custom: "${industri}"`)
   return 'custom'
 }
 
