@@ -59,10 +59,10 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Kerajinan / Heritage')
     expect(html).toContain('Kecantikan / Skincare')
     expect(html).toContain('Elektronik / Gadget')
-    expect(html).toContain('Rumah & Dekor')
+    expect(html).toContain('Rumah &amp; Dekor') // renderToStaticMarkup meng-escape '&'
     expect(html).toContain('Lainnya (gaya umum)')
     // Sub-kategori yang belum bespoke disembunyikan (ready:false)
-    expect(html).not.toContain('Kesehatan & Herbal')
+    expect(html).not.toContain('Kesehatan &amp; Herbal')
   })
 
   it('non-toko (klinik/sekolah) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
