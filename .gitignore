@@ -16,8 +16,11 @@ out/
 # Vite
 *.local
 
-# Visual-pipeline artifacts (local UAT, THEME_VISUAL_PIPELINE.md) — HTML + PNG
+# Visual-pipeline artifacts (local UAT, THEME_VISUAL_PIPELINE.md) — HTML + PNG + registry
 theme-samples/
+
+# Generator output sementara (tsc→run-gen.cjs: gen-rumah, theme-registry, dll)
+.tmp-gen-*/
 
 # Editor
 .vscode/
