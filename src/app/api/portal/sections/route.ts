@@ -15,6 +15,34 @@ async function getSessionTenantId(): Promise<string | null> {
   return typeof tid === 'string' ? tid : null
 }
 
+// XSS guard (audit 2026-06-13): isi_komponen dirender apa adanya, dan tipe
+// custom_html dirender via dangerouslySetInnerHTML. Portal (klien) TIDAK boleh
+// menulis HTML mentah atau URL skema berbahaya. Studio (admin) tak lewat sini.
+// Mengembalikan alasan penolakan, atau null bila aman.
+function findUnsafeContent(value: unknown, key = ''): string | null {
+  if (key.toLowerCase() === 'html') return 'field "html" tidak diizinkan dari portal'
+  if (typeof value === 'string') {
+    if (/^\s*javascript:/i.test(value)) return 'URL javascript: tidak diizinkan'
+    if (/^\s*data:text\/html/i.test(value)) return 'data URL HTML tidak diizinkan'
+    return null
+  }
+  if (Array.isArray(value)) {
+    for (const v of value) {
+      const r = findUnsafeContent(v, key)
+      if (r) return r
+    }
+    return null
+  }
+  if (value && typeof value === 'object') {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      const r = findUnsafeContent(v, k)
+      if (r) return r
+    }
+    return null
+  }
+  return null
+}
+
 // PATCH { sectionId, isi_komponen }  → update teks/gambar satu section.
 export async function PATCH(request: Request) {
   const tenantId = await getSessionTenantId()
@@ -55,12 +83,28 @@ export async function PATCH(request: Request) {
     // Ownership: section harus milik tenant si klien.
     const { data: section, error: selErr } = await supabaseAdmin
       .from('page_sections')
-      .select('id, tenant_id')
+      .select('id, tenant_id, tipe_komponen')
       .eq('id', sectionId)
       .maybeSingle()
     if (selErr) throw selErr
     if (!section || section.tenant_id !== tenantId) {
       return NextResponse.json({ error: 'Section tidak ditemukan' }, { status: 404 })
+    }
+
+    // XSS hardening: portal tak boleh menulis HTML mentah. custom_html dirender
+    // via dangerouslySetInnerHTML (studio-only); tolak edit isi_komponen-nya dari
+    // portal, dan saring HTML/URL berbahaya untuk tipe lain.
+    if (update.isi_komponen !== undefined) {
+      if (section.tipe_komponen === 'custom_html') {
+        return NextResponse.json(
+          { error: 'Section HTML kustom hanya bisa diedit oleh tim studio.' },
+          { status: 403 },
+        )
+      }
+      const unsafe = findUnsafeContent(update.isi_komponen)
+      if (unsafe) {
+        return NextResponse.json({ error: `Konten tidak diizinkan: ${unsafe}` }, { status: 400 })
+      }
     }
 
     const { data, error } = await supabaseAdmin

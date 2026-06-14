@@ -127,10 +127,33 @@ async function getOrder(rawId: string) {
 export default async function TrackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string }>
+  searchParams: Promise<{ id?: string; token?: string }>
 }) {
-  const { id } = await searchParams
+  const { id, token } = await searchParams
   const order = id ? await getOrder(id) : null
+
+  // IDOR hardening (audit 2026-06-13): /track dapat diakses lewat prefix order-id
+  // 8-char yang mudah ditebak (dan ditampilkan publik). RAHASIA — delivered_
+  // credentials (login situs) & tracking_token (kunci briefing) — TIDAK boleh
+  // bocor ke request ber-id saja. Tampilkan hanya bila request membawa
+  // tracking_token yang cocok (link WA pelanggan membawanya). Status/progress
+  // tetap bisa dilihat lewat id.
+  if (order) {
+    let revealSecrets = false
+    if (token) {
+      const { data: match } = await supabaseAdmin
+        .from('orders')
+        .select('id')
+        .eq('id', order.id)
+        .eq('tracking_token', token)
+        .maybeSingle()
+      revealSecrets = !!match
+    }
+    if (!revealSecrets) {
+      ;(order as Record<string, unknown>).delivered_credentials = null
+      ;(order as Record<string, unknown>).tracking_token = null
+    }
+  }
 
   // ── Empty state: tidak ada ?id= → tampilkan form input
   if (!id) {
