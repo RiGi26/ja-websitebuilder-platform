@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { industriToTipe } from '@/lib/websitebuilder-mapping'
+import type { TipeIndustri } from '@/types/websitebuilder'
 import { getVariants } from '@/lib/website-variants'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Check, Loader2, Clock, Sparkles } from 'lucide-react'
 import BrandingPreview from './BrandingPreview'
 import SubKategoriPicker from './SubKategoriPicker'
 import ThemePicker from './ThemePicker'
 import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
+import { BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
 import ImageUploadField from '@/app/portal/ImageUploadField'
 import HeroImageField from '@/app/portal/HeroImageField'
 
@@ -123,14 +125,41 @@ interface Props {
   email: string
   industri: string
   selectedAddons: string[]
+  // Handoff tema dari galeri preview corp (Fase 3) → default sub-kat + varian.
+  preselect?: { sub_kategori?: string | null; variant?: string }
 }
 
-export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri }: Props) {
+// Tipe industri dari tema bespoke (handoff). Label industri corp bisa salah-petak
+// (mis. "Kuliner & Makanan" → restaurant via industriToTipe), padahal tema
+// kuliner-tungku itu toko_online. Tema yang dipilih = sumber kebenaran tipe.
+function tipeFromVariant(variant?: string): TipeIndustri | null {
+  if (!variant) return null
+  const themeKey = BESPOKE_VARIANTS[variant]?.theme
+  if (!themeKey) return null
+  if (themeKey === 'restaurant-lux') return 'restaurant'
+  if (themeKey.startsWith('toko-')) return 'toko_online'
+  return null
+}
+
+export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email, industri, preselect }: Props) {
   const router = useRouter()
-  const tipe = industriToTipe(industri)
+  // Tema preselect (handoff) menentukan tipe bila ada — override label industri
+  // yang mungkin salah-petak. Tanpa preselect → perilaku lama (dari industri).
+  const tipe = tipeFromVariant(preselect?.variant) ?? industriToTipe(industri)
   const defaultColor = INDUSTRY_COLOR[tipe] ?? '#0071E3'
   const variants = getVariants(tipe)
   const defaultVariant = variants[0]?.id ?? ''
+
+  // Validasi preselect untuk tipe ini: tema bespoke sub-kat ATAU varian generik.
+  // Tak valid → null → brief pakai default (degradasi aman).
+  const preselected = (() => {
+    const v = preselect?.variant
+    if (!v) return null
+    const sk = preselect?.sub_kategori ?? ''
+    if (sk && getThemes(tipe, sk).some((t) => t.id === v)) return { sub_kategori: sk, variant: v }
+    if (variants.some((x) => x.id === v)) return { sub_kategori: '', variant: v }
+    return null
+  })()
   // Unggah gambar via token briefing (pra-akun) — bukan sesi portal.
   const uploadProps = { uploadUrl: '/api/briefing/upload', extraFields: { token } }
 
@@ -140,7 +169,8 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
     nama_usaha: namaKlien,
     wa: nomorWa,
     email,
-    variant: defaultVariant,
+    sub_kategori: preselected?.sub_kategori ?? '',
+    variant: preselected?.variant ?? defaultVariant,
     primary_color: defaultColor,
   })
   const [submitting, setSubmitting] = useState(false)
