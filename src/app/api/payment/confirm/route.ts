@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder } from '@/lib/referral'
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
 import { midtransConfigForMode, normalizeOrderMode } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
@@ -10,6 +11,13 @@ export async function POST(request: Request) {
     if (!order_id || !midtrans_order_id) {
       return NextResponse.json({ error: 'Missing params' }, { status: 400 })
     }
+
+    // Rate-limit per order (audit 2026-06-13, #8): endpoint hanya keyed order_id
+    // tanpa auth. Status di-sync dari Midtrans (sumber kebenaran, tak bisa
+    // dipalsukan), jadi cukup batasi spam/enumerasi. Thank-you page wajar memanggil
+    // beberapa kali → window longgar.
+    const rl = rateLimit(`pay:confirm:${order_id}`, 12, 5 * 60_000)
+    if (!rl.allowed) return tooManyRequests(rl.retryAfter)
 
     // Poll status pakai environment tempat transaksi DIBUAT (orders.midtrans_mode),
     // bukan mode toggle current — kalau admin flip mode di antara pembuatan order
@@ -38,10 +46,15 @@ export async function POST(request: Request) {
     const isPending = tx.transaction_status === 'pending'
 
     if (isPaid) {
+      // Terminal-state + dedupe guard (audit 2026-06-13, #11): paid states tidak
+      // boleh ditimpa, dan transisi MASUK dp_paid hanya sekali. Webhook (#142)
+      // sudah punya guard yang sama; ini menutup sisa race lintas-endpoint —
+      // bila webhook sudah set dp_paid, update ini balik null → WA tak dobel.
       const { data: updated } = await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'dp_paid', status: 'pending' })
         .eq('id', order_id)
+        .not('payment_status', 'in', '("dp_paid","lunas")')
         .select('id, nomor_wa, nama_usaha, nama_perusahaan, created_at, tracking_token')
         .maybeSingle()
 
@@ -91,10 +104,13 @@ export async function POST(request: Request) {
     }
 
     if (isPending) {
+      // Forward-only: jangan turunkan order yang sudah dp_paid/lunas ke
+      // awaiting_payment karena notifikasi 'pending' basi/telat.
       await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'awaiting_payment' })
         .eq('id', order_id)
+        .not('payment_status', 'in', '("dp_paid","lunas")')
       return NextResponse.json({ confirmed: false, status: 'awaiting_payment' })
     }
 

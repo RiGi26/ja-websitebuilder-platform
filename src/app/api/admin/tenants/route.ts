@@ -169,6 +169,7 @@ export async function POST(request: Request) {
     //     anon RLS memblokir status draft -> belum live sampai admin Publish dari
     //     Preview. "Bangun Draft" di kartu order tinggal jadi rebuild bila perlu.
     let built: { nSections: number } | null = null
+    let buildError: string | null = null
     try {
       const plan = generateContent(order)
       built = await applyBuildPlan(supabaseAdmin, {
@@ -179,7 +180,15 @@ export async function POST(request: Request) {
         publish: false,
       })
     } catch (e: any) {
-      console.error('auto-build saat provision (non-fatal):', e?.message)
+      // Non-fatal (provisioning tetap sukses) TAPI jangan ditelan diam-diam
+      // (audit 2026-06-13, #10): surface alasannya agar admin tahu page draft
+      // mungkin kosong/sampel & perlu "Bangun Draft" ulang.
+      buildError = e?.message ?? String(e)
+      console.error('auto-build saat provision (non-fatal, surfaced):', {
+        orderId,
+        tenantId: tenant.id,
+        error: buildError,
+      })
     }
 
     // 6. Buat akun login customer (otomatis). Tidak fatal kalau gagal /
@@ -191,7 +200,7 @@ export async function POST(request: Request) {
       console.error('createClientAccountForTenant gagal (non-fatal):', e?.message)
     }
 
-    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false, clientAccount, built })
+    return NextResponse.json({ tenantId: tenant.id, page, alreadyProvisioned: false, clientAccount, built, buildError })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
