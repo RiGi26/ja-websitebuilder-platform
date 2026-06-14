@@ -431,6 +431,87 @@ const KERAJINAN_LUX: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@tanahloka.id', alamat: 'Yogyakarta, DI Yogyakarta' },
 }
 
+// ── Kecantikan / Skincare (flagship bespoke "Embun") — KecantikanLuxRenderer.
+// Sample dedikasi kaya (ritual 4 langkah, statement, glow). Dipakai gen-samples +
+// imagery-borrow generateContent. Foto = id Unsplash terverifikasi (sama dgn KECANTIKAN).
+const KECANTIKAN_LUX: ComposableContent = {
+  nama: 'Embun',
+  hero: {
+    eyebrow: 'Skincare Lokal Teruji',
+    title: 'Kulit Menyala dari Dalam',
+    subtitle: 'Formula lembut berbahan aktif teruji untuk kulit sehat yang bercahaya. Jujur, aman, dan dirancang untuk pemakaian harian.',
+    ctaText: 'Lihat Produk',
+    ctaHref: '#produk',
+    ctaText2: 'Konsultasi Kulit',
+    ctaHref2: '#wa',
+    image: IMG('photo-1522335789203-aabd1fc54bc9'),
+  },
+  statement: {
+    eyebrow: 'Filosofi Kami',
+    quote: 'Kulit indah lahir dari konsistensi, bukan keajaiban semalam.',
+    cite: 'Tim Formulasi Embun',
+  },
+  features: [
+    { title: 'Bersihkan', desc: 'Pembersih lembut mengangkat kotoran tanpa membuat kulit terasa ketarik.' },
+    { title: 'Rawat', desc: 'Serum aktif terkonsentrasi — vitamin C & niacinamide untuk merata nada kulit.' },
+    { title: 'Lembapkan', desc: 'Pelembap ringan mengunci hidrasi, halus dan tak lengket sepanjang hari.' },
+    { title: 'Lindungi', desc: 'Tabir surya SPF 50 tanpa whitecast — langkah penutup yang tak boleh dilewat.' },
+  ],
+  featuresEyebrow: 'Ritual Glow',
+  featuresTitle: 'Empat langkah menuju kulit sehat',
+  showcase: {
+    title: 'Produk Terlaris',
+    subtitle: 'Rutinitas yang dicintai ribuan pelanggan.',
+    items: [
+      { nama: 'Gentle Cleanser', harga: 89000, desc: 'Pembersih lembut, tak bikin kulit ketarik. pH seimbang.', gambar: IMG('photo-1556228720-195a672e8a03', 900), kategori: 'Cleanser' },
+      { nama: 'Vitamin C Serum', harga: 159000, desc: 'Mencerahkan & menyamarkan noda hitam dalam pemakaian rutin.', gambar: IMG('photo-1571781926291-c477ebfd024b', 900), kategori: 'Serum' },
+      { nama: 'Hydrating Moisturizer', harga: 129000, desc: 'Lembap seharian, ringan tak lengket, cocok kulit sensitif.', gambar: IMG('photo-1596462502278-27bfdc403348', 900), kategori: 'Moisturizer' },
+      { nama: 'Sunscreen SPF 50', harga: 99000, desc: 'Proteksi tinggi, tekstur ringan, no whitecast.', gambar: IMG('photo-1620916566398-39f1143ab7be', 900), kategori: 'Sunscreen' },
+      { nama: 'Niacinamide Toner', harga: 109000, desc: 'Menghaluskan tekstur & mengecilkan tampilan pori.', gambar: IMG('photo-1556228720-195a672e8a03', 900), kategori: 'Toner' },
+      { nama: 'Eau de Parfum — Mawar', harga: 215000, desc: 'Aroma mawar lembut yang bertahan tanpa menyengat.', gambar: IMG('photo-1571781926291-c477ebfd024b', 900), kategori: 'Parfum' },
+    ],
+  },
+  about: {
+    title: 'Kecantikan yang Jujur',
+    body: 'Embun berawal dari satu keyakinan sederhana: perawatan kulit tidak perlu rumit atau penuh janji berlebihan.\n\nTiap formula kami racik bersama dermatolog, diuji nyata, dan terdaftar BPOM sebelum sampai ke tangan Anda, supaya yang Anda pakai setiap hari benar-benar bisa dipercaya.',
+    image: IMG('photo-1571781926291-c477ebfd024b'),
+    ctaText: 'Kenali Bahan Kami',
+    ctaHref: '#produk',
+  },
+  cta: {
+    title: 'Mulai Ritual Glowing Anda',
+    subtitle: 'Konsultasi gratis untuk menemukan rangkaian yang pas dengan jenis kulit Anda.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '50rb+', label: 'Pelanggan' },
+    { angka: '4.9', label: 'Rating ulasan' },
+    { angka: '98%', label: 'Beli lagi' },
+    { angka: '14 hari', label: 'Hasil terlihat' },
+  ],
+  testimonials: [
+    { quote: 'Kulit jadi lebih cerah dan lembap setelah 2 minggu. Teksturnya ringan dan wanginya lembut banget.', nama: 'Tari', peran: 'Pelanggan setia' },
+    { quote: 'Aman buat kulit sensitif aku, tidak breakout sama sekali. Sudah repurchase 3 kali.', nama: 'Nadia', peran: 'Kulit sensitif' },
+    { quote: 'Sunscreen-nya beneran no whitecast, enak dipakai sebelum makeup. Favorit baru.', nama: 'Vina', peran: 'Beauty enthusiast' },
+    { quote: 'Suka karena jujur — klaimnya masuk akal dan hasilnya nyata. Packaging-nya cantik pula.', nama: 'Rena', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah produk sudah terdaftar BPOM?', a: 'Ya, seluruh produk Embun terdaftar BPOM dan telah lolos uji keamanan untuk pemakaian harian.' },
+    { q: 'Apakah aman untuk kulit sensitif?', a: 'Formula kami bebas alkohol keras dan pewangi berlebih, dengan pH seimbang. Kami tetap menyarankan patch test sebelum pemakaian penuh.' },
+    { q: 'Urutan pemakaian yang benar bagaimana?', a: 'Pagi: cleanser → toner → serum → moisturizer → sunscreen. Malam tanpa sunscreen. Cukup ikuti ritual 4 langkah kami.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '09.00–18.00' },
+      { hari: 'Minggu', jam: 'Tutup' },
+    ],
+    alamat: 'Jakarta Selatan',
+    mapsQuery: 'Jakarta Selatan',
+  },
+  contact: { wa: '6281296917963', email: 'care@embun.id', alamat: 'Jakarta Selatan' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2298,6 +2379,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'kuliner-lux': KULINER_LUX,
   // Bespoke lux kerajinan (KerajinanLuxRenderer) — sample dedikasi card-grid artisan.
   'kerajinan-lux': KERAJINAN_LUX,
+  // Bespoke lux kecantikan (KecantikanLuxRenderer "Embun") — sample dedikasi glow + ritual.
+  'kecantikan-lux': KECANTIKAN_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
