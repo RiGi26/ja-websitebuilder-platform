@@ -91,7 +91,16 @@ function init(){
       document.body.style.overflow='';
       if(lastFocus&&lastFocus.focus)lastFocus.focus();
     }
-    trig.forEach(function(t,i){t.addEventListener('click',function(){open(i,t);});});
+    trig.forEach(function(t,i){
+      t.addEventListener('click',function(){open(i,t);});
+      /* WCAG 2.1.1: kartu quick-look = role=button + tabIndex, BUKAN elemen
+         native → Enter/Space tak otomatis memicu click. Bind manual; cegah
+         Space men-scroll halaman. open() idempoten, jadi aman bila elemen
+         kebetulan native (klik native + keydown = sekali buka efektif). */
+      t.addEventListener('keydown',function(e){
+        if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();open(i,t);}
+      });
+    });
     lb.addEventListener('click',function(e){
       var el=e.target;
       while(el&&el!==lb){if(el.getAttribute&&el.hasAttribute('data-lb-close')){close();return;}el=el.parentNode;}
