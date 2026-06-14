@@ -69,29 +69,29 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
     .eq('id', pageId)
   if (pageErr) throw new Error(`update landing_pages: ${pageErr.message}`)
 
-  // 2. Bersihkan baris generate lama (idempoten), lalu insert ulang.
-  await wipe(client, 'page_sections', pageId)
-  await wipe(client, 'services', pageId)
-  await wipe(client, 'menu_items', pageId)
-  await wipe(client, 'products', pageId)
-
-  // 3. Sections — urutan = index.
-  if (plan.sections.length) {
-    const rows = plan.sections.map((s, i) => ({
+  // 2. Regenerasi baris turunan (sections + services/menu/products). Atomik-per-
+  //    tabel: insert baris BARU dulu, baru hapus yang LAMA (audit 2026-06-13, #10).
+  //    Kalau insert gagal di tengah, konten lama tetap ada — page tak pernah kosong
+  //    diam-diam. Tetap idempoten (panggil 2x = hasil sama). Urutan = index.
+  await replaceRows(
+    client,
+    'page_sections',
+    pageId,
+    plan.sections.map((s, i) => ({
       page_id: pageId,
       tenant_id: tenantId,
       urutan: i,
       tipe_komponen: s.tipe_komponen,
       is_visible: true,
       isi_komponen: s.isi_komponen,
-    }))
-    const { error } = await client.from('page_sections').insert(rows)
-    if (error) throw new Error(`insert page_sections: ${error.message}`)
-  }
+    })),
+  )
 
-  // 4. Services / menu_items / products.
-  if (plan.services.length) {
-    const rows = plan.services.map((s, i) => ({
+  await replaceRows(
+    client,
+    'services',
+    pageId,
+    plan.services.map((s, i) => ({
       tenant_id: tenantId,
       page_id: pageId,
       nama: s.nama,
@@ -103,13 +103,14 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       gambar_url: s.gambar ?? null,
       is_active: true,
       urutan: i,
-    }))
-    const { error } = await client.from('services').insert(rows)
-    if (error) throw new Error(`insert services: ${error.message}`)
-  }
+    })),
+  )
 
-  if (plan.menuItems.length) {
-    const rows = plan.menuItems.map((m, i) => ({
+  await replaceRows(
+    client,
+    'menu_items',
+    pageId,
+    plan.menuItems.map((m, i) => ({
       tenant_id: tenantId,
       page_id: pageId,
       nama: m.nama,
@@ -119,13 +120,14 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       gambar_url: m.gambar ?? null,
       is_active: true,
       urutan: i,
-    }))
-    const { error } = await client.from('menu_items').insert(rows)
-    if (error) throw new Error(`insert menu_items: ${error.message}`)
-  }
+    })),
+  )
 
-  if (plan.products.length) {
-    const rows = plan.products.map((p, i) => ({
+  await replaceRows(
+    client,
+    'products',
+    pageId,
+    plan.products.map((p, i) => ({
       tenant_id: tenantId,
       page_id: pageId,
       nama: p.nama,
@@ -136,10 +138,8 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
       gambar_url: p.gambar ?? null,
       is_active: true,
       urutan: i,
-    }))
-    const { error } = await client.from('products').insert(rows)
-    if (error) throw new Error(`insert products: ${error.message}`)
-  }
+    })),
+  )
 
   // 5. tenant_profile (1 baris per page) — upsert.
   const tp = plan.tenantProfile
@@ -168,7 +168,35 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
   }
 }
 
-async function wipe(client: Client, table: string, pageId: string): Promise<void> {
-  const { error } = await client.from(table).delete().eq('page_id', pageId)
-  if (error) throw new Error(`wipe ${table}: ${error.message}`)
+// Ganti baris generate lama dengan yang baru secara aman: insert BARU dulu, lalu
+// hapus LAMA (by id yang ditangkap sebelum insert). Kalau insert gagal, baris lama
+// tetap utuh → page tak pernah kosong diam-diam (audit 2026-06-13, #10). Supabase JS
+// tak punya transaksi multi-statement; urutan insert→delete ini menurunkan risiko
+// jauh tanpa perlu RPC/postgres function (codebase belum memakainya).
+async function replaceRows(
+  client: Client,
+  table: string,
+  pageId: string,
+  rows: Record<string, unknown>[],
+): Promise<void> {
+  // Tangkap id baris lama SEBELUM insert (baris baru juga ber-page_id sama, jadi
+  // tak bisa dihapus pakai filter page_id setelah insert).
+  const { data: oldRows, error: selErr } = await client
+    .from(table)
+    .select('id')
+    .eq('page_id', pageId)
+  if (selErr) throw new Error(`read ${table}: ${selErr.message}`)
+  const oldIds = (oldRows ?? []).map((r) => r.id as string)
+
+  // Insert baris baru dulu — kalau gagal, lempar; baris lama belum disentuh.
+  if (rows.length) {
+    const { error: insErr } = await client.from(table).insert(rows)
+    if (insErr) throw new Error(`insert ${table}: ${insErr.message}`)
+  }
+
+  // Baru hapus baris lama setelah baris baru aman tersimpan.
+  if (oldIds.length) {
+    const { error: delErr } = await client.from(table).delete().in('id', oldIds)
+    if (delErr) throw new Error(`delete old ${table}: ${delErr.message}`)
+  }
 }

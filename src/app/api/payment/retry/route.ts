@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
 import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
     const { order_id } = await request.json()
     if (!order_id) return NextResponse.json({ error: 'order_id wajib' }, { status: 400 })
+
+    // Rate-limit per order (audit 2026-06-13, #8): endpoint keyed order_id tanpa
+    // auth dan me-reset payment_status + midtrans_order_id → batasi ketat supaya
+    // tak bisa dipakai mengganggu pembayaran order korban secara massal.
+    const rl = rateLimit(`pay:retry:${order_id}`, 5, 10 * 60_000)
+    if (!rl.allowed) return tooManyRequests(rl.retryAfter)
 
     // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
     const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API, mode: MIDTRANS_MODE } = await getPlatformMidtrans()

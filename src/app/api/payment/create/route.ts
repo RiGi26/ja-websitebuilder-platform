@@ -4,10 +4,16 @@ import { notifyCustomer } from '@/lib/fonnte'
 import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
 import { referralDiscountFor } from '@/lib/referral-tier'
 import { computeServerPrice } from '@/lib/pricing/server-price'
+import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
+    // Rate-limit per IP (audit 2026-06-13, #8): pembuatan order tak punya
+    // token/auth (belum ada order), jadi batasi spam pembuatan order + token Snap.
+    const rl = rateLimit(`pay:create:${clientIp(request)}`, 5, 60_000)
+    if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
     const body = await request.json()
     // Mode + kredensial Midtrans dipilih runtime dari DB (platform_settings) —
     // bisa di-switch sandbox/production dari /admin tanpa redeploy. Dipanggil

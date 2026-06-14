@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer } from '@/lib/fonnte'
+import { generateContent } from '@/lib/build/generateContent'
+import { applyBuildPlan } from '@/lib/build/persist'
+import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 
 const ADMIN_WA = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
 
@@ -14,7 +17,7 @@ export async function POST(request: Request) {
     // Validate token + pastikan belum submit sebelumnya
     const { data: order, error: fetchErr } = await supabaseAdmin
       .from('orders')
-      .select('id, tracking_token, payment_status, briefing_submitted_at, nomor_wa, nama_usaha, nama_perusahaan, industri, created_at')
+      .select('id, tenant_id, tracking_token, payment_status, briefing_submitted_at, nomor_wa, nama_usaha, nama_perusahaan, industri, created_at')
       .eq('tracking_token', token)
       .maybeSingle()
 
@@ -37,6 +40,40 @@ export async function POST(request: Request) {
       .eq('id', order.id)
 
     if (updateErr) throw updateErr
+
+    // Auto-rebuild dari briefing (audit 2026-06-13, #9): provisioning meng-auto-build
+    // dari briefing_data yang ada SAAT provision (sering kosong → konten contoh).
+    // Saat customer submit briefing (sekali; sudah di-gate dp_paid + belum-submit di
+    // atas), regenerasi draft dari brief agar situs mencerminkan isian nyata, bukan
+    // sampel. Non-fatal: kegagalan build tak boleh menggagalkan submit briefing.
+    if (order.tenant_id) {
+      try {
+        const { data: full } = await supabaseAdmin
+          .from('orders')
+          .select('*')
+          .eq('id', order.id)
+          .single()
+        const { data: page } = await supabaseAdmin
+          .from('landing_pages')
+          .select('id, tenant_id, konfigurasi')
+          .eq('tenant_id', order.tenant_id)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        if (full && page) {
+          const plan = generateContent(full)
+          await applyBuildPlan(supabaseAdmin, {
+            pageId: page.id,
+            tenantId: page.tenant_id,
+            currentKonfigurasi: (page.konfigurasi ?? {}) as KonfigurasiWebsite,
+            plan,
+            publish: false,
+          })
+        }
+      } catch (e: any) {
+        console.error('[briefing] auto-rebuild (non-fatal):', e?.message)
+      }
+    }
 
     // Notif WA ke admin (fire-and-forget)
     const clientName = order.nama_perusahaan || order.nama_usaha || 'Customer'
