@@ -16,6 +16,7 @@
 | `toko-kerajinan` (PR #128) | toko_online / kerajinan | tanah | Cinzel + Raleway | Forest `#1E3A2F` · Parchment `#F7F0E3` · Bronze `#C8962A` | batik Kawung (SVG inline, ter-tint) | — | motif kawung sebagai identitas |
 | `toko-kecantikan` (PR #152) | toko_online / kecantikan | embun | Italiana + Mulish | Porcelain `#FBF7F5` · Blush `#F4E7E4` · Rose `#B5566B`/`#A8455C` | glow bloom (radial-gradient CSS, bernapas) | asimetris terang, produk + halo glow di belakang | radial **glow halo** yang bernapas + **ritual stepper** bernomor |
 | `toko-gadget` (Wave 1) | toko_online / gadget | onyx | Space Grotesk + IBM Plex Sans/Mono | Onyx `#0A0E14` · Surface `#131B25` · Cyan `#22D3EE` | blueprint grid + corner-bracket + node dots | dark blueprint-grid, device-frame ber-scanline | **spec-readout HUD** (kartu mono ber-corner-bracket + garis sirkuit) |
+| `toko-rumah` (Wave 1) | toko_online / rumah | selaras | Spectral + Hanken Grotesk | Kapur `#F4F1EA` · Greige `#EDE8DD` · Arang `#2C2A25` · Sage-slate `#6F7A66` | bingkai arched alcove (ceruk lengkung) + bayangan natural lembut | hero terang asimetris + ruang lapang (ma) | **arched-alcove product frame** + statement tenang serif (bukan quote sinematik italik) |
 
 ## Aturan pakai
 
