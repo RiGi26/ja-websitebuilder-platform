@@ -594,6 +594,88 @@ const GADGET_LUX: ComposableContent = {
   contact: { wa: '6281296917963', email: 'cs@onyxgear.id', alamat: 'Bandung, Jawa Barat' },
 }
 
+// ── Rumah & Dekor (flagship bespoke "Selaras") — RumahLuxRenderer.
+// Sample dedikasi Japandi light-calm (pendekatan 4 langkah, statement tenang,
+// 6 produk mebel/dekor ber-kategori). Dipakai gen-samples + imagery-borrow
+// generateContent. Foto = id Unsplash terverifikasi (interior/mebel/tanaman).
+const RUMAH_LUX: ComposableContent = {
+  nama: 'Selaras',
+  hero: {
+    eyebrow: 'Mebel & Dekorasi Rumah',
+    title: 'Ruang yang Menenangkan',
+    subtitle: 'Mebel dan dekorasi yang dipilih dengan teliti — material jujur, bentuk yang tenang, dibuat untuk menemani rumah Anda bertahun-tahun. Konsultasi gratis sebelum membeli.',
+    ctaText: 'Lihat Koleksi',
+    ctaHref: '#koleksi',
+    ctaText2: 'Konsultasi',
+    ctaHref2: '#wa',
+    image: IMG('photo-1586023492125-27b2c045efd7'),
+  },
+  statement: {
+    eyebrow: 'Filosofi Kami',
+    quote: 'Rumah yang baik tidak penuh — ia cukup. Setiap benda punya alasan, setiap ruang punya napas.',
+    cite: 'Tim Kurasi Selaras',
+  },
+  features: [
+    { title: 'Material Jujur', desc: 'Kayu solid, rotan, dan kain alami yang menua dengan anggun — bukan partikel berlapis.' },
+    { title: 'Buatan Pengrajin', desc: 'Dikerjakan perajin lokal dengan sambungan rapi yang tahan dipakai harian.' },
+    { title: 'Konsultasi Ruang', desc: 'Bantu pilih ukuran dan tata letak yang pas untuk luas ruangan Anda.' },
+    { title: 'Antar & Rakit', desc: 'Pengiriman aman dengan pelindung, dirakit langsung di tempat oleh tim kami.' },
+  ],
+  featuresEyebrow: 'Pendekatan Kami',
+  featuresTitle: 'Empat hal yang kami jaga di tiap produk',
+  showcase: {
+    title: 'Koleksi Pilihan',
+    subtitle: 'Mebel dan dekorasi yang paling sering jadi awal sebuah ruang yang nyaman.',
+    items: [
+      { nama: 'Sofa Modular Linen', harga: 6850000, desc: 'Tiga dudukan, sarung linen lepas-cuci, busa rapat yang tetap nyaman.', gambar: IMG('photo-1555041469-a586c61ea9bc', 900), kategori: 'Ruang Tamu' },
+      { nama: 'Kursi Berlengan Oak', harga: 2450000, desc: 'Rangka kayu oak, dudukan empuk, garis ramping yang ringan di ruang.', gambar: IMG('photo-1567538096630-e0c55bd6374c', 900), kategori: 'Kursi' },
+      { nama: 'Meja Konsol Kayu', harga: 1980000, desc: 'Kayu solid finishing minyak alami, dua laci, untuk lorong atau ruang kerja.', gambar: IMG('photo-1530018607912-eff2daa1bac4', 900), kategori: 'Meja' },
+      { nama: 'Lampu Lantai Rotan', harga: 890000, desc: 'Anyaman rotan tangan, cahaya hangat yang menyebar lembut.', gambar: IMG('photo-1534349762230-e0cadf78f5da', 900), kategori: 'Pencahayaan' },
+      { nama: 'Vas Keramik Matte', harga: 285000, desc: 'Glasir matte buatan tangan, tiap unit punya nuansa warna sendiri.', gambar: IMG('photo-1513506003901-1e6a229e2d15', 900), kategori: 'Dekorasi' },
+      { nama: 'Monstera dalam Pot', harga: 320000, desc: 'Tanaman hias sehat lengkap dengan pot keramik dan panduan rawat.', gambar: IMG('photo-1485955900006-10f4d324d411', 900), kategori: 'Tanaman' },
+    ],
+  },
+  about: {
+    title: 'Dimulai dari Satu Rumah',
+    body: 'Selaras lahir dari kesulitan mencari mebel yang awet tanpa harus mahal berlebihan — yang terlihat tenang, bukan ramai.\n\nKami bekerja langsung dengan perajin, memilih material yang jujur, dan hanya menjual yang kami mau pakai di rumah sendiri. Sebelum membeli, ceritakan ruang Anda — kami bantu pilih yang benar-benar pas.',
+    image: IMG('photo-1524758631624-e2822e304c36'),
+    ctaText: 'Kenali Kurasi Kami',
+    ctaHref: '#koleksi',
+  },
+  cta: {
+    title: 'Mulai Tata Ruang Anda',
+    subtitle: 'Kirim foto atau ukuran ruangan via WhatsApp — kami bantu pilihkan yang pas, tanpa terburu-buru.',
+    ctaText: 'Konsultasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '12 thn', label: 'Menata rumah' },
+    { angka: '4.000+', label: 'Rumah ditemani' },
+    { angka: '4.9', label: 'Rating ulasan' },
+    { angka: '2 thn', label: 'Garansi rangka' },
+  ],
+  testimonials: [
+    { quote: 'Sofanya nyaman dan jahitannya rapi. Dibantu pilih ukuran lewat chat, pas banget sama ruang tamu yang mungil.', nama: 'Anindya', peran: 'Pelanggan' },
+    { quote: 'Suka karena tidak memaksa beli banyak. Malah disaranin mulai dari satu meja dulu. Jujur dan enak diajak diskusi.', nama: 'Pram', peran: 'Pelanggan' },
+    { quote: 'Pengiriman rapi, dirakit di tempat, dan bekas kardusnya dibawa pulang. Detail kecil yang bikin tenang.', nama: 'Sekar', peran: 'Pelanggan setia' },
+    { quote: 'Kayunya terasa solid, bukan yang ringan murahan. Setahun dipakai masih kokoh dan makin cantik.', nama: 'Bimo', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah bisa konsultasi ukuran dulu?', a: 'Tentu. Kirim foto dan ukuran ruangan via WhatsApp, tim kami bantu pilihkan ukuran dan tata letak yang pas sebelum Anda memutuskan.' },
+    { q: 'Bagaimana pengiriman dan perakitannya?', a: 'Dikirim dengan pelindung dan dirakit langsung di tempat oleh tim kami. Jangkauan luar kota dibantu lewat ekspedisi tepercaya.' },
+    { q: 'Apakah ada garansi?', a: 'Rangka kayu bergaransi 2 tahun untuk pemakaian normal. Kerusakan dari proses kirim kami tangani sepenuhnya.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '09.00–17.00' },
+      { hari: 'Minggu', jam: 'Dengan janji' },
+    ],
+    alamat: 'Yogyakarta',
+    mapsQuery: 'Yogyakarta',
+  },
+  contact: { wa: '6281296917963', email: 'halo@selaras.id', alamat: 'Yogyakarta' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2465,6 +2547,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'kecantikan-lux': KECANTIKAN_LUX,
   // Bespoke lux gadget (GadgetLuxRenderer "Onyx") — sample dedikasi dark-tech spec-readout.
   'gadget-lux': GADGET_LUX,
+  // Bespoke lux rumah (RumahLuxRenderer "Selaras") — sample dedikasi Japandi arched-alcove.
+  'rumah-lux': RUMAH_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
