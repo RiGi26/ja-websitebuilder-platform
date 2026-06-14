@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,6 +49,17 @@ const INIT: FormData = {
 // Add-on diturunkan dari SSOT katalog (src/lib/addons/catalog.ts). SKU yang
 // di-drop/hide (triage A3) otomatis tak tampil via orderAddons().
 const ADDONS = orderAddons()
+
+// Draft autosave (anti-kehilangan data saat tab ditutup) — pola seperti BriefingForm.
+const DRAFT_KEY = 'ja_order_draft'
+
+// Pilihan industri sebagai chip — tiap label dipetakan akurat oleh industriToTipe()
+// (mis. "Restoran & Kuliner" → restaurant). Hilangkan free-text yang rawan salah-petakan.
+const INDUSTRI_OPTIONS = [
+  'Toko Online', 'Restoran & Kuliner', 'Klinik & Kesehatan', 'Sekolah & Kursus',
+  'Travel & Rental', 'Perusahaan & Jasa', 'Personal & Kreatif', 'Blog & Media',
+  'Jastip', 'Lainnya',
+]
 
 // ── Reusable components ────────────────────────────────────────────────────────
 function StepHeader({ title, desc }: { title: string; desc: string }) {
@@ -100,6 +111,7 @@ function OrderFormContent() {
   const [pendingPayment, setPendingPayment] = useState<{
     displayId: string; dpAmount: number; redirectUrl: string
   } | null>(null)
+  const hydratedRef = useRef(false)
 
   // ── Program Mitra: kode referral ─────────────────────────────────────────
   const [referralCode, setReferralCode] = useState('')
@@ -144,6 +156,32 @@ function OrderFormContent() {
       }
     }
   }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Autosave draft: restore saat mount (hanya kalau BUKAN dari kalkulator /
+  // param otoritatif, supaya prefill URL tetap menang), lalu persist tiap ubah.
+  // Cegah "tutup tab = semua isian hilang" (penyebab abandonment klasik).
+  useEffect(() => {
+    const hasOrderQuery = !!(searchParams.get('template') || kalkulatorIndustri || kalkulatorPaket || kalkulatorEstimasi || kalkulatorAddons)
+    if (!hasOrderQuery) {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY)
+        if (raw) {
+          const d = JSON.parse(raw)
+          if (d.form) setForm(f => ({ ...f, ...d.form, agreedToTerms: false }))
+          if (typeof d.step === 'number' && d.step >= 0 && d.step <= 3) setStep(d.step)
+          if (typeof d.referralCode === 'string' && d.referralCode) setReferralCode(d.referralCode)
+        }
+      } catch { /* draft korup — abaikan */ }
+    }
+    hydratedRef.current = true
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!hydratedRef.current) return
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form: { ...form, agreedToTerms: false }, step, referralCode }))
+    } catch { /* kuota penuh — abaikan */ }
+  }, [form, step, referralCode])
 
   // Prefill kode referral: ?ref= (link mitra / corp landing) → fallback
   // cookie ja_ref (di-set short link /r/KODE, umur 30 hari).
@@ -314,6 +352,7 @@ function OrderFormContent() {
         order_id, display_id, dp_amount,
         redirect_url, created_at: new Date().toISOString(),
       }))
+      localStorage.removeItem(DRAFT_KEY) // order sukses — buang draft autosave
 
       // Tampilkan interstitial page (bukan langsung redirect)
       setPendingPayment({ displayId: display_id, dpAmount: dp_amount, redirectUrl: redirect_url })
@@ -350,6 +389,11 @@ function OrderFormContent() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Pesanan</h1>
           <p className="text-gray-500 font-medium">Lengkapi data diri dan pilih fitur yang Anda butuhkan.</p>
+          {!fromKalkulator && (
+            <p className="text-xs text-gray-400 font-medium mt-2 inline-flex items-center gap-1.5">
+              <Check size={12} className="text-green-500" /> Progres tersimpan otomatis di perangkat ini — aman ditinggal
+            </p>
+          )}
       </div>
 
       {/* Banner dari kalkulator */}
@@ -424,14 +468,33 @@ function OrderFormContent() {
                   <Input type="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
                 </FieldRow>
                 <div className="md:col-span-2">
-                  <FieldRow label="Bidang Industri">
-                    <Input placeholder="Contoh: Food & Beverage, Fashion, Pendidikan" value={form.industri} onChange={e => set('industri', e.target.value)} className="apple-input" />
+                  <FieldRow label="Bidang Industri" required>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {INDUSTRI_OPTIONS.map(opt => {
+                        const active = form.industri === opt
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => { set('industri', active ? '' : opt); triggerHaptic() }}
+                            aria-pressed={active}
+                            className={`min-h-[44px] px-4 rounded-full text-sm font-semibold border transition-all ${
+                              active
+                                ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-sm'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-[#0071E3]/40'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </FieldRow>
                 </div>
               </div>
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut Pembayaran <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || !form.industri || (form.clientType === 'individu' ? !form.namaUsaha : (!form.namaPerusahaan || !form.namapic))} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">{fromKalkulator ? 'Lanjut ke Konfirmasi' : 'Lanjut ke Fitur Tambahan'} <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -661,6 +724,13 @@ function OrderFormContent() {
                           </p>
                       </div>
                   </button>
+
+                  {/* Trust strip tepat sebelum tombol bayar — turunkan persepsi risiko di titik komit tertinggi */}
+                  <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-gray-500 font-medium">
+                    <span className="inline-flex items-center gap-1.5"><Lock size={13} className="text-gray-400" /> Pembayaran aman via Midtrans</span>
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck size={13} className="text-gray-400" /> Revisi sampai puas sebelum go-live</span>
+                    <span className="inline-flex items-center gap-1.5"><Check size={13} strokeWidth={3} className="text-gray-400" /> Data dikirim ke tim konsultan</span>
+                  </div>
 
                   <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                     <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
