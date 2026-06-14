@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -11,6 +12,12 @@ export async function POST(request: Request) {
   try {
     const { order_id } = await request.json()
     if (!order_id) return NextResponse.json({ error: 'order_id wajib' }, { status: 400 })
+
+    // Rate-limit per order (audit 2026-06-13, #8): endpoint keyed order_id tanpa
+    // auth dan me-reset payment_status + midtrans_order_id → batasi ketat supaya
+    // tak bisa dipakai mengganggu pembayaran order korban secara massal.
+    const rl = rateLimit(`pay:retry:${order_id}`, 5, 10 * 60_000)
+    if (!rl.allowed) return tooManyRequests(rl.retryAfter)
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
