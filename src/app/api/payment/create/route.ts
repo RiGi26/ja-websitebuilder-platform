@@ -4,6 +4,7 @@ import { notifyCustomer } from '@/lib/fonnte'
 import { normalizeCode, lookupActiveCode, isSelfReferral } from '@/lib/referral'
 import { referralDiscountFor } from '@/lib/referral-tier'
 import { computeServerPrice } from '@/lib/pricing/server-price'
+import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
 const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
@@ -13,6 +14,11 @@ const SNAP_API = IS_PROD
 
 export async function POST(request: Request) {
   try {
+    // Rate-limit per IP (audit 2026-06-13, #8): pembuatan order tak punya
+    // token/auth (belum ada order), jadi batasi spam pembuatan order + token Snap.
+    const rl = rateLimit(`pay:create:${clientIp(request)}`, 5, 60_000)
+    if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
     const body = await request.json()
     const {
       client_type, nama_usaha, nama_perusahaan, nama_pic, jabatan,
