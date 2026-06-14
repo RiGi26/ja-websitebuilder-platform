@@ -3,12 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder } from '@/lib/referral'
 import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const STATUS_API = IS_PROD
-  ? 'https://api.midtrans.com/v2'
-  : 'https://api.sandbox.midtrans.com/v2'
+import { midtransConfigForMode, normalizeOrderMode } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
@@ -23,6 +18,19 @@ export async function POST(request: Request) {
     // beberapa kali → window longgar.
     const rl = rateLimit(`pay:confirm:${order_id}`, 12, 5 * 60_000)
     if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
+    // Poll status pakai environment tempat transaksi DIBUAT (orders.midtrans_mode),
+    // bukan mode toggle current — kalau admin flip mode di antara pembuatan order
+    // dan poll thank-you, polling tetap mengarah ke environment yang benar. Order
+    // legacy (null) → mode legacy. (Webhook tetap jalur settlement otoritatif.)
+    const { data: orderRow } = await supabaseAdmin
+      .from('orders')
+      .select('midtrans_mode')
+      .eq('id', order_id)
+      .maybeSingle()
+    const { serverKey: SERVER_KEY, statusApiUrl: STATUS_API } = midtransConfigForMode(
+      normalizeOrderMode(orderRow?.midtrans_mode),
+    )
 
     // Verify transaction status directly from Midtrans
     const auth = Buffer.from(`${SERVER_KEY}:`).toString('base64')

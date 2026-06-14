@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const SNAP_API = IS_PROD
-  ? 'https://app.midtrans.com/snap/v1/transactions'
-  : 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +12,9 @@ export async function POST(request: Request) {
     // auth. Tiap hit bikin transaksi Snap baru → batasi spam pembuatan Snap.
     const rl = rateLimit(`pay:pelunasan:${order_id}`, 5, 10 * 60_000)
     if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
+    // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API, mode: MIDTRANS_MODE } = await getPlatformMidtrans()
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
@@ -71,9 +69,12 @@ export async function POST(request: Request) {
     const snapData = await snapRes.json()
     if (!snapRes.ok) throw new Error(snapData.error_messages?.join(', ') || 'Midtrans error')
 
+    // Simpan id transaksi pelunasan + environment-nya di kolom TERPISAH
+    // (pelunasan_midtrans_mode) supaya tak menimpa midtrans_mode milik DP —
+    // webhook -LUNAS verifikasi terhadap kolom ini.
     await supabaseAdmin
       .from('orders')
-      .update({ pelunasan_midtrans_order_id: midtransOrderId })
+      .update({ pelunasan_midtrans_order_id: midtransOrderId, pelunasan_midtrans_mode: MIDTRANS_MODE })
       .eq('id', order.id)
 
     return NextResponse.json({

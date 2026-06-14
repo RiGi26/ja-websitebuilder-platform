@@ -385,7 +385,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Field label="Nomor WhatsApp" required>
-                  <input className={inputCls} value={form.wa} onChange={e => set('wa', e.target.value)} placeholder="628123456789" />
+                  <input type="tel" inputMode="numeric" autoComplete="tel" className={inputCls} value={form.wa} onChange={e => set('wa', e.target.value)} placeholder="628123456789" />
                 </Field>
                 <Field label="Email Bisnis">
                   <input type="email" className={inputCls} value={form.email} onChange={e => set('email', e.target.value)} placeholder="halo@bisnis.com" />
@@ -453,7 +453,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                       <input className={inputCls} placeholder="Kategori (MPV/SUV/Motor)" value={row.kategori} onChange={e => updateRow('fleet', i, 'kategori', e.target.value)} />
                       <input className={inputCls} placeholder="Kapasitas (7 Kursi)" value={row.kapasitas} onChange={e => updateRow('fleet', i, 'kapasitas', e.target.value)} />
                       <input className={inputCls} placeholder="Transmisi (Manual/Otomatis)" value={row.transmisi} onChange={e => updateRow('fleet', i, 'transmisi', e.target.value)} />
-                      <input className={inputCls} placeholder="Harga/hari (350000)" value={row.harga} onChange={e => updateRow('fleet', i, 'harga', e.target.value)} />
+                      <input inputMode="numeric" className={inputCls} placeholder="Harga/hari (350000)" value={row.harga} onChange={e => updateRow('fleet', i, 'harga', e.target.value)} />
                       <div className="md:col-span-3">
                         <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('fleet', i, 'foto_url', url)} label="Foto kendaraan (opsional)" compact {...uploadProps} />
                       </div>
@@ -506,7 +506,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       <input className={inputCls} placeholder="Nama menu" value={row.nama} onChange={e => updateRow('menu', i, 'nama', e.target.value)} />
                       <input className={inputCls} placeholder="Kategori (Main, Appetizer)" value={row.kategori} onChange={e => updateRow('menu', i, 'kategori', e.target.value)} />
-                      <input className={inputCls} placeholder="Harga (35000)" value={row.harga} onChange={e => updateRow('menu', i, 'harga', e.target.value)} />
+                      <input inputMode="numeric" className={inputCls} placeholder="Harga (35000)" value={row.harga} onChange={e => updateRow('menu', i, 'harga', e.target.value)} />
                       <input className={`${inputCls} col-span-2 md:col-span-3`} placeholder="Deskripsi singkat" value={row.deskripsi} onChange={e => updateRow('menu', i, 'deskripsi', e.target.value)} />
                       <div className="col-span-2 md:col-span-3">
                         <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('menu', i, 'foto_url', url)} label="Foto menu (opsional)" compact {...uploadProps} />
@@ -652,7 +652,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                       </div>
                       <div className="flex gap-3">
                         <input className={inputCls} placeholder="Nama produk" value={row.nama} onChange={e => updateRow('produk_unggulan', i, 'nama', e.target.value)} />
-                        <input className={inputCls} placeholder="Harga (250000)" value={row.harga} onChange={e => updateRow('produk_unggulan', i, 'harga', e.target.value)} />
+                        <input inputMode="numeric" className={inputCls} placeholder="Harga (250000)" value={row.harga} onChange={e => updateRow('produk_unggulan', i, 'harga', e.target.value)} />
                       </div>
                       <ImageUploadField value={row.foto_url} onChange={(url) => updateRow('produk_unggulan', i, 'foto_url', url)} label="Foto produk (opsional)" compact {...uploadProps} />
                     </div>

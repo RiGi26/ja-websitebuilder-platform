@@ -196,3 +196,44 @@
     text-wrap: balance;
   }
 }
+
+/* ── Utilitas yang sebelumnya "hantu" (dipakai di /order & lain-lain tapi tak
+   pernah didefinisikan, sehingga polish diam-diam mati) ────────────────────── */
+@keyframes appleFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  /* Input ala Apple — selaraskan dengan inputCls BriefingForm agar field di
+     seluruh flow rakit konsisten (sebelumnya jatuh ke default shadcn). */
+  .apple-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .apple-input:focus {
+    outline: none;
+    border-color: #0071E3;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+  }
+
+  /* Scrollbar tipis untuk grid add-on yang panjang. */
+  .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.18) transparent; }
+  .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 9999px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.28); }
+
+  /* Entrance fade — dipakai luas tapi tak disediakan tw-animate-css. */
+  .animate-fade-in { animation: appleFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in { animation: none; }
+}

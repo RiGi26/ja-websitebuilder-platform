@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -50,6 +50,17 @@ const INIT: FormData = {
 // di-drop/hide (triage A3) otomatis tak tampil via orderAddons().
 const ADDONS = orderAddons()
 
+// Draft autosave (anti-kehilangan data saat tab ditutup) — pola seperti BriefingForm.
+const DRAFT_KEY = 'ja_order_draft'
+
+// Pilihan industri sebagai chip — tiap label dipetakan akurat oleh industriToTipe()
+// (mis. "Restoran & Kuliner" → restaurant). Hilangkan free-text yang rawan salah-petakan.
+const INDUSTRI_OPTIONS = [
+  'Toko Online', 'Restoran & Kuliner', 'Klinik & Kesehatan', 'Sekolah & Kursus',
+  'Travel & Rental', 'Perusahaan & Jasa', 'Personal & Kreatif', 'Blog & Media',
+  'Jastip', 'Lainnya',
+]
+
 // ── Reusable components ────────────────────────────────────────────────────────
 function StepHeader({ title, desc }: { title: string; desc: string }) {
   return (
@@ -60,13 +71,18 @@ function StepHeader({ title, desc }: { title: string; desc: string }) {
   )
 }
 
-function FieldRow({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function FieldRow({ label, required, htmlFor, error, children }: { label: string; required?: boolean; htmlFor?: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2 ml-1">
+      <Label htmlFor={htmlFor} className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2 ml-1">
         {label}{required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children}
+      {error && (
+        <p id={htmlFor ? `${htmlFor}-error` : undefined} className="text-xs font-medium text-red-500 mt-1.5 ml-1">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
@@ -100,6 +116,11 @@ function OrderFormContent() {
   const [pendingPayment, setPendingPayment] = useState<{
     displayId: string; dpAmount: number; redirectUrl: string
   } | null>(null)
+  const hydratedRef = useRef(false)
+  // Validasi inline: tandai field yang sudah disentuh, tampilkan error saat blur
+  // (ganti "tombol mati senyap" jadi pesan jelas) — tombol Lanjut tetap di-gate.
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const touch = (k: string) => setTouched(t => (t[k] ? t : { ...t, [k]: true }))
 
   // ── Program Mitra: kode referral ─────────────────────────────────────────
   const [referralCode, setReferralCode] = useState('')
@@ -145,6 +166,32 @@ function OrderFormContent() {
     }
   }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Autosave draft: restore saat mount (hanya kalau BUKAN dari kalkulator /
+  // param otoritatif, supaya prefill URL tetap menang), lalu persist tiap ubah.
+  // Cegah "tutup tab = semua isian hilang" (penyebab abandonment klasik).
+  useEffect(() => {
+    const hasOrderQuery = !!(searchParams.get('template') || kalkulatorIndustri || kalkulatorPaket || kalkulatorEstimasi || kalkulatorAddons)
+    if (!hasOrderQuery) {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY)
+        if (raw) {
+          const d = JSON.parse(raw)
+          if (d.form) setForm(f => ({ ...f, ...d.form, agreedToTerms: false }))
+          if (typeof d.step === 'number' && d.step >= 0 && d.step <= 3) setStep(d.step)
+          if (typeof d.referralCode === 'string' && d.referralCode) setReferralCode(d.referralCode)
+        }
+      } catch { /* draft korup — abaikan */ }
+    }
+    hydratedRef.current = true
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!hydratedRef.current) return
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form: { ...form, agreedToTerms: false }, step, referralCode }))
+    } catch { /* kuota penuh — abaikan */ }
+  }, [form, step, referralCode])
+
   // Prefill kode referral: ?ref= (link mitra / corp landing) → fallback
   // cookie ja_ref (di-set short link /r/KODE, umur 30 hari).
   useEffect(() => {
@@ -186,6 +233,23 @@ function OrderFormContent() {
   const fromKalkulator = !!(kalkulatorPaket || kalkulatorEstimasi)
 
   const set = (key: keyof FormData, val: any) => setForm(f => ({ ...f, [key]: val }))
+
+  // Pesan error per-field (hanya muncul setelah field disentuh).
+  const fieldError = (k: string): string => {
+    if (!touched[k]) return ''
+    switch (k) {
+      case 'namaUsaha': return form.namaUsaha.trim() ? '' : 'Nama usaha wajib diisi'
+      case 'namaPerusahaan': return form.namaPerusahaan.trim() ? '' : 'Nama perusahaan wajib diisi'
+      case 'namapic': return form.namapic.trim() ? '' : 'Nama PIC wajib diisi'
+      case 'nomorWa':
+        if (!form.nomorWa.trim()) return 'Nomor WhatsApp wajib diisi'
+        return form.nomorWa.replace(/\D/g, '').length >= 8 ? '' : 'Nomor WhatsApp belum lengkap'
+      case 'email':
+        if (!form.email.trim()) return 'Email wajib diisi'
+        return /^\S+@\S+\.\S+$/.test(form.email) ? '' : 'Format email belum benar (contoh: nama@email.com)'
+      default: return ''
+    }
+  }
 
   const handleNext = () => {
     if (fromKalkulator && step === 1) {
@@ -314,6 +378,7 @@ function OrderFormContent() {
         order_id, display_id, dp_amount,
         redirect_url, created_at: new Date().toISOString(),
       }))
+      localStorage.removeItem(DRAFT_KEY) // order sukses — buang draft autosave
 
       // Tampilkan interstitial page (bukan langsung redirect)
       setPendingPayment({ displayId: display_id, dpAmount: dp_amount, redirectUrl: redirect_url })
@@ -350,6 +415,11 @@ function OrderFormContent() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Pesanan</h1>
           <p className="text-gray-500 font-medium">Lengkapi data diri dan pilih fitur yang Anda butuhkan.</p>
+          {!fromKalkulator && (
+            <p className="text-xs text-gray-400 font-medium mt-2 inline-flex items-center gap-1.5">
+              <Check size={12} className="text-green-500" /> Progres tersimpan otomatis di perangkat ini — aman ditinggal
+            </p>
+          )}
       </div>
 
       {/* Banner dari kalkulator */}
@@ -404,34 +474,53 @@ function OrderFormContent() {
               <StepHeader title="Informasi Identitas" desc="Lengkapi detail kontak dan nama bisnis Anda." />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {form.clientType === 'individu' ? (
-                  <FieldRow label="Nama Usaha / Brand" required>
-                    <Input placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="apple-input" />
+                  <FieldRow label="Nama Usaha / Brand" htmlFor="order-nama-usaha" required error={fieldError('namaUsaha')}>
+                    <Input id="order-nama-usaha" placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} onBlur={() => touch('namaUsaha')} aria-invalid={!!fieldError('namaUsaha')} className="apple-input" />
                   </FieldRow>
                 ) : (
                   <>
-                    <FieldRow label="Nama Perusahaan" required>
-                      <Input placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama Perusahaan" htmlFor="order-nama-perusahaan" required error={fieldError('namaPerusahaan')}>
+                      <Input id="order-nama-perusahaan" placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} onBlur={() => touch('namaPerusahaan')} aria-invalid={!!fieldError('namaPerusahaan')} className="apple-input" />
                     </FieldRow>
-                    <FieldRow label="Nama PIC" required>
-                      <Input placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama PIC" htmlFor="order-nama-pic" required error={fieldError('namapic')}>
+                      <Input id="order-nama-pic" placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} onBlur={() => touch('namapic')} aria-invalid={!!fieldError('namapic')} className="apple-input" />
                     </FieldRow>
                   </>
                 )}
-                <FieldRow label="Nomor WhatsApp" required>
-                  <Input placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="apple-input" />
+                <FieldRow label="Nomor WhatsApp" htmlFor="order-wa" required error={fieldError('nomorWa')}>
+                  <Input id="order-wa" type="tel" inputMode="numeric" autoComplete="tel" placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} onBlur={() => touch('nomorWa')} aria-invalid={!!fieldError('nomorWa')} className="apple-input" />
                 </FieldRow>
-                <FieldRow label="Email" required>
-                  <Input type="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
+                <FieldRow label="Email" htmlFor="order-email" required error={fieldError('email')}>
+                  <Input id="order-email" type="email" autoComplete="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} onBlur={() => touch('email')} aria-invalid={!!fieldError('email')} className="apple-input" />
                 </FieldRow>
                 <div className="md:col-span-2">
-                  <FieldRow label="Bidang Industri">
-                    <Input placeholder="Contoh: Food & Beverage, Fashion, Pendidikan" value={form.industri} onChange={e => set('industri', e.target.value)} className="apple-input" />
+                  <FieldRow label="Bidang Industri" required>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {INDUSTRI_OPTIONS.map(opt => {
+                        const active = form.industri === opt
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => { set('industri', active ? '' : opt); triggerHaptic() }}
+                            aria-pressed={active}
+                            className={`min-h-[44px] px-4 rounded-full text-sm font-semibold border transition-all ${
+                              active
+                                ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-sm'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-[#0071E3]/40'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </FieldRow>
                 </div>
               </div>
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || (form.clientType === 'individu' ? !form.namaUsaha : !form.namaPerusahaan)} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut Pembayaran <ChevronRight className="ml-2" size={18} /></Button>
+                <Button disabled={!form.nomorWa || !/^\S+@\S+\.\S+$/.test(form.email) || !form.industri || (form.clientType === 'individu' ? !form.namaUsaha : (!form.namaPerusahaan || !form.namapic))} onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg glow-button">{fromKalkulator ? 'Lanjut ke Konfirmasi' : 'Lanjut ke Fitur Tambahan'} <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -498,7 +587,7 @@ function OrderFormContent() {
 
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
-                <Button onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
+                <Button onClick={handleNext} className="w-full md:w-auto rounded-2xl px-12 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-lg glow-button">Lanjut ke Konfirmasi <ChevronRight className="ml-2" size={18} /></Button>
               </div>
             </motion.div>
           )}
@@ -620,6 +709,19 @@ function OrderFormContent() {
                                   </div>
                                 )}
                               </div>
+
+                              {/* Biaya perpanjangan tahunan — transparan, tidak ditagih sekarang */}
+                              {totalYearlyMaint > 0 && (
+                                <div className="mt-3 pt-3 border-t border-black/5 flex items-start justify-between gap-3">
+                                  <div className="flex-1">
+                                    <p className="text-sm text-gray-600">
+                                      Perpanjangan tahunan <span className="text-gray-400 font-normal">(mulai tahun ke-2)</span>
+                                    </p>
+                                    <p className="text-[11px] text-gray-500 mt-0.5">Hosting dan maintenance · ditagih tiap tahun, bukan sekarang</p>
+                                  </div>
+                                  <span className="text-sm font-bold text-gray-600 tabular-nums shrink-0">± {formatPrice(totalYearlyMaint)}/th</span>
+                                </div>
+                              )}
                           </div>
                       </div>
                   </div>
@@ -644,15 +746,22 @@ function OrderFormContent() {
                             </a>
                           </p>
                           <p className="text-xs text-gray-500 leading-relaxed">
-                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah {isDP ? `pembayaran DP 50% (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan. Pelunasan dibayar sebelum website go-live.` : `pembayaran lunas (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan.`}
+                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah {isDP ? `pembayaran DP 50% (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan. Pelunasan dibayar sebelum website go-live.` : `pembayaran lunas (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan.`}{totalYearlyMaint > 0 && ` Mulai tahun ke-2 ada biaya perpanjangan ±Rp ${totalYearlyMaint.toLocaleString('id-ID')}/tahun untuk hosting dan maintenance.`}
                           </p>
                       </div>
                   </button>
 
+                  {/* Trust strip tepat sebelum tombol bayar — turunkan persepsi risiko di titik komit tertinggi */}
+                  <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-gray-500 font-medium">
+                    <span className="inline-flex items-center gap-1.5"><Lock size={13} className="text-gray-400" /> Pembayaran aman via Midtrans</span>
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck size={13} className="text-gray-400" /> Revisi sampai puas sebelum go-live</span>
+                    <span className="inline-flex items-center gap-1.5"><Check size={13} strokeWidth={3} className="text-gray-400" /> Data dikirim ke tim konsultan</span>
+                  </div>
+
                   <div className="flex flex-col-reverse md:flex-row justify-between mt-10 md:mt-12 pt-6 md:pt-8 border-t border-gray-100 gap-4">
                     <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400">Kembali</Button>
                     <Button disabled={!form.agreedToTerms || isSubmitting} onClick={handleSubmit} 
-                        className="w-full md:w-auto rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl flex items-center justify-center gap-3">
+                        className="w-full md:w-auto rounded-2xl flex-1 h-14 bg-[#0071E3] hover:bg-blue-600 text-white font-bold shadow-xl glow-button flex items-center justify-center gap-3">
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="animate-spin" size={20} /> Memproses Pesanan...

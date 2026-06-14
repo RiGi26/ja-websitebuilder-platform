@@ -10,9 +10,8 @@ import {
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
-import RestaurantLuxRenderer from '@/app/components/themes/restaurant-lux/RestaurantLuxRenderer'
 import AtelierCartButton from '@/app/components/themes/toko-atelier/AtelierCartButton'
-import { TOKO_BESPOKE } from '@/app/components/themes/toko-bespoke/registry'
+import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
 import BatikTokoRenderer from '@/app/components/themes/batik-toko/BatikTokoRenderer'
 import KlinikRenderer from '@/app/components/themes/klinik/KlinikRenderer'
 import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRenderer'
@@ -26,7 +25,7 @@ import { composableContentFromSections, articlesFromBlogPosts, type ShowcaseSour
 import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
-import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websitebuilder'
+import type { KonfigurasiWebsite, LandingPageWithSections, Product } from '@/types/websitebuilder'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Client = SupabaseClient<any>
@@ -53,49 +52,47 @@ export async function renderSite({
   const tawkId = konfig.features?.hasLiveChat ? (konfig.addons?.tawk_property_id ?? null) : null
   const sections = [...(page.page_sections ?? [])].sort((a, b) => a.urutan - b.urutan)
 
-  // ── Bespoke premium: Restaurant Lux (Opsi A, tier premium) ──
-  // theme='restaurant-lux' → renderer bespoke = view kaya atas ComposableContent
-  // yang SAMA (reuse menu fetch + composableContentFromSections). variant = preset
-  // palet (aurum/noir/hearth); primary = aksen brand. Coexist, nol regresi.
-  if (theme === 'restaurant-lux') {
-    const [source, profile, galleryRows] = await Promise.all([
-      fetchMenuItemsByPage(client, page.id),
-      fetchTenantProfile(client, page.id),
-      fetchGalleryByPage(client, page.id),
-    ])
-    const content = composableContentFromSections(
-      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, 'Menu Kami', galleryRows,
-    )
-    return <RestaurantLuxRenderer content={content} variant={variant} primary={primary} slug={slug} capabilities={konfig.capabilities} />
-  }
-
-  // ── Bespoke FLAGSHIP toko (registry: Atelier/Kuliner/…) ──
-  // Theme System lux bespoke per sub-kategori toko. SATU lookup registry (bukan
-  // cabang if per tema). Reuse fetch products + composableContentFromSections;
-  // products mentah diteruskan untuk pencocokan tombol keranjang per item
-  // (AtelierCartButton di-inject via slot supaya renderer bebas modul cart).
-  const bespoke = theme ? TOKO_BESPOKE[theme] : undefined
+  // ── Bespoke premium (registry universal: restaurant-lux + toko Atelier/Kuliner/…) ──
+  // SATU lookup registry → tak ada cabang if per tema/industri. Tiap entri
+  // mendeklarasikan `source` (etalase yang di-fetch) + `hasCart`. Renderer = view
+  // kaya atas ComposableContent yang SAMA (composableContentFromSections), jadi nol
+  // plumbing data baru. Coexist dgn composable di bawah → nol regresi.
+  const bespoke = theme ? BESPOKE_RENDERERS[theme] : undefined
   if (bespoke) {
-    const [products, profile, galleryRows] = await Promise.all([
-      fetchProductsByPage(client, page.id),
+    // Sumber etalase per industri (cermin cabang composable): menu_items / services
+    // / blog_posts (dipetakan) / products (default + toko).
+    const fetchSource: Promise<ShowcaseSourceItem[]> =
+      bespoke.source === 'menu' ? fetchMenuItemsByPage(client, page.id)
+        : bespoke.source === 'services' ? fetchServicesByPage(client, page.id)
+          : bespoke.source === 'blog'
+            ? fetchBlogPostsByPage(client, page.id).then((posts) =>
+                posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at })))
+            : fetchProductsByPage(client, page.id)
+    const [source, profile, galleryRows] = await Promise.all([
+      fetchSource,
       fetchTenantProfile(client, page.id),
       fetchGalleryByPage(client, page.id),
     ])
     const content = composableContentFromSections(
-      page.nama_website, sections, products, profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Koleksi Kami', galleryRows,
+      page.nama_website, sections, source, profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Koleksi Kami', galleryRows,
     )
     const Renderer = bespoke.Renderer
+    const withCart = !!bespoke.hasCart && hasCart
     const renderer = (
       <Renderer
         content={content}
         variant={variant}
         primary={primary}
-        products={products}
-        hasCart={hasCart}
+        // source = products mentah saat hasCart (toko) → cast aman; utk cocokkan
+        // tombol keranjang per item. Non-toko (restaurant/jasa) tak terima products.
+        products={bespoke.hasCart ? (source as unknown as Product[]) : undefined}
+        hasCart={withCart}
         CartButton={AtelierCartButton}
+        slug={slug}
+        capabilities={konfig.capabilities}
       />
     )
-    return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
+    return withCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
   }
 
   // ── Theme System (composable) ───────────────────────────────

@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notifyCustomer, notifyReferrer } from '@/lib/fonnte'
 import { createEarningForOrder, confirmEarningForOrder } from '@/lib/referral'
-import crypto from 'crypto'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
+import { verifyMidtransSignature, normalizeOrderMode } from '@/lib/platform-midtrans'
 
 // Midtrans requires HTTP 200 always — non-200 triggers retries
 // Signature check still happens; invalid ones are logged and ignored
@@ -20,13 +18,41 @@ export async function POST(request: Request) {
       fraud_status,
     } = body
 
-    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
-    const expected = crypto
-      .createHash('sha512')
-      .update(`${order_id}${status_code}${gross_amount}${SERVER_KEY}`)
-      .digest('hex')
+    // Body Midtrans wajib punya order_id. Tanpa itu tak ada yang bisa diproses
+    // (return 200 supaya Midtrans tak retry input rusak).
+    if (!order_id || typeof order_id !== 'string') {
+      return NextResponse.json({ received: true, note: 'missing_order_id' })
+    }
 
-    if (signature_key !== expected) {
+    // Identitas environment order ini. Webhook bisa untuk DP (midtrans_order_id)
+    // atau pelunasan (pelunasan_midtrans_order_id, suffix -LUNAS).
+    const isPelunasan = order_id.endsWith('-LUNAS')
+    const matchColumn = isPelunasan ? 'pelunasan_midtrans_order_id' : 'midtrans_order_id'
+
+    // Resolve mode order = environment saat transaksinya dibuat. DP & pelunasan
+    // punya kolom mode sendiri (bisa beda bila admin flip di antaranya). Verifikasi
+    // tanda tangan HANYA terhadap key mode itu (lihat verifyMidtransSignature) supaya
+    // notifikasi sandbox tak bisa menyelesaikan order produksi. Order legacy (mode
+    // null) → mode legacy (NEXT_PUBLIC_MIDTRANS_ENV).
+    const { data: modeRow } = await supabaseAdmin
+      .from('orders')
+      .select('midtrans_mode, pelunasan_midtrans_mode')
+      .eq(matchColumn, order_id)
+      .maybeSingle()
+    const orderMode = normalizeOrderMode(
+      isPelunasan ? modeRow?.pelunasan_midtrans_mode : modeRow?.midtrans_mode,
+    )
+
+    // Verify signature — reject silently if invalid (return 200 so Midtrans doesn't retry)
+    if (
+      !verifyMidtransSignature({
+        orderId: order_id,
+        statusCode: status_code,
+        grossAmount: gross_amount,
+        signatureKey: signature_key,
+        mode: orderMode,
+      })
+    ) {
       console.warn('[webhook] Invalid signature for order:', order_id)
       return NextResponse.json({ received: true, note: 'signature_mismatch' })
     }
@@ -48,9 +74,6 @@ export async function POST(request: Request) {
       update.payment_status = 'failed'
       update.status = 'pending_payment'
     }
-
-    // Deteksi apakah ini transaksi pelunasan (suffix -LUNAS)
-    const isPelunasan = order_id.endsWith('-LUNAS')
 
     if (Object.keys(update).length > 0) {
       if (isPelunasan) {
