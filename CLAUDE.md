@@ -16,6 +16,7 @@ Website builder Japan Arena: customer order + bayar (Midtrans) → platform auto
 | Add-on (SSOT: `catalog.ts`) | `ADDON_ARCHITECTURE_PLAN.md` |
 | E-commerce klien (checkout/Midtrans tenant) | `PLAN_ECOMMERCE.md` |
 | Tema flagship Atelier | `FLAGSHIP_ATELIER_PLAN.md` |
+| Roadmap tema bespoke per industri/sub-kategori (engine universal + 5 wave) | `ROADMAP_BESPOKE.md` |
 | Review visual tema — gerbang bespoke = §7 | `THEME_VISUAL_PIPELINE.md` |
 | Identitas visual antar tema bespoke (anti-duplikat + pelajaran UAT) | `DESIGN_LEDGER.md` |
 | SOP build situs | `SOP_WEBSITE_BUILD_V2.md`, `SOP_CUSTOM_BUILD.md` |
