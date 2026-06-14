@@ -33,6 +33,14 @@ const MAX_KB = 120
 const CARD_ASPECT = 4 / 3
 const WIDTH_CAP = { mobile: 440, tablet: 720, desktop: 1000 }
 
+// Lightbox "Lihat preview" (Fase 3b+): webp HALAMAN PENUH (tinggi penuh, TANPA crop)
+// untuk desktop + mobile saja (toggle modal). Lebar di-cap; tinggi ikut proporsi →
+// gambar bisa beberapa ribu px, jadi plafon KB lebih longgar & lazy-load di modal.
+const FULL_VIEWPORTS = ['desktop', 'mobile']
+const FULL_WIDTH_CAP = { mobile: 480, desktop: 1000 }
+const FULL_QUALITY = 80
+const FULL_MAX_KB = 450
+
 function die(msg) {
   console.error(`✗ ${msg}`)
   process.exit(1)
@@ -69,9 +77,24 @@ async function encodeWebp(pngPath, vp) {
   return { buf, q }
 }
 
+/** Halaman PENUH (tanpa crop): resize lebar ke cap, tinggi penuh → webp; turunkan
+ *  kualitas bertahap sampai ≤ FULL_MAX_KB (lantai q40). Untuk lightbox preview. */
+async function encodeFullWebp(pngPath, vp) {
+  const targetW = FULL_WIDTH_CAP[vp] ?? 1000
+  const pipe = () => sharp(pngPath).resize({ width: targetW, withoutEnlargement: true })
+  let q = FULL_QUALITY
+  let buf = await pipe().webp({ quality: q }).toBuffer()
+  while (buf.length / 1024 > FULL_MAX_KB && q > 40) {
+    q -= 10
+    buf = await pipe().webp({ quality: q }).toBuffer()
+  }
+  return { buf, q }
+}
+
 const registry = JSON.parse(readFileSync(REGISTRY_SRC, 'utf8'))
 
 let converted = 0
+let fullConverted = 0
 let noshot = 0
 let missing = 0
 
@@ -85,10 +108,13 @@ for (const ip of Object.values(registry)) {
       }
       // _shootId = id file PNG (≠ themeId utk tema legacy spt Atelier); di-set build:theme-registry.
       const shootId = t._shootId ?? t.themeId
+      // Loop kartu & full-page baca PNG yg sama → hitung tiap file hilang sekali saja.
+      const missingVps = new Set()
       for (const vp of VIEWPORTS) {
         const png = `theme-samples/${shootId}-${vp}.png`
         if (!existsSync(png)) {
           missing++
+          missingVps.add(vp)
           console.warn(`  ! PNG hilang: ${png} (status registry 'live' tapi file tak ada)`)
           continue
         }
@@ -99,6 +125,27 @@ for (const ip of Object.values(registry)) {
         writeFileSync(out, buf)
         converted++
         console.log(`  ✓ ${t.thumbs[vp]}  (${(buf.length / 1024).toFixed(0)}KB, q${q})`)
+      }
+      // Halaman penuh (lightbox) — desktop + mobile. fullThumbs di-set generator
+      // bersamaan dgn thumbs, jadi pasti ada bila status 'live'.
+      if (t.fullThumbs) {
+        for (const vp of FULL_VIEWPORTS) {
+          const png = `theme-samples/${shootId}-${vp}.png`
+          if (!existsSync(png)) {
+            // Hindari hitung-ganda: file ini sudah dilaporkan hilang di loop kartu.
+            if (!missingVps.has(vp)) {
+              missing++
+              console.warn(`  ! PNG hilang (full): ${png}`)
+            }
+            continue
+          }
+          const out = resolve(CORP_PUBLIC, t.fullThumbs[vp].replace(/^\//, ''))
+          mkdirSync(dirname(out), { recursive: true })
+          const { buf, q } = await encodeFullWebp(png, vp)
+          writeFileSync(out, buf)
+          fullConverted++
+          console.log(`  ✓ ${t.fullThumbs[vp]}  (full, ${(buf.length / 1024).toFixed(0)}KB, q${q})`)
+        }
       }
     }
   }
@@ -111,6 +158,6 @@ writeFileSync(corpRegistryPath, JSON.stringify(registry, (k, v) => (k === '_shoo
 
 console.log('')
 console.log(`✓ registry → ${corpRegistryPath}`)
-console.log(`✓ ${converted} webp · ${noshot} tema live-noshot · ${missing} PNG hilang`)
+console.log(`✓ ${converted} webp kartu · ${fullConverted} webp full-page · ${noshot} tema live-noshot · ${missing} PNG hilang`)
 if (missing) console.warn('⚠ ada PNG hilang — shoot ulang tema terkait sebelum commit.')
 console.log('→ review diff di repo CORP (data/ + public/theme-previews/) lalu commit (Fase 2).')
