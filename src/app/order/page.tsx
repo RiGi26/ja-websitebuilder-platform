@@ -620,6 +620,19 @@ function OrderFormContent() {
                                   </div>
                                 )}
                               </div>
+
+                              {/* Biaya perpanjangan tahunan — transparan, tidak ditagih sekarang */}
+                              {totalYearlyMaint > 0 && (
+                                <div className="mt-3 pt-3 border-t border-black/5 flex items-start justify-between gap-3">
+                                  <div className="flex-1">
+                                    <p className="text-sm text-gray-600">
+                                      Perpanjangan tahunan <span className="text-gray-400 font-normal">(mulai tahun ke-2)</span>
+                                    </p>
+                                    <p className="text-[11px] text-gray-500 mt-0.5">Hosting dan maintenance · ditagih tiap tahun, bukan sekarang</p>
+                                  </div>
+                                  <span className="text-sm font-bold text-gray-600 tabular-nums shrink-0">± {formatPrice(totalYearlyMaint)}/th</span>
+                                </div>
+                              )}
                           </div>
                       </div>
                   </div>
@@ -644,7 +657,7 @@ function OrderFormContent() {
                             </a>
                           </p>
                           <p className="text-xs text-gray-500 leading-relaxed">
-                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah {isDP ? `pembayaran DP 50% (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan. Pelunasan dibayar sebelum website go-live.` : `pembayaran lunas (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan.`}
+                              Saya mengonfirmasi bahwa data pesanan yang dimasukkan sudah benar. Saya memahami bahwa pesanan ini akan diproses setelah {isDP ? `pembayaran DP 50% (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan. Pelunasan dibayar sebelum website go-live.` : `pembayaran lunas (Rp ${dpAmount.toLocaleString('id-ID')}) berhasil dilakukan.`}{totalYearlyMaint > 0 && ` Mulai tahun ke-2 ada biaya perpanjangan ±Rp ${totalYearlyMaint.toLocaleString('id-ID')}/tahun untuk hosting dan maintenance.`}
                           </p>
                       </div>
                   </button>
