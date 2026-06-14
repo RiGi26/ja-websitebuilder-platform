@@ -56,7 +56,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
     { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: true },
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: true },
-    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
+    { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: true },
     { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
@@ -192,22 +192,17 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
       },
     ],
 
-    // ── ELEKTRONIK / GADGET ×3 — modern/gelap/tech ───────────────
+    // ── ELEKTRONIK / GADGET (flagship bespoke "Onyx") ────────────
+    // GadgetLuxRenderer (dark-tech, signature blueprint-grid + spec-readout HUD).
+    // 1 varian default: onyx. manifest:'toko-gadget' inert (di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (gadget-onyx/
+    // studio/neon di manifest.ts) tetap untuk situs existing, hanya tak ditawarkan
+    // lagi di brief form.
     gadget: [
       {
         id: 'gadget-onyx', subKategori: 'gadget', nama: 'Onyx',
-        deskripsi: 'Gelap dengan aksen cyan elektrik. Untuk aksesoris HP, audio, gadget.',
-        icon: 'Cpu', mood: '#22D3EE', bg: 'dark', manifest: 'gadget-onyx',
-      },
-      {
-        id: 'gadget-studio', subKategori: 'gadget', nama: 'Studio',
-        deskripsi: 'Terang & bersih ala Apple, fokus produk. Untuk gadget premium, smart home.',
-        icon: 'Monitor', mood: '#0071E3', bg: 'light', manifest: 'gadget-studio',
-      },
-      {
-        id: 'gadget-neon', subKategori: 'gadget', nama: 'Neon',
-        deskripsi: 'Gelap neon magenta, energik. Untuk gaming gear, aksesoris RGB, brand gen-Z.',
-        icon: 'Gamepad2', mood: '#D946EF', bg: 'dark', manifest: 'gadget-neon',
+        deskripsi: 'Gelap teknis dengan cyan elektrik, presisi & modern. Untuk aksesoris HP, audio, gadget, smart device.',
+        icon: 'Cpu', mood: '#22D3EE', bg: 'dark', manifest: 'toko-gadget',
       },
     ],
 

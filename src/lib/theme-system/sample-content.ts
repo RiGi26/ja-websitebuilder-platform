@@ -512,6 +512,88 @@ const KECANTIKAN_LUX: ComposableContent = {
   contact: { wa: '6281296917963', email: 'care@embun.id', alamat: 'Jakarta Selatan' },
 }
 
+// ── Elektronik / Gadget (flagship bespoke "Onyx") — GadgetLuxRenderer.
+// Sample dedikasi dark-tech (spec-readout 4 langkah, statement, 6 produk
+// ber-kategori). Dipakai gen-samples + imagery-borrow generateContent.
+// Foto = id Unsplash terverifikasi (sama dgn GADGET composable).
+const GADGET_LUX: ComposableContent = {
+  nama: 'Onyx',
+  hero: {
+    eyebrow: 'Gadget Original Bergaransi',
+    title: 'Teknologi Pilihan, Tanpa Kompromi',
+    subtitle: 'Aksesoris dan gadget original bergaransi resmi, dikurasi untuk performa dan daya tahan. Tiap unit diuji sebelum dikirim, didukung purna jual yang nyata.',
+    ctaText: 'Lihat Produk',
+    ctaHref: '#produk',
+    ctaText2: 'Konsultasi',
+    ctaHref2: '#wa',
+    image: IMG('photo-1511707171634-5f897ff02aa9'),
+  },
+  statement: {
+    eyebrow: 'Prinsip Kami',
+    quote: 'Gadget yang baik itu jujur — original, teruji, dan didukung purna jual yang benar-benar ada.',
+    cite: 'Tim Kurasi Onyx',
+  },
+  features: [
+    { title: 'Original 100%', desc: 'Tiap unit bersegel resmi, bukan rekondisi maupun replika.' },
+    { title: 'Garansi Resmi', desc: 'Klaim mudah lewat distributor Indonesia, bukan sekadar garansi toko.' },
+    { title: 'Lolos Uji QC', desc: 'Setiap unit dinyalakan dan dicek fungsi sebelum masuk paket.' },
+    { title: 'Kirim Kilat', desc: 'Order sebelum jam 3 sore diproses dan dikirim hari itu juga.' },
+  ],
+  featuresEyebrow: 'Standar Kami',
+  featuresTitle: 'Empat jaminan di balik tiap pesanan',
+  showcase: {
+    title: 'Produk Unggulan',
+    subtitle: 'Gadget terlaris yang paling sering jadi andalan pelanggan.',
+    items: [
+      { nama: 'TWS Pro ANC', harga: 459000, desc: 'Peredam bising aktif, baterai 30 jam, koneksi stabil.', gambar: IMG('photo-1505740420928-5e560c06d30e', 900), kategori: 'Audio' },
+      { nama: 'Smartwatch AMOLED', harga: 699000, desc: 'Pantau detak & tidur, layar AMOLED terang, tahan air.', gambar: IMG('photo-1572569511254-d8f925fe2cbb', 900), kategori: 'Wearable' },
+      { nama: 'Keyboard Mekanik', harga: 549000, desc: 'Hot-swap, RGB per-key, switch taktil yang renyah.', gambar: IMG('photo-1546435770-a3e426bf472b', 900), kategori: 'Setup' },
+      { nama: 'Powerbank 20.000mAh', harga: 279000, desc: 'Fast charging 22.5W, tiga port, ringkas dibawa.', gambar: IMG('photo-1498049794561-7780e7231661', 900), kategori: 'Daya' },
+      { nama: 'Charger GaN 65W', harga: 229000, desc: 'Mungil tapi bertenaga — isi laptop & HP sekaligus.', gambar: IMG('photo-1556910103-1c02745aae4d', 900), kategori: 'Daya' },
+      { nama: 'Hub USB-C 7-in-1', harga: 319000, desc: 'HDMI 4K, USB 3.0, card reader — satu colok untuk semua.', gambar: IMG('photo-1581091226825-a6a2a5aee158', 900), kategori: 'Konektivitas' },
+    ],
+  },
+  about: {
+    title: 'Dikurasi, Bukan Sekadar Dijual',
+    body: 'Onyx berawal dari rasa lelah berburu gadget yang ternyata KW atau tanpa garansi jelas.\n\nKami hanya menjual yang kami pakai sendiri: tiap produk diuji, tiap garansi kami pastikan bisa diklaim, dan tiap pertanyaan kami jawab dengan jujur — sebelum maupun sesudah Anda membeli.',
+    image: IMG('photo-1546435770-a3e426bf472b'),
+    ctaText: 'Kenali Kurasi Kami',
+    ctaHref: '#produk',
+  },
+  cta: {
+    title: 'Upgrade Gadget Anda Hari Ini',
+    subtitle: 'Tanya stok dan rekomendasi yang pas via WhatsApp — dibalas cepat oleh tim kami.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '30rb+', label: 'Unit terkirim' },
+    { angka: '4.8', label: 'Rating ulasan' },
+    { angka: '99%', label: 'Original tersegel' },
+    { angka: '24 jam', label: 'Kirim cepat' },
+  ],
+  testimonials: [
+    { quote: 'Barang ori, garansi resmi, dan pengirimannya ngebut. Sudah beberapa kali order, tidak pernah kecewa.', nama: 'Rio', peran: 'Pelanggan setia' },
+    { quote: 'Harga bersaing dan after-sales-nya responsif. Sempat tanya klaim garansi, langsung dibantu.', nama: 'Bayu', peran: 'Pelanggan' },
+    { quote: 'Packing aman pakai bubble tebal, gadget sampai mulus tanpa lecet. Recommended.', nama: 'Dewi', peran: 'Pelanggan' },
+    { quote: 'Suka karena jujur — dijelasin plus-minus produk sebelum beli. Jadi enggak salah pilih.', nama: 'Fajar', peran: 'Pelanggan baru' },
+  ],
+  faq: [
+    { q: 'Apakah produk bergaransi resmi?', a: 'Ya, semua produk bergaransi resmi distributor Indonesia, bukan sekadar garansi toko. Kami bantu proses klaimnya.' },
+    { q: 'Berapa lama pengiriman?', a: 'Pesanan sebelum jam 3 sore dikirim hari yang sama. Estimasi tiba 1–3 hari kerja tergantung lokasi.' },
+    { q: 'Bagaimana jika barang bermasalah saat tiba?', a: 'Lapor dalam 1×24 jam dengan video unboxing. Jika cacat dari pabrik, kami ganti unit baru tanpa biaya.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '09.00–18.00' },
+      { hari: 'Minggu', jam: 'Tutup' },
+    ],
+    alamat: 'Bandung, Jawa Barat',
+    mapsQuery: 'Bandung Jawa Barat',
+  },
+  contact: { wa: '6281296917963', email: 'cs@onyxgear.id', alamat: 'Bandung, Jawa Barat' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2381,6 +2463,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'kerajinan-lux': KERAJINAN_LUX,
   // Bespoke lux kecantikan (KecantikanLuxRenderer "Embun") — sample dedikasi glow + ritual.
   'kecantikan-lux': KECANTIKAN_LUX,
+  // Bespoke lux gadget (GadgetLuxRenderer "Onyx") — sample dedikasi dark-tech spec-readout.
+  'gadget-lux': GADGET_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
