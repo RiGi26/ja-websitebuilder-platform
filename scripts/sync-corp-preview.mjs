@@ -25,8 +25,13 @@ const CORP_ROOT = resolve('..', 'ja-corp-landing')
 const CORP_PUBLIC = resolve(CORP_ROOT, 'public')
 const CORP_DATA = resolve(CORP_ROOT, 'data')
 const VIEWPORTS = ['mobile', 'tablet', 'desktop']
-const WEBP_QUALITY = 80
+const WEBP_QUALITY = 82
 const MAX_KB = 120
+// Screenshot = full-page (sangat tinggi). Untuk kartu galeri kita crop region
+// HERO (dari atas) ke rasio kartu 4:3 + resize ke cap lebar → webp ringan & fokus
+// (bukan gambar 8000px). Cap per-viewport menjaga ukuran file.
+const CARD_ASPECT = 4 / 3
+const WIDTH_CAP = { mobile: 440, tablet: 720, desktop: 1000 }
 
 function die(msg) {
   console.error(`✗ ${msg}`)
@@ -43,13 +48,23 @@ try {
   die('paket `sharp` belum terpasang. Jalankan: npm i -D sharp')
 }
 
-/** Encode PNG → webp; turunkan kualitas bertahap sampai ≤ MAX_KB (lantai q40). */
-async function encodeWebp(pngPath) {
+/** Crop hero (atas, rasio kartu) → resize ke cap → webp; turunkan kualitas
+ *  bertahap sampai ≤ MAX_KB (lantai q40). */
+async function encodeWebp(pngPath, vp) {
+  const meta = await sharp(pngPath).metadata()
+  const w = meta.width ?? WIDTH_CAP[vp]
+  const h = meta.height ?? w
+  const cropH = Math.min(h, Math.round(w / CARD_ASPECT)) // region hero dari atas
+  const targetW = Math.min(w, WIDTH_CAP[vp] ?? 1000)
+  const pipe = () =>
+    sharp(pngPath)
+      .extract({ left: 0, top: 0, width: w, height: cropH })
+      .resize({ width: targetW, withoutEnlargement: true })
   let q = WEBP_QUALITY
-  let buf = await sharp(pngPath).webp({ quality: q }).toBuffer()
+  let buf = await pipe().webp({ quality: q }).toBuffer()
   while (buf.length / 1024 > MAX_KB && q > 40) {
     q -= 10
-    buf = await sharp(pngPath).webp({ quality: q }).toBuffer()
+    buf = await pipe().webp({ quality: q }).toBuffer()
   }
   return { buf, q }
 }
@@ -80,7 +95,7 @@ for (const ip of Object.values(registry)) {
         // t.thumbs[vp] = URL publik (mis. /theme-previews/toko_online/gadget/gadget-onyx-desktop.webp)
         const out = resolve(CORP_PUBLIC, t.thumbs[vp].replace(/^\//, ''))
         mkdirSync(dirname(out), { recursive: true })
-        const { buf, q } = await encodeWebp(png)
+        const { buf, q } = await encodeWebp(png, vp)
         writeFileSync(out, buf)
         converted++
         console.log(`  ✓ ${t.thumbs[vp]}  (${(buf.length / 1024).toFixed(0)}KB, q${q})`)
