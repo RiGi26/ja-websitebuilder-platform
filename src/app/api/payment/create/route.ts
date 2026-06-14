@@ -160,7 +160,9 @@ export async function POST(request: Request) {
       notifyCustomer({ type: 'order_created' }, nomor_wa, {
         clientName: clientName ?? 'Customer',
         displayId,
-        trackUrl: `${base}/track?id=${order.id}`,
+        // token disertakan supaya halaman /track milik pelanggan bisa menampilkan
+        // rahasia (kredensial/briefing); akses ber-id saja hanya lihat status.
+        trackUrl: `${base}/track?id=${order.id}&token=${order.tracking_token}`,
         paymentUrl: snapData.redirect_url,
       }).catch((e) => console.error('[payment/create] WA order_created failed:', e))
     }
