@@ -93,7 +93,7 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
   })
 })
 
-// FLAGSHIP bespoke toko (registry theme key). Tabel TOKO_BESPOKE_VARIANTS (SSOT)
+// FLAGSHIP bespoke toko (registry theme key). Tabel BESPOKE_VARIANTS (SSOT)
 // memetakan id ThemeOption brief → { theme key, palet variant native, sample }.
 // Brief form SELALU menyetel variant saat sub-kategori dipilih → intercept
 // berbasis id variant (bukan sub_kategori).
@@ -134,6 +134,19 @@ describe('generateContent — bespoke toko (Atelier fashion + Kuliner lux)', () 
 
   it('imagery enrichment aktif: products punya foto + foto_hero terisi (sample kuliner-lux)', () => {
     const plan = mkToko({ sub_kategori: 'kuliner', variant: 'kuliner-tungku' })
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.products.length).toBeGreaterThan(0)
+    expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)
+  })
+
+  it('kecantikan-embun → theme toko-kecantikan, variant embun (Wave 1)', () => {
+    const plan = mkToko({ sub_kategori: 'kecantikan', variant: 'kecantikan-embun' })
+    expect(plan.theme).toBe('toko-kecantikan')
+    expect(plan.variant).toBe('embun')
+  })
+
+  it('imagery enrichment aktif: products kecantikan punya foto (sample kecantikan-lux)', () => {
+    const plan = mkToko({ sub_kategori: 'kecantikan', variant: 'kecantikan-embun' })
     expect(typeof plan.dataKonten.foto_hero).toBe('string')
     expect(plan.products.length).toBeGreaterThan(0)
     expect(plan.products.every((p) => typeof p.gambar === 'string' && p.gambar!.length > 0)).toBe(true)

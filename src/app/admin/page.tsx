@@ -24,6 +24,8 @@ import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 import OrderStatusControl from './OrderStatusControl'
 import BuildButton from './BuildButton'
 import ClientAccountButton from './ClientAccountButton'
+import PaymentModeControl from './PaymentModeControl'
+import { getMidtransMode, getMidtransKeyStatus } from '@/lib/platform-midtrans'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,6 +110,8 @@ export default async function StudioAdminPage() {
   const orders = await getOrders()
   const pagesByTenant = await getPagesByTenant()
   const websites = await getAllWebsites()
+  const midtransMode = await getMidtransMode()
+  const midtransKeys = getMidtransKeyStatus()
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
@@ -146,6 +150,11 @@ export default async function StudioAdminPage() {
                   <LogOut size={20} />
                </a>
             </div>
+          </div>
+
+          {/* Mode pembayaran platform (Midtrans) — switch sandbox/production tanpa redeploy */}
+          <div className="mb-12">
+            <PaymentModeControl initialMode={midtransMode} keyStatus={midtransKeys} />
           </div>
 
           {/* Semua Website (lepas dari order) */}

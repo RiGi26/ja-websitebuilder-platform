@@ -1,6 +1,6 @@
 import type { BrandingConfig, FeatureFlags } from '@/types/websitebuilder'
 import { getManifest } from '@/lib/theme-system/manifest'
-import { TOKO_BESPOKE_VARIANTS, BESPOKE_RENDERED_BLOCKS } from '@/app/components/themes/toko-bespoke/variants'
+import { BESPOKE_VARIANTS, BESPOKE_RENDERED_BLOCKS } from '@/app/components/themes/toko-bespoke/variants'
 
 // Gating tab portal berbasis add-on (SSOT = landing_pages.konfigurasi.features,
 // diisi addonsToFeatures(order.selected_addons) saat provisioning; admin bisa
@@ -33,7 +33,8 @@ export interface ThemeContentTabs {
 // Cermin pemilihan sumber showcase di SiteRenderer (cabang composable).
 const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel', 'personal']
 
-const BESPOKE_THEMES = new Set(Object.values(TOKO_BESPOKE_VARIANTS).map((v) => v.theme))
+// Toko-only (restaurant-lux tidak ada di BESPOKE_VARIANTS — digate eksplisit di bawah).
+const BESPOKE_THEMES = new Set(Object.values(BESPOKE_VARIANTS).map((v) => v.theme))
 
 export function themeContentTabs(
   branding: BrandingConfig | undefined,

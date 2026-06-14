@@ -13,7 +13,8 @@
 // ketergantungan next/font di lingkungan test).
 // ============================================================
 import type { CSSProperties } from 'react'
-import type { ComposableContent, ShowcaseItem, TeamMember } from '@/lib/theme-system/manifest'
+import type { ShowcaseItem, TeamMember } from '@/lib/theme-system/manifest'
+import type { BespokeProps } from '../toko-bespoke/types'
 import { resolveCapabilities } from '@/lib/addons/capabilities'
 
 // ── Palet peran semantik (warm-dark luxury) ──────────────────
@@ -255,7 +256,7 @@ const QR_ICON = (
 
 export default function RestaurantLuxRenderer({
   content, variant, primary, slug, capabilities,
-}: { content: ComposableContent; variant?: string; primary?: string; slug?: string; capabilities?: string[] }) {
+}: BespokeProps) {
   const pal = getPal(variant)
   const accent = (primary && primary.trim()) || pal.accent
   const rootStyle = {

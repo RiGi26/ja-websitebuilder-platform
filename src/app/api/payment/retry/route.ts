@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, tooManyRequests } from '@/lib/rate-limit'
-
-const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY!
-const IS_PROD = process.env.NEXT_PUBLIC_MIDTRANS_ENV === 'production'
-const SNAP_API = IS_PROD
-  ? 'https://app.midtrans.com/snap/v1/transactions'
-  : 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+import { getPlatformMidtrans } from '@/lib/platform-midtrans'
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +13,9 @@ export async function POST(request: Request) {
     // tak bisa dipakai mengganggu pembayaran order korban secara massal.
     const rl = rateLimit(`pay:retry:${order_id}`, 5, 10 * 60_000)
     if (!rl.allowed) return tooManyRequests(rl.retryAfter)
+
+    // Mode Midtrans dari DB (switch sandbox/production via /admin tanpa redeploy).
+    const { serverKey: SERVER_KEY, snapApiUrl: SNAP_API, mode: MIDTRANS_MODE } = await getPlatformMidtrans()
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
@@ -70,10 +68,10 @@ export async function POST(request: Request) {
     const snapData = await snapRes.json()
     if (!snapRes.ok) throw new Error(snapData.error_messages?.join(', ') || 'Midtrans error')
 
-    // Update midtrans_order_id + reset status ke awaiting_payment
+    // Update midtrans_order_id + reset status ke awaiting_payment + environment transaksi
     await supabaseAdmin
       .from('orders')
-      .update({ midtrans_order_id: retryOrderId, payment_status: 'awaiting_payment', dp_amount: dpAmount })
+      .update({ midtrans_order_id: retryOrderId, payment_status: 'awaiting_payment', dp_amount: dpAmount, midtrans_mode: MIDTRANS_MODE })
       .eq('id', order.id)
 
     return NextResponse.json({
