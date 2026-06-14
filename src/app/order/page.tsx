@@ -8,7 +8,7 @@ import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
   Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck,
-  Copy, Shield, Lock, MessageCircle
+  Copy, Shield, Lock, MessageCircle, X
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -126,6 +126,99 @@ function WaFallbackLine({ href }: { href: string }) {
   )
 }
 
+// Proof strip: klaim proses yang verifiable saja (bukan social-proof tak bersumber).
+function ProofStrip() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-semibold text-gray-500 mt-5">
+      <span className="inline-flex items-center gap-1.5"><Rocket size={13} className="text-[#0071E3]" /> Live 3–5 hari kerja</span>
+      <span className="inline-flex items-center gap-1.5"><ShieldCheck size={13} className="text-emerald-500" /> Revisi sampai puas sebelum go-live</span>
+      <span className="inline-flex items-center gap-1.5"><Lock size={13} className="text-gray-400" /> Pembayaran aman via Midtrans</span>
+    </div>
+  )
+}
+
+// Sheet rincian biaya (DP & perpanjangan) — read-only, diturunkan dari nilai yang sudah dihitung.
+function MobileReceiptSheet({
+  open, onClose, baseLabel, basePrice, addons, referralDiscount, discountSuffix,
+  finalPrice, payableTotal, isDP, dpAmount, pelunasan, totalYearlyMaint,
+}: {
+  open: boolean; onClose: () => void
+  baseLabel: string; basePrice: number
+  addons: { name: string; price: number; included: boolean }[]
+  referralDiscount: number; discountSuffix: string
+  finalPrice: number; payableTotal: number; isDP: boolean
+  dpAmount: number; pelunasan: number; totalYearlyMaint: number
+}) {
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev }
+  }, [open, onClose])
+
+  return (
+    <div className={`fixed inset-0 z-[60] ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+      <div onClick={onClose} className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`} />
+      <div role="dialog" aria-label="Ringkasan Biaya" className={`absolute left-0 bottom-0 w-full sm:max-w-md sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 bg-white rounded-t-[28px] sm:rounded-[28px] shadow-2xl max-h-[85vh] overflow-y-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? 'translate-y-0' : 'translate-y-full sm:translate-y-[120%]'}`}>
+        <div className="sticky top-0 bg-white pt-3 pb-2 flex flex-col items-center sm:hidden"><span className="w-10 h-1.5 rounded-full bg-gray-200" /></div>
+        <div className="px-5 pt-2 sm:pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-black text-gray-900 sf-display-heavy">Ringkasan Biaya</h2>
+            <button onClick={onClose} aria-label="Tutup" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 active:scale-90 transition-transform shrink-0"><X size={16} /></button>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-gray-500 font-semibold flex-1">{baseLabel}</span>
+              <span className="text-sm font-bold text-gray-900 tabular-nums shrink-0">{formatPrice(basePrice)}</span>
+            </div>
+            {addons.map((a, i) => (
+              <div key={i} className="flex items-center justify-between gap-3 text-[#0071E3]">
+                <span className="text-sm font-medium flex-1">+ {a.name}</span>
+                <span className="text-sm font-bold shrink-0 tabular-nums">{a.included ? <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Termasuk</span> : formatPrice(a.price)}</span>
+              </div>
+            ))}
+            {referralDiscount > 0 && (
+              <div className="flex items-center justify-between gap-3 text-green-600">
+                <span className="text-sm font-medium flex-1">Diskon Referral{discountSuffix}</span>
+                <span className="text-sm font-bold shrink-0 tabular-nums">− {formatPrice(referralDiscount)}</span>
+              </div>
+            )}
+            <div className="pt-3 mt-1 border-t-2 border-black/5 flex items-center justify-between gap-3">
+              <span className="text-base font-black text-gray-900 uppercase tracking-tight flex-1">Total</span>
+              <span className="text-xl font-black text-[#0071E3] shrink-0 tabular-nums">
+                {referralDiscount > 0 && <span className="text-sm text-gray-300 line-through mr-2">{formatPrice(finalPrice)}</span>}
+                {formatPrice(payableTotal)}
+              </span>
+            </div>
+
+            <div className="bg-green-50 rounded-2xl p-4 border border-green-100 mt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Dibayar Sekarang</span>
+                <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-green-100 text-green-700">{isDP ? 'DP 50%' : 'Lunas'}</span>
+              </div>
+              <p className="text-2xl font-black text-green-700 tabular-nums">{formatPrice(dpAmount)}</p>
+              {isDP && <p className="text-xs text-gray-500 mt-1">Pelunasan sebelum go-live: <span className="font-bold tabular-nums">{formatPrice(pelunasan)}</span></p>}
+            </div>
+
+            {totalYearlyMaint > 0 && (
+              <div className="flex items-start justify-between gap-3 pt-2">
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">Perpanjangan tahunan <span className="text-gray-400 font-normal">(mulai tahun ke-2)</span></p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Hosting &amp; maintenance — ditagih tiap tahun, bukan sekarang</p>
+                </div>
+                <span className="text-sm font-bold text-gray-600 tabular-nums shrink-0">± {formatPrice(totalYearlyMaint)}/th</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function FieldRow({ label, required, htmlFor, error, children }: { label: string; required?: boolean; htmlFor?: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
@@ -168,6 +261,7 @@ function OrderFormContent() {
   const [form, setForm] = useState<FormData>(INIT)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
   const [pendingPayment, setPendingPayment] = useState<{
     displayId: string; dpAmount: number; redirectUrl: string
   } | null>(null)
@@ -488,6 +582,7 @@ function OrderFormContent() {
               <Check size={12} className="text-green-500" /> Progres tersimpan otomatis di perangkat ini — aman ditinggal
             </p>
           )}
+          <ProofStrip />
       </div>
 
       {/* Banner dari kalkulator */}
@@ -656,6 +751,10 @@ function OrderFormContent() {
                   <p className="text-lg font-black text-gray-900 tabular-nums">{formatPrice(finalPrice)}</p>
                 </div>
               </div>
+
+              <button type="button" onClick={() => setSheetOpen(true)} className="mt-3 w-full flex items-center justify-center gap-2 text-xs font-bold text-[#0071E3] py-2.5 rounded-xl border border-blue-100 bg-blue-50/40 hover:bg-blue-50 active:scale-[0.99] transition-all">
+                <Sparkles size={13} /> Lihat rincian lengkap (DP &amp; perpanjangan)
+              </button>
 
               <div className="flex flex-col-reverse md:flex-row justify-between mt-10 pt-8 border-t border-gray-100 gap-4">
                 <Button variant="ghost" onClick={handlePrev} className="w-full md:w-auto rounded-xl px-8 h-14 font-bold text-gray-400"><ChevronLeft className="mr-2" size={18} /> Kembali</Button>
@@ -852,6 +951,23 @@ function OrderFormContent() {
 
       {/* WhatsApp human-fallback — selalu tampak di tiap langkah */}
       <WaFallbackLine href={waOrderHref} />
+
+      {/* Sheet rincian biaya — dipicu dari ringkasan Step 2 */}
+      <MobileReceiptSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        baseLabel={kalkulatorPaket || selectedTemplate?.title || 'Website Studio'}
+        basePrice={currentBasePrice}
+        addons={form.selectedAddons.map(id => { const a = ADDONS.find(x => x.id === id); return a ? { name: a.name, price: a.price, included: fromKalkulator } : null }).filter(Boolean) as { name: string; price: number; included: boolean }[]}
+        referralDiscount={referralDiscount}
+        discountSuffix={isFlatTier(finalPrice) ? '' : (refInfo ? ` (${refInfo.discountPercent}%)` : '')}
+        finalPrice={finalPrice}
+        payableTotal={payableTotal}
+        isDP={isDP}
+        dpAmount={dpAmount}
+        pelunasan={pelunasan}
+        totalYearlyMaint={totalYearlyMaint}
+      />
     </div>
   )
 }
