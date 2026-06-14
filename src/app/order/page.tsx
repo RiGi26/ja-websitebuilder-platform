@@ -71,10 +71,10 @@ function StepHeader({ title, desc }: { title: string; desc: string }) {
   )
 }
 
-function FieldRow({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function FieldRow({ label, required, htmlFor, children }: { label: string; required?: boolean; htmlFor?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <Label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2 ml-1">
+      <Label htmlFor={htmlFor} className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2 ml-1">
         {label}{required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children}
@@ -448,24 +448,24 @@ function OrderFormContent() {
               <StepHeader title="Informasi Identitas" desc="Lengkapi detail kontak dan nama bisnis Anda." />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {form.clientType === 'individu' ? (
-                  <FieldRow label="Nama Usaha / Brand" required>
-                    <Input placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="apple-input" />
+                  <FieldRow label="Nama Usaha / Brand" htmlFor="order-nama-usaha" required>
+                    <Input id="order-nama-usaha" placeholder="Contoh: Kedai Kopi Mulyo" value={form.namaUsaha} onChange={e => set('namaUsaha', e.target.value)} className="apple-input" />
                   </FieldRow>
                 ) : (
                   <>
-                    <FieldRow label="Nama Perusahaan" required>
-                      <Input placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama Perusahaan" htmlFor="order-nama-perusahaan" required>
+                      <Input id="order-nama-perusahaan" placeholder="Contoh: PT Japan Arena Indonesia" value={form.namaPerusahaan} onChange={e => set('namaPerusahaan', e.target.value)} className="apple-input" />
                     </FieldRow>
-                    <FieldRow label="Nama PIC" required>
-                      <Input placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} className="apple-input" />
+                    <FieldRow label="Nama PIC" htmlFor="order-nama-pic" required>
+                      <Input id="order-nama-pic" placeholder="Nama lengkap Anda" value={form.namapic} onChange={e => set('namapic', e.target.value)} className="apple-input" />
                     </FieldRow>
                   </>
                 )}
-                <FieldRow label="Nomor WhatsApp" required>
-                  <Input placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="apple-input" />
+                <FieldRow label="Nomor WhatsApp" htmlFor="order-wa" required>
+                  <Input id="order-wa" type="tel" inputMode="numeric" autoComplete="tel" placeholder="Contoh: 08123456789" value={form.nomorWa} onChange={e => set('nomorWa', e.target.value)} className="apple-input" />
                 </FieldRow>
-                <FieldRow label="Email" required>
-                  <Input type="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
+                <FieldRow label="Email" htmlFor="order-email" required>
+                  <Input id="order-email" type="email" autoComplete="email" placeholder="Alamat email aktif (untuk kirim akses dashboard)" value={form.email} onChange={e => set('email', e.target.value)} className="apple-input" />
                 </FieldRow>
                 <div className="md:col-span-2">
                   <FieldRow label="Bidang Industri" required>
