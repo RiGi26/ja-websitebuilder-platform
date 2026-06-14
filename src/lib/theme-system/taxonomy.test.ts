@@ -69,23 +69,25 @@ describe('theme-system taxonomy (S0-1)', () => {
   })
 
   it('getReadySubKategori: hanya sub-kategori lux ber-renderer yang aktif di Toko Online', () => {
-    // LUX bespoke yang sudah ship: Kuliner (Toko Dapur) + Fashion (Atelier) + Kerajinan (Tanah Loka).
-    // Sisanya ready:false sampai renderer bespoke-nya dibangun (urutan = registry).
-    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion', 'kerajinan'])
-    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(3)
+    // LUX bespoke yang sudah ship: Kuliner (Toko Dapur) + Fashion (Atelier) +
+    // Kerajinan (Tanah Loka) + Kecantikan (Embun, Wave 1). Sisanya ready:false
+    // sampai renderer bespoke-nya dibangun (urutan = registry/roadmap).
+    expect(getReadySubKategori('toko_online').map((s) => s.id)).toEqual(['kuliner', 'fashion', 'kerajinan', 'kecantikan'])
+    expect(getSubKategori('toko_online').filter((s) => s.ready)).toHaveLength(4)
   })
 
-  it('tiap sub-kategori baru punya 3 gaya, subKategori cocok, id unik', () => {
-    for (const sub of ['kecantikan', 'gadget', 'rumah', 'kesehatan', 'anak']) {
+  it('sub-kategori toko yang belum bespoke punya 3 gaya composable, subKategori cocok, id unik', () => {
+    // kecantikan kini bespoke (1 varian "Embun") → keluar dari daftar 3-gaya.
+    for (const sub of ['gadget', 'rumah', 'kesehatan', 'anak']) {
       const themes = getThemes('toko_online', sub)
       expect(themes).toHaveLength(3)
       expect(themes.every((t) => t.subKategori === sub)).toBe(true)
     }
   })
 
-  it('getTheme menemukan tema lintas sub-kategori', () => {
-    const t = getTheme('toko_online', 'kecantikan-blush')
-    expect(t?.nama).toBe('Blush')
+  it('getTheme menemukan tema lintas sub-kategori (bespoke kecantikan-embun)', () => {
+    const t = getTheme('toko_online', 'kecantikan-embun')
+    expect(t?.nama).toBe('Embun')
   })
 
   it('Fashion → flagship Atelier (boutique bespoke): varian noir/ivoire, AKTIF', () => {

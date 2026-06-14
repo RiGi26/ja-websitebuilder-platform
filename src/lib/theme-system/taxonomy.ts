@@ -55,7 +55,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kuliner', nama: 'Kuliner / Makanan', deskripsi: 'Pempek, kue, frozen food, kopi, snack.', icon: 'UtensilsCrossed', ready: true },
     { id: 'fashion', nama: 'Fashion / Pakaian', deskripsi: 'Baju, hijab, sepatu, tas.', icon: 'Shirt', ready: true },
     { id: 'kerajinan', nama: 'Kerajinan / Heritage', deskripsi: 'Batik, tenun, ukiran, anyaman.', icon: 'Palette', ready: true },
-    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: false },
+    { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: true },
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: false },
     { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: false },
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
@@ -179,22 +179,16 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
       },
     ],
 
-    // ── KECANTIKAN / SKINCARE ×3 — lembut/elegan/pastel ──────────
+    // ── KECANTIKAN / SKINCARE (flagship bespoke "Embun") ─────────
+    // KecantikanLuxRenderer (light-luminous, signature glow halo). 1 varian
+    // default: embun. manifest:'toko-kecantikan' inert (di-intercept generateContent
+    // SEBELUM getManifest). Tema composable lama (kecantikan-blush/glow/noir) tetap
+    // di manifest.ts untuk situs existing, hanya tak ditawarkan lagi di brief form.
     kecantikan: [
       {
-        id: 'kecantikan-blush', subKategori: 'kecantikan', nama: 'Blush',
-        deskripsi: 'Lembut & pastel, feminin. Untuk skincare, body care, brand kecantikan ramah.',
-        icon: 'Flower2', mood: '#D98A9E', bg: 'light', manifest: 'kecantikan-blush',
-      },
-      {
-        id: 'kecantikan-glow', subKategori: 'kecantikan', nama: 'Glow',
-        deskripsi: 'Bersih & bercahaya, mewah ringan. Untuk serum, kosmetik, perawatan premium.',
-        icon: 'Sun', mood: '#BD9A5F', bg: 'light', manifest: 'kecantikan-glow',
-      },
-      {
-        id: 'kecantikan-noir', subKategori: 'kecantikan', nama: 'Noir',
-        deskripsi: 'Gelap elegan, kesan parfum mahal. Untuk parfum, kosmetik high-end, edisi terbatas.',
-        icon: 'Moon', mood: '#D8A7A0', bg: 'dark', manifest: 'kecantikan-noir',
+        id: 'kecantikan-embun', subKategori: 'kecantikan', nama: 'Embun',
+        deskripsi: 'Terang berkilau seperti glass skin, mekar rose lembut. Untuk skincare, kosmetik, parfum, body care.',
+        icon: 'Sparkles', mood: '#B5566B', bg: 'light', manifest: 'toko-kecantikan',
       },
     ],
 

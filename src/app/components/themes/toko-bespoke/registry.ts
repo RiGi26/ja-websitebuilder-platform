@@ -11,6 +11,7 @@ import RestaurantLuxRenderer from '../restaurant-lux/RestaurantLuxRenderer'
 import TokoAtelierRenderer from '../toko-atelier/TokoAtelierRenderer'
 import KulinerLuxRenderer from './KulinerLuxRenderer'
 import KerajinanLuxRenderer from './KerajinanLuxRenderer'
+import KecantikanLuxRenderer from './KecantikanLuxRenderer'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -32,4 +33,5 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'toko-atelier': { Renderer: TokoAtelierRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
   'toko-kuliner': { Renderer: KulinerLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Menu Kami' },
   'toko-kerajinan': { Renderer: KerajinanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kerajinan' },
+  'toko-kecantikan': { Renderer: KecantikanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
 }
