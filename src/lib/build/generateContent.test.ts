@@ -93,7 +93,7 @@ describe('generateContent — Fine Dining → restaurant-lux (bespoke premium)',
   })
 })
 
-// FLAGSHIP bespoke toko (registry theme key). Tabel TOKO_BESPOKE_VARIANTS (SSOT)
+// FLAGSHIP bespoke toko (registry theme key). Tabel BESPOKE_VARIANTS (SSOT)
 // memetakan id ThemeOption brief → { theme key, palet variant native, sample }.
 // Brief form SELALU menyetel variant saat sub-kategori dipilih → intercept
 // berbasis id variant (bukan sub_kategori).

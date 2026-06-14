@@ -13,7 +13,7 @@ import { capabilitiesForAddons } from '@/lib/addons/catalog'
 import { addonSectionBlueprints, mergeAddonSections } from '@/lib/addons/sections'
 import { getManifest } from '@/lib/theme-system/manifest'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
-import { TOKO_BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
+import { BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
 
 type OrderLike = {
   industri?: string | null
@@ -47,17 +47,17 @@ export function generateContent(order: OrderLike): BuildPlan {
     b.tipe === 'restaurant' &&
     (b.subKategori === 'finedining' || (b.variant ?? '').startsWith('finedining-') || b.variant === 'lux-restaurant')
 
-  // FLAGSHIP bespoke toko (Toko Atelier/Kuliner/…) → renderer bespoke via theme
-  // key di registry SiteRenderer. Tabel TOKO_BESPOKE_VARIANTS (SSOT) memetakan id
-  // ThemeOption brief → { theme key, palet variant native, sample imagery }.
+  // FLAGSHIP bespoke (Atelier/Kuliner/… + tema industri berikutnya) → renderer
+  // bespoke via theme key di registry SiteRenderer. Tabel BESPOKE_VARIANTS (SSOT)
+  // memetakan id ThemeOption brief → { theme key, palet variant native, sample }.
+  // Lookup LINTAS INDUSTRI: id variant unik global, jadi tak perlu guard per-tipe.
   // Warna brand klien tetap jadi aksen via primary di renderer.
-  // Sub-kategori fashion tanpa variant dikenal → Atelier noir (paritas jalur
-  // isAtelier lama: fashion SELALU bespoke, tak boleh jatuh ke lux-toko).
+  // Fashion tanpa variant dikenal → Atelier noir (paritas jalur isAtelier lama:
+  // fashion SELALU bespoke, tak boleh jatuh ke lux-toko). Restaurant Fine Dining
+  // ditangani jalur isLux di bawah (sengaja di luar BESPOKE_VARIANTS — lihat variants.ts).
   const bespoke =
-    b.tipe === 'toko_online'
-      ? (b.variant ? TOKO_BESPOKE_VARIANTS[b.variant] : undefined) ??
-        (b.subKategori === 'fashion' ? TOKO_BESPOKE_VARIANTS['atelier-noir'] : undefined)
-      : undefined
+    (b.variant ? BESPOKE_VARIANTS[b.variant] : undefined) ??
+    (b.tipe === 'toko_online' && b.subKategori === 'fashion' ? BESPOKE_VARIANTS['atelier-noir'] : undefined)
 
   // LUX TIER composable = DEFAULT premium per industri (Sprint 1 pilot:
   // restaurant + klinik). Bila briefing TIDAK memilih variant eksplisit →

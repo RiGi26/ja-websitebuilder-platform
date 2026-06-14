@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import Navbar from '@/app/components/Navbar'
 import { getManifest } from '@/lib/theme-system/manifest'
-import { TOKO_BESPOKE_VARIANTS, BESPOKE_RENDERED_BLOCKS } from '@/app/components/themes/toko-bespoke/variants'
+import { BESPOKE_VARIANTS, BESPOKE_RENDERED_BLOCKS } from '@/app/components/themes/toko-bespoke/variants'
 import DetailForm from './DetailForm'
 
 export const dynamic = 'force-dynamic'
@@ -31,11 +31,11 @@ export default async function BriefingDetailPage({ params }: { params: Promise<{
   // Tema yang dipilih klien menentukan section konten mana yang relevan
   // ditampilkan (form hanya minta blok yang BENAR dirender tema). Varian bespoke
   // toko (atelier-noir dst) tidak ada di MANIFESTS → resolve lewat
-  // TOKO_BESPOKE_VARIANTS → BESPOKE_RENDERED_BLOCKS. Tema lama/non-composable →
+  // BESPOKE_VARIANTS → BESPOKE_RENDERED_BLOCKS. Tema lama/non-composable →
   // keduanya undefined → semua false → hanya foto/testimoni klasik.
   const variant = ((order.briefing_data as Record<string, unknown>)?.branding as Record<string, unknown> | undefined)?.variant as string | undefined
   const mblocks = getManifest(variant)?.blocks
-  const bespokeTheme = variant ? TOKO_BESPOKE_VARIANTS[variant]?.theme : undefined
+  const bespokeTheme = variant ? BESPOKE_VARIANTS[variant]?.theme : undefined
   const bblocks = bespokeTheme ? BESPOKE_RENDERED_BLOCKS[bespokeTheme] : undefined
   const activeBlocks = {
     team: !!mblocks?.team,
