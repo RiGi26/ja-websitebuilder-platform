@@ -8,7 +8,7 @@ import { triggerHaptic } from '@/lib/ux-utils'
 import {
   Check, Building2, User, ChevronRight, ChevronLeft,
   Loader2, Sparkles, AlertCircle, Rocket, ShieldCheck,
-  Copy, Shield, Lock
+  Copy, Shield, Lock, MessageCircle
 } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -53,6 +53,9 @@ const ADDONS = orderAddons()
 // Draft autosave (anti-kehilangan data saat tab ditutup) — pola seperti BriefingForm.
 const DRAFT_KEY = 'ja_order_draft'
 
+// Nomor WhatsApp tim (sama dengan corp landing) untuk human-fallback tiap langkah.
+const WA_NUMBER = '6281296917963'
+
 // Pilihan industri sebagai chip — tiap label dipetakan akurat oleh industriToTipe()
 // (mis. "Restoran & Kuliner" → restaurant). Hilangkan free-text yang rawan salah-petakan.
 const INDUSTRI_OPTIONS = [
@@ -65,9 +68,61 @@ const INDUSTRI_OPTIONS = [
 function StepHeader({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-1">{title}</h2>
+      <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-1 sf-display-heavy tracking-tight">{title}</h2>
       <p className="text-gray-500 text-sm font-medium">{desc}</p>
     </div>
+  )
+}
+
+// Guided progress bar (tipis + momentum); langkah lampau bisa diklik untuk mundur.
+function GuidedProgressBar({ labels, current, total, onJump }: { labels: string[]; current: number; total: number; onJump: (i: number) => void }) {
+  const pct = current === 0 ? 0 : Math.round((current / (total - 1)) * 100)
+  const momentum = current >= total - 1 ? 'Langkah terakhir!' : current === 0 ? 'Ayo mulai' : 'Tinggal sedikit lagi'
+  return (
+    <div className="max-w-xl mx-auto mb-8 text-left">
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-0.5 sm:gap-1.5 min-w-0">
+          {labels.map((label, i) => {
+            const active = current === i
+            const passed = current > i
+            const clickable = i < current
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => clickable && onJump(i)}
+                disabled={!clickable}
+                aria-current={active ? 'step' : undefined}
+                className={`flex items-center gap-1.5 rounded-full pl-1 pr-1.5 sm:pr-2.5 py-1 transition-all ${active ? 'bg-blue-50' : clickable ? 'hover:bg-gray-50 active:scale-[0.97]' : 'cursor-default'}`}
+              >
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-black tabular-nums shrink-0 ${active ? 'bg-[#0071E3] text-white' : passed ? 'bg-blue-100 text-[#0071E3]' : 'bg-gray-100 text-gray-400'}`}>
+                  {passed ? <Check size={12} strokeWidth={3.5} /> : i + 1}
+                </span>
+                <span className={`text-xs font-bold whitespace-nowrap hidden sm:block ${active ? 'text-[#0071E3]' : passed ? 'text-gray-700' : 'text-gray-400'}`}>{label}</span>
+              </button>
+            )
+          })}
+        </div>
+        <span className="text-[11px] font-bold text-gray-400 whitespace-nowrap shrink-0">
+          <span className="tabular-nums">Langkah {current + 1}/{total}</span> · <span className="text-[#0071E3]">{momentum}</span>
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+        <div className="h-full rounded-full bg-[#0071E3] transition-[width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+// WhatsApp human-fallback — selalu tampak di tiap langkah.
+function WaFallbackLine({ href }: { href: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      className="flex items-center justify-center gap-2 text-xs font-semibold text-gray-500 hover:text-[#0071E3] transition-colors py-3">
+      <MessageCircle size={14} className="text-[#25D366]" aria-hidden="true" />
+      Bingung pilih? Chat tim kami — kami bantu pilihkan
+      <ChevronRight size={13} aria-hidden="true" />
+    </a>
   )
 }
 
@@ -393,6 +448,23 @@ function OrderFormContent() {
   const totalSteps = fromKalkulator ? 3 : 4
   const displayStep = fromKalkulator && step === 3 ? 2 : step
   const progress = displayStep === 0 ? 0 : Math.round((displayStep / (totalSteps - 1)) * 100)
+  const stepLabels = fromKalkulator
+    ? ['Kategori', 'Identitas', 'Konfirmasi']
+    : ['Kategori', 'Identitas', 'Fitur', 'Konfirmasi']
+  // Jump hanya MUNDUR (display 0/1 == real step 0/1) — maju tetap lewat tombol Lanjut
+  // supaya validasi Step 1 tak terlewati.
+  const jumpToDisplay = (target: number) => { if (target < displayStep) setStep(target) }
+  // Link WA pre-filled untuk human-fallback (rekomputasi tiap render, murah).
+  const waOrderHref = (() => {
+    const nama = form.clientType === 'perusahaan' ? form.namaPerusahaan : form.namaUsaha
+    const lines = [
+      'Halo Japan Arena, saya sedang mengisi order website dan butuh bantuan memilih.',
+      nama ? `Bisnis: ${nama}` : '',
+      form.industri ? `Industri: ${form.industri}` : '',
+      form.selectedAddons.length ? `Fitur: ${form.selectedAddons.map(id => ADDONS.find(a => a.id === id)?.name ?? id).join(', ')}` : '',
+    ].filter(Boolean)
+    return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`
+  })()
 
   // ── Interstitial page setelah order dibuat ─────────────────────────────────
   if (pendingPayment) {
@@ -408,11 +480,7 @@ function OrderFormContent() {
     <div className="max-w-4xl mx-auto">
       {/* Header (Apple Style) */}
       <div className="text-center mb-12 animate-fade-in px-4">
-          <div className="flex items-center justify-center gap-3 mb-6">
-              {(fromKalkulator ? [1,2,3] : [1,2,3,4]).map((s) => (
-                  <div key={s} className={`h-1.5 rounded-full transition-all duration-500 ${displayStep >= s-1 ? 'w-8 bg-[#0071E3]' : 'w-4 bg-gray-200'}`} />
-              ))}
-          </div>
+          <GuidedProgressBar labels={stepLabels} current={displayStep} total={totalSteps} onJump={jumpToDisplay} />
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2 sf-display-heavy">Detail Pesanan</h1>
           <p className="text-gray-500 font-medium">Lengkapi data diri dan pilih fitur yang Anda butuhkan.</p>
           {!fromKalkulator && (
@@ -450,14 +518,14 @@ function OrderFormContent() {
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <StepHeader title="Kategori Client" desc="Pilih jenis identitas untuk website Anda." />
+              <StepHeader title="Website ini untuk siapa?" desc="Pilih jenis identitas untuk website Anda." />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {[
                   { id: 'individu', title: 'Individu / UMKM', desc: 'Cocok untuk portfolio, blog, atau usaha mikro.', icon: User },
                   { id: 'perusahaan', title: 'Perusahaan / PT / CV', desc: 'Cocok untuk branding korporat dan skala bisnis menengah.', icon: Building2 },
                 ].map(opt => (
                   <button key={opt.id} onClick={() => { set('clientType', opt.id); handleNext(); triggerHaptic(); }}
-                    className={`p-6 md:p-8 rounded-[24px] md:rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] ${form.clientType === opt.id ? 'border-[#0071E3] bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-[#0071E3]/20 bg-gray-50/50'}`}>
+                    className={`p-6 md:p-8 rounded-[24px] md:rounded-[32px] border-2 text-left transition-all hover:translate-y-[-4px] active:scale-[0.98] ${form.clientType === opt.id ? 'border-[#0071E3] bg-blue-50/50 shadow-md' : 'border-gray-100 hover:border-[#0071E3]/20 bg-gray-50/50'}`}>
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${form.clientType === opt.id ? 'bg-[#0071E3] text-white' : 'bg-white text-gray-400'}`}>
                       <opt.icon size={28} />
                     </div>
@@ -471,7 +539,7 @@ function OrderFormContent() {
 
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <StepHeader title="Informasi Identitas" desc="Lengkapi detail kontak dan nama bisnis Anda." />
+              <StepHeader title="Kenalan dulu, yuk." desc="Lengkapi detail kontak dan nama bisnis Anda." />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {form.clientType === 'individu' ? (
                   <FieldRow label="Nama Usaha / Brand" htmlFor="order-nama-usaha" required error={fieldError('namaUsaha')}>
@@ -504,7 +572,7 @@ function OrderFormContent() {
                             type="button"
                             onClick={() => { set('industri', active ? '' : opt); triggerHaptic() }}
                             aria-pressed={active}
-                            className={`min-h-[44px] px-4 rounded-full text-sm font-semibold border transition-all ${
+                            className={`min-h-[44px] px-4 rounded-full text-sm font-semibold border transition-all active:scale-[0.97] ${
                               active
                                 ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-sm'
                                 : 'bg-white text-gray-600 border-gray-200 hover:border-[#0071E3]/40'
@@ -527,8 +595,12 @@ function OrderFormContent() {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <StepHeader title="Fitur Tambahan (Addons)" desc="Personalisasi website Anda dengan fitur pendukung bisnis." />
-              
+              <StepHeader title="Mau tambah fitur apa?" desc="Personalisasi website Anda dengan fitur pendukung bisnis. Semua opsional." />
+
+              <div className="mb-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-xs font-semibold text-emerald-700">
+                <ShieldCheck size={14} /> Revisi sampai puas sebelum go-live
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar pb-6">
                 {ADDONS.map(addon => {
                   const isSelected = form.selectedAddons.includes(addon.id)
@@ -544,10 +616,10 @@ function OrderFormContent() {
                       title={locked ? `Butuh: ${deps.map(nameOf).join(', ')}` : undefined}
                       className={`p-5 rounded-3xl border-2 text-left transition-all relative flex flex-col h-full ${
                         isSelected
-                          ? 'border-[#0071E3] bg-blue-50/30'
+                          ? 'border-[#0071E3] bg-blue-50/30 ring-2 ring-blue-100 active:scale-[0.98]'
                           : locked
                             ? 'border-gray-100 bg-gray-50/60 opacity-60 cursor-not-allowed'
-                            : `border-gray-100 bg-white hover:border-gray-200 ${!relevant ? 'opacity-70' : ''}`
+                            : `border-gray-100 bg-white hover:border-gray-200 active:scale-[0.98] ${!relevant ? 'opacity-70' : ''}`
                       }`}
                     >
                       <h4 className={`text-sm font-bold mb-1 pr-16 ${isSelected ? 'text-[#0071E3]' : 'text-gray-900'}`}>{addon.name}</h4>
@@ -577,11 +649,11 @@ function OrderFormContent() {
               <div className="mt-8 bg-blue-50/50 rounded-2xl p-4 border border-blue-100 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Fitur Terpilih</p>
-                  <p className="text-lg font-black text-[#0071E3]">{formatPrice(totalAddons)}</p>
+                  <p className="text-lg font-black text-[#0071E3] tabular-nums">{formatPrice(totalAddons)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Investasi</p>
-                  <p className="text-lg font-black text-gray-900">{formatPrice(finalPrice)}</p>
+                  <p className="text-lg font-black text-gray-900 tabular-nums">{formatPrice(finalPrice)}</p>
                 </div>
               </div>
 
@@ -595,7 +667,7 @@ function OrderFormContent() {
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                   <div className="flex items-center justify-between">
-                    <StepHeader title="Konfirmasi & Finalisasi" desc="Pastikan rincian brief Anda sudah sesuai sebelum dikirim ke tim konsultan kami." />
+                    <StepHeader title="Cek sekali lagi sebelum bayar." desc="Pastikan rincian brief Anda sudah sesuai sebelum dikirim ke tim konsultan kami." />
                     <div className="hidden md:block w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-[#0071E3]"><ShieldCheck size={32} /></div>
                   </div>
 
@@ -682,7 +754,7 @@ function OrderFormContent() {
                               )}
                               <div className="pt-6 mt-6 border-t-2 border-black/5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                   <span className="text-lg sm:text-xl sf-display-heavy text-gray-900 uppercase tracking-tighter flex-1">Total Estimasi</span>
-                                  <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right">
+                                  <span className="text-2xl md:text-3xl sf-display-heavy text-[#0071E3] shrink-0 text-left sm:text-right tabular-nums">
                                       {referralDiscount > 0 && (
                                           <span className="text-base text-gray-300 line-through mr-2 align-middle">{formatPrice(finalPrice)}</span>
                                       )}
@@ -777,6 +849,9 @@ function OrderFormContent() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* WhatsApp human-fallback — selalu tampak di tiap langkah */}
+      <WaFallbackLine href={waOrderHref} />
     </div>
   )
 }
