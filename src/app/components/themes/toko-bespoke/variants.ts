@@ -1,11 +1,17 @@
 // ============================================================
-// TOKO-BESPOKE — SUMBER KEBENARAN TUNGGAL pemetaan varian.
+// BESPOKE — SUMBER KEBENARAN TUNGGAL pemetaan varian (intercept build-time).
 // id ThemeOption (disimpan briefing.branding.variant) → { theme key bespoke,
 // palet variant native renderer, sample HTML untuk imagery-borrow }.
 //
-// Dipakai generateContent.ts (intercept toko_online) + gen-samples.test.tsx.
-// WAJIB sinkron dengan id di taxonomy.ts THEMES.toko_online[subcat] dan key di
-// registry.ts (theme) + LUX_SAMPLE_ALIAS sample-content.ts (sample).
+// Dipakai generateContent.ts (intercept LINTAS INDUSTRI) + portal-tabs.ts +
+// detail/page.tsx (gating permukaan edit). WAJIB sinkron dengan id di
+// taxonomy.ts THEMES[tipe][subcat] dan key di registry.ts (theme) +
+// LUX_SAMPLE_ALIAS sample-content.ts (sample).
+//
+// CATATAN: restaurant-lux SENGAJA tidak didaftarkan di sini — ia punya jalur
+// `isLux` sendiri di generateContent + gating eksplisit di portal-tabs. Map ini
+// menurunkan BESPOKE_THEMES (portal-tabs) yang harus tetap toko-only. Renderer-
+// nya tetap universal via registry.ts BESPOKE_RENDERERS.
 // ============================================================
 
 export interface BespokeVariantMap {
@@ -17,7 +23,7 @@ export interface BespokeVariantMap {
   sample: string
 }
 
-export const TOKO_BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
+export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // Fashion — flagship Atelier (noir/ivoire). Tetap.
   'atelier-noir': { theme: 'toko-atelier', variant: 'noir', sample: 'toko-atelier' },
   'atelier-ivoire': { theme: 'toko-atelier', variant: 'ivoire', sample: 'toko-atelier' },
