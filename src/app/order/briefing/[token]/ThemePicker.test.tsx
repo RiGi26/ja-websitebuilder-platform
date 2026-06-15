@@ -64,6 +64,14 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#C0432E') // swatch mood bata ter-inject
   })
 
+  it('render gaya Restaurant Cafe = flagship bespoke (Seduh, Wave 2)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="restaurant" subKategori="cafe" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Seduh')
+    expect(html).toContain('#A4642E') // swatch mood moka ter-inject
+  })
+
   it('render gaya Restaurant Fine Dining = 3 palet restaurant-lux (Aurum/Hearth/Noir)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="restaurant" subKategori="finedining" value="" onChange={noop} />,
@@ -122,13 +130,13 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect((html.match(/aria-pressed="true"/g) ?? []).length).toBe(1)
   })
 
-  it('restaurant (Wave 2) → picker TAMPIL (warung + finedining + Lainnya), copy "Jenis Restoran"', () => {
-    // warung + finedining ready → SubKategoriPicker muncul utk restaurant. cafe belum.
+  it('restaurant (Wave 2 TUNTAS) → picker TAMPIL (warung + cafe + finedining + Lainnya), copy "Jenis Restoran"', () => {
+    // warung + cafe + finedining semua ready → SubKategoriPicker muncul utk restaurant.
     const html = renderToStaticMarkup(<SubKategoriPicker tipe="restaurant" value="" onChange={noop} />)
     expect(html).toContain('Jenis Restoran') // label industri-aware, bukan "Tipe Toko"
     expect(html).toContain('Warung / Kedai')
+    expect(html).toContain('Cafe / Coffee Shop') // cafe kini ready → tampil
     expect(html).toContain('Fine Dining / Resto Keluarga')
-    expect(html).not.toContain('Cafe / Coffee Shop') // cafe ready:false → tak tampil
     expect(html).toContain('Lainnya (gaya umum)')
   })
 

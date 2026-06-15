@@ -2763,6 +2763,93 @@ const WARUNG_LUX: ComposableContent = {
   contact: { wa: '6281234567890', email: 'halo@warungbuyati.id', alamat: 'Salatiga, Jawa Tengah' },
 }
 
+// ── Cafe / Coffee Shop (FLAGSHIP bespoke lux — CafeRenderer "Seduh") ──
+// Sample dedikasi untuk renderer 'restaurant-cafe' (varian seduh, source menu).
+// Specialty coffee shop kontemporer: menu kopi (espresso/manual brew/signature) +
+// pastry, statement barista, kopi-ring harga. BEDA dari WARUNG_LUX (warung makan
+// merakyat) & KULINER_LUX (toko frozen/kue) & FINEDINING (resto premium gelap).
+// Foto Unsplash di-vet manual (kopi/cafe, bukan pinjam pool kuliner). JANGAN dipinjam tema lain.
+const CAFE_LUX: ComposableContent = {
+  nama: 'Kopi Senja',
+  hero: {
+    eyebrow: 'Specialty Coffee · Sejak 2016',
+    title: 'Kopi yang Diseduh dengan Sabar',
+    subtitle:
+      'Biji single-origin disangrai lokal, diseduh manual tiap cangkir. Tempat nyaman untuk kerja, ngobrol, atau sekadar menyeruput pelan.',
+    ctaText: 'Lihat Menu',
+    ctaHref: '#menu',
+    ctaText2: 'Pesan Antar',
+    ctaHref2: '#wa',
+    image: IMG('photo-1534687941688-651ccaafbff8'),
+  },
+  features: [
+    { title: 'Single-Origin Disangrai Lokal', desc: 'Biji dari petani Nusantara, kami sangrai sendiri tiap minggu agar segar saat sampai di cangkir.' },
+    { title: 'Diseduh Manual per Cangkir', desc: 'V60, tubruk, atau espresso — barista meracik satu per satu, bukan diendapkan sejak pagi.' },
+    { title: 'Ruang untuk Berlama-lama', desc: 'WiFi cepat, colokan di tiap meja, sudut yang tenang. Pesan satu, betah seharian.' },
+  ],
+  featuresEyebrow: 'Kenapa Mampir',
+  featuresTitle: 'Alasan tamu kembali tiap pagi',
+  statement: {
+    eyebrow: 'Filosofi Kami',
+    quote: 'Kopi yang baik tak perlu buru-buru. Kami seduh pelan supaya kamu pun ikut melambat sejenak.',
+    cite: 'Raka — Head Barista',
+  },
+  showcase: {
+    title: 'Menu Pilihan',
+    subtitle: 'Dari espresso pekat sampai manual brew lembut, ditemani manisnya pastry dari dapur kami.',
+    items: [
+      { nama: 'Espresso', kategori: 'Espresso Base', harga: 18000, desc: 'Dua shot ristretto dengan crema tebal. Pahit bersih berujung manis karamel.', gambar: IMG('photo-1484157239365-80e635261db7', 900) },
+      { nama: 'Cappuccino', kategori: 'Espresso Base', harga: 28000, desc: 'Espresso dengan susu steamed dan busa lembut tebal, taburan kakao halus.', gambar: IMG('photo-1534234757579-8ad69d218ad4', 900) },
+      { nama: 'Caffè Latte', kategori: 'Espresso Base', harga: 30000, desc: 'Espresso lembut berpadu susu segar, dituang dengan latte art di tiap gelas.', gambar: IMG('photo-1561882468-9110e03e0f78', 900) },
+      { nama: 'Flat White', kategori: 'Espresso Base', harga: 30000, desc: 'Microfoam tipis di atas double ristretto — rasa kopi terasa lebih menonjol.', gambar: IMG('photo-1503481766315-7a586b20f66d', 900) },
+      { nama: 'V60 Manual Brew', kategori: 'Manual Brew', harga: 32000, desc: 'Single-origin diseduh tetes demi tetes. Bersih, beraroma, tanpa ampas.', gambar: IMG('photo-1610874150308-a1e6f8c905d9', 900) },
+      { nama: 'Es Kopi Susu Aren', kategori: 'Signature', harga: 25000, desc: 'Espresso, susu segar, dan gula aren cair. Dingin, manis pas, menyegarkan.', gambar: IMG('photo-1598146635303-dd566d5e3ac2', 900) },
+      { nama: 'Butter Croissant', kategori: 'Pastry', harga: 22000, desc: 'Dipanggang tiap pagi, berlapis renyah dengan mentega Eropa yang gurih.', gambar: IMG('photo-1555507036-ab1f4038808a', 900) },
+      { nama: 'Cinnamon Roll', kategori: 'Pastry', harga: 24000, desc: 'Gulungan kayu manis hangat dengan glaze tipis. Teman kopi yang pas.', gambar: IMG('photo-1612366747681-e4ca6992b1e9', 900) },
+    ],
+  },
+  about: {
+    title: 'Berawal dari Satu Mesin Espresso',
+    body: 'Kopi Senja dimulai tahun 2016 dari satu mesin espresso bekas dan kecintaan pada kopi yang diseduh dengan benar. Kami mulai dari kios kecil, menyangrai sedikit demi sedikit.\n\nKini kami punya ruang sendiri dengan meja panjang untuk berbagi cerita. Yang tak berubah: biji dipilih teliti, disangrai segar, dan diseduh dengan sabar — secangkir demi secangkir.',
+    image: IMG('photo-1551887196-72e32bfc7bf3'),
+    ctaText: 'Mampir ke kedai',
+    ctaHref: '#kontak',
+  },
+  cta: {
+    title: 'Mampir, Seduh, Lambatkan Sejenak',
+    subtitle: 'Datang langsung atau pesan antar via WhatsApp — kami siapkan secangkir hangat untukmu.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+    image: IMG('photo-1542181961-9590d0c79dab'),
+  },
+  stats: [
+    { angka: '4.9', label: 'Rating Google' },
+    { angka: '12', label: 'Single-origin' },
+    { angka: '300+', label: 'Cangkir tiap hari' },
+    { angka: '8 thn', label: 'Menyeduh' },
+  ],
+  testimonials: [
+    { quote: 'Es kopi susu arennya juara, manisnya pas. Tempatnya adem banget buat kerja.', nama: 'Dinda', peran: 'Pekerja remote' },
+    { quote: 'V60-nya bersih banget, baristanya ramah jelasin asal bijinya. Langganan tiap weekend.', nama: 'Bram', peran: 'Penikmat kopi' },
+    { quote: 'Croissant plus cappuccino di pagi hari jadi ritual wajib. Selalu fresh.', nama: 'Sari', peran: 'Tetangga sebelah' },
+    { quote: 'Colokan banyak, WiFi kencang, kopinya enak. Betah berjam-jam ngerjain tugas.', nama: 'Yoga', peran: 'Mahasiswa' },
+  ],
+  faq: [
+    { q: 'Apakah bisa pesan antar?', a: 'Bisa. Klik tombol WhatsApp, sebutkan menu dan jumlahnya. Area dekat kami antar sendiri; area jauh lewat ojek online.' },
+    { q: 'Jam berapa buka?', a: 'Setiap hari pukul 08.00 sampai 22.00. Akhir pekan biasanya lebih ramai — datang pagi untuk tempat yang tenang.' },
+    { q: 'Apakah ada pilihan susu nabati?', a: 'Ada. Oat milk dan soy milk tersedia untuk semua menu espresso, cukup beri tahu barista saat memesan.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Jumat', jam: '08.00–22.00' },
+      { hari: 'Sabtu–Minggu', jam: '09.00–23.00' },
+    ],
+    alamat: 'Jl. Cendana No. 7, Bandung',
+    mapsQuery: 'Jl. Cendana Bandung',
+  },
+  contact: { wa: '6281234567890', email: 'halo@kopisenja.id', alamat: 'Bandung, Jawa Barat' },
+}
+
 const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'lux-restaurant': FINEDINING, // sudah punya statement kaya
   'lux-klinik': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan ramah, teliti, dan menjaga kenyamanan Anda di setiap kunjungan.'),
@@ -2783,6 +2870,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   // Bespoke lux warung (WarungRenderer "Hangat", Wave 2 — source menu, restoran).
   // Sample dedikasi warung makan merakyat (BUKAN toko kuliner). Banderol harga.
   'warung-lux': WARUNG_LUX,
+  // Bespoke lux cafe (CafeRenderer "Seduh", Wave 2 — source menu, restoran).
+  // Sample dedikasi coffee shop specialty (BUKAN warung). Kopi-ring harga.
+  'cafe-lux': CAFE_LUX,
   // Bespoke lux kerajinan (KerajinanLuxRenderer) — sample dedikasi card-grid artisan.
   'kerajinan-lux': KERAJINAN_LUX,
   // Bespoke lux kecantikan (KecantikanLuxRenderer "Embun") — sample dedikasi glow + ritual.

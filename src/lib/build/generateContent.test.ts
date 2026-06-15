@@ -240,6 +240,17 @@ describe('generateContent — LUX TIER default + enrichment (Sprint 1)', () => {
     expect(plan.menuItems.every((m) => typeof m.gambar === 'string' && m.gambar!.length > 0)).toBe(true)
   })
 
+  it('cafe-seduh (Wave 2 bespoke, source menu) → theme restaurant-cafe, variant seduh + menu ber-foto', () => {
+    const plan = mk('restaurant', { sub_kategori: 'cafe', variant: 'cafe-seduh', primary_color: '#A4642E' })
+    expect(plan.theme).toBe('restaurant-cafe')
+    expect(plan.variant).toBe('seduh')
+    expect(plan.primary).toBe('#A4642E')
+    // imagery enrichment: menu pinjam foto sample cafe-lux
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.menuItems.length).toBeGreaterThan(0)
+    expect(plan.menuItems.every((m) => typeof m.gambar === 'string' && m.gambar!.length > 0)).toBe(true)
+  })
+
   it('pilihan variant lama composable dihormati (escape hatch) — bukan lux/bespoke', () => {
     const plan = mk('restaurant', { variant: 'warung-rakyat' })
     expect(plan.variant).toBe('warung-rakyat')
