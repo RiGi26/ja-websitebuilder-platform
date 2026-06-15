@@ -14,6 +14,7 @@ import KerajinanLuxRenderer from './KerajinanLuxRenderer'
 import KecantikanLuxRenderer from './KecantikanLuxRenderer'
 import GadgetLuxRenderer from './GadgetLuxRenderer'
 import RumahLuxRenderer from './RumahLuxRenderer'
+import KesehatanLuxRenderer from './KesehatanLuxRenderer'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -38,4 +39,5 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'toko-kecantikan': { Renderer: KecantikanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
   'toko-gadget': { Renderer: GadgetLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Katalog Produk' },
   'toko-rumah': { Renderer: RumahLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
+  'toko-kesehatan': { Renderer: KesehatanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Etalase Herbal' },
 }
