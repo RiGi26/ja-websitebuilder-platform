@@ -45,6 +45,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // ── WAVE 2 (jasa, source services) ──
   // Klinik Umum — Bersih (cool trust blue indigo/navy, signature panel Jadwal Praktik + garis detak EKG).
   'klinik-bersih': { theme: 'klinik-umum', variant: 'bersih', sample: 'klinik-lux' },
+  // Klinik Estetik — Lumen (editorial derma plum/orchid, signature numeral serif raksasa + hairline).
+  'estetik-lumen': { theme: 'klinik-estetik', variant: 'lumen', sample: 'estetik-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -70,4 +72,5 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   // Klinik bespoke: dokter tampil di etalase Layanan (template memetakan dokter→services),
   // jadi tak ada balok terpisah yang perlu permukaan edit khusus di sini.
   'klinik-umum': {},
+  'klinik-estetik': {},
 }
