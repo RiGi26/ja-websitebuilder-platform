@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": false,
+    "outDir": "../.tmp-gen-estetik",
+    "rootDir": "..",
+    "baseUrl": "..",
+    "paths": { "@/*": ["src/*"] },
+    "resolveJsonModule": true,
+    "types": ["node", "react"]
+  },
+  "include": ["gen-estetik-entry.tsx"]
+}

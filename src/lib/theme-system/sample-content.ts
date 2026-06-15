@@ -2709,6 +2709,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   // Bespoke klinik (KlinikUmumRenderer "Klinik Bersih", Wave 2 — source services).
   // Pakai KLINIK_UMUM (kaya: services + team dokter + stats + faq) + statement.
   'klinik-lux': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan teliti, ramah, dan menghargai waktu Anda di setiap kunjungan.'),
+  // Bespoke klinik estetik (KlinikEstetikRenderer "Lumen", Wave 2 — source services).
+  'estetik-lux': luxSample(KLINIK_ESTETIK, 'Filosofi Kami', 'Kecantikan sejati lahir dari kulit yang sehat — pendekatan kami berbasis bukti, mengutamakan keamanan dan hasil yang bertahan.'),
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
