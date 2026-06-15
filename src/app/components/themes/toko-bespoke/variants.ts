@@ -53,6 +53,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // Warung/Kedai — Hangat (folk-warmth cream/brick/mustard, signature banderol tag harga).
   // Tema menu-source pertama lewat BESPOKE_VARIANTS (restaurant-lux sengaja di luar — isLux).
   'warung-hangat': { theme: 'restaurant-warung', variant: 'hangat', sample: 'warung-lux' },
+  // Cafe/Coffee Shop — Seduh (specialty warm-minimal oat/espresso/moka, signature kopi-ring harga).
+  'cafe-seduh': { theme: 'restaurant-cafe', variant: 'seduh', sample: 'cafe-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -82,4 +84,6 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'klinik-wellness': {},
   // Warung "Hangat": etalase = menu (source menu), tanpa galeri/social terpisah.
   'restaurant-warung': {},
+  // Cafe "Seduh": etalase = menu (source menu), tanpa galeri/social terpisah.
+  'restaurant-cafe': {},
 }

@@ -61,14 +61,15 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
   ],
-  // ── RESTAURANT (Wave 2) — sub-kategori picker AKTIF. Warung = bespoke "Hangat"
-  // (WarungRenderer, source menu). Fine Dining = restaurant-lux (3 palet via isLux,
-  // generateContent). Cafe menyusul (ready:false → belum tampil). "Lainnya (gaya
-  // umum)" di picker → kartu Lux/restaurant-lux (escape hatch). Tema composable lama
-  // (warung/cafe/finedining ×3) tetap di manifest.ts utk situs existing.
+  // ── RESTAURANT (Wave 2) — sub-kategori picker AKTIF, ketiganya READY. Warung =
+  // bespoke "Hangat" (WarungRenderer, source menu). Cafe = bespoke "Seduh"
+  // (CafeRenderer, source menu). Fine Dining = restaurant-lux (3 palet via isLux,
+  // generateContent). "Lainnya (gaya umum)" di picker → kartu Lux/restaurant-lux
+  // (escape hatch). Tema composable lama (warung/cafe/finedining ×3) tetap di
+  // manifest.ts utk situs existing.
   restaurant: [
     { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: true },
-    { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: false },
+    { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: true },
     { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: true },
   ],
   klinik: [
@@ -249,7 +250,8 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
   },
 
   // ════════════════════════════════════════════════════════════
-  // RESTAURANT (Sprint 4). 3 sub-kategori × 3 gaya. Deskripsi =
+  // RESTAURANT (Sprint 4 → Wave 2). Warung & Cafe kini bespoke (1 varian masing-
+  // masing); Fine Dining tetap 3 palet (restaurant-lux via isLux). Deskripsi =
   // microcopy self-select: [sifat visual] + "Untuk [jenis tempat]".
   // ════════════════════════════════════════════════════════════
   restaurant: {
@@ -267,21 +269,18 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         icon: 'Soup', mood: '#C0432E', bg: 'warm', manifest: 'restaurant-warung',
       },
     ],
+    // ── CAFE / COFFEE SHOP (flagship bespoke "Seduh", Wave 2) ────
+    // CafeRenderer (specialty warm-minimal light, source menu; signature "kopi-ring"
+    // badge harga di noda cincin kopi + uap hero). 1 varian default: seduh.
+    // manifest:'restaurant-cafe' = key registry bespoke (inert; di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (cafe-latte/
+    // roastery/bloom di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     cafe: [
       {
-        id: 'cafe-latte', subKategori: 'cafe', nama: 'Latte',
-        deskripsi: 'Cream lembut & cozy, nyaman berlama-lama. Untuk coffee shop, brunch, bakery cafe.',
-        icon: 'Coffee', mood: '#9C6B4A', bg: 'light', manifest: 'cafe-latte',
-      },
-      {
-        id: 'cafe-roastery', subKategori: 'cafe', nama: 'Roastery',
-        deskripsi: 'Gelap espresso & industrial, untuk pecinta kopi serius. Untuk roastery, specialty coffee, manual brew.',
-        icon: 'Bean', mood: '#C98A3E', bg: 'dark', manifest: 'cafe-roastery',
-      },
-      {
-        id: 'cafe-bloom', subKategori: 'cafe', nama: 'Bloom',
-        deskripsi: 'Pastel ceria & instagrammable, manis. Untuk dessert cafe, matcha, boba, tempat foto.',
-        icon: 'Cherry', mood: '#E08CA0', bg: 'light', manifest: 'cafe-bloom',
+        id: 'cafe-seduh', subKategori: 'cafe', nama: 'Seduh',
+        deskripsi: 'Specialty warm-minimal — oat, espresso, dan aksen moka. Untuk coffee shop, manual brew, brunch, bakery cafe.',
+        icon: 'Coffee', mood: '#A4642E', bg: 'light', manifest: 'restaurant-cafe',
       },
     ],
     finedining: [

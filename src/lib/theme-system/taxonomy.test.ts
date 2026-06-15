@@ -98,13 +98,12 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getReadySubKategori('toko_online').map((s) => s.id)).toContain('fashion')
   })
 
-  it('Restaurant (Wave 2): warung + finedining READY, cafe belum (sub-kat picker aktif)', () => {
+  it('Restaurant (Wave 2): warung + cafe + finedining semua READY (sub-kat picker aktif)', () => {
     expect(hasSubKategori('restaurant')).toBe(true)
     const subs = getSubKategori('restaurant')
     expect(subs.map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
-    // warung = bespoke "Hangat", finedining = restaurant-lux (3 palet via isLux). cafe menyusul.
-    expect(getReadySubKategori('restaurant').map((s) => s.id)).toEqual(['warung', 'finedining'])
-    expect(subs.find((s) => s.id === 'cafe')?.ready).toBe(false)
+    // warung = bespoke "Hangat", cafe = bespoke "Seduh", finedining = restaurant-lux (3 palet via isLux).
+    expect(getReadySubKategori('restaurant').map((s) => s.id)).toEqual(['warung', 'cafe', 'finedining'])
   })
 
   it('Restaurant warung = flagship bespoke "Hangat" (1 varian, manifest = key registry)', () => {
@@ -115,28 +114,34 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('restaurant', 'warung-hangat')?.nama).toBe('Hangat')
   })
 
-  it('Restaurant cafe & finedining tetap 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
-    // finedining → restaurant-lux (3 palet, jalur isLux generateContent); cafe = composable lama.
-    for (const sub of ['cafe', 'finedining']) {
-      const themes = getThemes('restaurant', sub)
-      expect(themes).toHaveLength(3)
-      expect(themes.every((t) => t.subKategori === sub)).toBe(true)
-      const bgs = new Set(themes.map((t) => t.bg))
-      expect(bgs.has('dark')).toBe(true)
-      expect(bgs.has('light') || bgs.has('warm')).toBe(true)
-    }
+  it('Restaurant cafe = flagship bespoke "Seduh" (1 varian, manifest = key registry)', () => {
+    const themes = getThemes('restaurant', 'cafe')
+    expect(themes.map((t) => t.id)).toEqual(['cafe-seduh'])
+    expect(themes.every((t) => t.manifest === 'restaurant-cafe')).toBe(true)
+    expect('restaurant-cafe' in BESPOKE_RENDERERS).toBe(true)
+    expect(getTheme('restaurant', 'cafe-seduh')?.nama).toBe('Seduh')
   })
 
-  it('Restaurant: id tema unik (7 total) & manifest === id kecuali warung bespoke', () => {
+  it('Restaurant finedining tetap 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
+    // finedining → restaurant-lux (3 palet, jalur isLux generateContent).
+    const themes = getThemes('restaurant', 'finedining')
+    expect(themes).toHaveLength(3)
+    expect(themes.every((t) => t.subKategori === 'finedining')).toBe(true)
+    const bgs = new Set(themes.map((t) => t.bg))
+    expect(bgs.has('dark')).toBe(true)
+    expect(bgs.has('light') || bgs.has('warm')).toBe(true)
+  })
+
+  it('Restaurant: id tema unik (5 total) & manifest === id kecuali warung/cafe bespoke', () => {
     const all = getThemes('restaurant', 'warung')
       .concat(getThemes('restaurant', 'cafe'), getThemes('restaurant', 'finedining'))
-    expect(new Set(all.map((t) => t.id)).size).toBe(7) // 1 warung bespoke + 3 cafe + 3 finedining
+    expect(new Set(all.map((t) => t.id)).size).toBe(5) // 1 warung + 1 cafe bespoke + 3 finedining
     for (const t of all) {
-      // Bespoke warung: manifest = key registry (≠ id). Composable cafe/finedining: manifest === id.
+      // Bespoke warung/cafe: manifest = key registry (≠ id). Composable finedining: manifest === id.
       if (t.manifest in BESPOKE_RENDERERS) continue
       expect(t.manifest).toBe(t.id)
     }
-    expect(getTheme('restaurant', 'cafe-roastery')?.nama).toBe('Roastery')
+    expect(getTheme('restaurant', 'finedining-aurum')?.nama).toBe('Aurum')
   })
 
   it('Klinik (Wave 2 TUNTAS): umum + estetik + wellness semua bespoke + READY', () => {

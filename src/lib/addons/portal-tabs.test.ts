@@ -35,6 +35,10 @@ describe('themeContentTabs — tab konten terbuka mengikuti apa yang tema render
     expect(themeContentTabs({ theme: 'restaurant-warung' }, 'restaurant')).toEqual({ ...NONE, menu: true })
   })
 
+  it('bespoke cafe (source menu, Wave 2): MENU terbuka, tanpa galeri', () => {
+    expect(themeContentTabs({ theme: 'restaurant-cafe' }, 'restaurant')).toEqual({ ...NONE, menu: true })
+  })
+
   it('bespoke klinik (source services): LAYANAN terbuka, bukan produk (Wave 2)', () => {
     expect(themeContentTabs({ theme: 'klinik-umum' }, 'klinik')).toEqual({ ...NONE, layanan: true })
   })
@@ -58,6 +62,7 @@ describe('kontenBrandEditable — stats/faq/statement hanya untuk tema yang memb
     expect(kontenBrandEditable({ theme: 'toko-kerajinan' })).toEqual({ stats: true, faq: true, statement: true })
     expect(kontenBrandEditable({ theme: 'restaurant-lux' })).toEqual({ stats: true, faq: true, statement: true })
     expect(kontenBrandEditable({ theme: 'restaurant-warung' })).toEqual({ stats: true, faq: true, statement: true })
+    expect(kontenBrandEditable({ theme: 'restaurant-cafe' })).toEqual({ stats: true, faq: true, statement: true })
     expect(kontenBrandEditable({ theme: 'klinik-umum' })).toEqual({ stats: true, faq: true, statement: true })
   })
 

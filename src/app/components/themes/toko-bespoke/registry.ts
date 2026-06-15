@@ -20,6 +20,7 @@ import KlinikUmumRenderer from './KlinikUmumRenderer'
 import KlinikEstetikRenderer from './KlinikEstetikRenderer'
 import KlinikWellnessRenderer from './KlinikWellnessRenderer'
 import WarungRenderer from './WarungRenderer'
+import CafeRenderer from './CafeRenderer'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -39,6 +40,8 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'restaurant-lux': { Renderer: RestaurantLuxRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Restaurant warung/kedai bespoke (Wave 2 "Hangat") — etalase = menu, tanpa keranjang.
   'restaurant-warung': { Renderer: WarungRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
+  // Restaurant cafe/coffee shop bespoke (Wave 2 "Seduh") — etalase = menu, tanpa keranjang.
+  'restaurant-cafe': { Renderer: CafeRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Klinik bespoke (Wave 2) — etalase = services (jasa), tanpa keranjang.
   'klinik-umum': { Renderer: KlinikUmumRenderer, source: 'services', showcaseTitle: 'Layanan Kami' },
   'klinik-estetik': { Renderer: KlinikEstetikRenderer, source: 'services', showcaseTitle: 'Perawatan Kami' },
