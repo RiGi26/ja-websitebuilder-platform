@@ -40,6 +40,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'rumah-selaras': { theme: 'toko-rumah', variant: 'selaras', sample: 'rumah-lux' },
   // Kesehatan & Herbal — Jamu (apothecary heritage kraft/turmeric, signature label apotek + segel).
   'kesehatan-jamu': { theme: 'toko-kesehatan', variant: 'jamu', sample: 'kesehatan-lux' },
+  // Bayi & Anak — Ceria (playful bright sky/coral/mint, signature kartu stiker + bento + confetti).
+  'anak-ceria': { theme: 'toko-anak', variant: 'ceria', sample: 'anak-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -61,4 +63,5 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'toko-gadget': {},
   'toko-rumah': {},
   'toko-kesehatan': {},
+  'toko-anak': {},
 }

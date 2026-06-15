@@ -1083,6 +1083,82 @@ const ANAK: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@cilukbakids.id', alamat: 'Surabaya, Jawa Timur' },
 }
 
+// ── Bayi & Anak — bespoke "Ceria" (playful friendly) ──────────
+const ANAK_LUX: ComposableContent = {
+  nama: 'Cilukba Kids',
+  hero: {
+    eyebrow: 'Mainan & Perlengkapan Anak',
+    title: 'Teman Tumbuh Kembang si Kecil',
+    subtitle:
+      'Mainan dan perlengkapan yang ceria, kuat, dan bikin belajar jadi menyenangkan — dipilih dengan hati untuk si kecil.',
+    ctaText: 'Lihat Mainan',
+    ctaHref: '#produk',
+    ctaText2: 'Tanya Kami',
+    ctaHref2: '#wa',
+    image: IMG('photo-1515488042361-ee00e0ddd4e4'),
+  },
+  statement: {
+    eyebrow: 'Janji Kami',
+    quote: 'Masa kecil cuma sekali. Kami memilih tiap mainan seperti untuk anak kami sendiri — seru, kuat, dan menyenangkan.',
+    cite: 'Tim Cilukba Kids',
+  },
+  features: [
+    { title: 'Bahan Aman', desc: 'Material food-grade bebas BPA, sudut tumpul, lolos uji SNI.' },
+    { title: 'Merangsang Kreativitas', desc: 'Dirancang bersama psikolog anak untuk belajar sambil bermain.' },
+    { title: 'Kuat & Tahan Banting', desc: 'Menemani si kecil bermain seharian tanpa cepat rusak.' },
+    { title: 'Siap Jadi Hadiah', desc: 'Dikemas rapi dan ceria, gratis kartu ucapan untuk setiap hadiah.' },
+  ],
+  featuresEyebrow: 'Kenapa Cilukba',
+  featuresTitle: 'Empat alasan bunda & ayah memilih kami',
+  showcase: {
+    title: 'Pilihan untuk si Kecil',
+    subtitle: 'Dari kamar sampai ruang main — yang ceria, nyaman, dan bikin senang.',
+    items: [
+      { nama: 'Set Seprai Anak Lembut', harga: 159000, desc: 'Katun adem dengan motif ceria, nyaman untuk tidur si kecil.', gambar: IMG('photo-1522771739844-6a9f6d5f14af', 900), kategori: 'Kamar' },
+      { nama: 'Baju Anak Ceria', harga: 89000, desc: 'Bahan adem & nyaman, model lucu untuk si aktif bergerak.', gambar: IMG('photo-1503454537195-1dcabb73ffb9', 900), kategori: 'Fashion' },
+      { nama: 'Set Mainan Edukatif', harga: 135000, desc: 'Aneka mainan warna-warni untuk eksplorasi sambil belajar.', gambar: IMG('photo-1545558014-8692077e9b5c', 900), kategori: 'Edukasi' },
+    ],
+  },
+  about: {
+    title: 'Bermain Sambil Belajar',
+    body: 'Cilukba Kids dimulai dari satu pertanyaan sederhana: mainan apa yang benar-benar aman dan bikin anak betah belajar?\n\nKami memilih tiap produk dengan standar yang sama seperti untuk anak kami sendiri — aman, mendidik, dan menyenangkan. Karena masa kecil cuma sekali.',
+    ctaText: 'Kenali Kami',
+    ctaHref: '#produk',
+  },
+  cta: {
+    title: 'Bahagiakan si Kecil Hari Ini',
+    subtitle: 'Ceritakan usia si kecil via WhatsApp — kami bantu pilihkan mainan yang pas. Gratis kartu ucapan untuk setiap hadiah.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '4.9', label: 'Rating ulasan' },
+    { angka: '15rb+', label: 'Keluarga senang' },
+    { angka: 'SNI', label: 'Berstandar' },
+    { angka: '0–8', label: 'Rentang usia (thn)' },
+  ],
+  testimonials: [
+    { quote: 'Mainannya kuat, bahannya tebal, anak betah main berjam-jam.', nama: 'Bunda Sasa', peran: 'Orang tua' },
+    { quote: 'Edukatif dan warnanya cerah. Anak belajar sambil bermain, senang lihatnya.', nama: 'Ibu Ratna', peran: 'Orang tua' },
+    { quote: 'Pengiriman cepat dan packing rapi banget. Cocok buat kado ulang tahun.', nama: 'Pak Dimas', peran: 'Pelanggan' },
+    { quote: 'Dibantu pilih sesuai umur anak lewat chat. Pas dan nggak ribet.', nama: 'Mama Kayla', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah mainannya aman untuk balita?', a: 'Ya, material food-grade/SNI, sudut tumpul, dan bebas BPA. Tetap dampingi anak saat bermain.' },
+    { q: 'Untuk usia berapa?', a: 'Setiap produk mencantumkan rekomendasi usia — ada pilihan untuk 0–1, 1–3, dan 3 tahun ke atas.' },
+    { q: 'Bisa kirim sebagai hadiah?', a: 'Bisa. Kami kemas rapi dan ceria, plus kartu ucapan gratis. Beri tahu kami pesannya saat pesan.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '08.00–17.00' },
+      { hari: 'Minggu', jam: 'Dengan janji' },
+    ],
+    alamat: 'Surabaya, Jawa Timur',
+    mapsQuery: 'Surabaya, Jawa Timur',
+  },
+  contact: { wa: '6281296917963', email: 'halo@cilukbakids.id', alamat: 'Surabaya, Jawa Timur' },
+}
+
 // ── RESTAURANT · Warung / Kedai (masakan rumahan) ──────────────
 const WARUNG: ComposableContent = {
   nama: 'Warung Bu Tatik',
@@ -2628,6 +2704,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'rumah-lux': RUMAH_LUX,
   // Bespoke lux kesehatan (KesehatanLuxRenderer "Jamu") — sample dedikasi apothecary heritage.
   'kesehatan-lux': KESEHATAN_LUX,
+  // Bespoke lux anak (AnakLuxRenderer "Ceria") — sample dedikasi playful friendly.
+  'anak-lux': ANAK_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

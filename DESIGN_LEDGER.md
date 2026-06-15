@@ -18,6 +18,7 @@
 | `toko-gadget` (Wave 1) | toko_online / gadget | onyx | Space Grotesk + IBM Plex Sans/Mono | Onyx `#0A0E14` · Surface `#131B25` · Cyan `#22D3EE` | blueprint grid + corner-bracket + node dots | dark blueprint-grid, device-frame ber-scanline | **spec-readout HUD** (kartu mono ber-corner-bracket + garis sirkuit) |
 | `toko-rumah` (Wave 1) | toko_online / rumah | selaras | Spectral + Hanken Grotesk | Kapur `#F4F1EA` · Greige `#EDE8DD` · Arang `#2C2A25` · Sage-slate `#6F7A66` | bingkai arched alcove (ceruk lengkung) + bayangan natural lembut | hero terang asimetris + ruang lapang (ma) | **arched-alcove product frame** + statement tenang serif (bukan quote sinematik italik) |
 | `toko-kesehatan` (Wave 1) | toko_online / kesehatan | jamu | Zilla Slab + Work Sans | Kraft `#ECE3CE`/`#E6DCC4` · Ink olive-hitam `#21271A` · Turmeric `#A8661A`/`#7C4A0E` | segel/stempel apotek (cincin-ganda) + dot-screen halftone + tepi perforasi | tipografi slab besar di atas produk + segel | **kartu "label apotek"** (tepi perforasi + segel) di etalase |
+| `toko-anak` (Wave 1) | toko_online / anak | ceria | Fredoka + Nunito | Warm-white `#FFFCF5`/`#FFF3E2` · Sky `#2491C8`/`#176F9E` · Ink-navy `#1E3147` · pop coral `#FF6B5C`/sunny `#FFC23C`/mint `#3CC9A8` | blob organik + confetti titik warna + sudut membulat besar | bento ceria (klaster media membulat + sel pop) | **kartu "stiker"** (tag kategori menempel miring + bounce) di etalase |
 
 ## Aturan pakai
 
