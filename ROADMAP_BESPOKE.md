@@ -10,14 +10,16 @@ dulu** sebelum bangun tema. Dokumen ini = SSOT roadmap; resume kerja: `lanjut <s
 
 ## Status
 
-**Bespoke live (11):** WAVE 1 TOKO TUNTAS (8/8) — `toko/fashion`→`toko-atelier` ·
+**Bespoke live (13):** WAVE 1 TOKO TUNTAS (8/8) — `toko/fashion`→`toko-atelier` ·
 `toko/kuliner`→`toko-kuliner` · `toko/kerajinan`→`toko-kerajinan` · `toko/kecantikan`→`toko-kecantikan`
 ("Embun") · `toko/gadget`→`toko-gadget` ("Onyx") · `toko/rumah`→`toko-rumah` ("Selaras") ·
 `toko/kesehatan`→`toko-kesehatan` ("Jamu") · `toko/anak`→`toko-anak` ("Ceria") ·
-`restaurant/finedining`→`restaurant-lux` · **WAVE 2: `klinik/umum`→`klinik-umum` ("Klinik Bersih")**.
+`restaurant/finedining`→`restaurant-lux` · **WAVE 2: `klinik/umum`→`klinik-umum` ("Klinik Bersih") ·
+`klinik/estetik`→`klinik-estetik` ("Lumen") · `klinik/wellness`→`klinik-wellness` ("Sanara") —
+KLINIK TUNTAS 3/3 · `restaurant/warung`→`restaurant-warung` ("Hangat")**.
 
-**Celah (23 sub-kategori):** restaurant (warung, cafe) · klinik (estetik, wellness) ·
-sekolah · personal · corporate · travel · blog · jastip (masing-masing 3).
+**Celah (10 sub-kategori):** restaurant (cafe) · sekolah · personal · corporate ·
+travel · blog · jastip (sisanya masing-masing 3, kecuali restaurant cafe = 1).
 
 ## Engine (S0 — SELESAI, PR `feat/bespoke-engine-universal`)
 
@@ -47,7 +49,7 @@ cek anti-duplikat `DESIGN_LEDGER.md`.** Default 1 palet/tema (owner boleh minta 
 | Wave | Sub-kategori | Source etalase |
 |---|---|---|
 | 1 — Toko | ~~kecantikan ("Embun")~~ · ~~gadget ("Onyx")~~ · ~~rumah ("Selaras")~~ · ~~kesehatan ("Jamu")~~ · ~~anak ("Ceria")~~ — **TUNTAS 8/8** | products |
-| 2 — Jasa & makan | ~~klinik/umum ("Klinik Bersih")~~ · ~~klinik/estetik ("Lumen")~~ · ~~klinik/wellness ("Sanara")~~ — **KLINIK TUNTAS 3/3** · restaurant (warung/cafe) | services / menu |
+| 2 — Jasa & makan | ~~klinik/umum ("Klinik Bersih")~~ · ~~klinik/estetik ("Lumen")~~ · ~~klinik/wellness ("Sanara")~~ — **KLINIK TUNTAS 3/3** · ~~restaurant/warung ("Hangat")~~ · restaurant (cafe) | services / menu |
 | 3 — Edukasi & bisnis | sekolah (reguler/islami/kursus) · corporate (startup/agency/korporat) | services |
 | 4 — Travel & personal | travel (kendaraan/wisata/akomodasi) · personal (kreator/profesional/coach) | services |
 | 5 — Konten & jastip | blog (jurnal/media/niche) · jastip (luar/lokal/preorder) | blog / products |

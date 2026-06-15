@@ -61,16 +61,15 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
   ],
-  // ── NON-TOKO industri — sub-kategori DISEMBUNYIKAN dari brief form (keputusan
-  // owner 2026-06-11): tema composable lama (warung/cafe/finedining ×3 dll) usang
-  // & membingungkan. ready:false → SubKategoriPicker null → brief form langsung
-  // tampilkan SATU kartu Lux (variant grid). Tema composable tetap di THEMES utk
-  // situs existing, hanya tak ditawarkan lagi. Restaurant Lux → RestaurantLuxRenderer
-  // bespoke (lihat generateContent isLux). Industri lain → composable lux-<industri>.
+  // ── RESTAURANT (Wave 2) — sub-kategori picker AKTIF. Warung = bespoke "Hangat"
+  // (WarungRenderer, source menu). Fine Dining = restaurant-lux (3 palet via isLux,
+  // generateContent). Cafe menyusul (ready:false → belum tampil). "Lainnya (gaya
+  // umum)" di picker → kartu Lux/restaurant-lux (escape hatch). Tema composable lama
+  // (warung/cafe/finedining ×3) tetap di manifest.ts utk situs existing.
   restaurant: [
-    { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: false },
+    { id: 'warung', nama: 'Warung / Kedai', deskripsi: 'Warung makan, kedai, masakan rumahan, angkringan.', icon: 'Store', ready: true },
     { id: 'cafe', nama: 'Cafe / Coffee Shop', deskripsi: 'Kopi, dessert, tempat nongkrong, brunch.', icon: 'Coffee', ready: false },
-    { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: false },
+    { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: true },
   ],
   klinik: [
     { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
@@ -254,21 +253,18 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
   // microcopy self-select: [sifat visual] + "Untuk [jenis tempat]".
   // ════════════════════════════════════════════════════════════
   restaurant: {
+    // ── WARUNG / KEDAI (flagship bespoke "Hangat", Wave 2) ────────
+    // WarungRenderer (folk-warmth light, source menu — bukan toko; signature label
+    // harga "banderol" tag kertas miring + spanduk hangat). 1 varian default: hangat.
+    // manifest:'restaurant-warung' = key registry bespoke (inert; di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (warung-rakyat/
+    // sambal/angkringan di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     warung: [
       {
-        id: 'warung-rakyat', subKategori: 'warung', nama: 'Rakyat',
-        deskripsi: 'Hangat & merakyat, terasa rumahan. Untuk warung makan, masakan padang, soto, nasi.',
-        icon: 'Soup', mood: '#C24E2C', bg: 'warm', manifest: 'warung-rakyat',
-      },
-      {
-        id: 'warung-sambal', subKategori: 'warung', nama: 'Sambal',
-        deskripsi: 'Berani & menggugah, merah membara. Untuk ayam geprek, seblak, pedasan, lalapan.',
-        icon: 'Flame', mood: '#D62828', bg: 'light', manifest: 'warung-sambal',
-      },
-      {
-        id: 'warung-angkringan', subKategori: 'warung', nama: 'Angkringan',
-        deskripsi: 'Gelap hangat bercahaya lampu, suasana malam. Untuk angkringan, kedai kopi tubruk, wedangan.',
-        icon: 'Moon', mood: '#E8A23D', bg: 'dark', manifest: 'warung-angkringan',
+        id: 'warung-hangat', subKategori: 'warung', nama: 'Hangat',
+        deskripsi: 'Merakyat & hangat seperti masakan rumah — krem, bata, dan mustard. Untuk warung makan, kedai, masakan rumahan, angkringan.',
+        icon: 'Soup', mood: '#C0432E', bg: 'warm', manifest: 'restaurant-warung',
       },
     ],
     cafe: [

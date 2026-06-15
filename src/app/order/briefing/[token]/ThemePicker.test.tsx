@@ -56,6 +56,22 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#3E8378') // swatch mood teal ter-inject
   })
 
+  it('render gaya Restaurant Warung = flagship bespoke (Hangat, Wave 2)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="restaurant" subKategori="warung" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Hangat')
+    expect(html).toContain('#C0432E') // swatch mood bata ter-inject
+  })
+
+  it('render gaya Restaurant Fine Dining = 3 palet restaurant-lux (Aurum/Hearth/Noir)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="restaurant" subKategori="finedining" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Aurum')
+    expect(html).toContain('Hearth')
+  })
+
   it('sub-kategori tak dikenal → render kosong (null)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="tidak-ada" value="" onChange={noop} />,
@@ -106,11 +122,20 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect((html.match(/aria-pressed="true"/g) ?? []).length).toBe(1)
   })
 
-  it('non-toko lain (sekolah/restaurant) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
+  it('restaurant (Wave 2) → picker TAMPIL (warung + finedining + Lainnya), copy "Jenis Restoran"', () => {
+    // warung + finedining ready → SubKategoriPicker muncul utk restaurant. cafe belum.
+    const html = renderToStaticMarkup(<SubKategoriPicker tipe="restaurant" value="" onChange={noop} />)
+    expect(html).toContain('Jenis Restoran') // label industri-aware, bukan "Tipe Toko"
+    expect(html).toContain('Warung / Kedai')
+    expect(html).toContain('Fine Dining / Resto Keluarga')
+    expect(html).not.toContain('Cafe / Coffee Shop') // cafe ready:false → tak tampil
+    expect(html).toContain('Lainnya (gaya umum)')
+  })
+
+  it('non-toko lux-only (sekolah) → picker DISEMBUNYIKAN (langsung kartu Lux)', () => {
     // ready:false utk semua sub-kat → SubKategoriPicker null → brief form langsung
     // tampilkan variant grid (satu kartu Lux), tanpa langkah sub-kategori.
     expect(renderToStaticMarkup(<SubKategoriPicker tipe="sekolah" value="" onChange={noop} />)).toBe('')
-    expect(renderToStaticMarkup(<SubKategoriPicker tipe="restaurant" value="" onChange={noop} />)).toBe('')
   })
 
   it('tetap dormant untuk industri tanpa sub-kategori (mis. custom)', () => {
