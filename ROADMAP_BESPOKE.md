@@ -47,7 +47,7 @@ cek anti-duplikat `DESIGN_LEDGER.md`.** Default 1 palet/tema (owner boleh minta 
 | Wave | Sub-kategori | Source etalase |
 |---|---|---|
 | 1 — Toko | ~~kecantikan ("Embun")~~ · ~~gadget ("Onyx")~~ · ~~rumah ("Selaras")~~ · ~~kesehatan ("Jamu")~~ · ~~anak ("Ceria")~~ — **TUNTAS 8/8** | products |
-| 2 — Jasa & makan | ~~klinik/umum ("Klinik Bersih")~~ · ~~klinik/estetik ("Lumen")~~ · klinik/wellness · restaurant (warung/cafe) | services / menu |
+| 2 — Jasa & makan | ~~klinik/umum ("Klinik Bersih")~~ · ~~klinik/estetik ("Lumen")~~ · ~~klinik/wellness ("Sanara")~~ — **KLINIK TUNTAS 3/3** · restaurant (warung/cafe) | services / menu |
 | 3 — Edukasi & bisnis | sekolah (reguler/islami/kursus) · corporate (startup/agency/korporat) | services |
 | 4 — Travel & personal | travel (kendaraan/wisata/akomodasi) · personal (kreator/profesional/coach) | services |
 | 5 — Konten & jastip | blog (jurnal/media/niche) · jastip (luar/lokal/preorder) | blog / products |
