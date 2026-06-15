@@ -10,6 +10,19 @@ import { Check } from 'lucide-react'
 import { getReadySubKategori } from '@/lib/theme-system/taxonomy'
 import { ThemeIcon } from './ThemeIcon'
 
+// Sentinel "gaya umum" — TIDAK boleh sama dengan id sub-kategori mana pun (lintas
+// industri), supaya getThemes(tipe, ESCAPE) selalu [] → jalur generik. Dulu 'umum'
+// dan bentrok dengan sub-kat klinik 'umum' (dua kartu sama-sama aktif). Underscore
+// memastikan tak pernah cocok dengan id taksonomi.
+const ESCAPE = '__lainnya__'
+
+// Label/microcopy per industri (picker dipakai lintas industri sejak Wave 2 klinik).
+function copyFor(tipe: string): { label: string; hint: string } {
+  if (tipe === 'klinik') return { label: 'Jenis Klinik', hint: 'Pilih jenis klinikmu — kami tampilkan gaya yang paling cocok.' }
+  if (tipe === 'toko_online') return { label: 'Tipe Toko', hint: 'Pilih jenis tokomu — kami tampilkan gaya yang paling cocok.' }
+  return { label: 'Kategori', hint: 'Pilih kategori bisnismu — kami tampilkan gaya yang paling cocok.' }
+}
+
 export default function SubKategoriPicker({
   tipe,
   value,
@@ -21,23 +34,24 @@ export default function SubKategoriPicker({
 }) {
   const subs = getReadySubKategori(tipe)
   if (subs.length === 0) return null
+  const { label, hint } = copyFor(tipe)
 
   return (
     <div className="animate-fade-in">
       <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">
-        Tipe Toko
+        {label}
       </label>
       <p className="text-xs text-gray-400 font-medium mb-3">
-        Pilih jenis tokomu — kami tampilkan gaya yang paling cocok.
+        {hint}
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {subs.map((s) => (
           <SubCard key={s.id} icon={s.icon} nama={s.nama} active={value === s.id} onClick={() => onChange(s.id)} />
         ))}
-        {/* Escape hatch: toko di luar kategori kurasi → gaya umum (variant lama).
-            Pakai sentinel 'umum' (bukan '') supaya state awal "belum pilih" tetap
-            kosong — kartu gaya hanya muncul setelah user memilih tipe. */}
-        <SubCard icon="LayoutGrid" nama="Lainnya (gaya umum)" active={value === 'umum'} onClick={() => onChange('umum')} />
+        {/* Escape hatch: di luar kategori kurasi → gaya umum (variant lama). Sentinel
+            ESCAPE (bukan '') supaya state awal "belum pilih" tetap kosong; bukan id
+            sub-kat nyata supaya tak bentrok (mis. klinik 'umum'). */}
+        <SubCard icon="LayoutGrid" nama="Lainnya (gaya umum)" active={value === ESCAPE} onClick={() => onChange(ESCAPE)} />
       </div>
     </div>
   )
