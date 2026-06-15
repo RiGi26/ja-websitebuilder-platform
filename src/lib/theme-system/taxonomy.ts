@@ -58,7 +58,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'kecantikan', nama: 'Kecantikan / Skincare', deskripsi: 'Kosmetik, parfum, perawatan.', icon: 'Sparkles', ready: true },
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: true },
     { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: true },
-    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: false },
+    { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
     { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
   ],
   // ── NON-TOKO industri — sub-kategori DISEMBUNYIKAN dari brief form (keputusan
@@ -220,22 +220,17 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
       },
     ],
 
-    // ── KESEHATAN & HERBAL ×3 — natural/hijau/trust ──────────────
+    // ── KESEHATAN & HERBAL (flagship bespoke "Jamu") ─────────────
+    // KesehatanLuxRenderer (apothecary heritage light — kraft/turmeric, signature
+    // kartu label apotek + segel). 1 varian default: jamu. manifest:'toko-kesehatan'
+    // inert (di-intercept generateContent SEBELUM getManifest). Tema composable lama
+    // (herbal-daun/jamu/botani di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     kesehatan: [
       {
-        id: 'herbal-daun', subKategori: 'kesehatan', nama: 'Daun',
-        deskripsi: 'Hijau segar & bersih, terpercaya. Untuk madu, teh herbal, produk organik.',
-        icon: 'Sprout', mood: '#4E944F', bg: 'light', manifest: 'herbal-daun',
-      },
-      {
-        id: 'herbal-jamu', subKategori: 'kesehatan', nama: 'Jamu',
-        deskripsi: 'Amber kunyit hangat, tradisional. Untuk jamu, rempah, ramuan warisan.',
-        icon: 'Soup', mood: '#C97A1B', bg: 'warm', manifest: 'herbal-jamu',
-      },
-      {
-        id: 'herbal-botani', subKategori: 'kesehatan', nama: 'Botani',
-        deskripsi: 'Emerald gelap & emas, esensial premium. Untuk minyak esensial, suplemen botani.',
-        icon: 'Leaf', mood: '#C9AE6A', bg: 'dark', manifest: 'herbal-botani',
+        id: 'kesehatan-jamu', subKategori: 'kesehatan', nama: 'Jamu',
+        deskripsi: 'Apotek herbal bergaya warisan — kraft & kunyit, label & segel. Untuk madu, jamu, teh herbal, minyak esensial, suplemen.',
+        icon: 'Soup', mood: '#A8661A', bg: 'light', manifest: 'toko-kesehatan',
       },
     ],
 
