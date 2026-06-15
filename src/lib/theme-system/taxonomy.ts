@@ -59,7 +59,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'gadget', nama: 'Elektronik / Gadget', deskripsi: 'Aksesoris HP, gadget, elektronik.', icon: 'Smartphone', ready: true },
     { id: 'rumah', nama: 'Rumah & Dekor', deskripsi: 'Mebel, dekorasi, tanaman.', icon: 'Sofa', ready: true },
     { id: 'kesehatan', nama: 'Kesehatan & Herbal', deskripsi: 'Madu, jamu, suplemen.', icon: 'Leaf', ready: true },
-    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: false },
+    { id: 'anak', nama: 'Bayi & Anak', deskripsi: 'Perlengkapan bayi, mainan.', icon: 'Baby', ready: true },
   ],
   // ── NON-TOKO industri — sub-kategori DISEMBUNYIKAN dari brief form (keputusan
   // owner 2026-06-11): tema composable lama (warung/cafe/finedining ×3 dll) usang
@@ -234,22 +234,17 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
       },
     ],
 
-    // ── BAYI & ANAK / MAINAN ×3 — playful/ramah ──────────────────
+    // ── BAYI & ANAK / MAINAN (flagship bespoke "Ceria") ──────────
+    // AnakLuxRenderer (playful bright rounded — sky/coral/mint, signature kartu
+    // stiker + hero bento + confetti). 1 varian default: ceria. manifest:'toko-anak'
+    // inert (di-intercept generateContent SEBELUM getManifest). Tema composable lama
+    // (anak-pastel/ceria/pop di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     anak: [
       {
-        id: 'anak-pastel', subKategori: 'anak', nama: 'Pastel',
-        deskripsi: 'Pastel mint-peach lembut, menenangkan. Untuk perlengkapan bayi, baju newborn.',
-        icon: 'Rabbit', mood: '#8FC9C2', bg: 'light', manifest: 'anak-pastel',
-      },
-      {
         id: 'anak-ceria', subKategori: 'anak', nama: 'Ceria',
-        deskripsi: 'Cerah & ramah, seimbang. Untuk mainan edukasi, baju anak, perlengkapan sekolah.',
-        icon: 'Smile', mood: '#2BA8E0', bg: 'light', manifest: 'anak-ceria',
-      },
-      {
-        id: 'anak-pop', subKategori: 'anak', nama: 'Pop',
-        deskripsi: 'Candy lantang & ceria, penuh energi. Untuk mainan seru, snack anak, brand playful.',
-        icon: 'Candy', mood: '#E5318F', bg: 'light', manifest: 'anak-pop',
+        deskripsi: 'Cerah & ramah, membulat dan menyenangkan. Untuk mainan, perlengkapan bayi, baju anak, snack.',
+        icon: 'Smile', mood: '#2491C8', bg: 'light', manifest: 'toko-anak',
       },
     ],
   },
