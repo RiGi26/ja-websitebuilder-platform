@@ -55,6 +55,9 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'warung-hangat': { theme: 'restaurant-warung', variant: 'hangat', sample: 'warung-lux' },
   // Cafe/Coffee Shop — Seduh (specialty warm-minimal oat/espresso/moka, signature kopi-ring harga).
   'cafe-seduh': { theme: 'restaurant-cafe', variant: 'seduh', sample: 'cafe-lux' },
+  // ── WAVE 3 (edukasi, source services) ──
+  // Sekolah Umum — Almamater (collegiate prestige navy/krem/emas, signature lencana/crest perisai).
+  'reguler-almamater': { theme: 'sekolah-reguler', variant: 'almamater', sample: 'sekolah-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -86,4 +89,6 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'restaurant-warung': {},
   // Cafe "Seduh": etalase = menu (source menu), tanpa galeri/social terpisah.
   'restaurant-cafe': {},
+  // Sekolah "Almamater": etalase = services (program), tanpa galeri/social terpisah.
+  'sekolah-reguler': {},
 }

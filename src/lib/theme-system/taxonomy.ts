@@ -77,8 +77,11 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
     { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
   ],
+  // ── SEKOLAH (Wave 3) — reguler = bespoke "Almamater" (source services). Islami &
+  // kursus menyusul (ready:false → belum tampil di picker). Picker tampil saat ≥1
+  // sub-kat ready; "Lainnya (gaya umum)" → composable lux-sekolah (escape hatch).
   sekolah: [
-    { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: false },
+    { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: true },
     { id: 'islami', nama: 'Sekolah Islami / Pesantren', deskripsi: 'Madrasah, pesantren, sekolah Islam terpadu.', icon: 'BookOpen', ready: false },
     { id: 'kursus', nama: 'Kursus / Bimbel', deskripsi: 'Bimbel, kursus bahasa, skill, course online.', icon: 'PencilRuler', ready: false },
   ],
@@ -352,21 +355,18 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
   // Deskripsi = microcopy self-select: [sifat visual] + "Untuk [jenis sekolah]".
   // ════════════════════════════════════════════════════════════
   sekolah: {
+    // ── SEKOLAH UMUM (flagship bespoke "Almamater", Wave 3) ────────
+    // SekolahAlmamaterRenderer (collegiate prestige light, source services;
+    // signature lencana/crest perisai + monogram). 1 varian default: almamater.
+    // manifest:'sekolah-reguler' = key registry bespoke (inert; di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (reguler-cerdas/
+    // ceria/prestasi di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     reguler: [
       {
-        id: 'reguler-cerdas', subKategori: 'reguler', nama: 'Cerdas',
-        deskripsi: 'Biru akademik bersih & terpercaya. Untuk SMP/SMA, sekolah negeri, sekolah modern.',
-        icon: 'GraduationCap', mood: '#2563EB', bg: 'light', manifest: 'reguler-cerdas',
-      },
-      {
-        id: 'reguler-ceria', subKategori: 'reguler', nama: 'Ceria',
-        deskripsi: 'Hangat & ramah anak, penuh semangat. Untuk TK, PAUD, SD, sekolah dasar.',
-        icon: 'Backpack', mood: '#C2680C', bg: 'warm', manifest: 'reguler-ceria',
-      },
-      {
-        id: 'reguler-prestasi', subKategori: 'reguler', nama: 'Prestasi',
-        deskripsi: 'Navy emas gelap & berwibawa. Untuk SMA unggulan, sekolah favorit, boarding school.',
-        icon: 'Trophy', mood: '#C9A24A', bg: 'dark', manifest: 'reguler-prestasi',
+        id: 'reguler-almamater', subKategori: 'reguler', nama: 'Almamater',
+        deskripsi: 'Wibawa akademik — navy, krem, dan emas berkelas dengan lencana sekolah. Untuk SD/SMP/SMA, sekolah favorit, yayasan, boarding school.',
+        icon: 'GraduationCap', mood: '#15294B', bg: 'light', manifest: 'sekolah-reguler',
       },
     ],
     islami: [
