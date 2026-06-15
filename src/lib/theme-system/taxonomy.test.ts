@@ -127,34 +127,27 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('restaurant', 'cafe-roastery')?.nama).toBe('Roastery')
   })
 
-  it('Klinik (Wave 2): umum + estetik = bespoke READY; wellness masih disembunyikan', () => {
+  it('Klinik (Wave 2 TUNTAS): umum + estetik + wellness semua bespoke + READY', () => {
     expect(hasSubKategori('klinik')).toBe(true)
     const subs = getSubKategori('klinik')
     expect(subs.map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
-    // Wave 2: umum ("Klinik Bersih") + estetik ("Lumen") bespoke + ready. wellness lux-only.
-    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik'])
+    // Wave 2: 3/3 sub-kat klinik bespoke + ready (Klinik Bersih · Lumen · Sanara).
+    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
+    expect(getSubKategori('klinik').filter((s) => s.ready)).toHaveLength(3)
   })
 
-  it('Klinik umum/estetik = flagship bespoke (1 varian, manifest = key registry)', () => {
-    const umum = getThemes('klinik', 'umum')
-    expect(umum.map((t) => t.id)).toEqual(['klinik-bersih'])
-    expect(umum.every((t) => t.manifest === 'klinik-umum')).toBe(true)
-    expect(getTheme('klinik', 'klinik-bersih')?.nama).toBe('Klinik Bersih')
-    const estetik = getThemes('klinik', 'estetik')
-    expect(estetik.map((t) => t.id)).toEqual(['estetik-lumen'])
-    expect(estetik.every((t) => t.manifest === 'klinik-estetik')).toBe(true)
-    expect(getTheme('klinik', 'estetik-lumen')?.nama).toBe('Lumen')
-  })
-
-  it('Klinik wellness (lux-only, belum bespoke): tetap 3 gaya, manifest === id, VARIASI bg', () => {
-    const themes = getThemes('klinik', 'wellness')
-    expect(themes).toHaveLength(3)
-    expect(themes.every((t) => t.subKategori === 'wellness')).toBe(true)
-    expect(themes.every((t) => t.manifest === t.id)).toBe(true)
-    const bgs = new Set(themes.map((t) => t.bg))
-    expect(bgs.has('dark')).toBe(true)
-    expect(bgs.has('light') || bgs.has('warm')).toBe(true)
-    expect(getTheme('klinik', 'wellness-forest')?.nama).toBe('Forest')
+  it('Klinik 3 sub-kat = flagship bespoke (1 varian masing-masing, manifest = key registry)', () => {
+    const expected: Record<string, { id: string; theme: string; nama: string }> = {
+      umum: { id: 'klinik-bersih', theme: 'klinik-umum', nama: 'Klinik Bersih' },
+      estetik: { id: 'estetik-lumen', theme: 'klinik-estetik', nama: 'Lumen' },
+      wellness: { id: 'wellness-sanara', theme: 'klinik-wellness', nama: 'Sanara' },
+    }
+    for (const [sub, e] of Object.entries(expected)) {
+      const themes = getThemes('klinik', sub)
+      expect(themes.map((t) => t.id)).toEqual([e.id])
+      expect(themes.every((t) => t.manifest === e.theme)).toBe(true)
+      expect(getTheme('klinik', e.id)?.nama).toBe(e.nama)
+    }
   })
 
   it('Sekolah: sub-kategori terdaftar tapi DISEMBUNYIKAN dari brief form (lux-only)', () => {

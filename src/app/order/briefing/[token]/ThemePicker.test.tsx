@@ -48,6 +48,14 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#9A5C8E') // swatch mood orchid ter-inject
   })
 
+  it('render gaya Klinik Wellness = flagship bespoke (Sanara, Wave 2)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="klinik" subKategori="wellness" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Sanara')
+    expect(html).toContain('#3E8378') // swatch mood teal ter-inject
+  })
+
   it('sub-kategori tak dikenal → render kosong (null)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="tidak-ada" value="" onChange={noop} />,
@@ -80,14 +88,14 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
-  it('klinik (Wave 2) → picker TAMPIL umum (bespoke ready) + opsi "Lainnya", copy industri-aware', () => {
-    // umum kini ready:true (Klinik Bersih) → SubKategoriPicker muncul utk klinik,
-    // menampilkan sub-kat umum + escape hatch. estetik/wellness masih tersembunyi.
+  it('klinik (Wave 2 TUNTAS) → picker TAMPIL 3 sub-kat bespoke + opsi "Lainnya", copy industri-aware', () => {
+    // umum/estetik/wellness semua ready → SubKategoriPicker muncul utk klinik dgn
+    // ketiga sub-kat + escape hatch. Label industri-aware ("Jenis Klinik").
     const html = renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="" onChange={noop} />)
     expect(html).toContain('Jenis Klinik') // label industri-aware, bukan "Tipe Toko"
     expect(html).toContain('Klinik Umum / Gigi')
-    expect(html).toContain('Skincare / Estetik') // Wave 2 #2: estetik kini ready
-    expect(html).not.toContain('Fisio / Wellness') // wellness masih disembunyikan
+    expect(html).toContain('Skincare / Estetik')
+    expect(html).toContain('Fisio / Wellness') // Wave 2 #3: wellness kini ready
     expect(html).toContain('Lainnya (gaya umum)')
   })
 

@@ -47,6 +47,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'klinik-bersih': { theme: 'klinik-umum', variant: 'bersih', sample: 'klinik-lux' },
   // Klinik Estetik — Lumen (editorial derma plum/orchid, signature numeral serif raksasa + hairline).
   'estetik-lumen': { theme: 'klinik-estetik', variant: 'lumen', sample: 'estetik-lux' },
+  // Klinik Wellness — Sanara (calm healing warm-stone/teal, signature bingkai daun + sprout).
+  'wellness-sanara': { theme: 'klinik-wellness', variant: 'sanara', sample: 'wellness-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -73,4 +75,5 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   // jadi tak ada balok terpisah yang perlu permukaan edit khusus di sini.
   'klinik-umum': {},
   'klinik-estetik': {},
+  'klinik-wellness': {},
 }

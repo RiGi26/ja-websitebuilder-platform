@@ -75,7 +75,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
   klinik: [
     { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
     { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
-    { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: false },
+    { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
   ],
   sekolah: [
     { id: 'reguler', nama: 'Sekolah Umum (SD/SMP/SMA)', deskripsi: 'Sekolah negeri/swasta, TK, SD, SMP, SMA/SMK.', icon: 'GraduationCap', ready: false },
@@ -338,21 +338,16 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         icon: 'Sparkles', mood: '#9A5C8E', bg: 'light', manifest: 'klinik-estetik',
       },
     ],
+    // ── KLINIK WELLNESS (flagship bespoke "Sanara", Wave 2) ───────
+    // KlinikWellnessRenderer (calm healing warm-stone/teal, source services; signature
+    // bingkai foto bentuk daun + motif sprout). 1 varian: sanara. manifest='klinik-wellness'
+    // (key registry; di-intercept generateContent). Composable lama (wellness-sage/terra/
+    // forest di manifest.ts) tetap untuk situs existing.
     wellness: [
       {
-        id: 'wellness-sage', subKategori: 'wellness', nama: 'Sage',
-        deskripsi: 'Sage hijau lembut & tenang. Untuk fisioterapi, klinik tumbuh kembang, holistik.',
-        icon: 'Leaf', mood: '#6E8B5A', bg: 'light', manifest: 'wellness-sage',
-      },
-      {
-        id: 'wellness-terra', subKategori: 'wellness', nama: 'Terra',
-        deskripsi: 'Earth terracotta hangat & membumi. Untuk spa medis, terapi pijat, pusat relaksasi.',
-        icon: 'Sprout', mood: '#B07A4E', bg: 'warm', manifest: 'wellness-terra',
-      },
-      {
-        id: 'wellness-forest', subKategori: 'wellness', nama: 'Forest',
-        deskripsi: 'Hijau hutan gelap & menyembuhkan. Untuk wellness center, retreat, terapi premium.',
-        icon: 'TreePine', mood: '#5FB389', bg: 'dark', manifest: 'wellness-forest',
+        id: 'wellness-sanara', subKategori: 'wellness', nama: 'Sanara',
+        deskripsi: 'Tenang & menyembuhkan — batu hangat, teal lembut, dan bentuk daun. Untuk fisioterapi, terapi, spa medis, pusat kebugaran.',
+        icon: 'Sprout', mood: '#3E8378', bg: 'light', manifest: 'klinik-wellness',
       },
     ],
   },
