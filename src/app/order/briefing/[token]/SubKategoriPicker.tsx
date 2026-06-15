@@ -20,6 +20,7 @@ const ESCAPE = '__lainnya__'
 function copyFor(tipe: string): { label: string; hint: string } {
   if (tipe === 'klinik') return { label: 'Jenis Klinik', hint: 'Pilih jenis klinikmu — kami tampilkan gaya yang paling cocok.' }
   if (tipe === 'toko_online') return { label: 'Tipe Toko', hint: 'Pilih jenis tokomu — kami tampilkan gaya yang paling cocok.' }
+  if (tipe === 'restaurant') return { label: 'Jenis Restoran', hint: 'Pilih jenis tempat makanmu — kami tampilkan gaya yang paling cocok.' }
   return { label: 'Kategori', hint: 'Pilih kategori bisnismu — kami tampilkan gaya yang paling cocok.' }
 }
 

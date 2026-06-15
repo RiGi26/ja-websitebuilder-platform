@@ -136,7 +136,8 @@ function tipeFromVariant(variant?: string): TipeIndustri | null {
   if (!variant) return null
   const themeKey = BESPOKE_VARIANTS[variant]?.theme
   if (!themeKey) return null
-  if (themeKey === 'restaurant-lux') return 'restaurant'
+  // Restoran: 'restaurant-lux' (finedining) + 'restaurant-warung' (Wave 2) → restaurant.
+  if (themeKey === 'restaurant-lux' || themeKey.startsWith('restaurant-')) return 'restaurant'
   if (themeKey.startsWith('toko-')) return 'toko_online'
   // Wave 2 jasa: tema bespoke industri-jasa diberi key `<tipe>-<subcat>` (mis.
   // 'klinik-umum'). Bila handoff corp salah-petak industri (mis. "Bisnis Jasa" →
