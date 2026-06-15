@@ -74,7 +74,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
   ],
   klinik: [
     { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
-    { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: false },
+    { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
     { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: false },
   ],
   sekolah: [
@@ -326,21 +326,16 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         icon: 'Stethoscope', mood: '#2B5BD7', bg: 'light', manifest: 'klinik-umum',
       },
     ],
+    // ── KLINIK ESTETIK (flagship bespoke "Lumen", Wave 2) ─────────
+    // KlinikEstetikRenderer (editorial derma plum/orchid, source services; signature
+    // numeral serif raksasa + bingkai hairline). 1 varian: lumen. manifest='klinik-estetik'
+    // (key registry; di-intercept generateContent SEBELUM getManifest). Composable lama
+    // (estetik-rosegold/derma/noir di manifest.ts) tetap untuk situs existing.
     estetik: [
       {
-        id: 'estetik-rosegold', subKategori: 'estetik', nama: 'Rosegold',
-        deskripsi: 'Rose-gold hangat & elegan. Untuk klinik kecantikan, beauty clinic, perawatan wajah.',
-        icon: 'Flower2', mood: '#C58B6B', bg: 'warm', manifest: 'estetik-rosegold',
-      },
-      {
-        id: 'estetik-derma', subKategori: 'estetik', nama: 'Derma',
-        deskripsi: 'Putih klinis & pink lembut, ilmiah. Untuk dermatologi, skincare clinic, dokter kulit.',
-        icon: 'Droplet', mood: '#E0789C', bg: 'light', manifest: 'estetik-derma',
-      },
-      {
-        id: 'estetik-noir', subKategori: 'estetik', nama: 'Noir',
-        deskripsi: 'Plum gelap mewah, kesan eksklusif. Untuk aesthetic clinic premium, anti-aging, laser.',
-        icon: 'Gem', mood: '#D6A4B6', bg: 'dark', manifest: 'estetik-noir',
+        id: 'estetik-lumen', subKategori: 'estetik', nama: 'Lumen',
+        deskripsi: 'Editorial derma yang tenang — serif elegan, plum & orchid di atas putih lembut. Untuk klinik kecantikan, dermatologi, perawatan kulit & wajah.',
+        icon: 'Sparkles', mood: '#9A5C8E', bg: 'light', manifest: 'klinik-estetik',
       },
     ],
     wellness: [

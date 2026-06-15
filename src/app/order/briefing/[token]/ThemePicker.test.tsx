@@ -40,6 +40,14 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#2B5BD7') // swatch mood indigo ter-inject
   })
 
+  it('render gaya Klinik Estetik = flagship bespoke (Lumen, Wave 2)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="klinik" subKategori="estetik" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Lumen')
+    expect(html).toContain('#9A5C8E') // swatch mood orchid ter-inject
+  })
+
   it('sub-kategori tak dikenal → render kosong (null)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="tidak-ada" value="" onChange={noop} />,
@@ -78,7 +86,8 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     const html = renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="" onChange={noop} />)
     expect(html).toContain('Jenis Klinik') // label industri-aware, bukan "Tipe Toko"
     expect(html).toContain('Klinik Umum / Gigi')
-    expect(html).not.toContain('Skincare / Estetik')
+    expect(html).toContain('Skincare / Estetik') // Wave 2 #2: estetik kini ready
+    expect(html).not.toContain('Fisio / Wellness') // wellness masih disembunyikan
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
