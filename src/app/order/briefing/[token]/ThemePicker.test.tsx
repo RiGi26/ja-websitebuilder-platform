@@ -32,6 +32,14 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#1E3A2F') // swatch mood tanah ter-inject
   })
 
+  it('render gaya Klinik Umum = flagship bespoke (Klinik Bersih, Wave 2)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="klinik" subKategori="umum" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Klinik Bersih')
+    expect(html).toContain('#2B5BD7') // swatch mood indigo ter-inject
+  })
+
   it('sub-kategori tak dikenal → render kosong (null)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="toko_online" subKategori="tidak-ada" value="" onChange={noop} />,
@@ -64,10 +72,26 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
-  it('non-toko (klinik/sekolah) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
-    // ready:false utk semua sub-kat non-toko → SubKategoriPicker null → brief form
-    // langsung tampilkan variant grid (satu kartu Lux), tanpa langkah sub-kategori.
-    expect(renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="" onChange={noop} />)).toBe('')
+  it('klinik (Wave 2) → picker TAMPIL umum (bespoke ready) + opsi "Lainnya", copy industri-aware', () => {
+    // umum kini ready:true (Klinik Bersih) → SubKategoriPicker muncul utk klinik,
+    // menampilkan sub-kat umum + escape hatch. estetik/wellness masih tersembunyi.
+    const html = renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="" onChange={noop} />)
+    expect(html).toContain('Jenis Klinik') // label industri-aware, bukan "Tipe Toko"
+    expect(html).toContain('Klinik Umum / Gigi')
+    expect(html).not.toContain('Skincare / Estetik')
+    expect(html).toContain('Lainnya (gaya umum)')
+  })
+
+  it('klinik: kartu umum & escape "Lainnya" TIDAK aktif bersamaan (sentinel ≠ id sub-kat)', () => {
+    // Regresi: dulu escape memakai sentinel 'umum' yang bentrok dgn sub-kat klinik
+    // 'umum' → dua kartu sama-sama aktif. Kini value='umum' hanya menyalakan SATU.
+    const html = renderToStaticMarkup(<SubKategoriPicker tipe="klinik" value="umum" onChange={noop} />)
+    expect((html.match(/aria-pressed="true"/g) ?? []).length).toBe(1)
+  })
+
+  it('non-toko lain (sekolah/restaurant) → picker DISEMBUNYIKAN (lux-only, langsung kartu Lux)', () => {
+    // ready:false utk semua sub-kat → SubKategoriPicker null → brief form langsung
+    // tampilkan variant grid (satu kartu Lux), tanpa langkah sub-kategori.
     expect(renderToStaticMarkup(<SubKategoriPicker tipe="sekolah" value="" onChange={noop} />)).toBe('')
     expect(renderToStaticMarkup(<SubKategoriPicker tipe="restaurant" value="" onChange={noop} />)).toBe('')
   })

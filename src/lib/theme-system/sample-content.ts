@@ -1411,7 +1411,7 @@ const KLINIK_UMUM: ComposableContent = {
       { nama: 'Pemeriksaan Umum', harga: 50000, desc: 'Konsultasi dokter umum, diagnosa & resep.', gambar: IMG('photo-1579684385127-1ef15d508118', 800), kategori: 'Pemeriksaan', durasi: 30 },
       { nama: 'Perawatan Gigi', harga: 150000, desc: 'Scaling, tambal, cabut oleh dokter gigi.', gambar: IMG('photo-1606811841689-23dfddce3e95', 800), kategori: 'Gigi & Mulut', durasi: 45 },
       { nama: 'Vaksinasi', harga: 200000, desc: 'Imunisasi anak & dewasa, stok lengkap.', gambar: IMG('photo-1612277795421-9bc7706a4a34', 800), kategori: 'Imunisasi', durasi: 20 },
-      { nama: 'Cek Laboratorium', harga: 100000, desc: 'Tes darah, gula, kolesterol. Hasil cepat.', gambar: IMG('photo-1582719508461-905c673771fd', 800), kategori: 'Laboratorium', durasi: 15 },
+      { nama: 'Cek Laboratorium', harga: 100000, desc: 'Tes darah, gula, kolesterol. Hasil cepat.', gambar: IMG('photo-1581595219315-a187dd40c322', 800), kategori: 'Laboratorium', durasi: 15 },
     ],
   },
   stats: [
@@ -2706,6 +2706,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'kesehatan-lux': KESEHATAN_LUX,
   // Bespoke lux anak (AnakLuxRenderer "Ceria") — sample dedikasi playful friendly.
   'anak-lux': ANAK_LUX,
+  // Bespoke klinik (KlinikUmumRenderer "Klinik Bersih", Wave 2 — source services).
+  // Pakai KLINIK_UMUM (kaya: services + team dokter + stats + faq) + statement.
+  'klinik-lux': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan teliti, ramah, dan menghargai waktu Anda di setiap kunjungan.'),
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

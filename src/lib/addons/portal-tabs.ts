@@ -1,6 +1,7 @@
 import type { BrandingConfig, FeatureFlags } from '@/types/websitebuilder'
 import { getManifest } from '@/lib/theme-system/manifest'
 import { BESPOKE_VARIANTS, BESPOKE_RENDERED_BLOCKS } from '@/app/components/themes/toko-bespoke/variants'
+import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
 
 // Gating tab portal berbasis add-on (SSOT = landing_pages.konfigurasi.features,
 // diisi addonsToFeatures(order.selected_addons) saat provisioning; admin bisa
@@ -42,10 +43,14 @@ export function themeContentTabs(
 ): ThemeContentTabs {
   const none: ThemeContentTabs = { produk: false, menu: false, layanan: false, blog: false, galeri: false }
   const theme = branding?.theme
-  // Bespoke toko (Atelier/Kuliner/Kerajinan): etalase = products; galeri hanya
-  // untuk renderer yang benar merendernya (BESPOKE_RENDERED_BLOCKS).
+  // Bespoke lintas industri: tab etalase mengikuti `source` di registry
+  // (products→produk, menu→menu, services→layanan, blog→blog) — sehingga klinik
+  // (services) membuka tab Layanan, bukan Produk. Galeri hanya untuk renderer
+  // yang benar merendernya (BESPOKE_RENDERED_BLOCKS).
   if (theme && BESPOKE_THEMES.has(theme)) {
-    return { ...none, produk: true, galeri: !!BESPOKE_RENDERED_BLOCKS[theme]?.gallery }
+    const src = BESPOKE_RENDERERS[theme]?.source
+    const tab = src === 'menu' ? 'menu' : src === 'services' ? 'layanan' : src === 'blog' ? 'blog' : 'produk'
+    return { ...none, [tab]: true, galeri: !!BESPOKE_RENDERED_BLOCKS[theme]?.gallery }
   }
   // Bespoke premium restaurant-lux: etalase = menu_items; galeri dirender (rl-gal).
   if (theme === 'restaurant-lux') return { ...none, menu: true, galeri: true }
