@@ -676,6 +676,83 @@ const RUMAH_LUX: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@selaras.id', alamat: 'Yogyakarta' },
 }
 
+// ── Kesehatan & Herbal — bespoke "Jamu" (apothecary heritage) ──
+const KESEHATAN_LUX: ComposableContent = {
+  nama: 'Sari Bumi',
+  hero: {
+    eyebrow: 'Apotek Herbal Warisan',
+    title: 'Sehat dari Resep Leluhur',
+    subtitle:
+      'Madu murni, jamu, dan herbal pilihan — diracik dari resep turun-temurun, langsung dari petani lokal. Tanpa pengawet, tanpa pemanis buatan.',
+    ctaText: 'Lihat Produk',
+    ctaHref: '#produk',
+    ctaText2: 'Konsultasi',
+    ctaHref2: '#wa',
+    image: IMG('photo-1556760544-74068565f05c'),
+  },
+  statement: {
+    eyebrow: 'Filosofi Kami',
+    quote: 'Yang alami tak perlu dipaksa. Kami hanya menjaga apa yang sudah diberi bumi — murni, utuh, apa adanya.',
+    cite: 'Peracik Sari Bumi',
+  },
+  features: [
+    { title: '100% Murni', desc: 'Tanpa campuran gula atau pengawet kimia apa pun — hanya bahan utuh dari alam.' },
+    { title: 'Resep Warisan', desc: 'Racikan turun-temurun yang dijaga takarannya, bukan formula instan pabrikan.' },
+    { title: 'Dari Petani Lokal', desc: 'Sumber langsung dari kebun mitra di lereng Merbabu, harga adil untuk petani.' },
+    { title: 'Teruji Lab', desc: 'Lolos uji kualitas sebelum dikemas — aman dikonsumsi seluruh keluarga.' },
+  ],
+  featuresEyebrow: 'Khasiat & Mutu',
+  featuresTitle: 'Empat hal yang kami jaga di tiap botol',
+  showcase: {
+    title: 'Etalase Herbal',
+    subtitle: 'Kebaikan alam, diracik dengan takaran yang dijaga turun-temurun.',
+    items: [
+      { nama: 'Kapsul Herbal Daya Tahan', harga: 78000, desc: 'Ekstrak herbal terstandar dalam kapsul, praktis untuk jaga stamina harian.', gambar: IMG('photo-1471864190281-a93a3070b6de', 900), kategori: 'Suplemen' },
+      { nama: 'Jamu Kunyit Asam', harga: 38000, desc: 'Racikan kunyit dan asam jawa segar, bantu jaga daya tahan harian.', gambar: IMG('photo-1597318181409-cf64d0b5d8a2', 900), kategori: 'Jamu' },
+      { nama: 'Teh Herbal Detoks', harga: 65000, desc: 'Racikan daun pilihan bebas kafein, hangat menenangkan di malam hari.', gambar: IMG('photo-1564890369478-c89ca6d9cde9', 900), kategori: 'Teh' },
+      { nama: 'Minyak Esensial Sereh', harga: 89000, desc: 'Sulingan sereh murni untuk aromaterapi yang menenangkan.', gambar: IMG('photo-1515378791036-0648a3ef77b2', 900), kategori: 'Minyak' },
+    ],
+  },
+  about: {
+    title: 'Diracik dari Warisan',
+    body: 'Sari Bumi lahir dari keyakinan sederhana: tubuh paling cocok dengan yang alami. Kami melanjutkan resep racikan keluarga yang dijaga takarannya turun-temurun.\n\nKami bermitra langsung dengan petani di lereng Merbabu — memilih bahan utuh, meracik dalam jumlah kecil, dan menguji tiap batch sebelum sampai ke tangan Anda.',
+    ctaText: 'Kenali Cara Kami',
+    ctaHref: '#produk',
+  },
+  cta: {
+    title: 'Mulai Hidup Lebih Sehat',
+    subtitle: 'Ceritakan kebutuhan Anda via WhatsApp — kami bantu pilihkan herbal yang pas, tanpa terburu-buru.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+  },
+  stats: [
+    { angka: '100%', label: 'Murni alami' },
+    { angka: '12rb+', label: 'Pelanggan' },
+    { angka: '4.9', label: 'Rating ulasan' },
+    { angka: '25 thn', label: 'Resep warisan' },
+  ],
+  testimonials: [
+    { quote: 'Badan terasa lebih segar dan tidur lebih nyenyak. Alami tanpa efek aneh.', nama: 'Bu Wati', peran: 'Pelanggan' },
+    { quote: 'Racikannya terasa tradisional asli, bukan instan. Kunyit asamnya juara.', nama: 'Pak Slamet', peran: 'Pelanggan' },
+    { quote: 'Madunya kental dan benar-benar murni, beda jauh dari yang di pasaran.', nama: 'Endah', peran: 'Pelanggan setia' },
+    { quote: 'Dikemas rapi, ada aturan pakainya, dan dibantu pilih lewat chat. Tenang belanjanya.', nama: 'Rian', peran: 'Pelanggan' },
+  ],
+  faq: [
+    { q: 'Apakah produk dijamin murni?', a: 'Ya, produk kami alami tanpa campuran gula atau pengawet dan lolos uji kualitas lab sebelum dikemas.' },
+    { q: 'Bagaimana aturan konsumsinya?', a: 'Setiap produk dilengkapi aturan pakai. Untuk kondisi medis tertentu atau ibu hamil, konsultasikan dulu ke dokter.' },
+    { q: 'Berapa lama herbal bertahan?', a: 'Tertera tanggal kedaluwarsa di tiap kemasan. Simpan di tempat sejuk dan kering, jauh dari sinar matahari langsung.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '08.00–17.00' },
+      { hari: 'Minggu', jam: 'Dengan janji' },
+    ],
+    alamat: 'Magelang, Jawa Tengah',
+    mapsQuery: 'Magelang, Jawa Tengah',
+  },
+  contact: { wa: '6281296917963', email: 'halo@saribumi.id', alamat: 'Magelang, Jawa Tengah' },
+}
+
 // ── Kerajinan / Heritage (batik & wastra — uji motif) ──────────
 const KERAJINAN: ComposableContent = {
   nama: 'Wastra Nusantara',
@@ -2549,6 +2626,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'gadget-lux': GADGET_LUX,
   // Bespoke lux rumah (RumahLuxRenderer "Selaras") — sample dedikasi Japandi arched-alcove.
   'rumah-lux': RUMAH_LUX,
+  // Bespoke lux kesehatan (KesehatanLuxRenderer "Jamu") — sample dedikasi apothecary heritage.
+  'kesehatan-lux': KESEHATAN_LUX,
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {
