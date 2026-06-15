@@ -229,7 +229,18 @@ describe('generateContent — LUX TIER default + enrichment (Sprint 1)', () => {
     expect(plan.services.every((s) => typeof s.gambar === 'string' && s.gambar!.length > 0)).toBe(true)
   })
 
-  it('pilihan variant eksplisit dihormati (escape hatch) — bukan lux', () => {
+  it('warung-hangat (Wave 2 bespoke, source menu) → theme restaurant-warung, variant hangat + menu ber-foto', () => {
+    const plan = mk('restaurant', { sub_kategori: 'warung', variant: 'warung-hangat', primary_color: '#C0432E' })
+    expect(plan.theme).toBe('restaurant-warung')
+    expect(plan.variant).toBe('hangat')
+    expect(plan.primary).toBe('#C0432E')
+    // imagery enrichment: menu pinjam foto sample warung-lux
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.menuItems.length).toBeGreaterThan(0)
+    expect(plan.menuItems.every((m) => typeof m.gambar === 'string' && m.gambar!.length > 0)).toBe(true)
+  })
+
+  it('pilihan variant lama composable dihormati (escape hatch) — bukan lux/bespoke', () => {
     const plan = mk('restaurant', { variant: 'warung-rakyat' })
     expect(plan.variant).toBe('warung-rakyat')
     expect(plan.theme).toBe('composable')

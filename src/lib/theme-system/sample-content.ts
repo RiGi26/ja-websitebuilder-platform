@@ -2677,6 +2677,92 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
 function luxSample(base: ComposableContent, eyebrow: string, quote: string): ComposableContent {
   return base.statement ? base : { ...base, statement: { eyebrow, quote, cite: base.nama } }
 }
+// ── Warung / Kedai (FLAGSHIP bespoke lux — WarungRenderer "Hangat") ──
+// Sample dedikasi untuk renderer 'restaurant-warung' (varian hangat, source menu).
+// Konten ditulis untuk warung makan merakyat: menu rumahan harga warung, statement
+// dari pemilik, banderol harga di tiap kartu. BEDA dari KULINER_LUX (toko frozen/kue
+// "Dapur Tungku") & FINEDINING (resto premium). JANGAN dipinjam tema lain.
+const WARUNG_LUX: ComposableContent = {
+  nama: 'Warung Bu Yati',
+  hero: {
+    eyebrow: 'Masakan Rumahan Sejak 1998',
+    title: 'Makan Enak, Rasa Rumah, Harga Warung',
+    subtitle:
+      'Nasi rames, soto, dan lauk masakan rumahan yang dimasak segar tiap pagi. Tempat makan sederhana yang bikin kangen pulang.',
+    ctaText: 'Lihat Menu',
+    ctaHref: '#menu',
+    ctaText2: 'Pesan Antar',
+    ctaHref2: '#wa',
+    image: IMG('photo-1539755530862-00f623c00f52'),
+  },
+  features: [
+    { title: 'Dimasak Segar Tiap Pagi', desc: 'Lauk diolah subuh, disajikan hangat. Habis hari itu juga — tak ada stok semalam.' },
+    { title: 'Porsi Mengenyangkan', desc: 'Nasi boleh nambah. Kami kenyangkan perut, bukan cuma menghias piring.' },
+    { title: 'Harga Bersahabat', desc: 'Masakan rumahan jujur dengan harga warung. Makan enak tak harus mahal.' },
+  ],
+  featuresEyebrow: 'Kenapa Mampir',
+  featuresTitle: 'Alasan pelanggan balik lagi tiap hari',
+  statement: {
+    eyebrow: 'Kata Bu Yati',
+    quote: 'Saya masak buat pelanggan seperti masak buat keluarga sendiri — bumbunya jujur, porsinya tidak pelit.',
+    cite: 'Bu Yati — Pemilik Warung',
+  },
+  showcase: {
+    title: 'Menu Andalan',
+    subtitle: 'Masakan rumahan favorit pelanggan, siap dari pagi sampai habis.',
+    items: [
+      { nama: 'Nasi Rames Komplit', kategori: 'Nasi & Lauk', harga: 18000, desc: 'Nasi hangat dengan ayam, tahu, tempe, sayur, dan sambal dalam satu piring.', gambar: IMG('photo-1584455486010-760bd0b28fc2', 900) },
+      { nama: 'Soto Ayam Kampung', kategori: 'Berkuah', harga: 20000, desc: 'Kuah bening rempah, ayam kampung suwir, taburan bawang goreng.', gambar: IMG('photo-1682139710677-cb02f6bc4211', 900) },
+      { nama: 'Ayam Penyet Sambal', kategori: 'Lauk', harga: 18000, desc: 'Ayam goreng kremes diulek bersama sambal terasi, lengkap dengan lalapan.', gambar: IMG('photo-1666239308347-4292ea2ff777', 900) },
+      { nama: 'Nasi Goreng Spesial', kategori: 'Nasi', harga: 16000, desc: 'Nasi goreng kampung dengan telur, ayam suwir, dan acar segar.', gambar: IMG('photo-1680674814945-7945d913319c', 900) },
+      { nama: 'Sate Ayam Bumbu Kacang', kategori: 'Sate', harga: 22000, desc: 'Sepuluh tusuk sate ayam dibakar arang, bumbu kacang ulekan kental.', gambar: IMG('photo-1645696301019-35adcc18fc21', 900) },
+      { nama: 'Sambal Terasi Spesial', kategori: 'Sambal', harga: 5000, desc: 'Diulek dadakan, pedasnya bisa diatur. Teman wajib lauk apa pun.', gambar: IMG('photo-1534939561126-855b8675edd7', 900) },
+      { nama: 'Tahu Tempe Bacem', kategori: 'Gorengan', harga: 8000, desc: 'Dibacem gula jawa sampai meresap, lalu digoreng manis-gurih.', gambar: IMG('photo-1680169590313-9a14f3cd8148', 900) },
+      { nama: 'Es Teh & Es Jeruk', kategori: 'Minuman', harga: 5000, desc: 'Teh tubruk dan jeruk peras asli, manisnya pas, dingin menyegarkan.', gambar: IMG('photo-1461023058943-07fcbe16d735', 900) },
+    ],
+  },
+  about: {
+    title: 'Dari Gerobak Jadi Warung',
+    body: 'Warung Bu Yati berawal tahun 1998 dari satu gerobak nasi di pinggir pasar. Modalnya cuma resep masakan rumahan dan tekad melayani dengan ramah.\n\nDua puluh lima tahun kemudian, gerobak itu sudah jadi warung tetap. Yang tak berubah: bumbu diulek tangan, lauk dimasak segar tiap pagi, dan harga yang tetap bersahabat untuk semua.',
+    image: IMG('photo-1622572771591-6ca7813cc39d'),
+    ctaText: 'Mampir ke warung',
+    ctaHref: '#kontak',
+  },
+  cta: {
+    title: 'Lapar? Mampir atau Pesan Antar',
+    subtitle: 'Datang langsung ke warung atau pesan antar via WhatsApp — kami siapkan hangat-hangat.',
+    ctaText: 'Pesan via WhatsApp',
+    ctaHref: '#wa',
+    image: IMG('photo-1562607635-4608ff48a859'),
+  },
+  stats: [
+    { angka: '4.8', label: 'Rating pelanggan' },
+    { angka: '500+', label: 'Porsi tiap hari' },
+    { angka: '25 thn', label: 'Melayani' },
+    { angka: '10rb', label: 'Mulai dari' },
+  ],
+  testimonials: [
+    { quote: 'Sotonya juara, kuahnya bening tapi kaya rasa. Tiap pulang kerja pasti mampir.', nama: 'Pak Darto', peran: 'Pelanggan setia' },
+    { quote: 'Harganya bikin tenang, porsinya bikin kenyang. Nasi rames di sini favorit anak kos.', nama: 'Rina', peran: 'Anak kos sebelah' },
+    { quote: 'Berasa makan masakan ibu sendiri. Ramah orangnya, jujur masakannya.', nama: 'Bu Hartini', peran: 'Langganan 10 tahun' },
+    { quote: 'Pesan antar buat rapat kantor, datangnya rapi dan masih hangat. Recommended.', nama: 'Agus', peran: 'Pelanggan kantor' },
+  ],
+  faq: [
+    { q: 'Apakah bisa pesan antar?', a: 'Bisa. Klik tombol WhatsApp, sebutkan menu dan jumlahnya. Untuk area dekat kami antar sendiri; area jauh lewat ojek online.' },
+    { q: 'Jam berapa buka?', a: 'Setiap hari pukul 07.00 sampai habis, biasanya sekitar 21.00. Datang lebih awal agar menu masih lengkap.' },
+    { q: 'Apakah nasi bisa nambah?', a: 'Tentu. Nasi boleh nambah dengan tambahan kecil. Kami ingin Anda kenyang dan puas.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin–Sabtu', jam: '07.00–21.00' },
+      { hari: 'Minggu', jam: '07.00–16.00' },
+    ],
+    alamat: 'Jl. Pasar Lama No. 12, Salatiga',
+    mapsQuery: 'Jl. Pasar Lama Salatiga',
+  },
+  contact: { wa: '6281234567890', email: 'halo@warungbuyati.id', alamat: 'Salatiga, Jawa Tengah' },
+}
+
 const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'lux-restaurant': FINEDINING, // sudah punya statement kaya
   'lux-klinik': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan ramah, teliti, dan menjaga kenyamanan Anda di setiap kunjungan.'),
@@ -2694,6 +2780,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   // Bespoke lux kuliner (KulinerLuxRenderer) — sample dedikasi kaya (menu-board,
   // galeri proses, statement). Dipakai gen-samples + imagery-borrow generateContent.
   'kuliner-lux': KULINER_LUX,
+  // Bespoke lux warung (WarungRenderer "Hangat", Wave 2 — source menu, restoran).
+  // Sample dedikasi warung makan merakyat (BUKAN toko kuliner). Banderol harga.
+  'warung-lux': WARUNG_LUX,
   // Bespoke lux kerajinan (KerajinanLuxRenderer) — sample dedikasi card-grid artisan.
   'kerajinan-lux': KERAJINAN_LUX,
   // Bespoke lux kecantikan (KecantikanLuxRenderer "Embun") — sample dedikasi glow + ritual.
