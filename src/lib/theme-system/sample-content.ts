@@ -2892,6 +2892,9 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'estetik-lux': luxSample(KLINIK_ESTETIK, 'Filosofi Kami', 'Kecantikan sejati lahir dari kulit yang sehat — pendekatan kami berbasis bukti, mengutamakan keamanan dan hasil yang bertahan.'),
   // Bespoke klinik wellness (KlinikWellnessRenderer "Sanara", Wave 2 — source services).
   'wellness-lux': luxSample(KLINIK_WELLNESS, 'Filosofi Kami', 'Pemulihan terbaik berjalan dengan tenang dan terukur — kami menemani tiap langkah Anda kembali bergerak tanpa nyeri.'),
+  // Bespoke sekolah (SekolahAlmamaterRenderer "Almamater", Wave 3 — source services).
+  // Pakai SEKOLAH_REGULER (kaya: program + stats + testimoni + faq + about) + statement visi.
+  'sekolah-lux': luxSample(SEKOLAH_REGULER, 'Visi Kami', 'Kami percaya setiap anak menyimpan potensi besar; tugas kami menumbuhkannya dengan ilmu, karakter, dan ketekunan — bukan sekadar mengejar nilai.'),
 }
 
 export function sampleContentForTheme(themeId: string): ComposableContent {

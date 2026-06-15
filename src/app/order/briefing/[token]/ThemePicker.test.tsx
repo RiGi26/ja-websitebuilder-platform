@@ -64,6 +64,14 @@ describe('ThemePicker (S0-3)', () => {
     expect(html).toContain('#C0432E') // swatch mood bata ter-inject
   })
 
+  it('render gaya Sekolah reguler = flagship bespoke (Almamater, Wave 3)', () => {
+    const html = renderToStaticMarkup(
+      <ThemePicker tipe="sekolah" subKategori="reguler" value="" onChange={noop} />,
+    )
+    expect(html).toContain('Almamater')
+    expect(html).toContain('#15294B') // swatch mood navy ter-inject
+  })
+
   it('render gaya Restaurant Cafe = flagship bespoke (Seduh, Wave 2)', () => {
     const html = renderToStaticMarkup(
       <ThemePicker tipe="restaurant" subKategori="cafe" value="" onChange={noop} />,
@@ -140,10 +148,14 @@ describe('SubKategoriPicker — aktif untuk toko_online (S1-5)', () => {
     expect(html).toContain('Lainnya (gaya umum)')
   })
 
-  it('non-toko lux-only (sekolah) → picker DISEMBUNYIKAN (langsung kartu Lux)', () => {
-    // ready:false utk semua sub-kat → SubKategoriPicker null → brief form langsung
-    // tampilkan variant grid (satu kartu Lux), tanpa langkah sub-kategori.
-    expect(renderToStaticMarkup(<SubKategoriPicker tipe="sekolah" value="" onChange={noop} />)).toBe('')
+  it('sekolah (Wave 3) → picker TAMPIL (reguler ready + Lainnya), copy "Jenis Sekolah"; islami/kursus belum', () => {
+    // reguler ready → SubKategoriPicker muncul utk sekolah. islami/kursus belum.
+    const html = renderToStaticMarkup(<SubKategoriPicker tipe="sekolah" value="" onChange={noop} />)
+    expect(html).toContain('Jenis Sekolah') // label industri-aware
+    expect(html).toContain('Sekolah Umum (SD/SMP/SMA)')
+    expect(html).not.toContain('Sekolah Islami / Pesantren') // islami ready:false → tak tampil
+    expect(html).not.toContain('Kursus / Bimbel') // kursus ready:false → tak tampil
+    expect(html).toContain('Lainnya (gaya umum)')
   })
 
   it('tetap dormant untuk industri tanpa sub-kategori (mis. custom)', () => {

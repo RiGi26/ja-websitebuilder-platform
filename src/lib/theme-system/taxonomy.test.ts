@@ -167,15 +167,25 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('Sekolah: sub-kategori terdaftar tapi DISEMBUNYIKAN dari brief form (lux-only)', () => {
+  it('Sekolah (Wave 3): reguler READY (bespoke "Almamater"), islami + kursus belum', () => {
     expect(hasSubKategori('sekolah')).toBe(true)
     const subs = getSubKategori('sekolah')
     expect(subs.map((s) => s.id)).toEqual(['reguler', 'islami', 'kursus'])
-    expect(getReadySubKategori('sekolah')).toEqual([])
+    expect(getReadySubKategori('sekolah').map((s) => s.id)).toEqual(['reguler'])
+    expect(subs.find((s) => s.id === 'islami')?.ready).toBe(false)
+    expect(subs.find((s) => s.id === 'kursus')?.ready).toBe(false)
   })
 
-  it('Sekolah (S7): tiap sub-kategori 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
-    for (const sub of ['reguler', 'islami', 'kursus']) {
+  it('Sekolah reguler = flagship bespoke "Almamater" (1 varian, manifest = key registry)', () => {
+    const themes = getThemes('sekolah', 'reguler')
+    expect(themes.map((t) => t.id)).toEqual(['reguler-almamater'])
+    expect(themes.every((t) => t.manifest === 'sekolah-reguler')).toBe(true)
+    expect('sekolah-reguler' in BESPOKE_RENDERERS).toBe(true)
+    expect(getTheme('sekolah', 'reguler-almamater')?.nama).toBe('Almamater')
+  })
+
+  it('Sekolah islami & kursus tetap 3 gaya, subKategori cocok, VARIASI bg gelap↔terang', () => {
+    for (const sub of ['islami', 'kursus']) {
       const themes = getThemes('sekolah', sub)
       expect(themes).toHaveLength(3)
       expect(themes.every((t) => t.subKategori === sub)).toBe(true)
@@ -185,11 +195,15 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('Sekolah (S7): id tema unik (9) & manifest === id', () => {
+  it('Sekolah: id tema unik (7 total) & manifest === id kecuali reguler bespoke', () => {
     const all = getThemes('sekolah', 'reguler')
       .concat(getThemes('sekolah', 'islami'), getThemes('sekolah', 'kursus'))
-    expect(new Set(all.map((t) => t.id)).size).toBe(9)
-    expect(all.every((t) => t.manifest === t.id)).toBe(true)
+    expect(new Set(all.map((t) => t.id)).size).toBe(7) // 1 reguler bespoke + 3 islami + 3 kursus
+    for (const t of all) {
+      // Bespoke reguler: manifest = key registry (≠ id). Composable islami/kursus: manifest === id.
+      if (t.manifest in BESPOKE_RENDERERS) continue
+      expect(t.manifest).toBe(t.id)
+    }
     expect(getTheme('sekolah', 'kursus-malam')?.nama).toBe('Malam')
   })
 

@@ -143,6 +143,7 @@ function tipeFromVariant(variant?: string): TipeIndustri | null {
   // 'klinik-umum'). Bila handoff corp salah-petak industri (mis. "Bisnis Jasa" →
   // corporate), tema terpilih tetap memulihkan tipe yang benar.
   if (themeKey.startsWith('klinik-')) return 'klinik'
+  if (themeKey.startsWith('sekolah-')) return 'sekolah'
   return null
 }
 

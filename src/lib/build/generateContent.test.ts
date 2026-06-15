@@ -251,6 +251,15 @@ describe('generateContent — LUX TIER default + enrichment (Sprint 1)', () => {
     expect(plan.menuItems.every((m) => typeof m.gambar === 'string' && m.gambar!.length > 0)).toBe(true)
   })
 
+  it('reguler-almamater (Wave 3 bespoke, source services) → theme sekolah-reguler, variant almamater + foto enrich', () => {
+    const plan = mk('sekolah', { sub_kategori: 'reguler', variant: 'reguler-almamater', primary_color: '#15294B' })
+    expect(plan.theme).toBe('sekolah-reguler')
+    expect(plan.variant).toBe('almamater')
+    expect(plan.primary).toBe('#15294B')
+    // imagery enrichment: hero pinjam foto sample sekolah-lux
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+  })
+
   it('pilihan variant lama composable dihormati (escape hatch) — bukan lux/bespoke', () => {
     const plan = mk('restaurant', { variant: 'warung-rakyat' })
     expect(plan.variant).toBe('warung-rakyat')
