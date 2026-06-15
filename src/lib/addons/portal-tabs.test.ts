@@ -31,6 +31,10 @@ describe('themeContentTabs — tab konten terbuka mengikuti apa yang tema render
     expect(themeContentTabs({ theme: 'restaurant-lux' }, 'restaurant')).toEqual({ ...NONE, menu: true, galeri: true })
   })
 
+  it('bespoke klinik (source services): LAYANAN terbuka, bukan produk (Wave 2)', () => {
+    expect(themeContentTabs({ theme: 'klinik-umum' }, 'klinik')).toEqual({ ...NONE, layanan: true })
+  })
+
   it('manifest lux: sumber etalase per industri (cermin SiteRenderer)', () => {
     expect(themeContentTabs({ variant: 'lux-klinik' }, 'klinik')).toEqual({ ...NONE, layanan: true, galeri: true })
     expect(themeContentTabs({ variant: 'lux-restaurant' }, 'restaurant')).toEqual({ ...NONE, menu: true, galeri: true })
@@ -45,10 +49,11 @@ describe('themeContentTabs — tab konten terbuka mengikuti apa yang tema render
 })
 
 describe('kontenBrandEditable — stats/faq/statement hanya untuk tema yang membacanya', () => {
-  it('bespoke (toko + restaurant-lux) → semua true', () => {
+  it('bespoke (toko + restaurant-lux + klinik) → semua true', () => {
     expect(kontenBrandEditable({ theme: 'toko-atelier' })).toEqual({ stats: true, faq: true, statement: true })
     expect(kontenBrandEditable({ theme: 'toko-kerajinan' })).toEqual({ stats: true, faq: true, statement: true })
     expect(kontenBrandEditable({ theme: 'restaurant-lux' })).toEqual({ stats: true, faq: true, statement: true })
+    expect(kontenBrandEditable({ theme: 'klinik-umum' })).toEqual({ stats: true, faq: true, statement: true })
   })
 
   it('manifest → ikut blocks (lux-blog tanpa stats)', () => {

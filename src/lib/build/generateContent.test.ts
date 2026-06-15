@@ -218,6 +218,17 @@ describe('generateContent — LUX TIER default + enrichment (Sprint 1)', () => {
     expect(plan.variant).toBe('lux-klinik')
   })
 
+  it('klinik-bersih (Wave 2 bespoke) → theme klinik-umum, variant bersih + services ber-foto', () => {
+    const plan = mk('klinik', { sub_kategori: 'umum', variant: 'klinik-bersih', primary_color: '#2B5BD7' })
+    expect(plan.theme).toBe('klinik-umum')
+    expect(plan.variant).toBe('bersih')
+    expect(plan.primary).toBe('#2B5BD7')
+    // imagery enrichment: services pinjam foto sample klinik-lux
+    expect(typeof plan.dataKonten.foto_hero).toBe('string')
+    expect(plan.services.length).toBeGreaterThan(0)
+    expect(plan.services.every((s) => typeof s.gambar === 'string' && s.gambar!.length > 0)).toBe(true)
+  })
+
   it('pilihan variant eksplisit dihormati (escape hatch) — bukan lux', () => {
     const plan = mk('restaurant', { variant: 'warung-rakyat' })
     expect(plan.variant).toBe('warung-rakyat')

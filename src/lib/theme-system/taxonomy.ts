@@ -73,7 +73,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'finedining', nama: 'Fine Dining / Resto Keluarga', deskripsi: 'Restoran keluarga, fine dining, resto spesial.', icon: 'ChefHat', ready: false },
   ],
   klinik: [
-    { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: false },
+    { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
     { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: false },
     { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: false },
   ],
@@ -312,21 +312,18 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
   // self-select: [sifat visual] + "Untuk [jenis klinik]".
   // ════════════════════════════════════════════════════════════
   klinik: {
+    // ── KLINIK UMUM & GIGI (flagship bespoke "Klinik Bersih", Wave 2) ────
+    // KlinikUmumRenderer (cool trust blue, source services — bukan toko; signature
+    // panel Jadwal Praktik + garis detak EKG). 1 varian default: bersih.
+    // manifest:'klinik-umum' = key registry bespoke (inert; di-intercept
+    // generateContent SEBELUM getManifest). Tema composable lama (umum-bluecare/
+    // freshteal/trustnavy di manifest.ts) tetap untuk situs existing, hanya tak
+    // ditawarkan lagi di brief form.
     umum: [
       {
-        id: 'umum-bluecare', subKategori: 'umum', nama: 'Bluecare',
-        deskripsi: 'Biru klinis bersih & menenangkan. Untuk klinik umum, poli, layanan keluarga.',
-        icon: 'Stethoscope', mood: '#1E6FE0', bg: 'light', manifest: 'umum-bluecare',
-      },
-      {
-        id: 'umum-freshteal', subKategori: 'umum', nama: 'Freshteal',
-        deskripsi: 'Teal segar & ramah, kesan higienis. Untuk klinik gigi, anak, laboratorium.',
-        icon: 'Activity', mood: '#0E9E96', bg: 'light', manifest: 'umum-freshteal',
-      },
-      {
-        id: 'umum-trustnavy', subKategori: 'umum', nama: 'Trustnavy',
-        deskripsi: 'Navy gelap profesional & mantap. Untuk klinik spesialis, medical center premium.',
-        icon: 'Shield', mood: '#4FA3F0', bg: 'dark', manifest: 'umum-trustnavy',
+        id: 'klinik-bersih', subKategori: 'umum', nama: 'Klinik Bersih',
+        deskripsi: 'Biru tepercaya & menenangkan, klinis dan rapi. Untuk klinik umum, dokter gigi, poli, layanan keluarga.',
+        icon: 'Stethoscope', mood: '#2B5BD7', bg: 'light', manifest: 'klinik-umum',
       },
     ],
     estetik: [

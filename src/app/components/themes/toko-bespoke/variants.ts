@@ -42,6 +42,9 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'kesehatan-jamu': { theme: 'toko-kesehatan', variant: 'jamu', sample: 'kesehatan-lux' },
   // Bayi & Anak — Ceria (playful bright sky/coral/mint, signature kartu stiker + bento + confetti).
   'anak-ceria': { theme: 'toko-anak', variant: 'ceria', sample: 'anak-lux' },
+  // ── WAVE 2 (jasa, source services) ──
+  // Klinik Umum — Bersih (cool trust blue indigo/navy, signature panel Jadwal Praktik + garis detak EKG).
+  'klinik-bersih': { theme: 'klinik-umum', variant: 'bersih', sample: 'klinik-lux' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -64,4 +67,7 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'toko-rumah': {},
   'toko-kesehatan': {},
   'toko-anak': {},
+  // Klinik bespoke: dokter tampil di etalase Layanan (template memetakan dokter→services),
+  // jadi tak ada balok terpisah yang perlu permukaan edit khusus di sini.
+  'klinik-umum': {},
 }

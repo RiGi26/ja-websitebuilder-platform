@@ -138,6 +138,10 @@ function tipeFromVariant(variant?: string): TipeIndustri | null {
   if (!themeKey) return null
   if (themeKey === 'restaurant-lux') return 'restaurant'
   if (themeKey.startsWith('toko-')) return 'toko_online'
+  // Wave 2 jasa: tema bespoke industri-jasa diberi key `<tipe>-<subcat>` (mis.
+  // 'klinik-umum'). Bila handoff corp salah-petak industri (mis. "Bisnis Jasa" →
+  // corporate), tema terpilih tetap memulihkan tipe yang benar.
+  if (themeKey.startsWith('klinik-')) return 'klinik'
   return null
 }
 
