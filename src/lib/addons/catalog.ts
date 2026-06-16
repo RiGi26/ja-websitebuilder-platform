@@ -150,7 +150,7 @@ export const ADDON_CATALOG: AddonDef[] = [
   {
     id: 'booking', name: 'Sistem Booking & Kalender', price: 300000, yearlyMaint: 150000,
     desc: 'Jadwal temu & janji temu real-time.',
-    klass: 'structural', status: 'live', industries: ['klinik', 'travel', 'restaurant', 'personal'],
+    klass: 'structural', status: 'live', industries: ['klinik', 'travel', 'restaurant', 'personal', 'sekolah'],
     features: ['hasBooking'], capability: ['booking', 'booking-page'],
     sections: [{ tipe: 'contact_form', preset: 'booking', anchor: 'before-cta' }],
     aliases: ['clinic-res', 'doc-sched'],

@@ -423,8 +423,9 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <Field label="Nomor WhatsApp" required>
                   <input type="tel" inputMode="numeric" autoComplete="tel" className={inputCls} value={form.wa} onChange={e => set('wa', e.target.value)} placeholder="628123456789" />
                 </Field>
-                <Field label="Email Bisnis">
+                <Field label="Email Bisnis" required>
                   <input type="email" className={inputCls} value={form.email} onChange={e => set('email', e.target.value)} placeholder="halo@bisnis.com" />
+                  <p className="text-[11px] text-gray-400 font-medium">Dipakai untuk login dashboard pengelolaan website Anda.</p>
                 </Field>
               </div>
             )}
@@ -911,11 +912,16 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
 
             <button
               onClick={handleSubmit}
-              disabled={submitting || !form.nama_usaha || !form.wa}
+              disabled={submitting || !form.nama_usaha || !form.wa || !/^\S+@\S+\.\S+$/.test(form.email)}
               className="w-full py-4 rounded-2xl bg-[#0071E3] text-white font-black text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
             >
               {submitting ? <><Loader2 size={18} className="animate-spin" /> Mengirim...</> : <><Check size={18} /> Kirim Briefing</>}
             </button>
+            {!/^\S+@\S+\.\S+$/.test(form.email) && (
+              <p className="text-[11px] text-amber-600 text-center font-semibold">
+                Email Bisnis belum lengkap — isi di langkah Identitas. Dipakai untuk login dashboard Anda.
+              </p>
+            )}
             <p className="text-[11px] text-gray-400 text-center font-medium">
               Setelah submit, tim kami akan menghubungi Anda via WhatsApp dalam 1×24 jam.
             </p>
