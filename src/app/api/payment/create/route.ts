@@ -195,6 +195,10 @@ export async function POST(request: Request) {
       display_id: displayId,
       dp_amount: dpAmount,
       referral_discount: referralDiscount,
+      // Kunci form briefing — diberikan ke browser pembeli (yg baru saja buat order)
+      // supaya halaman thank-you bisa menautkan langsung ke /order/briefing/<token>
+      // tanpa bergantung pada WA. Sama amannya dgn WA yg mengirim link ini ke HP-nya.
+      tracking_token: order.tracking_token,
     })
   } catch (err: any) {
     console.error('[payment/create]', err.message)
