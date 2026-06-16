@@ -69,10 +69,12 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
     .eq('id', pageId)
   if (pageErr) throw new Error(`update landing_pages: ${pageErr.message}`)
 
-  // 2. Regenerasi baris turunan (sections + services/menu/products). Atomik-per-
-  //    tabel: insert baris BARU dulu, baru hapus yang LAMA (audit 2026-06-13, #10).
-  //    Kalau insert gagal di tengah, konten lama tetap ada — page tak pernah kosong
-  //    diam-diam. Tetap idempoten (panggil 2x = hasil sama). Urutan = index.
+  // 2. Regenerasi baris turunan (sections + services/menu/products). Per tabel:
+  //    HAPUS baris lama dulu, baru INSERT baru. `page_sections` punya
+  //    unique(page_id, urutan) → insert-dulu (saat baris lama masih ada dengan
+  //    urutan 0..N yang sama) PASTI menabrak constraint pada rebuild ke-2+.
+  //    replaceRows me-restore baris lama bila insert baru gagal (penuhi maksud
+  //    audit #10: page tak pernah kosong). Idempoten (panggil 2x = hasil sama).
   await replaceRows(
     client,
     'page_sections',
@@ -168,35 +170,53 @@ export async function applyBuildPlan(client: Client, params: ApplyParams): Promi
   }
 }
 
-// Ganti baris generate lama dengan yang baru secara aman: insert BARU dulu, lalu
-// hapus LAMA (by id yang ditangkap sebelum insert). Kalau insert gagal, baris lama
-// tetap utuh → page tak pernah kosong diam-diam (audit 2026-06-13, #10). Supabase JS
-// tak punya transaksi multi-statement; urutan insert→delete ini menurunkan risiko
-// jauh tanpa perlu RPC/postgres function (codebase belum memakainya).
-async function replaceRows(
+// Ganti baris generate lama dengan yang baru. HAPUS lama dulu, baru INSERT baru:
+// `page_sections` punya unique(page_id, urutan), jadi meng-insert baris baru
+// (urutan 0..N) sementara baris lama (urutan 0..N yang sama) masih ada PASTI
+// menabrak constraint pada rebuild ke-2+ (build awal aman karena page kosong).
+// Maka delete→insert adalah satu-satunya urutan yang aman.
+//
+// Supabase JS tak punya transaksi multi-statement, jadi untuk tetap memenuhi
+// maksud audit #10 ("page tak pernah kosong diam-diam") kita tangkap baris lama
+// LENGKAP dulu; bila insert baru gagal, baris lama di-restore (rollback manual)
+// lalu error dilempar. Ini mendekati atomik tanpa perlu RPC/postgres function.
+//
+// Diekspor untuk regression test (mem-verifikasi urutan delete→insert).
+export async function replaceRows(
   client: Client,
   table: string,
   pageId: string,
   rows: Record<string, unknown>[],
 ): Promise<void> {
-  // Tangkap id baris lama SEBELUM insert (baris baru juga ber-page_id sama, jadi
-  // tak bisa dihapus pakai filter page_id setelah insert).
+  // Tangkap baris lama LENGKAP (bukan hanya id) untuk kemungkinan rollback.
   const { data: oldRows, error: selErr } = await client
     .from(table)
-    .select('id')
+    .select('*')
     .eq('page_id', pageId)
   if (selErr) throw new Error(`read ${table}: ${selErr.message}`)
-  const oldIds = (oldRows ?? []).map((r) => r.id as string)
+  const hadOld = !!(oldRows && oldRows.length)
 
-  // Insert baris baru dulu — kalau gagal, lempar; baris lama belum disentuh.
-  if (rows.length) {
-    const { error: insErr } = await client.from(table).insert(rows)
-    if (insErr) throw new Error(`insert ${table}: ${insErr.message}`)
+  // Hapus lama DULU supaya insert baru tak menabrak unique(page_id, urutan).
+  if (hadOld) {
+    const { error: delErr } = await client.from(table).delete().eq('page_id', pageId)
+    if (delErr) throw new Error(`delete old ${table}: ${delErr.message}`)
   }
 
-  // Baru hapus baris lama setelah baris baru aman tersimpan.
-  if (oldIds.length) {
-    const { error: delErr } = await client.from(table).delete().in('id', oldIds)
-    if (delErr) throw new Error(`delete old ${table}: ${delErr.message}`)
+  // Insert baris baru. Bila gagal, restore baris lama → page tak pernah kosong
+  // diam-diam (maksud audit #10, kini dipenuhi via rollback eksplisit).
+  if (rows.length) {
+    const { error: insErr } = await client.from(table).insert(rows)
+    if (insErr) {
+      if (hadOld) {
+        const { error: restoreErr } = await client.from(table).insert(oldRows as Record<string, unknown>[])
+        if (restoreErr) {
+          throw new Error(
+            `insert ${table}: ${insErr.message}; ROLLBACK GAGAL (${restoreErr.message}) — ` +
+              `konten lama mungkin hilang, pulihkan dari version snapshot (pre_build)`,
+          )
+        }
+      }
+      throw new Error(`insert ${table}: ${insErr.message} (baris lama dipulihkan)`)
+    }
   }
 }
