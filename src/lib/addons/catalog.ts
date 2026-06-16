@@ -153,8 +153,8 @@ export const ADDON_CATALOG: AddonDef[] = [
     klass: 'structural', status: 'live', industries: ['klinik', 'travel', 'restaurant', 'personal', 'sekolah'],
     features: ['hasBooking'], capability: ['booking', 'booking-page'],
     sections: [{ tipe: 'contact_form', preset: 'booking', anchor: 'before-cta' }],
-    aliases: ['clinic-res', 'doc-sched'],
-    note: 'Route /booking + /api/booking/create hidup. CTA in-page utk lux/composable = B2.',
+    aliases: ['clinic-res', 'doc-sched', 'resv-meja'],
+    note: 'Route /booking + /api/booking/create hidup. CTA in-page utk lux/composable = B2. Alias per-industri: clinic-res/doc-sched (klinik), resv-meja (restoran reservasi meja).',
   },
   {
     // Hasil merge telemedicine + live-session → satu SKU "Video Meeting" (Temuan D).
