@@ -23,9 +23,10 @@ export default async function BriefingPage({ params }: { params: Promise<{ token
     redirect('/track')
   }
 
-  // Belum bayar DP
+  // Belum bayar DP — bawa token supaya /track menampilkan banner briefing begitu
+  // pembayaran terkonfirmasi (auto-refresh 30 dtk), alih-alih jadi dead-end.
   if (order.payment_status !== 'dp_paid') {
-    redirect(`/track?id=${order.id}`)
+    redirect(`/track?id=${order.id}&token=${token}`)
   }
 
   const namaKlien = order.nama_perusahaan || order.nama_usaha || 'Customer'

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, MessageCircle, ArrowRight, Clock, Phone, Layers } from 'lucide-react'
+import { CheckCircle2, MessageCircle, ArrowRight, Clock, Phone, Layers, ClipboardList } from 'lucide-react'
 import Navbar from '@/app/components/Navbar'
 
 const REDIRECT_DELAY_SECONDS = 5
@@ -40,6 +40,7 @@ export default function ThankYouPage() {
   const [countdown, setCountdown] = useState(REDIRECT_DELAY_SECONDS)
   const [autoRedirect, setAutoRedirect] = useState(true)
   const [isPelunasan, setIsPelunasan] = useState(false)
+  const [briefingToken, setBriefingToken] = useState<string | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -54,6 +55,7 @@ export default function ThankYouPage() {
     let resolvedOrderId: string | null = null
     let resolvedDisplayId: string | null = null
     let resolvedIsPelunasan = false
+    let resolvedToken: string | null = null
 
     if (idFromUrl) {
       resolvedOrderId = idFromUrl
@@ -88,6 +90,9 @@ export default function ThankYouPage() {
           resolvedOrderId = parsed.order_id
         }
 
+        // Kunci form briefing (dibawa dari halaman order) → jalur in-app ke brief.
+        if (parsed.tracking_token) resolvedToken = parsed.tracking_token
+
         // Trigger payment confirm (backup to webhook)
         if (parsed.order_id && parsed.display_id) {
           const suffix = resolvedIsPelunasan ? '-LUNAS' : '-DP';
@@ -104,9 +109,24 @@ export default function ThankYouPage() {
       } catch {}
     }
 
+    // Fallback token dari localStorage (browser sama, bertahan reload/hard refresh).
+    if (!resolvedToken) {
+      try {
+        const last = localStorage.getItem('ja_last_order')
+        if (last) {
+          const p = JSON.parse(last)
+          if (p.tracking_token && (!resolvedOrderId || p.order_id === resolvedOrderId)) {
+            resolvedToken = p.tracking_token
+            if (!resolvedOrderId && p.order_id) resolvedOrderId = p.order_id
+          }
+        }
+      } catch {}
+    }
+
     if (resolvedOrderId) setOrderId(resolvedOrderId)
     if (resolvedDisplayId) setDisplayId(resolvedDisplayId)
     setIsPelunasan(resolvedIsPelunasan)
+    if (resolvedToken) setBriefingToken(resolvedToken)
 
     setMounted(true)
   }, [])
@@ -118,15 +138,19 @@ export default function ThankYouPage() {
     if (!mounted || !orderId || !autoRedirect) return
 
     if (countdown <= 0) {
-      router.replace(`/track?id=${orderId}`)
+      // Bawa token kalau ada → banner "Isi Form Briefing" tampil di /track
+      // (tanpa token, IDOR-hardening menyembunyikannya).
+      router.replace(briefingToken ? `/track?id=${orderId}&token=${briefingToken}` : `/track?id=${orderId}`)
       return
     }
 
     const t = setTimeout(() => setCountdown(c => c - 1), 1000)
     return () => clearTimeout(t)
-  }, [mounted, orderId, countdown, autoRedirect, router])
+  }, [mounted, orderId, countdown, autoRedirect, briefingToken, router])
 
-  const trackUrl = orderId ? `/track?id=${orderId}` : '/track'
+  const trackUrl = orderId
+    ? (briefingToken ? `/track?id=${orderId}&token=${briefingToken}` : `/track?id=${orderId}`)
+    : '/track'
   // orderId may be a shortId (8-char) or full UUID — /track handles both via ilike
 
   if (!mounted) return null
@@ -231,11 +255,23 @@ export default function ThankYouPage() {
             </div>
           )}
 
-          {/* CTAs — benchmark: Shopee "Lihat Pesanan" + "Lanjut Belanja" */}
+          {/* CTAs — briefing jadi aksi utama bila token tersedia (jalur in-app, tak perlu WA) */}
           <div className="flex flex-col gap-3">
+            {briefingToken && !isPelunasan && (
+              <Link
+                href={`/order/briefing/${briefingToken}`}
+                className="w-full bg-[#0071E3] text-white text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-600 active:scale-95 transition-all shadow-sm shadow-blue-200"
+              >
+                <ClipboardList size={16} /> Isi Form Briefing Sekarang <ArrowRight size={16} />
+              </Link>
+            )}
             <Link
               href={trackUrl}
-              className="w-full bg-[#1D1D1F] text-white text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-black active:scale-95 transition-all shadow-sm"
+              className={`w-full text-center py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all ${
+                briefingToken && !isPelunasan
+                  ? 'bg-white border border-gray-200 text-[#1D1D1F] hover:bg-gray-50'
+                  : 'bg-[#1D1D1F] text-white hover:bg-black shadow-sm'
+              }`}
             >
               Lacak Progress Sekarang <ArrowRight size={16} />
             </Link>
