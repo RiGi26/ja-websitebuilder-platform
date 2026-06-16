@@ -66,6 +66,27 @@ const INDUSTRI_OPTIONS = [
   'Jastip', 'Lainnya',
 ]
 
+// Tipe industri → label chip WB. Dipakai menormalkan param `industri` dari corp
+// (mis. tile "Website Klinik & Spa") ke label chip yang sama persis ("Klinik &
+// Kesehatan") via industriToTipe, supaya pilihan dari kalkulator LANGSUNG
+// ter-highlight — bukan terkesan "harus pilih ulang" karena label tak cocok.
+const TIPE_TO_INDUSTRI_LABEL: Record<string, string> = {
+  toko_online: 'Toko Online',
+  restaurant: 'Restoran & Kuliner',
+  klinik: 'Klinik & Kesehatan',
+  sekolah: 'Sekolah & Kursus',
+  travel: 'Travel & Rental',
+  corporate: 'Perusahaan & Jasa',
+  personal: 'Personal & Kreatif',
+  blog: 'Blog & Media',
+  jastip: 'Jastip',
+  custom: 'Lainnya',
+}
+function normalizeIndustriLabel(raw: string): string {
+  if (INDUSTRI_OPTIONS.includes(raw)) return raw
+  return TIPE_TO_INDUSTRI_LABEL[industriToTipe(raw)] ?? raw
+}
+
 // ── Reusable components ────────────────────────────────────────────────────────
 function StepHeader({ title, desc }: { title: string; desc: string }) {
   return (
@@ -309,7 +330,7 @@ function OrderFormContent() {
   useEffect(() => {
     const tid = searchParams.get('template')
     if (tid && templatesData[tid]) setForm(f => ({ ...f, templateId: tid }))
-    if (kalkulatorIndustri) setForm(f => ({ ...f, industri: kalkulatorIndustri }))
+    if (kalkulatorIndustri) setForm(f => ({ ...f, industri: normalizeIndustriLabel(kalkulatorIndustri) }))
 
     if (kalkulatorAddons) {
       const rawIds = kalkulatorAddons.split(',').map(s => s.trim()).filter(Boolean)
