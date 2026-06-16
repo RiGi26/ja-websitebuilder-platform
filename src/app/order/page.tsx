@@ -534,14 +534,16 @@ function OrderFormContent() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal membuat transaksi')
 
-      const { redirect_url, order_id, display_id, dp_amount } = data
+      const { redirect_url, order_id, display_id, dp_amount, tracking_token } = data
 
-      // Simpan ke sessionStorage (fallback GoPay deep link)
-      sessionStorage.setItem('ja_pending_order', JSON.stringify({ order_id, display_id, dp_amount }))
+      // Simpan ke sessionStorage (fallback GoPay deep link). tracking_token =
+      // kunci form briefing, dibawa ke halaman thank-you supaya bisa langsung
+      // menautkan ke /order/briefing/<token> tanpa bergantung WA.
+      sessionStorage.setItem('ja_pending_order', JSON.stringify({ order_id, display_id, dp_amount, tracking_token }))
 
       // Simpan ke localStorage (fallback permanen kalau browser ditutup)
       localStorage.setItem('ja_last_order', JSON.stringify({
-        order_id, display_id, dp_amount,
+        order_id, display_id, dp_amount, tracking_token,
         redirect_url, created_at: new Date().toISOString(),
       }))
       localStorage.removeItem(DRAFT_KEY) // order sukses — buang draft autosave
