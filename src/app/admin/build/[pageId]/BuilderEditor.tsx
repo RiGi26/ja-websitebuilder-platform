@@ -42,6 +42,7 @@ const FEATURE_LABELS: Record<keyof FeatureFlags, string> = {
   hasPayment: 'Payment Gateway',
   hasShipping: 'Integrasi Ongkir',
   hasMenu: 'Menu Digital QR',
+  hasPreorder: 'Pre-Order F&B (PO + dashboard)',
   hasDelivery: 'Integrasi Delivery',
   hasMembership: 'Membership',
   hasLMS: 'LMS / Kelas Online',

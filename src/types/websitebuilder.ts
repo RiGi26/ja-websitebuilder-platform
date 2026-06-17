@@ -37,6 +37,7 @@ export interface FeatureFlags {
   hasPayment?: boolean // payment gateway (Midtrans)
   hasShipping?: boolean // integrasi ongkir
   hasMenu?: boolean // menu digital QR (F&B)
+  hasPreorder?: boolean // F&B pre-order: form PO pelanggan → dashboard order/omzet
   hasDelivery?: boolean // integrasi delivery (GoFood/GrabFood)
   hasMembership?: boolean // sistem membership
   hasLMS?: boolean // LMS / kelas online / sertifikat
@@ -74,6 +75,21 @@ export interface AddonsConfig {
   sheets_webhook?: string    // Google Sheets — URL Apps Script webhook milik tenant
 }
 
+// Konfigurasi Pre-Order F&B (disimpan di landing_pages.konfigurasi).
+export interface PreorderConfig {
+  open: boolean                            // ronde PO dibuka/ditutup ("Buka/Tutup PO")
+  open_label?: string                      // mis. "PO dibuka s/d Jumat, ambil Sabtu"
+  wa_admin?: string                        // nomor WA admin utk notifikasi order baru (Fonnte)
+  fulfillment?: ('pickup' | 'delivery')[]  // opsi pemenuhan yang ditawarkan
+}
+
+// Locale per-tenant (default IDR/id-ID/62 → tenant Indonesia existing tak berubah).
+export interface LocaleConfig {
+  currency?: string  // ISO 4217, mis. 'IDR' | 'JPY'
+  locale?: string    // BCP-47, mis. 'id-ID' | 'ja-JP'
+  phone_cc?: string  // kode negara telp tanpa '+', mis. '62' | '81'
+}
+
 export interface KonfigurasiWebsite {
   features?: FeatureFlags
   branding?: BrandingConfig
@@ -82,6 +98,10 @@ export interface KonfigurasiWebsite {
   // diturunkan dari selected_addons via catalog.capabilitiesForAddons, dibaca
   // renderer untuk render UI kondisional. Beda dari `features` (flag boolean lama).
   capabilities?: string[]
+  /** F&B Pre-Order: konfigurasi ronde PO + nomor WA admin. */
+  preorder?: PreorderConfig
+  /** Locale per-tenant (currency/locale/phone). Default IDR/id-ID/62 bila kosong. */
+  localeConfig?: LocaleConfig
   /** Opsi C: konten halaman masih contoh template (briefing inti kosong saat build).
    *  Portal pakai ini untuk banner onboarding. Tidak memengaruhi render situs publik. */
   content_is_sample?: boolean
@@ -289,6 +309,12 @@ export interface MenuItem {
   harga: number
   gambar_url: string | null
   is_active: boolean
+  /** Biaya/cost per item → perhitungan profit. TIDAK diekspos ke anon (lihat fetchMenuItemsByPage). */
+  hpp?: number
+  /** Stok per ronde PO; null/undefined = tak terbatas. TIDAK diekspos ke anon. */
+  stok_harian?: number | null
+  /** Tandai habis → badge "Habis" di menu + tolak di form PO. */
+  is_sold_out?: boolean
   urutan: number
   created_at: string
   updated_at: string

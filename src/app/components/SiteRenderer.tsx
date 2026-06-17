@@ -78,6 +78,9 @@ export async function renderSite({
     )
     const Renderer = bespoke.Renderer
     const withCart = !!bespoke.hasCart && hasCart
+    // F&B Pre-Order: aktif bila flag hasPreorder + ronde PO dibuka. CTA menu → /{slug}/po.
+    // Props additive opsional → renderer bespoke lain mengabaikan (nol regresi).
+    const poEnabled = !!konfig.features?.hasPreorder && konfig.preorder?.open === true
     const renderer = (
       <Renderer
         content={content}
@@ -90,6 +93,8 @@ export async function renderSite({
         CartButton={AtelierCartButton}
         slug={slug}
         capabilities={konfig.capabilities}
+        poUrl={poEnabled ? `/${slug}/po` : undefined}
+        localeConfig={konfig.localeConfig}
       />
     )
     return withCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
