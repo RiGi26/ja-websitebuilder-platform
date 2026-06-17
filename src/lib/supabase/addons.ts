@@ -47,9 +47,13 @@ export async function fetchServicesByPage(client: Client, pageId: string): Promi
 
 // Item menu aktif untuk sebuah halaman (resto), urut by urutan lalu nama.
 export async function fetchMenuItemsByPage(client: Client, pageId: string): Promise<MenuItem[]> {
+  // Kolom EKSPLISIT (bukan select('*')): ini fetch publik via anon client untuk
+  // render situs. hpp (biaya) & stok_harian TIDAK boleh bocor ke pengunjung →
+  // sengaja tidak diambil. is_sold_out disertakan untuk badge "Habis".
+  // Owner/portal membaca kolom penuh lewat path authenticated (lihat portal).
   const { data, error } = await client
     .from('menu_items')
-    .select('*')
+    .select('id, tenant_id, page_id, kategori, nama, deskripsi, harga, gambar_url, is_active, urutan, created_at, updated_at, is_sold_out')
     .eq('page_id', pageId)
     .eq('is_active', true)
     .order('urutan', { ascending: true })

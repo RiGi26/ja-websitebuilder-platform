@@ -7,9 +7,12 @@ import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
   FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette, Lock,
+  ClipboardList, BarChart3, Settings, Bike,
 } from 'lucide-react'
+import confetti from 'canvas-confetti'
 import { getAddon } from '@/lib/addons/catalog'
-import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
+import { formatMoney, moneyFromConfig } from '@/lib/format-money'
+import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile, PreorderConfig, LocaleConfig } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ImageUploadField from './ImageUploadField'
 import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
@@ -20,7 +23,7 @@ import TampilanPanel, { type TampilanData } from './TampilanPanel'
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
 
-export type ShopOrderItem = { id: string; nama: string; harga_satuan: number; qty: number; subtotal: number }
+export type ShopOrderItem = { id: string; nama: string; harga_satuan: number; qty: number; subtotal: number; hpp_satuan?: number; menu_item_id?: string | null }
 export type ShopOrderRow = {
   id: string
   pembeli_nama: string
@@ -32,6 +35,11 @@ export type ShopOrderRow = {
   status: string
   payment_status: string
   created_at: string
+  // F&B pre-order (null/'shop' = order toko biasa)
+  order_kind?: string | null
+  fulfillment_type?: string | null
+  fulfillment_date?: string | null
+  fulfillment_time?: string | null
   shop_order_items: ShopOrderItem[]
 }
 
@@ -66,6 +74,9 @@ type Props = {
   hasMenu: boolean
   hasBlog: boolean
   hasGallery: boolean
+  hasPreorder: boolean
+  preorder: PreorderConfig
+  localeConfig?: LocaleConfig
   contentIsSample: boolean
   kontenBrand: KontenBrandData
   paymentStatus: PaymentStatus
@@ -84,10 +95,10 @@ type Props = {
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
+  type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
   const hasBrand = kontenBrand.flags.stats || kontenBrand.flags.faq || kontenBrand.flags.statement
   const hasContent = initialSections.length > 0 || hasBrand
   const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : showProduk ? 'produk' : showLayanan ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
@@ -228,6 +239,21 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 <Receipt size={14} /> Pesanan
               </button>
             )}
+            {hasPreorder && (
+              <button onClick={() => setTab('pesanan-po')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pesanan-po' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <ClipboardList size={14} /> Pesanan PO
+              </button>
+            )}
+            {hasPreorder && (
+              <button onClick={() => setTab('laporan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'laporan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <BarChart3 size={14} /> Laporan
+              </button>
+            )}
+            {hasPreorder && (
+              <button onClick={() => setTab('po-settings')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'po-settings' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <Settings size={14} /> Setelan PO
+              </button>
+            )}
             {showLayanan && (
               <button onClick={() => setTab('layanan')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'layanan' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
                 <Briefcase size={14} /> Layanan
@@ -276,6 +302,12 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             paymentEntitled ? <PaymentPanel initial={paymentStatus} /> : <PaymentLockedPanel namaTenant={namaTenant} />
           ) : tab === 'pesanan' ? (
             <OrdersPanel initial={initialOrders} />
+          ) : tab === 'pesanan-po' ? (
+            <PreorderPanel initial={initialOrders} tenantId={tenantId} localeConfig={localeConfig} />
+          ) : tab === 'laporan' ? (
+            <ReportsPanel orders={initialOrders} localeConfig={localeConfig} />
+          ) : tab === 'po-settings' ? (
+            <PoSettingsPanel initial={preorder} />
           ) : tab === 'layanan' ? (
             <ServicePanel page={page} tenantId={tenantId} initial={initialServices} />
           ) : tab === 'reservasi' ? (
@@ -623,6 +655,274 @@ function OrdersPanel({ initial }: { initial: ShopOrderRow[] }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Panel Pesanan PO (F&B pre-order) — antrian + realtime + status ──
+const PO_STEPS = ['pending', 'processing', 'done'] as const
+const PO_STATUS_LABEL: Record<string, string> = {
+  pending: 'Pending', processing: 'Diproses', done: 'Selesai', cancelled: 'Dibatalkan',
+}
+const PO_STATUS_BADGE: Record<string, string> = {
+  pending: 'bg-amber-50 text-amber-700', processing: 'bg-blue-50 text-blue-700',
+  done: 'bg-green-50 text-green-700', cancelled: 'bg-gray-100 text-gray-500',
+}
+
+function PreorderPanel({ initial, tenantId, localeConfig }: { initial: ShopOrderRow[]; tenantId: string; localeConfig?: LocaleConfig }) {
+  const supabase = createClient()
+  const { locale, currency } = moneyFromConfig(localeConfig)
+  const money = (n: number) => formatMoney(n, locale, currency)
+  const onlyPo = (list: ShopOrderRow[]) => list.filter((o) => (o.order_kind ?? 'shop') === 'preorder')
+  const [orders, setOrders] = useState<ShopOrderRow[]>(onlyPo(initial))
+  const [busy, setBusy] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(null)
+  const [flashId, setFlashId] = useState<string | null>(null)
+
+  // Realtime: order PO baru → muat barisnya, highlight + confetti (efek demo dramatis).
+  useEffect(() => {
+    const ch = supabase
+      .channel('po-orders')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'shop_orders', filter: `tenant_id=eq.${tenantId}` },
+        async (payload: { new?: { id?: string } }) => {
+          const id = payload?.new?.id
+          if (!id) return
+          const { data } = await supabase.from('shop_orders').select('*, shop_order_items(*)').eq('id', id).single()
+          const row = data as ShopOrderRow | null
+          if (!row || (row.order_kind ?? 'shop') !== 'preorder') return
+          setOrders((p) => (p.some((o) => o.id === id) ? p : [row, ...p]))
+          setFlashId(id); setTimeout(() => setFlashId(null), 3000)
+          try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.3 }, disableForReducedMotion: true }) } catch { /* noop */ }
+        })
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenantId])
+
+  const setStatus = async (id: string, status: string) => {
+    setBusy(id)
+    try {
+      const { data, error } = await supabase.from('shop_orders')
+        .update({ status } as never).eq('id', id).select('*, shop_order_items(*)').single()
+      if (error) throw error
+      setOrders((p) => p.map((o) => (o.id === id ? (data as ShopOrderRow) : o)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+
+  const aktif = orders.filter((o) => o.status === 'pending' || o.status === 'processing').length
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">Pesanan PO</h2>
+          <p className="text-xs text-gray-400 font-medium mt-0.5">Pembaruan langsung saat pesanan baru masuk</p>
+        </div>
+        <span className="text-xs text-gray-400 font-medium">{aktif} aktif · {orders.length} total</span>
+      </div>
+
+      {orders.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">Belum ada pesanan. Pesanan PO dari pelanggan akan muncul di sini secara langsung.</p>
+      ) : (
+        <div className="space-y-2">
+          {orders.map((o) => (
+            <div key={o.id} className={`rounded-xl border bg-gray-50 transition-shadow ${flashId === o.id ? 'border-apple-blue ring-2 ring-apple-blue/30' : 'border-black/5'}`}>
+              <button onClick={() => setOpen(open === o.id ? null : o.id)} className="w-full flex items-center justify-between gap-3 p-3 text-left">
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{o.pembeli_nama} · {money(Number(o.total))}</p>
+                  <p className="text-xs text-gray-500">
+                    {o.fulfillment_type === 'delivery' ? 'Diantar' : 'Ambil'}{o.fulfillment_date ? ` · ${o.fulfillment_date}` : ''}{o.fulfillment_time ? ` ${o.fulfillment_time}` : ''}
+                    {' · '}#{o.id.slice(0, 8).toUpperCase()}
+                  </p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shrink-0 ${PO_STATUS_BADGE[o.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                  {PO_STATUS_LABEL[o.status] ?? o.status}
+                </span>
+              </button>
+
+              {open === o.id && (
+                <div className="px-3 pb-3 space-y-3 border-t border-black/5 pt-3">
+                  <div className="space-y-1">
+                    {o.shop_order_items?.map((it) => (
+                      <div key={it.id} className="flex justify-between text-xs text-gray-600">
+                        <span>{it.nama} ×{it.qty}</span><span>{money(Number(it.subtotal))}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    {o.pembeli_hp && <p>WA: <a href={`https://wa.me/${o.pembeli_hp.replace(/\D/g, '')}`} target="_blank" className="text-apple-blue font-bold">{o.pembeli_hp}</a></p>}
+                    {o.alamat && <p>Alamat: {o.alamat}</p>}
+                    {o.catatan && <p>Catatan: {o.catatan}</p>}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {PO_STEPS.map((s) => (
+                      <button key={s} onClick={() => setStatus(o.id, s)} disabled={busy === o.id || o.status === s}
+                        className={`px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-colors ${o.status === s ? 'bg-apple-blue text-white' : 'border border-black/10 text-gray-500 hover:text-apple-blue'}`}>
+                        {PO_STATUS_LABEL[s]}
+                      </button>
+                    ))}
+                    {o.status !== 'cancelled' && o.status !== 'done' && (
+                      <button onClick={() => setStatus(o.id, 'cancelled')} disabled={busy === o.id}
+                        className="px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest border border-red-100 text-red-500 hover:bg-red-50 transition-colors">
+                        Batalkan
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Panel Laporan (omzet/profit/menu terlaris PO) ───────────────
+function ReportsPanel({ orders, localeConfig }: { orders: ShopOrderRow[]; localeConfig?: LocaleConfig }) {
+  const { locale, currency } = moneyFromConfig(localeConfig)
+  const money = (n: number) => formatMoney(n, locale, currency)
+  const po = orders.filter((o) => (o.order_kind ?? 'shop') === 'preorder' && o.status !== 'cancelled')
+
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+  const ym = todayStr.slice(0, 7)
+  const omzetHari = po.filter((o) => (o.created_at ?? '').slice(0, 10) === todayStr).reduce((a, b) => a + Number(b.total), 0)
+  const omzetBulan = po.filter((o) => (o.created_at ?? '').slice(0, 7) === ym).reduce((a, b) => a + Number(b.total), 0)
+  const omzetTotal = po.reduce((a, b) => a + Number(b.total), 0)
+  const profit = po.reduce((a, o) => a + (o.shop_order_items ?? []).reduce((s, it) => s + (Number(it.subtotal) - Number(it.hpp_satuan ?? 0) * it.qty), 0), 0)
+  const margin = omzetTotal > 0 ? Math.round((profit / omzetTotal) * 100) : 0
+
+  const byStatus: Record<string, number> = { pending: 0, processing: 0, done: 0 }
+  for (const o of po) byStatus[o.status] = (byStatus[o.status] ?? 0) + 1
+
+  const tally = new Map<string, { qty: number; omzet: number }>()
+  for (const o of po) for (const it of o.shop_order_items ?? []) {
+    const t = tally.get(it.nama) ?? { qty: 0, omzet: 0 }
+    t.qty += it.qty; t.omzet += Number(it.subtotal); tally.set(it.nama, t)
+  }
+  const top = [...tally.entries()].sort((a, b) => b[1].qty - a[1].qty).slice(0, 5)
+  const maxQty = top.length ? top[0][1].qty : 1
+
+  const Kpi = ({ label, value, sub }: { label: string; value: string; sub?: string }) => (
+    <div className="bg-gray-50 rounded-2xl p-4 border border-black/5">
+      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+      <p className="text-xl font-extrabold text-gray-900 mt-1 tabular-nums">{value}</p>
+      {sub && <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>}
+    </div>
+  )
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+        <h2 className="text-lg font-bold text-gray-900 mb-5">Ringkasan</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Kpi label="Omzet Hari Ini" value={money(omzetHari)} />
+          <Kpi label="Omzet Bulan Ini" value={money(omzetBulan)} />
+          <Kpi label="Total Pesanan" value={String(po.length)} sub={`${byStatus.pending ?? 0} pending · ${byStatus.processing ?? 0} diproses · ${byStatus.done ?? 0} selesai`} />
+          <Kpi label="Profit (estimasi)" value={money(profit)} sub={`Margin ${margin}% · omzet total ${money(omzetTotal)}`} />
+        </div>
+        <p className="text-[11px] text-gray-400 mt-4">Profit = harga jual − HPP (biaya) tiap item. Atur HPP per menu di tab Menu agar akurat. Pesanan dibatalkan tidak dihitung.</p>
+      </div>
+
+      <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+        <h2 className="text-lg font-bold text-gray-900 mb-5">Menu Terlaris</h2>
+        {top.length === 0 ? (
+          <p className="text-sm text-gray-400 italic">Belum ada data penjualan.</p>
+        ) : (
+          <div className="space-y-3">
+            {top.map(([nama, t]) => (
+              <div key={nama}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-bold text-gray-900 truncate pr-2">{nama}</span>
+                  <span className="text-gray-500 shrink-0 tabular-nums">{t.qty} terjual · {money(t.omzet)}</span>
+                </div>
+                <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-full rounded-full bg-apple-blue" style={{ width: `${Math.round((t.qty / maxQty) * 100)}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Panel Setelan PO (Buka/Tutup ronde + WA admin + pemenuhan) ───
+function PoSettingsPanel({ initial }: { initial: PreorderConfig }) {
+  const [open, setOpen] = useState(!!initial.open)
+  const [label, setLabel] = useState(initial.open_label ?? '')
+  const [wa, setWa] = useState(initial.wa_admin ?? '')
+  const fulInit = initial.fulfillment
+  const [pickup, setPickup] = useState(!fulInit || fulInit.includes('pickup'))
+  const [delivery, setDelivery] = useState(!fulInit || fulInit.includes('delivery'))
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+  const inp = 'w-full text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
+
+  const save = async () => {
+    setBusy(true); setMsg(null)
+    const fulfillment = [...(pickup ? ['pickup'] : []), ...(delivery ? ['delivery'] : [])]
+    try {
+      const res = await fetch('/api/portal/preorder-settings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ open, open_label: label, wa_admin: wa, fulfillment }),
+      })
+      const json = await res.json()
+      if (!res.ok) { setMsg(`Gagal: ${json.error}`); return }
+      setMsg('Tersimpan.')
+    } catch { setMsg('Error koneksi') } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Setelan Pre-Order</h2>
+      <p className="text-sm text-gray-500 mb-5">Atur ronde PO, notifikasi WhatsApp, dan cara pemenuhan.</p>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-gray-50 border border-black/5">
+          <div>
+            <p className="text-sm font-bold text-gray-900">{open ? 'PO sedang DIBUKA' : 'PO sedang DITUTUP'}</p>
+            <p className="text-[11px] text-gray-400">Saat ditutup, pelanggan tidak bisa mengirim pesanan baru.</p>
+          </div>
+          <button onClick={() => setOpen((v) => !v)} role="switch" aria-checked={open} aria-label="Buka atau tutup pre-order"
+            className={`relative w-14 h-8 rounded-full transition-colors shrink-0 ${open ? 'bg-green-500' : 'bg-gray-300'}`}>
+            <span className={`absolute top-1 h-6 w-6 rounded-full bg-white transition-all ${open ? 'left-7' : 'left-1'}`} />
+          </button>
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keterangan ronde (opsional)</label>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="mis. PO dibuka s/d Jumat, ambil Sabtu" className={inp} />
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nomor WhatsApp admin (notifikasi order baru)</label>
+          <input value={wa} onChange={(e) => setWa(e.target.value)} placeholder="mis. 09012345678" inputMode="tel" className={inp} />
+          <p className="text-[11px] text-gray-400 mt-1">Setiap pesanan baru dikirim ke nomor ini lewat WhatsApp.</p>
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Cara pemenuhan</label>
+          <div className="flex gap-2">
+            <button onClick={() => setPickup((v) => !v)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-colors ${pickup ? 'border-gray-900 bg-gray-50 text-gray-900' : 'border-black/10 text-gray-400'}`}>
+              <Store size={16} /> Ambil sendiri
+            </button>
+            <button onClick={() => setDelivery((v) => !v)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-colors ${delivery ? 'border-gray-900 bg-gray-50 text-gray-900' : 'border-black/10 text-gray-400'}`}>
+              <Bike size={16} /> Diantar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {msg && <p className="text-xs mt-4 text-gray-500">{msg}</p>}
+      <div className="mt-5">
+        <button onClick={save} disabled={busy} className="flex items-center gap-1 px-5 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-bold uppercase hover:bg-gray-800 disabled:opacity-50">
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Simpan
+        </button>
+      </div>
     </div>
   )
 }

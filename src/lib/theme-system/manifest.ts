@@ -150,6 +150,7 @@ export interface ShowcaseItem {
   penulis?: string   // blog_posts.penulis → meta artikel
   tanggal?: string   // blog_posts.published_at (ISO) → meta tanggal artikel
   stok?: number      // products.stok → badge ketersediaan (opsional)
+  soldOut?: boolean  // menu_items.is_sold_out → badge "Habis" (F&B pre-order)
 }
 // ── Konten balok Sprint 5 ─────────────────────────────────────
 export interface Testimonial { quote: string; nama: string; peran?: string }

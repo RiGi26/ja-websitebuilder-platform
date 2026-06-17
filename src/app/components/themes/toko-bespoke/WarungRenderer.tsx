@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { BespokeProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
+import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 
 // ============================================================
 // HANGAT — Restaurant Warung / Kedai Bespoke Lux Renderer (Folk Warmth)
@@ -126,6 +127,10 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-card-cat{position:absolute;top:.8rem;left:.8rem;z-index:2;font-family:${DISPLAY};font-size:.72rem;letter-spacing:.02em;color:var(--wr-ink);background:rgba(255,251,242,.94);padding:.3rem .7rem;border-radius:999px}
 /* Banderol — tag harga kertas miring */
 .wr-card-tag{position:absolute;top:.9rem;right:-.2rem;z-index:3;font-family:${DISPLAY};font-size:1.05rem;color:var(--wr-ink);background:${MUSTARD};padding:.4rem 1rem .4rem .85rem;transform:rotate(2deg);box-shadow:0 6px 14px var(--wr-shadow);clip-path:polygon(12% 0,100% 0,100% 100%,12% 100%,0 50%)}
+/* Sold-out (F&B pre-order) — badge "Habis" + redupkan kartu */
+.wr-card-soldout{position:absolute;left:.8rem;bottom:.8rem;z-index:4;font-family:${DISPLAY};font-size:.78rem;color:var(--wr-onAccent);background:var(--wr-ink);padding:.32rem .85rem;border-radius:999px;letter-spacing:.02em;box-shadow:0 6px 14px var(--wr-shadow)}
+.wr-card.is-soldout .wr-card-frame img{opacity:.5;filter:grayscale(.4)}
+.wr-card.is-soldout .wr-card-tag{opacity:.6}
 .wr-card-body{padding:1.2rem 1.3rem 1.3rem}
 .wr-card-name{font-family:${DISPLAY};font-size:1.45rem;color:var(--wr-ink);margin-bottom:.35rem;line-height:1.2}
 .wr-card-desc{font-size:.88rem;color:var(--wr-muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -261,12 +266,15 @@ html,body{overflow-x:hidden;max-width:100%}
 // situs Hangat. Klaim spesifik milik klien → konten editabel.
 const RIBBON = ['Masakan Rumahan', 'Hangat', 'Dimasak Dadakan', 'Bersama', 'Sederhana']
 
-export default function WarungRenderer({ content: c, variant = 'hangat' }: BespokeProps) {
+export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, localeConfig }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.hangat
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#menu'
+  // F&B Pre-Order: bila poUrl ada, CTA "Pesan" utama → form PO; WhatsApp jadi sekunder.
+  const orderHref = poUrl ?? waUrl
+  const orderLabel = poUrl ? 'Pesan (PO)' : 'Pesan'
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
   const features = c.features ?? []
@@ -282,7 +290,8 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
     '--wr-line': p.line, '--wr-line2': p.line2, '--wr-shadow': p.shadow, '--wr-shadowDeep': p.shadowDeep,
   } as React.CSSProperties
 
-  const fmt = (n: number) => 'Rp ' + n.toLocaleString('id-ID')
+  const { locale, currency } = moneyFromConfig(localeConfig)
+  const fmt = (n: number) => formatMoney(n, locale, currency)
   const priceText = (n?: number) => (typeof n === 'number' && n > 0 ? fmt(n) : 'Tanya')
 
   return (
@@ -292,7 +301,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
       {/* NAV */}
       <nav className="wr-nav" aria-label="Navigasi utama">
         <a href="#beranda" className="wr-nav-logo">{c.nama ?? 'Warung'}</a>
-        <a href={waUrl} className="wr-nav-cta">Pesan</a>
+        <a href={orderHref} className="wr-nav-cta">{orderLabel}</a>
       </nav>
 
       {/* HERO */}
@@ -304,7 +313,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
           {hero.subtitle && <p className="wr-hero-sub">{hero.subtitle}</p>}
           <div className="wr-hero-btns">
             <a href={hero.ctaHref ?? '#menu'} className="wr-btn-primary">{hero.ctaText ?? 'Lihat Menu'}</a>
-            <a href={hero.ctaHref2 ?? waUrl} className="wr-btn-ghost">{hero.ctaText2 ?? 'Pesan Antar'}</a>
+            <a href={poUrl ?? hero.ctaHref2 ?? waUrl} className="wr-btn-ghost">{poUrl ? 'Pesan (PO)' : (hero.ctaText2 ?? 'Pesan Antar')}</a>
           </div>
           {stats.length > 0 && (
             <div className="wr-hero-meta">
@@ -368,21 +377,22 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
             {items.map((item, i) => (
               <article
                 key={i}
-                className="wr-card lx-lb-open wr-rv lx-reveal"
+                className={`wr-card lx-lb-open wr-rv lx-reveal${item.soldOut ? ' is-soldout' : ''}`}
                 style={{ transitionDelay: `${(i % 3) * 0.08}s` }}
                 data-cat={item.kategori ?? ''}
                 data-src={item.gambar ?? ''}
                 data-title={item.nama}
                 data-price={priceText(item.harga)}
                 data-desc={item.desc ?? ''}
-                data-href={waUrl}
+                data-href={orderHref}
                 role="button"
                 tabIndex={0}
-                aria-label={`${item.nama} — ${priceText(item.harga)}`}
+                aria-label={`${item.nama} — ${priceText(item.harga)}${item.soldOut ? ' (Habis)' : ''}`}
               >
                 <div className="wr-card-frame">
                   {item.kategori && <span className="wr-card-cat">{item.kategori}</span>}
                   <span className="wr-card-tag">{priceText(item.harga)}</span>
+                  {item.soldOut && <span className="wr-card-soldout">Habis</span>}
                   {item.gambar && <img src={item.gambar} alt={item.nama} loading="lazy" />}
                 </div>
                 <div className="wr-card-body">
@@ -511,7 +521,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
             <h2 className="wr-cta-title">{c.cta.title}</h2>
             {c.cta.subtitle && <p className="wr-cta-sub">{c.cta.subtitle}</p>}
             <div className="wr-cta-btns">
-              <a href={waUrl} className="wr-btn-primary">{c.cta.ctaText ?? 'Pesan via WhatsApp'}</a>
+              <a href={orderHref} className="wr-btn-primary">{poUrl ? 'Pesan Sekarang' : (c.cta.ctaText ?? 'Pesan via WhatsApp')}</a>
               <a href="#menu" className="wr-btn-ghost">Lihat Menu</a>
             </div>
           </div>
@@ -564,7 +574,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat' }: Bespo
       </footer>
 
       {/* LIGHTBOX */}
-      <BespokeLightbox ctaText="Pesan via WhatsApp" />
+      <BespokeLightbox ctaText={poUrl ? 'Pesan (PO)' : 'Pesan via WhatsApp'} />
       <script dangerouslySetInnerHTML={{ __html: LUX_JS }} />
     </div>
   )

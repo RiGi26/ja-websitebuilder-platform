@@ -24,6 +24,7 @@ export interface ShowcaseSourceItem {
   stok?: number | null          // products
   penulis?: string | null       // blog (dipetakan dari blog_posts.penulis)
   tanggal?: string | null       // blog (dipetakan dari blog_posts.published_at)
+  is_sold_out?: boolean | null  // menu_items → badge "Habis" (F&B pre-order)
 }
 
 // Baris tabel gallery_images yang relevan untuk galeri (tab Galeri portal).
@@ -54,6 +55,7 @@ export function composableContentFromSections(
       stok: typeof p.stok === 'number' ? p.stok : undefined,
       penulis: p.penulis ?? undefined,
       tanggal: p.tanggal ?? undefined,
+      soldOut: p.is_sold_out ?? undefined,
     }))
 
   const showcase = items.length ? { title: showcaseTitle, items } : undefined

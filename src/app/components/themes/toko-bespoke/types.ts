@@ -7,7 +7,7 @@
 // ============================================================
 import type { ComponentType } from 'react'
 import type { ComposableContent } from '@/lib/theme-system/manifest'
-import type { Product } from '@/types/websitebuilder'
+import type { Product, LocaleConfig } from '@/types/websitebuilder'
 
 export interface BespokeProps {
   content: ComposableContent
@@ -22,6 +22,11 @@ export interface BespokeProps {
   slug?: string
   /** Capability add-on aktif (booking/delivery/qr-menu) — UI kondisional. */
   capabilities?: string[]
+  /** F&B Pre-Order: URL form PO (`/{slug}/po`) bila tenant mengaktifkan hasPreorder + ronde dibuka.
+   *  Renderer mengarahkan CTA "Pesan" utama ke sini; WhatsApp jadi opsi sekunder. */
+  poUrl?: string
+  /** Locale per-tenant (currency/locale/phone) — format harga. Default IDR/id-ID bila kosong. */
+  localeConfig?: LocaleConfig
 }
 
 /** @deprecated alias — pakai BespokeProps. Dipertahankan utk renderer toko lama. */
