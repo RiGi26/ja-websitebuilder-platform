@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeHiddenSections, isValidHiddenSectionsInput } from '@/lib/portal/section-visibility'
 
 // Tab Tampilan + kartu "Angka, FAQ & Filosofi" portal — baca/ubah field
 // whitelist di landing_pages.data_konten milik tenant sendiri. Whitelist KETAT
@@ -100,6 +101,7 @@ export async function GET() {
       stats: Array.isArray(k.stats) ? k.stats : [],
       faq: Array.isArray(k.faq) ? k.faq : [],
       statement: k.statement && typeof k.statement === 'object' ? k.statement : null,
+      hidden_sections: sanitizeHiddenSections(k.hidden_sections),
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown'
@@ -115,8 +117,8 @@ export async function PATCH(request: Request) {
 
   try {
     const body = await request.json().catch(() => ({}))
-    const { foto_hero, foto_hero_focus, stats, faq, statement } = (body ?? {}) as {
-      foto_hero?: unknown; foto_hero_focus?: unknown; stats?: unknown; faq?: unknown; statement?: unknown
+    const { foto_hero, foto_hero_focus, stats, faq, statement, hidden_sections } = (body ?? {}) as {
+      foto_hero?: unknown; foto_hero_focus?: unknown; stats?: unknown; faq?: unknown; statement?: unknown; hidden_sections?: unknown
     }
 
     const updates: Record<string, unknown> = {}
@@ -154,6 +156,12 @@ export async function PATCH(request: Request) {
       const parsed = parseStatementInput(statement)
       if (parsed === 'invalid') return NextResponse.json({ error: 'statement tidak valid (kutipan wajib, maks 300 karakter)' }, { status: 400 })
       updates.statement = parsed
+    }
+    if (hidden_sections !== undefined) {
+      if (!isValidHiddenSectionsInput(hidden_sections)) {
+        return NextResponse.json({ error: 'hidden_sections tidak valid' }, { status: 400 })
+      }
+      updates.hidden_sections = sanitizeHiddenSections(hidden_sections)
     }
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Tak ada perubahan' }, { status: 400 })

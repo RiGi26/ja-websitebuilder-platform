@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTenantPaymentStatus } from '@/lib/tenant-midtrans'
 import { paymentEntitled, themeContentTabs, kontenBrandEditable } from '@/lib/addons/portal-tabs'
+import { sanitizeHiddenSections, type HideableSectionKey } from '@/lib/portal/section-visibility'
 import type { KonfigurasiWebsite, Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile } from '@/types/websitebuilder'
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 import type { EditableSection } from './ContentPanel'
@@ -159,10 +160,25 @@ export default async function PortalPage() {
     sections = (data ?? []) as EditableSection[]
   }
 
+  // Tab "Susunan Halaman" (di dalam Tampilan): bagian pengayaan yang BENAR
+  // dirender tema ini DAN punya data → bisa disembunyikan customer. Bagian
+  // tanpa data sudah otomatis tak tampil, jadi tak perlu ditawarkan.
+  const hiddenSections = sanitizeHiddenSections(dataKonten.hidden_sections)
+  const hasStatement = !!(rawStatement && typeof rawStatement === 'object'
+    && typeof rawStatement.quote === 'string' && rawStatement.quote.trim())
+  const fotoItems = Array.isArray(dataKonten.foto_items) ? dataKonten.foto_items : []
+  const susunanSections: HideableSectionKey[] = []
+  if (brandFlags.stats && initialKontenBrand.stats.length > 0) susunanSections.push('stats')
+  if (brandFlags.faq && initialKontenBrand.faq.length > 0) susunanSections.push('faq')
+  if (brandFlags.statement && hasStatement) susunanSections.push('statement')
+  if (themeTabs.galeri && (gallery.length > 0 || fotoItems.length > 0)) susunanSections.push('gallery')
+
   return (
     <PortalDashboard
       tenantId={tenantId}
       namaTenant={tenant?.nama ?? 'Website Saya'}
+      susunanSections={susunanSections}
+      hiddenSections={hiddenSections}
       page={page ? { id: page.id, nama_website: page.nama_website, slug: page.slug, status: page.status } : null}
       initialProducts={products}
       hasShop={hasShop}
