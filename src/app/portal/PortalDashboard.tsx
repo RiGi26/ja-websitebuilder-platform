@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
   FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette, Lock,
-  ClipboardList, BarChart3, Settings, Bike,
+  ClipboardList, BarChart3, Settings, Bike, ChevronUp, ChevronDown, HelpCircle, Quote,
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { getAddon } from '@/lib/addons/catalog'
@@ -19,6 +19,7 @@ import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
 import LivePreview from './LivePreview'
 import SampleContentBanner from './SampleContentBanner'
 import TampilanPanel, { type TampilanData } from './TampilanPanel'
+import { HIDEABLE_SECTION_LABEL, type HideableSectionKey } from '@/lib/portal/section-visibility'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
 type PaymentStatus = { configured: boolean; isActive: boolean; isProduction: boolean; clientKey: string | null }
@@ -90,12 +91,33 @@ type Props = {
   initialProfile: TenantProfile | null
   initialSections: EditableSection[]
   initialTampilan: TampilanData
+  // Susunan Halaman (di tab Tampilan): bagian pengayaan yang bisa disembunyikan
+  // + yang sedang disembunyikan. Kosong → panel tak dirender (tema non-bespoke).
+  susunanSections: HideableSectionKey[]
+  hiddenSections: HideableSectionKey[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
 const EMPTY: Draft = { nama: '', harga: '', kategori: '', gambar_url: '', deskripsi: '', stok: '' }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan }: Props) {
+// Geser item index `idx` ke arah `dir` (-1 naik / +1 turun) lalu tetapkan
+// `urutan = posisi baru` untuk seluruh list. Kembalikan list baru + hanya baris
+// yang urutannya berubah (umumnya 2 untuk satu tukar — minim write). null bila
+// gerakan keluar batas. Dipakai semua panel etalase + galeri.
+function reorderList<T extends { id: string; urutan: number }>(items: T[], idx: number, dir: -1 | 1) {
+  const j = idx + dir
+  if (j < 0 || j >= items.length) return null
+  const arr = [...items]
+  ;[arr[idx], arr[j]] = [arr[j], arr[idx]]
+  const updates: { id: string; urutan: number }[] = []
+  const next = arr.map((it, i) => {
+    if (it.urutan !== i) updates.push({ id: it.id, urutan: i })
+    return { ...it, urutan: i }
+  })
+  return { next, updates }
+}
+
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
@@ -177,6 +199,17 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
       if (error) throw error
       setItems((p) => p.filter((x) => x.id !== id))
     } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
+  const move = async (idx: number, dir: -1 | 1) => {
+    const res = reorderList(items, idx, dir)
+    if (!res) return
+    const prev = items
+    setItems(res.next)
+    setBusy('reorder')
+    try {
+      await Promise.all(res.updates.map((u) =>
+        supabase.from('products').update({ urutan: u.urutan } as never).eq('id', u.id)))
+    } catch (e: any) { alert(`Gagal mengurutkan: ${e.message}`); setItems(prev) } finally { setBusy(null) }
   }
 
   const inp = 'text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
@@ -297,7 +330,10 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               {hasBrand && <KontenBrandPanel initial={kontenBrand} />}
             </div>
           ) : tab === 'tampilan' ? (
-            <TampilanPanel initial={initialTampilan} />
+            <div className="space-y-6">
+              <TampilanPanel initial={initialTampilan} />
+              {susunanSections.length > 0 && <SusunanPanel available={susunanSections} initialHidden={hiddenSections} />}
+            </div>
           ) : tab === 'pembayaran' ? (
             paymentEntitled ? <PaymentPanel initial={paymentStatus} /> : <PaymentLockedPanel namaTenant={namaTenant} />
           ) : tab === 'pesanan' ? (
@@ -343,7 +379,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
               <p className="text-sm text-gray-400 italic">Belum ada produk. Tambahkan produk pertama Anda di atas.</p>
             ) : (
               <div className="space-y-2">
-                {items.map((it) =>
+                {items.map((it, idx) =>
                   editId === it.id ? (
                     <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
                       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
@@ -368,6 +404,8 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                         <p className="text-xs text-gray-500">Rp {Number(it.harga).toLocaleString('id-ID')}{it.kategori ? ` · ${it.kategori}` : ''}{it.stok != null ? ` · stok ${it.stok}` : ''}</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => move(idx, -1)} disabled={idx === 0 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Naikkan" aria-label="Naikkan urutan"><ChevronUp size={14} /></button>
+                        <button onClick={() => move(idx, 1)} disabled={idx === items.length - 1 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Turunkan" aria-label="Turunkan urutan"><ChevronDown size={14} /></button>
                         <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
                         <button onClick={() => toggle(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_active ? 'Sembunyikan' : 'Tampilkan'}>
                           {it.is_active ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
@@ -384,6 +422,73 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
         </>
         )}
       </main>
+    </div>
+  )
+}
+
+// ── Panel Susunan Halaman — sembunyikan/tampilkan bagian pengayaan ──
+// Hanya untuk tema bespoke/lux yang merender blok ini dari data_konten.
+// Toggle = visible (hijau) / hidden (abu). Simpan ke data_konten.hidden_sections
+// via /api/portal/landing-page; renderer null-kan blok yang dimatikan.
+const SUSUNAN_ICON: Record<HideableSectionKey, ReactNode> = {
+  stats: <BarChart3 size={16} />,
+  faq: <HelpCircle size={16} />,
+  statement: <Quote size={16} />,
+  gallery: <ImageIcon size={16} />,
+}
+const SUSUNAN_HELP: Record<HideableSectionKey, string> = {
+  stats: 'Strip angka & pencapaian',
+  faq: 'Tanya-jawab singkat',
+  statement: 'Kutipan filosofi brand',
+  gallery: 'Galeri foto',
+}
+
+function SusunanPanel({ available, initialHidden }: { available: HideableSectionKey[]; initialHidden: HideableSectionKey[] }) {
+  const [hidden, setHidden] = useState<HideableSectionKey[]>(initialHidden)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+
+  const toggle = async (key: HideableSectionKey) => {
+    const prev = hidden
+    const next = hidden.includes(key) ? hidden.filter((k) => k !== key) : [...hidden, key]
+    setHidden(next)
+    setBusy(true); setMsg(null)
+    try {
+      const res = await fetch('/api/portal/landing-page', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hidden_sections: next }),
+      })
+      if (!res.ok) { const j = await res.json().catch(() => ({})); throw new Error(j.error ?? 'gagal') }
+      setMsg('Tersimpan.')
+      window.dispatchEvent(new Event('portal:saved')) // refresh live preview bila terbuka
+    } catch (e: any) { setMsg(`Gagal: ${e.message}`); setHidden(prev) } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Susunan Halaman</h2>
+      <p className="text-sm text-gray-500 mb-5">Pilih bagian yang tampil di situs Anda. Mematikan tidak menghapus isinya — hanya menyembunyikannya dari halaman.</p>
+      <div className="space-y-3">
+        {available.map((key) => {
+          const visible = !hidden.includes(key)
+          return (
+            <div key={key} className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-gray-50 border border-black/5">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="w-9 h-9 rounded-xl bg-white border border-black/5 flex items-center justify-center text-gray-500 shrink-0">{SUSUNAN_ICON[key]}</span>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-gray-900">{HIDEABLE_SECTION_LABEL[key]}</p>
+                  <p className="text-[11px] text-gray-400">{SUSUNAN_HELP[key]}{visible ? '' : ' · disembunyikan'}</p>
+                </div>
+              </div>
+              <button onClick={() => toggle(key)} disabled={busy} role="switch" aria-checked={visible} aria-label={`Tampilkan bagian ${HIDEABLE_SECTION_LABEL[key]}`}
+                className={`relative w-14 h-8 rounded-full transition-colors shrink-0 disabled:opacity-50 ${visible ? 'bg-green-500' : 'bg-gray-300'}`}>
+                <span className={`absolute top-1 h-6 w-6 rounded-full bg-white transition-all ${visible ? 'left-7' : 'left-1'}`} />
+              </button>
+            </div>
+          )
+        })}
+      </div>
+      {msg && <p className="text-xs mt-4 text-gray-500">{msg}</p>}
     </div>
   )
 }
@@ -1001,6 +1106,17 @@ function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tena
       setItems((p) => p.filter((x) => x.id !== id))
     } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
   }
+  const move = async (idx: number, dir: -1 | 1) => {
+    const res = reorderList(items, idx, dir)
+    if (!res) return
+    const prev = items
+    setItems(res.next)
+    setBusy('reorder')
+    try {
+      await Promise.all(res.updates.map((u) =>
+        supabase.from('services').update({ urutan: u.urutan } as never).eq('id', u.id)))
+    } catch (e: any) { alert(`Gagal mengurutkan: ${e.message}`); setItems(prev) } finally { setBusy(null) }
+  }
 
   return (
     <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
@@ -1030,7 +1146,7 @@ function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tena
         <p className="text-sm text-gray-400 italic">Belum ada layanan. Tambahkan layanan pertama Anda di atas.</p>
       ) : (
         <div className="space-y-2">
-          {items.map((it) =>
+          {items.map((it, idx) =>
             editId === it.id ? (
               <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
@@ -1060,6 +1176,8 @@ function ServicePanel({ page, tenantId, initial }: { page: PageInfo | null; tena
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => move(idx, -1)} disabled={idx === 0 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Naikkan" aria-label="Naikkan urutan"><ChevronUp size={14} /></button>
+                  <button onClick={() => move(idx, 1)} disabled={idx === items.length - 1 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Turunkan" aria-label="Turunkan urutan"><ChevronDown size={14} /></button>
                   <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
                   <button onClick={() => toggle(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_active ? 'Sembunyikan' : 'Tampilkan'}>
                     {it.is_active ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
@@ -1251,6 +1369,17 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
       setItems((p) => p.filter((x) => x.id !== id))
     } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
   }
+  const move = async (idx: number, dir: -1 | 1) => {
+    const res = reorderList(items, idx, dir)
+    if (!res) return
+    const prev = items
+    setItems(res.next)
+    setBusy('reorder')
+    try {
+      await Promise.all(res.updates.map((u) =>
+        supabase.from('menu_items').update({ urutan: u.urutan } as never).eq('id', u.id)))
+    } catch (e: any) { alert(`Gagal mengurutkan: ${e.message}`); setItems(prev) } finally { setBusy(null) }
+  }
 
   return (
     <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
@@ -1278,7 +1407,7 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
         <p className="text-sm text-gray-400 italic">Belum ada menu. Tambahkan item pertama Anda di atas.</p>
       ) : (
         <div className="space-y-2">
-          {items.map((it) =>
+          {items.map((it, idx) =>
             editId === it.id ? (
               <div key={it.id} className="p-3 bg-blue-50/40 rounded-xl border border-apple-blue/20 space-y-2">
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
@@ -1302,6 +1431,8 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                   <p className="text-xs text-gray-500">Rp {Number(it.harga).toLocaleString('id-ID')}{it.kategori ? ` · ${it.kategori}` : ''}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => move(idx, -1)} disabled={idx === 0 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Naikkan" aria-label="Naikkan urutan"><ChevronUp size={14} /></button>
+                  <button onClick={() => move(idx, 1)} disabled={idx === items.length - 1 || !!busy} className="p-1.5 rounded-lg hover:bg-white text-gray-500 disabled:opacity-30" title="Turunkan" aria-label="Turunkan urutan"><ChevronDown size={14} /></button>
                   <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
                   <button onClick={() => toggle(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_active ? 'Sembunyikan' : 'Tampilkan'}>
                     {it.is_active ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
@@ -1479,6 +1610,17 @@ function GalleryPanel({ page, tenantId, initial }: { page: PageInfo | null; tena
       setItems((p) => p.filter((x) => x.id !== id))
     } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
   }
+  const move = async (idx: number, dir: -1 | 1) => {
+    const res = reorderList(items, idx, dir)
+    if (!res) return
+    const prev = items
+    setItems(res.next)
+    setBusy('reorder')
+    try {
+      await Promise.all(res.updates.map((u) =>
+        supabase.from('gallery_images').update({ urutan: u.urutan } as never).eq('id', u.id)))
+    } catch (e: any) { alert(`Gagal mengurutkan: ${e.message}`); setItems(prev) } finally { setBusy(null) }
+  }
 
   return (
     <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
@@ -1497,10 +1639,14 @@ function GalleryPanel({ page, tenantId, initial }: { page: PageInfo | null; tena
         <p className="text-sm text-gray-400 italic">Belum ada foto.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {items.map((it) => (
+          {items.map((it, idx) => (
             <div key={it.id} className="relative rounded-xl overflow-hidden border border-black/5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={it.url} alt={it.caption ?? ''} className="w-full aspect-square object-cover bg-gray-100" />
+              <div className="absolute top-2 left-2 flex gap-1">
+                <button onClick={() => move(idx, -1)} disabled={idx === 0 || !!busy} className="p-1.5 rounded-lg bg-white/90 text-gray-600 hover:bg-white disabled:opacity-30" title="Naikkan" aria-label="Naikkan urutan"><ChevronUp size={14} /></button>
+                <button onClick={() => move(idx, 1)} disabled={idx === items.length - 1 || !!busy} className="p-1.5 rounded-lg bg-white/90 text-gray-600 hover:bg-white disabled:opacity-30" title="Turunkan" aria-label="Turunkan urutan"><ChevronDown size={14} /></button>
+              </div>
               <button onClick={() => remove(it.id)} disabled={busy === it.id} className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 text-red-500 hover:bg-white" title="Hapus"><Trash2 size={14} /></button>
               {it.caption && <p className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] p-1.5 truncate">{it.caption}</p>}
             </div>

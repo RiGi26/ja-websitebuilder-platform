@@ -8,6 +8,7 @@ import type { PageSection, TenantProfile } from '@/types/websitebuilder'
 import type { ComposableContent, ShowcaseItem, InfoLokasi, TeamMember, PricingContent, PricingPlan, ProcessContent, PartnersContent, PartnerLogo, SocialContent, SocialLink, SocialPlatform, Testimonial, GalleryContent, GalleryImage, StatItem, FaqItem, StatementContent, PresetBand } from './manifest'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
 import { resolveWaHref, waLink } from '@/lib/wa'
+import { sanitizeHiddenSections } from '@/lib/portal/section-visibility'
 
 // Bentuk yang dibagi Product / MenuItem / Service / (blog map). Field dasar
 // dipakai semua varian; field industri (kategori/durasi_menit/stok/penulis/
@@ -105,17 +106,24 @@ export function composableContentFromSections(
   // merender row-nya via SectionRenderer).
   const bands = buildPresetBands(sections, base.contact?.wa)
 
+  // Penyembunyian per-section dari portal "Susunan Halaman"
+  // (data_konten.hidden_sections). Null-kan blok yang dimatikan customer —
+  // renderer bespoke/lux semua ber-guard `&& length > 0`, jadi blok hilang dari
+  // halaman tanpa menghapus datanya. Hanya blok pengayaan (stats/faq/statement/
+  // gallery) yang boleh, bukan inti halaman.
+  const hidden = new Set(sanitizeHiddenSections(konten.hidden_sections))
+
   return {
     nama: base.nama,
     hero: { ...base.hero, image: fotoHero, imagePosition: fotoHeroFocus },
     features: base.features,
     showcase,
     info,
-    statement,
+    statement: hidden.has('statement') ? undefined : statement,
     testimonials,
-    stats,
-    faq,
-    gallery,
+    stats: hidden.has('stats') ? undefined : stats,
+    faq: hidden.has('faq') ? undefined : faq,
+    gallery: hidden.has('gallery') ? undefined : gallery,
     teamEyebrow,
     teamTitle,
     team,
