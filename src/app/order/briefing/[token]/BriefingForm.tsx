@@ -13,6 +13,7 @@ import { getReadySubKategori, getThemes } from '@/lib/theme-system/taxonomy'
 import { BESPOKE_VARIANTS } from '@/app/components/themes/toko-bespoke/variants'
 import ImageUploadField from '@/app/portal/ImageUploadField'
 import HeroImageField from '@/app/portal/HeroImageField'
+import { composeDeskripsi } from '@/lib/build/composeNarasi'
 
 // ── Types ─────────────────────────────────────────────────────
 interface FleetRow { nama: string; kategori: string; kapasitas: string; transmisi: string; harga: string; foto_url: string }
@@ -26,7 +27,10 @@ interface FormState {
   // Step 0 — Identitas
   nama_usaha: string
   tagline: string
-  deskripsi: string
+  // Pertanyaan terpandu (jantung Step 0) — digabung jadi deskripsi situs.
+  tawaran: string
+  pelanggan: string
+  deskripsi: string // diisi otomatis dari komposisi narasi; freeform legacy/fallback.
   wa: string
   email: string
   alamat: string
@@ -68,7 +72,7 @@ interface FormState {
 }
 
 const INIT: FormState = {
-  nama_usaha: '', tagline: '', deskripsi: '', wa: '', email: '',
+  nama_usaha: '', tagline: '', tawaran: '', pelanggan: '', deskripsi: '', wa: '', email: '',
   alamat: '', jam_operasional: '', kota_layanan: '',
   fleet: [{ nama: '', kategori: '', kapasitas: '', transmisi: '', harga: '', foto_url: '' }],
   menu: [{ nama: '', kategori: '', harga: '', deskripsi: '', foto_url: '' }],
@@ -100,6 +104,17 @@ const INDUSTRY_COLOR: Record<string, string> = {
   blog: '#0EA5E9',
   jastip: '#D97706',
 }
+
+// ── Contoh jawaban "pertanyaan terpandu" per industri (placeholder, bukan default) ──
+const NARASI_PH: Record<string, { tawaran: string; pelanggan: string; pembeda: string }> = {
+  travel: { tawaran: 'Sewa mobil harian & lepas kunci', pelanggan: 'Keluarga & wisatawan di Bali', pembeda: 'Antar-jemput bandara 24 jam' },
+  restaurant: { tawaran: 'Masakan Sunda rumahan, dimasak saat dipesan', pelanggan: 'Keluarga & karyawan kantor sekitar', pembeda: 'Resep warisan, bumbu diulek sendiri' },
+  corporate: { tawaran: 'Jasa konsultan pajak & pembukuan', pelanggan: 'Pemilik UMKM tanpa tim finance', pembeda: 'Pendampingan langsung tiap bulan' },
+  klinik: { tawaran: 'Klinik gigi keluarga & perawatan estetik', pelanggan: 'Keluarga muda di Bekasi', pembeda: 'Dokter berpengalaman 10+ tahun' },
+  sekolah: { tawaran: 'Sekolah Islam terpadu jenjang SD', pelanggan: 'Orang tua yang ingin anak hafal Quran', pembeda: 'Kelas kecil, maksimal 15 siswa' },
+  toko_online: { tawaran: 'Batik tulis Pekalongan handmade', pelanggan: 'Pencinta wastra Nusantara', pembeda: 'Motif eksklusif, jumlah terbatas' },
+}
+const NARASI_PH_DEFAULT = { tawaran: 'Jasa fotografi pernikahan & prewedding', pelanggan: 'Pasangan yang menikah tahun ini', pembeda: 'Gaya candid natural, file lengkap' }
 
 // ── Helpers ───────────────────────────────────────────────────
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -153,6 +168,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   // yang mungkin salah-petak. Tanpa preselect → perilaku lama (dari industri).
   const tipe = tipeFromVariant(preselect?.variant) ?? industriToTipe(industri)
   const defaultColor = INDUSTRY_COLOR[tipe] ?? '#0071E3'
+  const ph = NARASI_PH[tipe] ?? NARASI_PH_DEFAULT
   const variants = getVariants(tipe)
   const defaultVariant = variants[0]?.id ?? ''
 
@@ -183,6 +199,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [editKontak, setEditKontak] = useState(false)
+  const [showSoftGate, setShowSoftGate] = useState(false)
 
   const selectedVariant = variants.find(v => v.id === form.variant) ?? variants[0]
 
@@ -251,7 +268,18 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   const STEPS = ['Identitas', 'Konten Website', 'Branding', 'Konfirmasi']
 
   // ── Submit ────────────────────────────────────────────────────
-  const handleSubmit = async () => {
+  // Soft-gate: kalau "Apa yang Anda tawarkan?" (bahan utama copy) kosong, tahan
+  // sekali dengan kartu ramah — bukan blokir. "Lanjut saja" memanggil doSubmit.
+  const handleSubmit = () => {
+    if (!form.tawaran.trim()) {
+      setShowSoftGate(true)
+      return
+    }
+    doSubmit()
+  }
+
+  const doSubmit = async () => {
+    setShowSoftGate(false)
     setSubmitting(true)
     setError(null)
     try {
@@ -273,12 +301,19 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
   }
 
   function buildBriefingData() {
+    // Pembeda (Q3) = keunggulan. Deskripsi disusun dari jawaban terpandu; freeform
+    // legacy dipakai bila komposisi kosong (mis. draft lama). Narasi mentah ikut
+    // disimpan terstruktur untuk pemakaian lanjutan (mis. enhance AI ke depan).
+    const pembeda = form.keunggulan.filter((k) => k.trim())
+    const deskripsiKomposit =
+      composeDeskripsi({ tawaran: form.tawaran, pelanggan: form.pelanggan, pembeda }) || form.deskripsi
     const base = {
       industri_tipe: tipe,
       identitas: {
         nama_usaha: form.nama_usaha,
         tagline: form.tagline,
-        deskripsi: form.deskripsi,
+        deskripsi: deskripsiKomposit,
+        narasi: { tawaran: form.tawaran, pelanggan: form.pelanggan, pembeda },
         wa: form.wa,
         email: form.email,
         alamat: form.alamat,
@@ -402,9 +437,46 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                 <input className={inputCls} value={form.tagline} onChange={e => set('tagline', e.target.value)} placeholder="Perjalanan Lebih Nyaman, Harga Lebih Hemat" />
               </Field>
             </div>
-            <Field label="Deskripsi Singkat Bisnis">
-              <textarea className={textareaCls} rows={3} value={form.deskripsi} onChange={e => set('deskripsi', e.target.value)} placeholder="Ceritakan bisnis Anda dalam 2-3 kalimat..." />
-            </Field>
+            {/* INTI WEBSITE — pertanyaan terpandu (jantung Step 0). Jawaban digabung
+                jadi deskripsi + keunggulan: bahan utama copy situs. Panel ber-surface
+                beda agar menonjol dari field biasa. */}
+            <div className="rounded-[24px] bg-blue-50/50 border border-blue-100 p-5 sm:p-6 space-y-5">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#0071E3]/10 flex items-center justify-center shrink-0">
+                  <Sparkles size={18} className="text-[#0071E3]" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-[#0071E3]">Inti Website Anda</p>
+                  <p className="text-base font-bold text-gray-900 mt-0.5">Ceritakan bisnis Anda, singkat saja</p>
+                  <p className="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
+                    Jawaban Anda kami pakai untuk menulis paragraf pembuka dan alasan orang memilih Anda. Makin spesifik, makin website terasa milik Anda sendiri.
+                  </p>
+                </div>
+              </div>
+              <Field label="Apa yang Anda tawarkan?">
+                <input className={inputCls} value={form.tawaran} onChange={e => set('tawaran', e.target.value)} placeholder={ph.tawaran} />
+              </Field>
+              <Field label="Siapa pelanggan utama Anda?">
+                <input className={inputCls} value={form.pelanggan} onChange={e => set('pelanggan', e.target.value)} placeholder={ph.pelanggan} />
+              </Field>
+              <div className="space-y-2">
+                <label className="block text-[11px] font-black uppercase tracking-widest text-gray-400">
+                  Apa yang membuat Anda beda? <span className="text-gray-300 normal-case tracking-normal font-bold">(1–3 hal)</span>
+                </label>
+                {([0,1,2] as const).map(i => (
+                  <input key={i} className={inputCls}
+                    aria-label={`Hal yang membuat beda ${i + 1}`}
+                    placeholder={i === 0 ? ph.pembeda : 'Hal lain yang bikin beda (opsional)'}
+                    value={form.keunggulan[i]}
+                    onChange={e => {
+                      const arr: [string,string,string] = [...form.keunggulan] as [string,string,string]
+                      arr[i] = e.target.value
+                      set('keunggulan', arr)
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
             {!editKontak ? (
               <div className="flex items-center justify-between gap-4 p-4 rounded-[16px] bg-gray-50 border border-black/[0.05]">
                 <div className="min-w-0">
@@ -502,23 +574,9 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
                   <Plus size={16} /> Tambah Kendaraan
                 </button>
 
-                {/* Keunggulan & Syarat Sewa — khusus rental */}
-                <div className="pt-4 border-t border-black/[0.05] space-y-4">
-                  <div>
-                    <p className="text-sm font-bold text-gray-700 mb-1">3 Keunggulan Bisnis Anda</p>
-                    <p className="text-xs text-gray-400 mb-3">Dalam kalimat Anda sendiri — ini yang membedakan Anda dari kompetitor.</p>
-                    {([0,1,2] as const).map(i => (
-                      <input key={i} className={`${inputCls} mb-2`}
-                        placeholder={['Contoh: Satu-satunya rental di Jakarta yang antar jemput bandara 24 jam', 'Contoh: Semua armada ber-GPS dan diasuransikan Jasindo', 'Contoh: Driver berpengalaman 5+ tahun, ramah & profesional'][i]}
-                        value={form.keunggulan[i]}
-                        onChange={e => {
-                          const arr: [string,string,string] = [...form.keunggulan] as [string,string,string]
-                          arr[i] = e.target.value
-                          set('keunggulan', arr)
-                        }}
-                      />
-                    ))}
-                  </div>
+                {/* Syarat Sewa — khusus rental. (Keunggulan kini ditanya di Step 0
+                    "Apa yang membuat Anda beda?", tak diulang di sini.) */}
+                <div className="pt-4 border-t border-black/[0.05]">
                   <Field label="Syarat Sewa (opsional)">
                     <textarea className={textareaCls} rows={2} value={form.syarat_sewa}
                       onChange={e => set('syarat_sewa', e.target.value)}
@@ -717,27 +775,9 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               </div>
             )}
 
-            {/* KEUNGGULAN UNIVERSAL — semua industri kecuali rental (sudah ada di atas) */}
-            {tipe !== 'travel' && (
-              <div className="pt-4 border-t border-black/[0.05] space-y-3">
-                <p className="text-sm font-bold text-gray-700">3 Keunggulan Bisnis Anda</p>
-                <p className="text-xs text-gray-400">Dalam kalimat Anda sendiri. Ini yang ditampilkan di section "Mengapa Kami".</p>
-                {([0,1,2] as const).map(i => (
-                  <input key={i} className={inputCls}
-                    placeholder={`Keunggulan ${i+1} (contoh: Berpengalaman 10+ tahun, 500+ klien puas...)`}
-                    value={form.keunggulan[i]}
-                    onChange={e => {
-                      const arr: [string,string,string] = [...form.keunggulan] as [string,string,string]
-                      arr[i] = e.target.value
-                      set('keunggulan', arr)
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Tombol "Lewati" dihapus (Opsi C) — nav "Lanjut ke Branding" tetap
-                meneruskan tanpa wajib isi, jadi form tetap bisa dilewati. */}
+            {/* Keunggulan kini ditanya di Step 0 ("Apa yang membuat Anda beda?") →
+                tak diulang di sini supaya tidak double-ask. Nav "Lanjut ke Branding"
+                tetap meneruskan tanpa wajib isi (form tetap bisa dilewati). */}
           </div>
         )}
 
@@ -883,6 +923,7 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
               {[
                 { label: 'Nama Usaha', val: form.nama_usaha },
                 { label: 'Tagline', val: form.tagline || '— (tidak diisi)' },
+                { label: 'Cerita Bisnis', val: form.tawaran || '— (belum diisi)' },
                 { label: 'WhatsApp', val: form.wa },
                 { label: 'Email', val: form.email || '— (tidak diisi)' },
                 { label: 'Alamat', val: form.alamat || '— (tidak diisi)' },
@@ -907,6 +948,33 @@ export default function BriefingForm({ token, orderId, namaKlien, nomorWa, email
             {error && (
               <div className="p-4 rounded-[16px] bg-red-50 border border-red-100">
                 <p className="text-sm font-bold text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Soft-gate: tahan sekali (ramah, bukan blokir) kalau "Cerita Bisnis"
+                kosong. "Isi dulu" lompat ke Step 0; "Lanjut saja" tetap kirim. */}
+            {showSoftGate && (
+              <div className="p-4 rounded-[16px] bg-amber-50 border border-amber-200 animate-fade-in">
+                <p className="text-sm font-bold text-amber-900">Lewati cerita bisnis?</p>
+                <p className="text-xs text-amber-800/90 font-medium mt-1 leading-relaxed">
+                  Tanpa ini, website Anda memakai kalimat umum yang juga dipakai bisnis lain. Isi satu kalimat saja sudah jauh lebih baik.
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => { setShowSoftGate(false); setStep(0) }}
+                    className="px-4 py-2 rounded-full bg-[#0071E3] text-white text-xs font-bold hover:bg-blue-600 transition-colors"
+                  >
+                    Isi dulu
+                  </button>
+                  <button
+                    type="button"
+                    onClick={doSubmit}
+                    className="px-4 py-2 rounded-full text-amber-800 text-xs font-bold hover:bg-amber-100 transition-colors"
+                  >
+                    Lanjut saja
+                  </button>
+                </div>
               </div>
             )}
 
