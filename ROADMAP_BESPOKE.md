@@ -42,6 +42,16 @@ Mesin bespoke digeneralisasi dari toko-only ke **lintas industri**, additive & n
 **Cara nambah industri baru:** daftarkan renderer di `BESPOKE_RENDERERS` (+`source`) + variant
 di `BESPOKE_VARIANTS` → intercept & render otomatis. Tak ada cabang `if` baru.
 
+**Kontrak portal "Susunan Halaman" (berlaku otomatis untuk tema baru):** customer bisa
+menyembunyikan blok pengayaan (stats/faq/statement/gallery) dan me-reorder item etalase
+langsung dari portal. Reorder universal — fetch publik (`lib/supabase/addons.ts`) selalu
+`ORDER BY urutan`, tak perlu kerja per-tema. Untuk hide, **setiap renderer WAJIB merender
+blok opsional di belakang guard kehadiran** (`{content.stats?.length && …}` /
+`{content.statement && …}`) — JANGAN unconditional/fallback. Adapter me-null-kan blok yang
+disembunyikan; renderer ber-guard otomatis menghilangkannya. Dikunci test
+`toko-bespoke/hide-contract.test.tsx` (parametrik atas `BESPOKE_RENDERERS` → tema baru
+auto-teruji). SSOT key: `lib/portal/section-visibility.ts`.
+
 ## Roadmap tema (5 wave, 1 tema = 1 PR, urut bisa di-reorder owner)
 
 Theme-key registry = `<tipe>-<subcat>` (stabil). Seed direction = palet/mood dari stub
@@ -62,7 +72,9 @@ cek anti-duplikat `DESIGN_LEDGER.md`.** Default 1 palet/tema (owner boleh minta 
    palet+pairing dari ui-ux-pro-max DB; kontrak `design-rules/<mood>.md`.
 2. **BUILD** — renderer `src/app/components/themes/<tipe>-<subcat>/...Renderer.tsx` pakai
    primitive `lux-script.ts`. Wajib: **mode sparse** (pelajaran #132) + **state tersembunyi-awal
-   lewat primitive LUX_JS / CSS murni base-TAMPIL**, bukan React hook (pelajaran #138).
+   lewat primitive LUX_JS / CSS murni base-TAMPIL**, bukan React hook (pelajaran #138) +
+   **blok opsional (stats/faq/statement/gallery) di belakang guard kehadiran** supaya hide
+   portal "Susunan Halaman" jalan (dikunci `hide-contract.test.tsx`).
 3. **Wiring** — `BESPOKE_RENDERERS` (+`source`) · `BESPOKE_VARIANTS` · repoint
    `THEMES[tipe][subcat]` + flip `ready:true` di `INDUSTRY_SUBKATEGORI` · `sample-content.ts`
    alias imagery · baris `DESIGN_LEDGER.md`.
