@@ -3,25 +3,27 @@
 
 const FONNTE_API = 'https://api.fonnte.com/send'
 
-// Normalisasi nomor WA Indonesia → format 62XXX (tanpa +, tanpa spasi, tanpa 0 di depan)
-// Mendukung input "0812...", "+62812...", "62812...", "0812-3456-7890" dll.
-export function normalizeWa(phone: string): string {
-  let cleaned = phone.replace(/\D/g, '')
-  if (cleaned.startsWith('0')) cleaned = '62' + cleaned.substring(1)
-  if (!cleaned.startsWith('62')) cleaned = '62' + cleaned
+// Normalisasi nomor WA → format <cc>XXX (tanpa +, spasi, atau 0 di depan).
+// defaultCc = kode negara tenant (default '62' Indonesia; mis. '81' utk Jepang).
+// Mendukung input "0812...", "+62812...", "62812...", "090...", "+8190..." dll.
+// Logika identik dgn versi lama saat defaultCc='62' (parity utk semua caller existing).
+export function normalizeWa(phone: string, defaultCc = '62'): string {
+  let cleaned = (phone ?? '').replace(/\D/g, '')
+  if (cleaned.startsWith('0')) cleaned = defaultCc + cleaned.substring(1)
+  if (!cleaned.startsWith(defaultCc)) cleaned = defaultCc + cleaned
   return cleaned
 }
 
 export type FonnteResult = { ok: true; id?: string } | { ok: false; error: string }
 
-export async function sendWhatsApp(target: string, message: string): Promise<FonnteResult> {
+export async function sendWhatsApp(target: string, message: string, defaultCc = '62'): Promise<FonnteResult> {
   const token = process.env.FONNTE_TOKEN
   if (!token) {
     console.warn('[fonnte] FONNTE_TOKEN tidak diset — skip kirim WA')
     return { ok: false, error: 'no_token' }
   }
 
-  const phone = normalizeWa(target)
+  const phone = normalizeWa(target, defaultCc)
   if (!phone || phone.length < 10) {
     console.warn('[fonnte] nomor WA invalid:', target)
     return { ok: false, error: 'invalid_phone' }
@@ -363,4 +365,63 @@ export async function notifyReferrer(
       break
   }
   return sendWhatsApp(phone, message)
+}
+
+// ── F&B Pre-Order: notifikasi order baru ────────────────────────────────────
+export type PreorderNotifContext = {
+  businessName: string
+  customerName: string
+  orderShort: string       // id pendek (8 char)
+  itemsText: string        // "Bakso Campur ×2, Es Teh ×1"
+  totalText: string        // sudah diformat mata uang (mis. "¥1,800")
+  fulfillmentText: string  // "Ambil sendiri · 2026-06-20 12:00" / "Diantar · ..."
+  address?: string | null
+  note?: string | null
+  trackUrl?: string | null
+}
+
+function preorderAdminTemplate(c: PreorderNotifContext): string {
+  return [
+    `🍜 *Pesanan PO baru!*`,
+    ``,
+    `${c.businessName}`,
+    `Order: *${c.orderShort}*`,
+    ``,
+    `👤 ${c.customerName}`,
+    `🧾 ${c.itemsText}`,
+    `💰 Total: *${c.totalText}*`,
+    `📦 ${c.fulfillmentText}`,
+    c.address ? `📍 ${c.address}` : '',
+    c.note ? `📝 ${c.note}` : '',
+    ``,
+    `Kelola pesanan di dashboard Anda.`,
+  ].filter(Boolean).join('\n')
+}
+
+function preorderReceiptTemplate(c: PreorderNotifContext): string {
+  return [
+    `Halo ${c.customerName}! 🙏`,
+    ``,
+    `Terima kasih, pesanan Anda di *${c.businessName}* sudah kami terima.`,
+    ``,
+    `Order: *${c.orderShort}*`,
+    `🧾 ${c.itemsText}`,
+    `💰 Total: *${c.totalText}*`,
+    `📦 ${c.fulfillmentText}`,
+    ``,
+    `Kami akan konfirmasi ketersediaan & detail pembayaran via chat ini. 😊`,
+    c.trackUrl ? `\nLacak: ${c.trackUrl}` : '',
+  ].filter(Boolean).join('\n')
+}
+
+export async function notifyPreorder(
+  event: { type: 'preorder_admin' | 'preorder_receipt' },
+  phone: string,
+  ctx: PreorderNotifContext,
+  defaultCc = '62',
+): Promise<FonnteResult> {
+  const message = event.type === 'preorder_admin'
+    ? preorderAdminTemplate(ctx)
+    : preorderReceiptTemplate(ctx)
+  return sendWhatsApp(phone, message, defaultCc)
 }

@@ -51,6 +51,7 @@ export default async function PortalPage() {
   const hasMenu = !!konfig.features?.hasMenu
   const hasBlog = !!konfig.features?.hasBlog
   const hasGallery = !!konfig.features?.hasGallery
+  const hasPreorder = !!konfig.features?.hasPreorder
   const contentIsSample = !!konfig.content_is_sample
 
   // Tab konten yang HARUS terbuka karena tema situs merender datanya tanpa
@@ -92,9 +93,10 @@ export default async function PortalPage() {
   // terlanjur konfigurasi di-grandfather (lihat lib/addons/portal-tabs).
   const hasPaymentTab = paymentEntitled(konfig.features, paymentStatus.configured)
 
-  // Pesanan masuk (toko) — terbaru dulu, dengan item-nya.
+  // Pesanan masuk (toko + pre-order F&B) — terbaru dulu, dengan item-nya.
+  // PO juga tersimpan di shop_orders → muat juga saat hasPreorder.
   let shopOrders: ShopOrderRow[] = []
-  if (hasShop && page?.id) {
+  if ((hasShop || hasPreorder) && page?.id) {
     const { data } = await supabaseAdmin
       .from('shop_orders')
       .select('*, shop_order_items(*)')
@@ -170,6 +172,9 @@ export default async function PortalPage() {
       hasMenu={showMenu}
       hasBlog={showBlog}
       hasGallery={showGallery}
+      hasPreorder={hasPreorder}
+      preorder={konfig.preorder ?? { open: false }}
+      localeConfig={konfig.localeConfig}
       contentIsSample={contentIsSample}
       kontenBrand={initialKontenBrand}
       paymentStatus={paymentStatus}
