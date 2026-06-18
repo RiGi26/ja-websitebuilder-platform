@@ -105,6 +105,10 @@ export interface KonfigurasiWebsite {
   /** Opsi C: konten halaman masih contoh template (briefing inti kosong saat build).
    *  Portal pakai ini untuk banner onboarding. Tidak memengaruhi render situs publik. */
   content_is_sample?: boolean
+  /** Cutover Bakso Fase 1 (BAKSO_PORTAL_CONTRACT.md §11). 'portal' → storefront baca
+   *  catalog_mirror + checkout POST ke /api/orders (Portal SoR). Default/absen = jalur
+   *  WB lama (menu_items + /api/preorder/create). Per-tenant; tenant lain nol regresi. */
+  source_of_truth?: 'wb' | 'portal'
 }
 
 export type TipeKomponen =
