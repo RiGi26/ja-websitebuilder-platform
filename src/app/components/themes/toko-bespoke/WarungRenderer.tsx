@@ -4,6 +4,7 @@ import type { BespokeProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
+import PortalMenuSection from '@/app/components/order/PortalMenuSection'
 
 // ============================================================
 // HANGAT — Restaurant Warung / Kedai Bespoke Lux Renderer (Folk Warmth)
@@ -266,15 +267,18 @@ html,body{overflow-x:hidden;max-width:100%}
 // situs Hangat. Klaim spesifik milik klien → konten editabel.
 const RIBBON = ['Masakan Rumahan', 'Hangat', 'Dimasak Dadakan', 'Bersama', 'Sederhana']
 
-export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, localeConfig }: BespokeProps) {
+export default function WarungRenderer({ content: c, variant = 'hangat', primary, poUrl, localeConfig, portalCatalog }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.hangat
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
+  // Cutover Portal (Bakso Fase 1): etalase jadi ber-keranjang in-page → CTA "Pesan"
+  // mengarah ke #menu (bukan WA/PO). PortalCartProvider membungkus dari SiteRenderer.
+  const portalMode = Array.isArray(portalCatalog) && portalCatalog.length > 0
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#menu'
   // F&B Pre-Order: bila poUrl ada, CTA "Pesan" utama → form PO; WhatsApp jadi sekunder.
-  const orderHref = poUrl ?? waUrl
-  const orderLabel = poUrl ? 'Pesan (PO)' : 'Pesan'
+  const orderHref = portalMode ? '#menu' : (poUrl ?? waUrl)
+  const orderLabel = portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : 'Pesan')
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
   const features = c.features ?? []
@@ -313,7 +317,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, 
           {hero.subtitle && <p className="wr-hero-sub">{hero.subtitle}</p>}
           <div className="wr-hero-btns">
             <a href={hero.ctaHref ?? '#menu'} className="wr-btn-primary">{hero.ctaText ?? 'Lihat Menu'}</a>
-            <a href={poUrl ?? hero.ctaHref2 ?? waUrl} className="wr-btn-ghost">{poUrl ? 'Pesan (PO)' : (hero.ctaText2 ?? 'Pesan Antar')}</a>
+            <a href={portalMode ? '#menu' : (poUrl ?? hero.ctaHref2 ?? waUrl)} className="wr-btn-ghost">{portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : (hero.ctaText2 ?? 'Pesan Antar'))}</a>
           </div>
           {stats.length > 0 && (
             <div className="wr-hero-meta">
@@ -365,8 +369,19 @@ export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, 
         </section>
       )}
 
-      {/* SHOWCASE MENU — banderol harga (signature) */}
-      {items.length > 0 && (
+      {/* SHOWCASE MENU — mode Portal (Bakso Fase 1): etalase ber-keranjang in-page. */}
+      {portalMode && (
+        <PortalMenuSection
+          catalog={portalCatalog!}
+          localeConfig={localeConfig}
+          primary={primary ?? p.accent}
+          heading={c.showcase?.title ?? 'Menu Kami'}
+          subtitle={c.showcase?.subtitle}
+        />
+      )}
+
+      {/* SHOWCASE MENU — banderol harga (signature), link-only (non-portal) */}
+      {!portalMode && items.length > 0 && (
         <section className="wr-section wr-showcase" id="menu">
           <div className="wr-sec-hdr wr-rv lx-reveal" style={{ textAlign: 'center', margin: '0 auto 3.2rem' }}>
             <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Menu</p>
@@ -521,7 +536,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, 
             <h2 className="wr-cta-title">{c.cta.title}</h2>
             {c.cta.subtitle && <p className="wr-cta-sub">{c.cta.subtitle}</p>}
             <div className="wr-cta-btns">
-              <a href={orderHref} className="wr-btn-primary">{poUrl ? 'Pesan Sekarang' : (c.cta.ctaText ?? 'Pesan via WhatsApp')}</a>
+              <a href={orderHref} className="wr-btn-primary">{portalMode || poUrl ? 'Pesan Sekarang' : (c.cta.ctaText ?? 'Pesan via WhatsApp')}</a>
               <a href="#menu" className="wr-btn-ghost">Lihat Menu</a>
             </div>
           </div>
@@ -574,7 +589,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', poUrl, 
       </footer>
 
       {/* LIGHTBOX */}
-      <BespokeLightbox ctaText={poUrl ? 'Pesan (PO)' : 'Pesan via WhatsApp'} />
+      <BespokeLightbox ctaText={portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : 'Pesan via WhatsApp')} />
       <script dangerouslySetInnerHTML={{ __html: LUX_JS }} />
     </div>
   )

@@ -8,6 +8,7 @@
 import type { ComponentType } from 'react'
 import type { ComposableContent } from '@/lib/theme-system/manifest'
 import type { Product, LocaleConfig } from '@/types/websitebuilder'
+import type { PortalCatalogItem } from '@/lib/portal/types'
 
 export interface BespokeProps {
   content: ComposableContent
@@ -27,6 +28,10 @@ export interface BespokeProps {
   poUrl?: string
   /** Locale per-tenant (currency/locale/phone) — format harga. Default IDR/id-ID bila kosong. */
   localeConfig?: LocaleConfig
+  /** Cutover Portal (Bakso Fase 1, BAKSO_PORTAL_CONTRACT.md §11): bila ada, renderer
+   *  menu-source mengganti showcase link-only dgn etalase ber-keranjang (PortalMenuSection).
+   *  SiteRenderer membungkus renderer dgn PortalCartProvider. Renderer lain mengabaikan. */
+  portalCatalog?: PortalCatalogItem[]
 }
 
 /** @deprecated alias — pakai BespokeProps. Dipertahankan utk renderer toko lama. */
