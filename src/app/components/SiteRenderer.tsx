@@ -9,6 +9,8 @@ import {
 } from '@/lib/supabase/addons'
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
+import PortalCartProvider from '@/app/components/order/PortalCartProvider'
+import { fetchCatalogMirror } from '@/lib/portal/mirror'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import AtelierCartButton from '@/app/components/themes/toko-atelier/AtelierCartButton'
 import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
@@ -59,6 +61,48 @@ export async function renderSite({
   // plumbing data baru. Coexist dgn composable di bawah → nol regresi.
   const bespoke = theme ? BESPOKE_RENDERERS[theme] : undefined
   if (bespoke) {
+    // ── Cutover Portal (Bakso Fase 1, BAKSO_PORTAL_CONTRACT.md §11) ──
+    // Tenant ber-flag source_of_truth='portal' pada renderer menu-source: storefront
+    // baca catalog_mirror (service-role; mirror tanpa anon §3/§8) + etalase ber-keranjang
+    // in-page → checkout /api/orders (Portal SoR). Tenant lain & renderer toko = nol regresi.
+    if (konfig.source_of_truth === 'portal' && bespoke.source === 'menu') {
+      const [catalog, profile, galleryRows] = await Promise.all([
+        fetchCatalogMirror(slug),
+        fetchTenantProfile(client, page.id),
+        fetchGalleryByPage(client, page.id),
+      ])
+      // Mirror kosong (gagal fetch ATAU full-sync menonaktifkan semua pack) → jangan
+      // render storefront ber-keranjang tanpa menu. Tampilkan notice ber-brand.
+      if (catalog.length === 0) {
+        return (
+          <main style={{ minHeight: '60vh', display: 'grid', placeItems: 'center', padding: '4rem 1.5rem', textAlign: 'center', fontFamily: 'system-ui,sans-serif', background: '#FBF3E4', color: '#2B1A12' }}>
+            <div>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '.5rem' }}>{page.nama_website}</h1>
+              <p style={{ color: '#6E5240' }}>Menu sedang disiapkan — silakan kembali sebentar lagi.</p>
+            </div>
+          </main>
+        )
+      }
+      // Source kosong: showcase composable digantikan PortalMenuSection (dari mirror).
+      const content = composableContentFromSections(
+        page.nama_website, sections, [], profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Menu Kami', galleryRows,
+      )
+      const Renderer = bespoke.Renderer
+      return (
+        <PortalCartProvider slug={slug} primary={primary} localeConfig={konfig.localeConfig} businessName={page.nama_website}>
+          <Renderer
+            content={content}
+            variant={variant}
+            primary={primary}
+            slug={slug}
+            capabilities={konfig.capabilities}
+            localeConfig={konfig.localeConfig}
+            portalCatalog={catalog}
+          />
+        </PortalCartProvider>
+      )
+    }
+
     // Sumber etalase per industri (cermin cabang composable): menu_items / services
     // / blog_posts (dipetakan) / products (default + toko).
     const fetchSource: Promise<ShowcaseSourceItem[]> =
