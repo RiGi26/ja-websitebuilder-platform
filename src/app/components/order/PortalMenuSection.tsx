@@ -75,6 +75,7 @@ export default function PortalMenuSection({
                   )}
                   {low && !soldOut && <span className="pmenu-low">Stok menipis</span>}
                   {preorder && <span className="pmenu-po-label">Pre-Order</span>}
+                  {item.avail_status === 'tersedia' && <span className="pmenu-available">Tersedia</span>}
                 </div>
               </div>
             </article>
@@ -98,6 +99,7 @@ function pmenuCss(primary: string): string {
 .pmenu-out{font:600 .82rem/1 system-ui,sans-serif;color:#9A3322}
 .pmenu-low{font-size:.74rem;color:#9A3322;font-weight:600}
 .pmenu-po-label{font-size:.74rem;color:#0071E3;font-weight:600}
+.pmenu-available{font-size:.74rem;color:#34C759;font-weight:600}
 .wr-card-preorder{position:absolute;left:.8rem;bottom:.8rem;z-index:4;font-size:.78rem;color:#fff;background:#0071E3;padding:.32rem .85rem;border-radius:999px;letter-spacing:.02em;box-shadow:0 6px 14px rgba(0,113,227,0.3)}
 .pmenu-add-btn:focus-visible,.pmenu-step button:focus-visible{outline:3px solid ${primary};outline-offset:2px}
 `
