@@ -36,6 +36,14 @@ export const PALETTES: Record<string, WrPal> = {
     line: 'rgba(43,26,18,.14)', line2: 'rgba(43,26,18,.08)',
     shadow: 'rgba(43,26,18,.1)', shadowDeep: 'rgba(43,26,18,.2)',
   },
+  // Biru — minimalis putih & biru macOS (Apple Blue)
+  biru: {
+    bg: '#F5F5F7', bg2: '#EAEAEF', surface: '#FFFFFF', surface2: '#F5F5F7',
+    ink: '#1D1D1F', inkDim: '#3A3A3C', muted: '#86868B',
+    accent: '#0071E3', accentDeep: '#005BB5', onAccent: '#FFFFFF',
+    line: 'rgba(0,0,0,.08)', line2: 'rgba(0,0,0,.04)',
+    shadow: 'rgba(0,0,0,.04)', shadowDeep: 'rgba(0,0,0,.08)',
+  },
 }
 
 const FONT_IMPORT = 'https://fonts.googleapis.com/css2?family=Caprasimo&family=Karla:wght@300;400;500;600;700&display=swap'
@@ -377,6 +385,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
           primary={primary ?? p.accent}
           heading={c.showcase?.title ?? 'Menu Kami'}
           subtitle={c.showcase?.subtitle}
+          variant={variant}
         />
       )}
 

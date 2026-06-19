@@ -17,12 +17,14 @@ export default function PortalMenuSection({
   primary = '#C0432E',
   heading = 'Menu Kami',
   subtitle,
+  variant,
 }: {
   catalog: PortalCatalogItem[]
   localeConfig?: LocaleConfig
   primary?: string
   heading?: string
   subtitle?: string
+  variant?: string
 }) {
   const { add, inc, dec, qtyOf } = usePortalCart()
   const { locale, currency } = moneyFromConfig(localeConfig)
@@ -39,7 +41,7 @@ export default function PortalMenuSection({
 
   return (
     <section className="wr-section pmenu-section-container" id="menu">
-      <style dangerouslySetInnerHTML={{ __html: pmenuCss(primary) }} />
+      <style dangerouslySetInnerHTML={{ __html: pmenuCss(primary, variant) }} />
       
       <div className="wr-sec-hdr pmenu-header" style={{ textAlign: 'center', margin: '0 auto 2.5rem' }}>
         <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Menu</p>
@@ -141,11 +143,31 @@ export default function PortalMenuSection({
   )
 }
 
-function pmenuCss(primary: string): string {
+function pmenuCss(primary: string, variant?: string): string {
+  const isBiru = variant === 'biru'
+  const bg = isBiru ? '#F5F5F7' : '#FBF3E4'
+  const cardBg = isBiru ? '#FFFFFF' : '#FFFBF2'
+  const ink = isBiru ? '#1D1D1F' : '#2B1A12'
+  const inkDim = isBiru ? '#475569' : '#6E5240'
+  const cardBorder = isBiru ? 'rgba(0, 0, 0, 0.05)' : 'rgba(43, 26, 18, 0.04)'
+  const cardShadow = isBiru ? '0 8px 30px rgba(0, 0, 0, 0.03)' : '0 10px 30px rgba(43, 26, 18, 0.03)'
+  const cardHoverShadow = isBiru ? '0 25px 50px rgba(0, 0, 0, 0.06)' : '0 25px 50px rgba(43, 26, 18, 0.08)'
+  const priceBg = isBiru ? 'rgba(0, 113, 227, 0.95)' : 'rgba(224, 169, 60, 0.95)'
+  const priceText = isBiru ? '#FFFFFF' : '#2B1A12'
+  const catBtnBorder = isBiru ? 'rgba(0, 0, 0, 0.06)' : 'rgba(43, 26, 18, 0.08)'
+  const catBtnColor = isBiru ? '#475569' : '#6E5240'
+  const catBtnHoverBg = isBiru ? 'rgba(0, 0, 0, 0.03)' : 'rgba(43, 26, 18, 0.04)'
+  const catBtnHoverColor = isBiru ? '#1D1D1F' : '#2B1A12'
+  const catBtnActiveBg = isBiru ? primary : '#2B1A12'
+  const catBtnActiveColor = isBiru ? '#FFFFFF' : '#FFFBF2'
+  const catBtnActiveBorder = isBiru ? primary : '#2B1A12'
+  const catBarBg = isBiru ? 'rgba(255, 255, 255, 0.85)' : 'rgba(251, 243, 228, 0.85)'
+  const catBarBorder = isBiru ? 'rgba(0, 0, 0, 0.05)' : 'rgba(43, 26, 18, 0.05)'
+
   return `
 /* SECTION STYLING */
 .pmenu-section-container {
-  background: #FBF3E4;
+  background: ${bg};
 }
 
 /* STICKY CATEGORY CAPSULE BAR */
@@ -157,15 +179,15 @@ function pmenuCss(primary: string): string {
   justify-content: center;
   margin-bottom: 2.5rem;
   padding: 0.5rem 0;
-  background: rgba(251, 243, 228, 0.85);
+  background: ${catBarBg};
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 999px;
-  box-shadow: 0 4px 20px rgba(43, 26, 18, 0.03);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid rgba(43, 26, 18, 0.05);
+  border: 1px solid ${catBarBorder};
 }
 @media (max-width: 640px) {
   .pmenu-cat-bar-wrapper {
@@ -199,9 +221,9 @@ function pmenuCss(primary: string): string {
   font-family: inherit;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6E5240;
+  color: ${catBtnColor};
   background: transparent;
-  border: 1px solid rgba(43, 26, 18, 0.08);
+  border: 1px solid ${catBtnBorder};
   padding: 0.5rem 1.2rem;
   border-radius: 999px;
   cursor: pointer;
@@ -209,29 +231,29 @@ function pmenuCss(primary: string): string {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pmenu-cat-btn:hover {
-  background: rgba(43, 26, 18, 0.04);
-  color: #2B1A12;
+  background: ${catBtnHoverBg};
+  color: ${catBtnHoverColor};
 }
 .pmenu-cat-btn.active {
-  background: #2B1A12;
-  color: #FFFBF2;
-  border-color: #2B1A12;
-  box-shadow: 0 4px 12px rgba(43, 26, 18, 0.15);
+  background: ${catBtnActiveBg};
+  color: ${catBtnActiveColor};
+  border-color: ${catBtnActiveBorder};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
 /* PREMIUM ELEVATED CARDS */
 .pmenu-card {
   border-radius: 28px !important;
-  background: #FFFBF2 !important;
-  border: 1px solid rgba(43, 26, 18, 0.04) !important;
-  box-shadow: 0 10px 30px rgba(43, 26, 18, 0.03) !important;
+  background: ${cardBg} !important;
+  border: 1px solid ${cardBorder} !important;
+  box-shadow: ${cardShadow} !important;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 .pmenu-card:hover {
   transform: translateY(-8px) scale(1.015) !important;
-  box-shadow: 0 25px 50px rgba(43, 26, 18, 0.08) !important;
-  border-color: rgba(192, 67, 46, 0.15) !important;
+  box-shadow: ${cardHoverShadow} !important;
+  border-color: ${isBiru ? 'rgba(0, 113, 227, 0.25)' : 'rgba(192, 67, 46, 0.15)'} !important;
 }
 .pmenu-card-frame {
   border-radius: 24px 24px 0 0 !important;
@@ -246,22 +268,22 @@ function pmenuCss(primary: string): string {
 
 /* GLASSMORPHIC PRICE TAG & BADGES */
 .pmenu-card-cat {
-  background: rgba(255, 251, 242, 0.88) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #2B1A12 !important;
-  border: 1px solid rgba(43, 26, 18, 0.05);
+  color: ${ink} !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .pmenu-card-tag {
-  background: rgba(224, 169, 60, 0.95) !important; /* Gold */
-  color: #2B1A12 !important;
+  background: ${priceBg} !important;
+  color: ${priceText} !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(224, 169, 60, 0.2) !important;
+  box-shadow: ${isBiru ? '0 4px 12px rgba(0, 113, 227, 0.15)' : '0 4px 12px rgba(224, 169, 60, 0.2)'} !important;
   border-radius: 999px 0 0 999px;
 }
 .pmenu-badge-soldout {
-  background: rgba(43, 26, 18, 0.9) !important;
+  background: rgba(29, 29, 31, 0.9) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -289,12 +311,12 @@ function pmenuCss(primary: string): string {
 }
 .pmenu-card-name {
   font-size: 1.35rem !important;
-  color: #2B1A12 !important;
+  color: ${ink} !important;
   margin-bottom: 0.5rem !important;
 }
 .pmenu-card-desc {
   font-size: 0.88rem !important;
-  color: #6E5240 !important;
+  color: ${inkDim} !important;
   line-height: 1.6 !important;
 }
 
@@ -323,13 +345,13 @@ function pmenuCss(primary: string): string {
   font: 600 0.85rem/1 system-ui, sans-serif;
   padding: 0.65rem 1.3rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(192, 67, 46, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.15);
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pmenu-add-btn:hover {
   filter: brightness(1.08);
   transform: scale(1.04);
-  box-shadow: 0 6px 16px rgba(192, 67, 46, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.25);
 }
 .pmenu-add-btn:active {
   transform: scale(0.96);
@@ -342,7 +364,7 @@ function pmenuCss(primary: string): string {
   border-radius: 999px;
   padding: 0.3rem 0.5rem;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(192, 67, 46, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.05);
   animation: pmenu-pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pmenu-step button {
@@ -350,7 +372,7 @@ function pmenuCss(primary: string): string {
   height: 30px;
   border: none;
   background: ${primary}14;
-  color: #2B1A12;
+  color: ${ink};
   border-radius: 50%;
   cursor: pointer;
   display: inline-flex;
@@ -377,9 +399,9 @@ function pmenuCss(primary: string): string {
   gap: 0.4rem;
   margin-left: auto;
   padding: 0.35rem 0.75rem;
-  background: rgba(43, 26, 18, 0.03);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 999px;
-  border: 1px solid rgba(43, 26, 18, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 }
 .pmenu-status-dot {
   width: 6px;
@@ -448,5 +470,5 @@ function pmenuCss(primary: string): string {
   outline: 3px solid ${primary};
   outline-offset: 2px;
 }
-`
+`;
 }
