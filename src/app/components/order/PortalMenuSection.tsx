@@ -80,8 +80,9 @@ export default function PortalMenuSection({
           const preorder = item.avail_status === 'preorder'
           const ready = item.avail_status === 'tersedia'
           const qty = qtyOf(item.pack_id)
+          const hasImage = !!item.foto_url
           return (
-            <article key={item.pack_id} className={`wr-card pmenu-card${soldOut ? ' is-soldout' : ''}`}>
+            <article key={item.pack_id} className={`wr-card pmenu-card${soldOut ? ' is-soldout' : ''}${!hasImage ? ' no-image' : ''}`}>
               <div className="wr-card-frame pmenu-card-frame">
                 {item.kategori && <span className="wr-card-cat pmenu-card-cat">{item.kategori}</span>}
                 <span className="wr-card-tag pmenu-card-tag">{priceText(item.harga)}</span>
@@ -94,9 +95,22 @@ export default function PortalMenuSection({
                 {item.foto_url && <img src={item.foto_url} alt={item.product_nama} loading="lazy" className="pmenu-card-img" />}
               </div>
               <div className="wr-card-body pmenu-card-body">
+                {/* Mobile Price & Category Row */}
+                <div className="pmenu-mobile-price-row">
+                  {item.kategori && <span className="pmenu-mobile-cat">{item.kategori}</span>}
+                  <span className="pmenu-mobile-price">{priceText(item.harga)}</span>
+                </div>
+
                 <h3 className="wr-card-name pmenu-card-name">{item.product_nama}</h3>
                 {item.deskripsi && <p className="wr-card-desc pmenu-card-desc">{item.deskripsi}</p>}
                 
+                {/* Mobile Status Badges */}
+                <div className="pmenu-mobile-badges">
+                  {soldOut && <span className="pmenu-mobile-badge pmenu-mobile-badge-soldout">Habis</span>}
+                  {preorder && <span className="pmenu-mobile-badge pmenu-mobile-badge-po">PO</span>}
+                  {low && <span className="pmenu-mobile-badge pmenu-mobile-badge-limited">Terbatas</span>}
+                </div>
+
                 <div className="pmenu-add-section">
                   <div className="pmenu-add">
                     {soldOut ? (
@@ -187,6 +201,10 @@ function pmenuCss(primary: string, variant?: string): string {
 /* SECTION STYLING */
 .pmenu-section-container {
   background: ${bg};
+}
+
+.pmenu-mobile-price-row, .pmenu-mobile-badges {
+  display: none;
 }
 
 /* STICKY CATEGORY CAPSULE BAR */
@@ -518,6 +536,174 @@ function pmenuCss(primary: string, variant?: string): string {
 }
 .pmenu-expand-btn:active {
   transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .pmenu-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+  .pmenu-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    min-height: 110px !important;
+    text-align: left !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+  }
+  .pmenu-card:hover {
+    transform: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    border-color: ${cardBorder} !important;
+  }
+  .pmenu-card:hover .pmenu-card-img {
+    transform: none !important;
+  }
+  .pmenu-card-frame {
+    width: 90px !important;
+    height: 90px !important;
+    flex-shrink: 0 !important;
+    order: 2 !important;
+    margin: 10px !important;
+    border-radius: 12px !important;
+    aspect-ratio: 1/1 !important;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+  }
+  .pmenu-card-frame img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+  .pmenu-card-frame > span {
+    display: none !important;
+  }
+  .pmenu-card.no-image .pmenu-card-frame {
+    display: none !important;
+  }
+  .pmenu-card-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    order: 1 !important;
+    padding: 10px 0 10px 14px !important;
+  }
+  .pmenu-card-name {
+    font-size: 1rem !important;
+    margin-bottom: 2px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+  .pmenu-card-desc {
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 4px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  
+  .pmenu-mobile-price-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-bottom: 4px !important;
+  }
+  .pmenu-mobile-cat {
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    background: ${isBiru ? 'rgba(0, 113, 227, 0.08)' : 'rgba(224, 169, 60, 0.12)'} !important;
+    color: ${isBiru ? primary : '#B07B1B'} !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    line-height: 1.2 !important;
+  }
+  .pmenu-mobile-price {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: ${isBiru ? primary : '#C0432E'} !important;
+    line-height: 1.2 !important;
+  }
+  
+  .pmenu-mobile-badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .pmenu-mobile-badge {
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    padding: 1px 6px !important;
+    border-radius: 4px !important;
+    line-height: 1.2 !important;
+  }
+  .pmenu-mobile-badge-soldout {
+    background: #8E8E93 !important;
+    color: #FFF !important;
+  }
+  .pmenu-mobile-badge-po {
+    background: #0071E3 !important;
+    color: #FFF !important;
+  }
+  .pmenu-mobile-badge-limited {
+    background: #FF9500 !important;
+    color: #FFF !important;
+  }
+
+  .pmenu-add-section {
+    margin-top: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .pmenu-add {
+    min-height: 32px !important;
+    gap: 0.5rem !important;
+  }
+  .pmenu-add-btn {
+    padding: 0.4rem 1rem !important;
+    font-size: 0.76rem !important;
+    min-height: 32px !important;
+    line-height: 1 !important;
+  }
+  .pmenu-step {
+    padding: 0.2rem 0.4rem !important;
+    gap: 0.5rem !important;
+    min-height: 32px !important;
+  }
+  .pmenu-step button {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .pmenu-step span {
+    font-size: 0.85rem !important;
+  }
+  .pmenu-status-container {
+    padding: 0.25rem 0.6rem !important;
+    gap: 0.3rem !important;
+  }
+  .pmenu-status-dot {
+    width: 5px !important;
+    height: 5px !important;
+  }
+  .pmenu-po-note {
+    font-size: 0.65rem !important;
+    margin-top: 4px !important;
+  }
 }
 `;
 }

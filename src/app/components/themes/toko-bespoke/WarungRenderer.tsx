@@ -99,7 +99,7 @@ html,body{overflow-x:hidden;max-width:100%}
   .wr-hero-sub{margin-bottom:1.2rem}
   .wr-hero-btns{margin-bottom:1.5rem}
 }
-@media(max-width:560px){.wr-nav{padding:.9rem 6vw}
+@media(max-width:560px){.wr-nav{padding:.9rem 6vw}}
 
 /* PITA — kata warung hangat (BUKAN klaim) */
 .wr-ribbon{background:var(--wr-accentDeep);padding:0.6rem 7vw;overflow:hidden}
