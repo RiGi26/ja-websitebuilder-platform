@@ -109,6 +109,7 @@ export default function PortalMenuSection({
                   {soldOut && <span className="pmenu-mobile-badge pmenu-mobile-badge-soldout">Habis</span>}
                   {preorder && <span className="pmenu-mobile-badge pmenu-mobile-badge-po">PO</span>}
                   {low && <span className="pmenu-mobile-badge pmenu-mobile-badge-limited">Terbatas</span>}
+                  {ready && <span className="pmenu-mobile-badge pmenu-mobile-badge-ready">Ready</span>}
                 </div>
 
                 <div className="pmenu-add-section">
@@ -663,6 +664,10 @@ function pmenuCss(primary: string, variant?: string): string {
     background: #FF9500 !important;
     color: #FFF !important;
   }
+  .pmenu-mobile-badge-ready {
+    background: #34C759 !important;
+    color: #FFF !important;
+  }
 
   .pmenu-add-section {
     margin-top: auto !important;
@@ -693,12 +698,7 @@ function pmenuCss(primary: string, variant?: string): string {
     font-size: 0.85rem !important;
   }
   .pmenu-status-container {
-    padding: 0.25rem 0.6rem !important;
-    gap: 0.3rem !important;
-  }
-  .pmenu-status-dot {
-    width: 5px !important;
-    height: 5px !important;
+    display: none !important;
   }
   .pmenu-po-note {
     font-size: 0.65rem !important;
