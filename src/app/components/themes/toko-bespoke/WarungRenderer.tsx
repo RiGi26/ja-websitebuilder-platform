@@ -65,8 +65,7 @@ html,body{overflow-x:hidden;max-width:100%}
 /* NAV */
 .wr-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0.9rem 7vw;display:flex;align-items:center;justify-content:space-between;transition:background .45s,box-shadow .45s,backdrop-filter .45s,padding .45s}
 .wr-root.lx-scrolled .wr-nav{background:rgba(251,243,228,.9);backdrop-filter:blur(10px);box-shadow:0 2px 0 var(--wr-line2);padding-top:.7rem;padding-bottom:.7rem}
-.wr-nav-logo{font-family:${DISPLAY};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em;opacity:0;transform:translateY(-4px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
-.wr-root.lx-scrolled .wr-nav-logo{opacity:1;transform:translateY(0);pointer-events:auto}
+.wr-nav-logo{font-family:${DISPLAY};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em}
 .wr-nav-cta{font-size:.86rem;color:var(--wr-onAccent);background:var(--wr-accentDeep);padding:.66rem 1.5rem;border-radius:999px;text-decoration:none;transition:transform .3s ${BOUNCE},background .3s}
 .wr-nav-cta:hover{transform:translateY(-2px) rotate(-1deg);background:var(--wr-ink)}
 
@@ -285,6 +284,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
   // Cutover Portal (Bakso Fase 1): etalase jadi ber-keranjang in-page → CTA "Pesan"
   // mengarah ke #menu (bukan WA/PO). PortalCartProvider membungkus dari SiteRenderer.
   const portalMode = Array.isArray(portalCatalog) && portalCatalog.length > 0
+  const hideNavCta = !!(c as any).hideNavCta
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#menu'
   // F&B Pre-Order: bila poUrl ada, CTA "Pesan" utama → form PO; WhatsApp jadi sekunder.
@@ -316,7 +316,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {/* NAV */}
       <nav className="wr-nav" aria-label="Navigasi utama">
         <a href="#beranda" className="wr-nav-logo">{c.nama ?? 'Warung'}</a>
-        <a href={orderHref} className="wr-nav-cta">{orderLabel}</a>
+        {!hideNavCta && <a href={orderHref} className="wr-nav-cta">{orderLabel}</a>}
       </nav>
 
       {/* HERO */}
