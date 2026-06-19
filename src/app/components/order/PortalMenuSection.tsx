@@ -34,16 +34,24 @@ export default function PortalMenuSection({
   // Get unique categories dynamically
   const categories = ['Semua', ...Array.from(new Set(catalog.map((item) => item.kategori).filter(Boolean))) as string[]]
   const [activeCategory, setActiveCategory] = useState('Semua')
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const filteredCatalog = activeCategory === 'Semua'
     ? catalog
     : catalog.filter((item) => item.kategori === activeCategory)
 
+  const visibleCatalog = isExpanded ? filteredCatalog : filteredCatalog.slice(0, 6)
+
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat)
+    setIsExpanded(false)
+  }
+
   return (
     <section className="wr-section pmenu-section-container" id="menu">
       <style dangerouslySetInnerHTML={{ __html: pmenuCss(primary, variant) }} />
       
-      <div className="wr-sec-hdr pmenu-header" style={{ textAlign: 'center', margin: '0 auto 2.5rem' }}>
+      <div className="wr-sec-hdr pmenu-header" style={{ textAlign: 'center', margin: '0 auto 1.5rem' }}>
         <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Menu</p>
         <h2 className="wr-heading">{heading}</h2>
         {subtitle && <p className="wr-subtext" style={{ marginLeft: 'auto', marginRight: 'auto' }}>{subtitle}</p>}
@@ -56,7 +64,7 @@ export default function PortalMenuSection({
             <button
               key={cat}
               className={`pmenu-cat-btn${activeCategory === cat ? ' active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategoryChange(cat)}
             >
               {cat}
             </button>
@@ -65,8 +73,8 @@ export default function PortalMenuSection({
       </div>
 
       {/* PRODUCT GRID */}
-      <div className="wr-grid pmenu-grid" data-count={filteredCatalog.length}>
-        {filteredCatalog.map((item) => {
+      <div className="wr-grid pmenu-grid" data-count={visibleCatalog.length}>
+        {visibleCatalog.map((item) => {
           const soldOut = item.avail_status === 'habis'
           const low = item.avail_status === 'menipis'
           const preorder = item.avail_status === 'preorder'
@@ -139,6 +147,17 @@ export default function PortalMenuSection({
           )
         })}
       </div>
+
+      {filteredCatalog.length > 6 && (
+        <div className="pmenu-expand-container">
+          <button
+            className="pmenu-expand-btn"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Lihat Lebih Sedikit' : `Lihat Semua Menu (${filteredCatalog.length})`}
+          </button>
+        </div>
+      )}
     </section>
   )
 }
@@ -177,7 +196,7 @@ function pmenuCss(primary: string, variant?: string): string {
   z-index: 50;
   display: flex;
   justify-content: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   padding: 0.5rem 0;
   background: ${catBarBg};
   backdrop-filter: blur(16px);
@@ -307,17 +326,17 @@ function pmenuCss(primary: string, variant?: string): string {
 
 /* CARD BODY */
 .pmenu-card-body {
-  padding: 1.5rem !important;
+  padding: 1rem 1.25rem !important;
 }
 .pmenu-card-name {
-  font-size: 1.35rem !important;
+  font-size: 1.25rem !important;
   color: ${ink} !important;
-  margin-bottom: 0.5rem !important;
+  margin-bottom: 0.4rem !important;
 }
 .pmenu-card-desc {
-  font-size: 0.88rem !important;
+  font-size: 0.84rem !important;
   color: ${inkDim} !important;
-  line-height: 1.6 !important;
+  line-height: 1.55 !important;
 }
 
 /* BUTTONS & STEPPER */
@@ -325,7 +344,7 @@ function pmenuCss(primary: string, variant?: string): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1.25rem;
+  margin-top: 0.9rem;
 }
 .pmenu-add {
   display: flex;
@@ -469,6 +488,36 @@ function pmenuCss(primary: string, variant?: string): string {
 .pmenu-add-btn:focus-visible, .pmenu-step button:focus-visible {
   outline: 3px solid ${primary};
   outline-offset: 2px;
+}
+
+/* COLLAPSIBLE MENU EXPAND BUTTON */
+.pmenu-expand-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+.pmenu-expand-btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: ${primary};
+  background: ${isBiru ? 'rgba(0, 113, 227, 0.05)' : 'rgba(43, 26, 18, 0.04)'};
+  border: 1.5px solid ${isBiru ? 'rgba(0, 113, 227, 0.15)' : 'rgba(43, 26, 18, 0.12)'};
+  padding: 0.75rem 2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pmenu-expand-btn:hover {
+  background: ${primary};
+  color: #FFFFFF;
+  border-color: ${primary};
+  box-shadow: 0 6px 16px ${isBiru ? 'rgba(0, 113, 227, 0.2)' : 'rgba(192, 67, 46, 0.2)'};
+  transform: translateY(-1px);
+}
+.pmenu-expand-btn:active {
+  transform: translateY(0);
 }
 `;
 }
