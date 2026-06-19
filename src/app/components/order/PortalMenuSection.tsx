@@ -41,6 +41,7 @@ export default function PortalMenuSection({
         {catalog.map((item) => {
           const soldOut = item.avail_status === 'habis'
           const low = item.avail_status === 'menipis'
+          const preorder = item.avail_status === 'preorder'
           const qty = qtyOf(item.pack_id)
           return (
             <article key={item.pack_id} className={`wr-card${soldOut ? ' is-soldout' : ''}`}>
@@ -48,6 +49,7 @@ export default function PortalMenuSection({
                 {item.kategori && <span className="wr-card-cat">{item.kategori}</span>}
                 <span className="wr-card-tag">{priceText(item.harga)}</span>
                 {soldOut && <span className="wr-card-soldout">Habis</span>}
+                {preorder && <span className="wr-card-preorder">Pre-Order</span>}
                 {item.foto_url && <img src={item.foto_url} alt={item.product_nama} loading="lazy" />}
               </div>
               <div className="wr-card-body">
@@ -62,7 +64,7 @@ export default function PortalMenuSection({
                       onClick={() => add({ pack_id: item.pack_id, nama: item.product_nama, harga: item.harga, kategori: item.kategori, gambar: item.foto_url })}
                       aria-label={`Tambah ${item.product_nama} ke keranjang`}
                     >
-                      <Plus size={15} aria-hidden /> Tambah
+                      <Plus size={15} aria-hidden /> {preorder ? 'Pre-order' : 'Tambah'}
                     </button>
                   ) : (
                     <div className="pmenu-step">
@@ -72,6 +74,7 @@ export default function PortalMenuSection({
                     </div>
                   )}
                   {low && !soldOut && <span className="pmenu-low">Stok menipis</span>}
+                  {preorder && <span className="pmenu-po-label">Pre-Order</span>}
                 </div>
               </div>
             </article>
@@ -94,6 +97,8 @@ function pmenuCss(primary: string): string {
 .pmenu-step span{min-width:1.4ch;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 .pmenu-out{font:600 .82rem/1 system-ui,sans-serif;color:#9A3322}
 .pmenu-low{font-size:.74rem;color:#9A3322;font-weight:600}
+.pmenu-po-label{font-size:.74rem;color:#0071E3;font-weight:600}
+.wr-card-preorder{position:absolute;left:.8rem;bottom:.8rem;z-index:4;font-size:.78rem;color:#fff;background:#0071E3;padding:.32rem .85rem;border-radius:999px;letter-spacing:.02em;box-shadow:0 6px 14px rgba(0,113,227,0.3)}
 .pmenu-add-btn:focus-visible,.pmenu-step button:focus-visible{outline:3px solid ${primary};outline-offset:2px}
 `
 }
