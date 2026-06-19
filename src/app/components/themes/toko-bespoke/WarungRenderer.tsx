@@ -93,7 +93,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-hero-frame img{width:100%;height:100%;object-fit:cover}
 .wr-hero-stamp{position:absolute;left:-1rem;bottom:1.5rem;z-index:3;background:${MUSTARD};color:var(--wr-ink);font-family:${DISPLAY};font-size:.95rem;padding:.8rem 1.3rem;border-radius:14px;transform:rotate(-3deg);box-shadow:0 12px 28px var(--wr-shadowDeep);display:flex;align-items:center;gap:.45rem}
 @media(max-width:880px){
-  .wr-hero{grid-template-columns:1fr;min-height:unset;padding:4.5rem 7vw 1.5rem;gap:1.5rem}
+  .wr-hero{grid-template-columns:1fr;min-height:unset;padding:6.5rem 7vw 1.5rem;gap:1.5rem}
   .wr-hero-media{order:-1;max-width:280px;margin:0 auto}
   .wr-hero-title{font-size:clamp(2rem,8vw,3rem);margin-bottom:0.8rem}
   .wr-hero-sub{margin-bottom:1.2rem}
