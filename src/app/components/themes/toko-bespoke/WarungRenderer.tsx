@@ -65,14 +65,15 @@ html,body{overflow-x:hidden;max-width:100%}
 /* NAV */
 .wr-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0.9rem 7vw;display:flex;align-items:center;justify-content:space-between;transition:background .45s,box-shadow .45s,backdrop-filter .45s,padding .45s}
 .wr-root.lx-scrolled .wr-nav{background:rgba(251,243,228,.9);backdrop-filter:blur(10px);box-shadow:0 2px 0 var(--wr-line2);padding-top:.7rem;padding-bottom:.7rem}
-.wr-nav-logo{font-family:${DISPLAY};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em}
+.wr-nav-logo{font-family:${DISPLAY};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em;opacity:0;transform:translateY(-4px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+.wr-root.lx-scrolled .wr-nav-logo{opacity:1;transform:translateY(0);pointer-events:auto}
 .wr-nav-cta{font-size:.86rem;color:var(--wr-onAccent);background:var(--wr-accentDeep);padding:.66rem 1.5rem;border-radius:999px;text-decoration:none;transition:transform .3s ${BOUNCE},background .3s}
 .wr-nav-cta:hover{transform:translateY(-2px) rotate(-1deg);background:var(--wr-ink)}
 
 .lx-sentinel{position:absolute;top:0;left:0;width:1px;height:130px;opacity:0;pointer-events:none}
 
 /* HERO — spanduk hangat: teks + foto */
-.wr-hero{position:relative;min-height:60vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(1.5rem,4vw,3.5rem);padding:6.5rem 7vw 2.5rem;background:var(--wr-bg)}
+.wr-hero{position:relative;min-height:60vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(1.5rem,4vw,3.5rem);padding:7.5rem 7vw 2.5rem;background:var(--wr-bg)}
 .wr-hero-text{position:relative;z-index:2}
 .wr-hero-ew{font-size:.92rem;color:var(--wr-accentDeep);margin-bottom:1.1rem;display:inline-flex;align-items:center;gap:.5rem;background:${MUSTARD};color:var(--wr-ink);padding:.4rem 1.1rem;border-radius:999px;transform:rotate(-1.5deg);font-weight:700}
 .wr-hero-title{font-family:${DISPLAY};font-size:clamp(2.4rem,5.2vw,4.2rem);line-height:1.05;color:var(--wr-ink);margin-bottom:1rem;letter-spacing:.005em}
