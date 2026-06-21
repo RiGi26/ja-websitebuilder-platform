@@ -29,3 +29,28 @@ jobs:
 
       - name: Render snapshot tests (F5-4)
         run: npm test
+
+  notify-failure:
+    name: Notify on master CI failure (WhatsApp)
+    needs: test
+    if: failure() && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kirim alert WhatsApp via Fonnte
+        env:
+          FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
+          ALERT_WA: ${{ vars.ALERT_WA }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$FONNTE_TOKEN" ] || [ -z "$ALERT_WA" ]; then
+            echo "FONNTE_TOKEN / ALERT_WA belum di-set di repo Settings - lewati alert (tak menggagalkan workflow)."
+            exit 0
+          fi
+          SHORT=$(echo "$SHA" | cut -c1-7)
+          MSG="[CI MERAH] master $REPO@$SHORT gagal. Run: $RUN_URL"
+          curl -s -X POST https://api.fonnte.com/send \
+            -H "Authorization: $FONNTE_TOKEN" \
+            --data-urlencode "target=$ALERT_WA" \
+            --data-urlencode "message=$MSG"
