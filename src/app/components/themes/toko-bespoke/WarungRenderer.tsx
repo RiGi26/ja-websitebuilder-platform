@@ -39,7 +39,7 @@ export const PALETTES: Record<string, WrPal> = {
   // Biru — minimalis putih & biru macOS (Apple Blue)
   biru: {
     bg: '#F5F5F7', bg2: '#EAEAEF', surface: '#FFFFFF', surface2: '#F5F5F7',
-    ink: '#1D1D1F', inkDim: '#3A3A3C', muted: '#86868B',
+    ink: '#1D1D1F', inkDim: '#3A3A3C', muted: '#636366', // #86868B → #636366: WCAG AA ≥4.5 teks sekunder di surface terang
     accent: '#0071E3', accentDeep: '#005BB5', onAccent: '#FFFFFF',
     line: 'rgba(0,0,0,.08)', line2: 'rgba(0,0,0,.04)',
     shadow: 'rgba(0,0,0,.04)', shadowDeep: 'rgba(0,0,0,.08)',
