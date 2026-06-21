@@ -31,7 +31,7 @@ Website builder Japan Arena: customer order + bayar (Midtrans) → platform auto
 - Scope ambigu / multi-file → ajukan rencana singkat + pertanyaan dulu, jangan langsung koding
 
 **Git & deploy:**
-- Fitur / API / DB / multi-file = **PR** (jangan direct push). Hanya perubahan ≤3 baris non-logic yang boleh direct push ke `master`.
+- **Semua perubahan ke `master` lewat PR** — master di-branch-protect (wajib PR + check CI "Typecheck & Render Tests" hijau + up-to-date; `enforce_admins` aktif, admin pun tak bisa bypass). Direct push DIBLOKIR. Fix kecil pun: buka PR lalu `gh pr merge --auto --squash` (auto-merge begitu CI hijau). CI master merah → alert WA otomatis (Fonnte) bila secret `FONNTE_TOKEN` + var `ALERT_WA` di-set.
 - Setelah push: pantau CI + Vercel sampai **Ready/Error** — jangan lapor selesai saat masih Building.
 
 **Perubahan visual tema (gerbang lengkap di THEME_VISUAL_PIPELINE.md §7):**
