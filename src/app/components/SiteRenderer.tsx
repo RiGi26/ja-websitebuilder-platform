@@ -10,6 +10,7 @@ import {
 import { SectionRenderer } from '@/app/components/sections/SectionRenderer'
 import { CartProvider } from '@/app/components/cart/CartProvider'
 import PortalCartProvider from '@/app/components/order/PortalCartProvider'
+import CeriaOrderRenderer from '@/app/components/order/CeriaOrderRenderer'
 import { fetchCatalogMirror } from '@/lib/portal/mirror'
 import RestaurantRenderer from '@/app/components/themes/restaurant/RestaurantRenderer'
 import AtelierCartButton from '@/app/components/themes/toko-atelier/AtelierCartButton'
@@ -87,18 +88,39 @@ export async function renderSite({
       const content = composableContentFromSections(
         page.nama_website, sections, [], profile, page.data_konten as Record<string, unknown>, bespoke.showcaseTitle ?? 'Menu Kami', galleryRows,
       )
+      // Skin "Ceria & Ramah" (order-first app-style) bila branding.variant='ceria':
+      // renderer khusus appbar+search+hero+info+menu-stepper+bottom-cart-bar.
+      // Kejujuran-jualan: tanpa rating/terjual karangan; "Menu Andalan" = kurasi
+      // manual (data_konten.andalan = pack_id[]); halal = data_konten.order_meta.halal.
+      // Selain itu → renderer bespoke menu-source biasa (Warung dll) + PortalMenuSection.
+      const dk = (page.data_konten ?? {}) as Record<string, unknown>
+      const orderMeta = (dk.order_meta ?? {}) as Record<string, unknown>
       const Renderer = bespoke.Renderer
       return (
-        <PortalCartProvider slug={slug} primary={primary} localeConfig={konfig.localeConfig} businessName={page.nama_website}>
-          <Renderer
-            content={content}
-            variant={variant}
-            primary={primary}
-            slug={slug}
-            capabilities={konfig.capabilities}
-            localeConfig={konfig.localeConfig}
-            portalCatalog={catalog}
-          />
+        <PortalCartProvider slug={slug} primary={primary} variant={variant} localeConfig={konfig.localeConfig} businessName={page.nama_website}>
+          {variant === 'ceria' ? (
+            <CeriaOrderRenderer
+              content={content}
+              variant={variant}
+              primary={primary}
+              slug={slug}
+              capabilities={konfig.capabilities}
+              localeConfig={konfig.localeConfig}
+              portalCatalog={catalog}
+              andalanIds={Array.isArray(dk.andalan) ? (dk.andalan as unknown[]).filter((x): x is string => typeof x === 'string') : undefined}
+              halal={typeof orderMeta.halal === 'boolean' ? orderMeta.halal : undefined}
+            />
+          ) : (
+            <Renderer
+              content={content}
+              variant={variant}
+              primary={primary}
+              slug={slug}
+              capabilities={konfig.capabilities}
+              localeConfig={konfig.localeConfig}
+              portalCatalog={catalog}
+            />
+          )}
         </PortalCartProvider>
       )
     }

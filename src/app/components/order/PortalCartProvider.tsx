@@ -54,12 +54,16 @@ type DoneState = { res: PortalOrderResponse; trackUrl: string }
 export default function PortalCartProvider({
   slug,
   primary = '#C0432E',
+  variant,
   localeConfig,
   businessName,
   children,
 }: {
   slug: string
   primary?: string
+  /** Skin drawer/checkout. 'ceria' → palet hangat-oranye + Baloo (cocok CeriaOrderRenderer);
+   *  default → warung; primary '#0071E3' → biru. Tak ubah logika kontrak. */
+  variant?: string
   localeConfig?: LocaleConfig
   businessName: string
   children: React.ReactNode
@@ -112,10 +116,10 @@ export default function PortalCartProvider({
   return (
     <Ctx.Provider value={ctx}>
       {children}
-      <style dangerouslySetInnerHTML={{ __html: pcartCss(primary) }} />
+      <style dangerouslySetInnerHTML={{ __html: pcartCss(primary, variant) }} />
 
-      {/* Floating cart button */}
-      {hydrated && count > 0 && view === 'closed' && (
+      {/* Floating cart button — disuppress di skin 'ceria' (renderer punya bottom cart bar sendiri). */}
+      {hydrated && count > 0 && view === 'closed' && variant !== 'ceria' && (
         <button className="pcart-fab" onClick={() => setView('cart')} aria-label={`Buka keranjang (${count} item)`}>
           <ShoppingBag size={20} aria-hidden />
           <span className="pcart-fab-count">{count}</span>
@@ -350,14 +354,15 @@ function DoneView({ fmt, done, businessName, onClose }: { fmt: (n: number) => st
   )
 }
 
-function pcartCss(primary: string): string {
-  const isBiru = primary === '#0071E3'
-  const bg = isBiru ? '#FFFFFF' : '#FFFBF2'
-  const text = isBiru ? '#1D1D1F' : '#2B1A12'
-  const mutedText = isBiru ? '#475569' : '#6E5240'
-  const border = isBiru ? 'rgba(0, 0, 0, 0.08)' : 'rgba(43, 26, 18, 0.1)'
-  const miniBg = isBiru ? 'rgba(0, 0, 0, 0.03)' : 'rgba(43, 26, 18, 0.04)'
-  const methodsBorder = isBiru ? 'rgba(0, 0, 0, 0.12)' : 'rgba(43, 26, 18, 0.16)'
+function pcartCss(primary: string, variant?: string): string {
+  const isCeria = variant === 'ceria'
+  const isBiru = !isCeria && primary === '#0071E3'
+  const bg = isCeria ? '#FFFDF8' : isBiru ? '#FFFFFF' : '#FFFBF2'
+  const text = isCeria ? '#3A2A1E' : isBiru ? '#1D1D1F' : '#2B1A12'
+  const mutedText = isCeria ? '#6E5D50' : isBiru ? '#475569' : '#6E5240'
+  const border = isCeria ? 'rgba(58, 42, 30, 0.12)' : isBiru ? 'rgba(0, 0, 0, 0.08)' : 'rgba(43, 26, 18, 0.1)'
+  const miniBg = isCeria ? 'rgba(255, 107, 53, 0.07)' : isBiru ? 'rgba(0, 0, 0, 0.03)' : 'rgba(43, 26, 18, 0.04)'
+  const methodsBorder = isCeria ? 'rgba(58, 42, 30, 0.16)' : isBiru ? 'rgba(0, 0, 0, 0.12)' : 'rgba(43, 26, 18, 0.16)'
 
   return `
 .pcart-fab{position:fixed;right:1.1rem;bottom:1.1rem;z-index:900;display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.1rem;border:none;border-radius:999px;background:${primary};color:#fff;font:600 .9rem/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .2s}
@@ -429,5 +434,15 @@ function pcartCss(primary: string): string {
 @keyframes pcart-rot{to{transform:rotate(360deg)}}
 @media(max-width:480px){.pcart-panel{width:100%}.pcart-row{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.pcart-panel,.pcart-spin{animation:none}}
+${isCeria ? `
+/* Skin 'ceria' — Baloo (di-import CeriaOrderRenderer, satu dokumen) + sudut membulat + CTA membal. */
+.pcart-head h2,.pcart-instr h3,.pcart-cta,.pcart-fab-total{font-family:'Baloo 2','Segoe UI',system-ui,sans-serif}
+.pcart-panel{border-top-left-radius:22px;border-bottom-left-radius:22px}
+.pcart-cta{border-radius:14px;transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .2s}
+.pcart-cta:hover:not(:disabled){transform:translateY(-1px) scale(1.01);filter:brightness(1.04)}
+.pcart-cta:active:not(:disabled){transform:scale(.98)}
+.pcart-metode-opt,.pcart-field input,.pcart-field textarea{border-radius:14px}
+@media(max-width:480px){.pcart-panel{border-radius:0}}
+` : ''}
 `
 }
