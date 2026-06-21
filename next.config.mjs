@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+import { withSentryConfig } from '@sentry/nextjs'
+
 // P5DB-2 — Security headers.
 // Catatan penting: situs klien publik [slug] SENGAJA dibiarkan bisa di-iframe
 // (galeri "Karya Kami" di corp-landing menampilkannya via <iframe>). Karena itu
@@ -38,4 +40,15 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+// Sentry — error & performance monitoring.
+// Opsi upload source map (org/project/authToken) dibaca dari ENV → hanya jalan saat
+// di-set (di Vercel/CI); build tetap sukses tanpa itu. tunnelRoute SENGAJA tak dipakai:
+// route [slug] multi-tenant bisa bentrok dengan path tunnel.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  disableLogger: true,
+})
