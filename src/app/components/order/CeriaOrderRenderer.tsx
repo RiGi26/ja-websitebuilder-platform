@@ -609,7 +609,7 @@ function coCss(): string {
 .co-footer-brand{font-family:var(--co-display);font-weight:800;font-size:20px;color:var(--co-ink);margin-bottom:6px}
 .co-footer-tag{max-width:46ch;margin:0 auto 10px;line-height:1.6}
 .co-footer-facts{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:10px;font-weight:600}
-.co-footer-jam{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-weight:600}
+.co-footer-jam{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;font-weight:600;text-align:center}
 .co-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#08361b;font-weight:800;min-height:48px;padding:0 24px;border-radius:13px;text-decoration:none;margin-top:16px;font-size:14px;transition:transform .2s var(--co-bounce)}
 .co-wa:hover{transform:translateY(-2px)}
 
