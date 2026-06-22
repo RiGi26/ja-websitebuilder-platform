@@ -108,4 +108,7 @@ export interface CartLine {
   qty: number
   kategori?: string | null
   gambar?: string | null
+  /** avail_status='preorder' saat ditambahkan → tampilkan notice estimasi PO di
+   *  keranjang/checkout (tetap orderable, tak memblok). Diabaikan oleh Portal saat order. */
+  preorder?: boolean
 }
