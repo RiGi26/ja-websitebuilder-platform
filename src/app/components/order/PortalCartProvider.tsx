@@ -11,12 +11,12 @@
 // memanggil useCart() (PortalMenuSection, di dalam .wr-root).
 // ============================================================
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
-import { ShoppingBag, Plus, Minus, X, ArrowLeft, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { ShoppingBag, Plus, Minus, X, ArrowLeft, Loader2, CheckCircle2, AlertTriangle, Clock } from 'lucide-react'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import { METODE_BAYAR, type MetodeBayar, type CartLine, type PortalOrderResponse, type StockConflictEntry } from '@/lib/portal/types'
 import type { LocaleConfig } from '@/types/websitebuilder'
 
-type AddItem = { pack_id: string; nama: string; harga: number; kategori?: string | null; gambar?: string | null }
+type AddItem = { pack_id: string; nama: string; harga: number; kategori?: string | null; gambar?: string | null; preorder?: boolean }
 
 interface CartCtx {
   items: CartLine[]
@@ -96,7 +96,7 @@ export default function PortalCartProvider({
         next[i] = { ...next[i], qty: next[i].qty + qty }
         return next
       }
-      return [...prev, { pack_id: item.pack_id, nama: item.nama, harga: item.harga, qty, kategori: item.kategori, gambar: item.gambar }]
+      return [...prev, { pack_id: item.pack_id, nama: item.nama, harga: item.harga, qty, kategori: item.kategori, gambar: item.gambar, preorder: item.preorder }]
     })
   }, [])
   const setQty = useCallback((packId: string, qty: number) => {
@@ -150,12 +150,24 @@ export default function PortalCartProvider({
   )
 }
 
+// Notice PO proaktif: muncul di keranjang/checkout saat ada item preorder. Tidak
+// memblok checkout (kontrak: stok habis → tetap orderable sebagai PO, beri info).
+function PreorderNotice() {
+  return (
+    <div className="pcart-po" role="note">
+      <Clock size={15} aria-hidden />
+      <p>Sebagian item berstatus <strong>Pre-Order</strong> — tetap bisa dipesan. Estimasi pengiriman 5–7 hari kerja setelah pembayaran dikonfirmasi; item lain diproses seperti biasa.</p>
+    </div>
+  )
+}
+
 // ── Cart list view ──────────────────────────────────────────
 function CartView({ items, fmt, subtotal, inc, dec, remove, onClose, onCheckout }: {
   items: CartLine[]; fmt: (n: number) => string; subtotal: number
   inc: (id: string) => void; dec: (id: string) => void; remove: (id: string) => void
   onClose: () => void; onCheckout: () => void
 }) {
+  const hasPreorder = items.some((l) => l.preorder)
   return (
     <>
       <header className="pcart-head">
@@ -170,7 +182,7 @@ function CartView({ items, fmt, subtotal, inc, dec, remove, onClose, onCheckout 
             {items.map((l) => (
               <li key={l.pack_id} className="pcart-line">
                 <div className="pcart-line-info">
-                  <span className="pcart-line-name">{l.nama}</span>
+                  <span className="pcart-line-name">{l.nama}{l.preorder && <span className="pcart-line-po">Pre-Order</span>}</span>
                   <span className="pcart-line-price">{fmt(l.harga)}</span>
                 </div>
                 <div className="pcart-stepper">
@@ -185,6 +197,7 @@ function CartView({ items, fmt, subtotal, inc, dec, remove, onClose, onCheckout 
         )}
       </div>
       <footer className="pcart-foot">
+        {hasPreorder && <PreorderNotice />}
         <div className="pcart-subtotal"><span>Subtotal</span><strong>{fmt(subtotal)}</strong></div>
         <button className="pcart-cta" disabled={items.length === 0} onClick={onCheckout}>Lanjut ke Pembayaran</button>
         <p className="pcart-note">Ongkir & instruksi bayar tampil setelah pesanan dibuat.</p>
@@ -204,6 +217,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [conflicts, setConflicts] = useState<StockConflictEntry[] | null>(null)
+  const hasPreorder = items.some((l) => l.preorder)
   // Idempotency-Key per sesi checkout (tahan retry; ganti saat keranjang berubah).
   const [idemKey] = useState(() => (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.round(Math.random() * 1e9)}`))
 
@@ -271,6 +285,8 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
           ))}
           <li className="pcart-mini-sub"><span>Subtotal</span><strong>{fmt(subtotal)}</strong></li>
         </ul>
+
+        {hasPreorder && <PreorderNotice />}
 
         <h3 className="pcart-h3">Data Pemesan</h3>
         <div className="pcart-field"><label htmlFor="pc-nama">Nama *</label><input id="pc-nama" value={form.nama} onChange={set('nama')} autoComplete="name" /></div>
@@ -398,6 +414,11 @@ function pcartCss(primary: string, variant?: string): string {
 .pcart-cta:disabled{opacity:.5;cursor:not-allowed}
 .pcart-cta-link{text-decoration:none}
 .pcart-note{font-size:.76rem;color:${mutedText};text-align:center;margin:0}
+.pcart-po{display:flex;gap:.5rem;align-items:flex-start;background:#FFF4E5;border:1px solid #F4C892;border-radius:12px;padding:.7rem .8rem;color:#7A4A12;font-size:.82rem;line-height:1.5}
+.pcart-po svg{flex-shrink:0;margin-top:.12rem;color:#B45309}
+.pcart-po p{margin:0}
+.pcart-po strong{color:#8A3B0B}
+.pcart-line-po{display:inline-block;margin-left:.45rem;background:#FFE7CC;color:#8A3B0B;font-size:.66rem;font-weight:700;padding:.06rem .4rem;border-radius:999px;vertical-align:middle;letter-spacing:.02em}
 .pcart-mini{list-style:none;margin:0 0 1.2rem;padding:.8rem 1rem;background:${miniBg};border-radius:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.86rem}
 .pcart-mini li{display:flex;justify-content:space-between;gap:1rem}
 .pcart-mini-sub{border-top:1px dashed ${border};padding-top:.4rem;margin-top:.2rem}
