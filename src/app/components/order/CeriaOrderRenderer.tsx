@@ -149,10 +149,10 @@ export default function CeriaOrderRenderer({
         <div className="co-card-body">
           {/* FAB/stepper hidup di body (punya padding-top 22px utk overlap) — di frame ber-overflow:hidden ia kepotong. */}
           {soldOut ? (
-            <button className="co-fab" disabled aria-label={`${m.product_nama} habis`}><Plus size={22} aria-hidden /></button>
+            <button className="co-fab" disabled aria-label={`${m.product_nama} habis`}><Plus size={20} aria-hidden /></button>
           ) : qty === 0 ? (
             <button className="co-fab" onClick={() => add({ pack_id: m.pack_id, nama: m.product_nama, harga: m.harga, kategori: m.kategori, gambar: m.foto_url, preorder })} aria-label={`Tambah ${m.product_nama}`}>
-              <Plus size={22} aria-hidden />
+              <Plus size={20} aria-hidden />
             </button>
           ) : (
             <div className="co-step">
@@ -173,7 +173,7 @@ export default function CeriaOrderRenderer({
   }
 
   return (
-    <div className="co-root" style={rootStyle}>
+    <div className={`co-root${count > 0 ? ' has-cart' : ''}`} style={rootStyle}>
       <style dangerouslySetInnerHTML={{ __html: coCss() }} />
 
       {/* ── APP BAR ── */}
@@ -451,6 +451,9 @@ function coCss(): string {
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;
 }
 .co-root *,.co-root *::before,.co-root *::after{box-sizing:border-box;margin:0;padding:0}
+/* Saat keranjang berisi, bottom cart bar (fixed) muncul → beri ruang di akhir
+   halaman agar bar tak menutupi footer/konten terakhir. Kosong → tanpa gap. */
+.co-root.has-cart{padding-bottom:96px}
 .co-root h1,.co-root h2,.co-root h3{font-family:var(--co-display);line-height:1.15;letter-spacing:-.01em}
 .co-root img{display:block;max-width:100%}
 .co-root :focus-visible{outline:3px solid var(--co-primary);outline-offset:2px;border-radius:8px}
@@ -529,7 +532,7 @@ function coCss(): string {
 .co-chip.active{background:var(--co-primary);color:#fff;border-color:var(--co-primary);box-shadow:0 6px 14px rgba(255,107,53,.3)}
 
 /* MENU GRID */
-.co-menu{padding-bottom:104px}
+.co-menu{padding-bottom:24px}
 .co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
 .co-card{position:relative;background:var(--co-surface);border:1px solid var(--co-line2);border-radius:22px;overflow:hidden;box-shadow:var(--co-shadow);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column}
 .co-card:hover{transform:translateY(-4px);box-shadow:var(--co-shadow-lg)}
@@ -544,16 +547,16 @@ function coCss(): string {
 .co-badge-ready{background:var(--co-green)}
 .co-badge-pedas{background:var(--co-sunny);color:#5A3D00}
 .co-badge-tr{left:auto;right:9px}
-.co-fab{position:absolute;right:10px;top:-22px;width:44px;height:44px;border:none;border-radius:14px;background:var(--co-primary);color:#fff;box-shadow:0 8px 18px rgba(255,107,53,.4);cursor:pointer;display:grid;place-items:center;transition:transform .2s var(--co-bounce),filter .2s;z-index:3}
+.co-fab{position:absolute;right:10px;top:-22px;width:40px;height:40px;border:none;border-radius:13px;background:var(--co-primary);color:#fff;box-shadow:0 8px 18px rgba(255,107,53,.4);cursor:pointer;display:grid;place-items:center;transition:transform .2s var(--co-bounce),filter .2s;z-index:3}
 .co-fab:hover:not(:disabled){filter:brightness(1.06);transform:scale(1.1)}
 .co-fab:active:not(:disabled){transform:scale(.92)}
 .co-fab:disabled{background:var(--co-grey);box-shadow:none;cursor:not-allowed}
-.co-step{position:absolute;right:10px;top:-22px;display:inline-flex;align-items:center;gap:5px;background:var(--co-surface);border-radius:14px;box-shadow:0 8px 18px rgba(58,42,30,.2);padding:4px;z-index:3;animation:co-pop .2s var(--co-bounce)}
+.co-step{position:absolute;right:10px;top:-22px;display:inline-flex;align-items:center;gap:5px;background:var(--co-surface);border-radius:13px;box-shadow:0 8px 18px rgba(58,42,30,.2);padding:3px;z-index:3;animation:co-pop .2s var(--co-bounce)}
 @keyframes co-pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
-.co-step button{width:40px;height:40px;border:none;border-radius:10px;background:var(--co-tint);color:var(--co-deep);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
+.co-step button{width:36px;height:36px;border:none;border-radius:10px;background:var(--co-tint);color:var(--co-deep);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
 .co-step button:hover{background:var(--co-primary);color:#fff}
 .co-q{min-width:1.4ch;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:16px}
-.co-card-body{position:relative;padding:22px 14px 16px;display:flex;flex-direction:column;gap:5px;flex:1}
+.co-card-body{position:relative;padding:26px 14px 16px;display:flex;flex-direction:column;gap:5px;flex:1}
 .co-card-name{font-family:var(--co-display);font-size:17px;font-weight:700;color:var(--co-ink);line-height:1.2}
 .co-card-desc{font-size:12.5px;color:var(--co-muted);font-weight:500;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .co-card-foot{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:4px}
@@ -637,7 +640,7 @@ function coCss(): string {
   .co-halal{width:64px;height:64px;top:12px;right:12px}
   .co-halal b{font-size:12px}
   .co-grid{grid-template-columns:1fr 1fr;gap:11px}
-  .co-card-body{padding:20px 11px 13px}
+  .co-card-body{padding:26px 11px 13px}
   .co-card-name{font-size:15px}
   .co-price{font-size:16px}
   .co-chips-wrap{top:66px}
