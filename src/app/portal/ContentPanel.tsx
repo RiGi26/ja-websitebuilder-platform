@@ -42,6 +42,7 @@ const FIELD_LABEL: Record<string, string> = {
   eyebrow: 'Label Kecil',
   deskripsi: 'Deskripsi',
   description: 'Deskripsi',
+  desc: 'Deskripsi',
   teks: 'Teks',
   text: 'Teks',
   cta_text: 'Teks Tombol',
