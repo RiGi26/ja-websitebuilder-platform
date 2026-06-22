@@ -20,6 +20,7 @@ Website builder Japan Arena: customer order + bayar (Midtrans) → platform auto
 | Review visual tema — gerbang bespoke = §7 | `THEME_VISUAL_PIPELINE.md` |
 | Identitas visual antar tema bespoke (anti-duplikat + pelajaran UAT) | `DESIGN_LEDGER.md` |
 | SOP build situs | `SOP_WEBSITE_BUILD_V2.md`, `SOP_CUSTOM_BUILD.md` |
+| **Integrasi Portal Operasi eksternal** (cutover: storefront+order→Portal, mirror katalog, gating `/portal`, jebakan) | `PORTAL_INTEGRATION_PLAYBOOK.md` (peta+checklist) + `BAKSO_PORTAL_CONTRACT.md` (wire-level SSOT) |
 
 ## Alur kerja wajib
 
