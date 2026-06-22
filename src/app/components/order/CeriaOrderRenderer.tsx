@@ -20,7 +20,7 @@
 import { useMemo, useState } from 'react'
 import {
   ShoppingBag, Search, Plus, Minus, Truck, ShieldCheck, Wallet,
-  Flame, Soup, ArrowRight, MessageCircle, Clock, MapPin, Sparkles,
+  Flame, Soup, ArrowRight, MessageCircle, Clock, MapPin, Sparkles, Check,
 } from 'lucide-react'
 import { usePortalCart } from './PortalCartProvider'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
@@ -127,20 +127,27 @@ export default function CeriaOrderRenderer({
     const soldOut = m.avail_status === 'habis'
     const low = m.avail_status === 'menipis'
     const preorder = m.avail_status === 'preorder'
+    const ready = m.avail_status === 'tersedia'
     const qty = qtyOf(m.pack_id)
     const pedas = isPedas(m)
     return (
       <article key={m.pack_id} className={`co-card${soldOut ? ' is-out' : ''}`}>
         <div className="co-card-frame">
+          {/* Status stok NYATA dari avail_status (kontrak Portal) — satu badge stok per kartu, kiri-atas. */}
           {soldOut && <span className="co-badge co-badge-out">Habis</span>}
-          {preorder && <span className="co-badge co-badge-po">Pre-Order</span>}
+          {preorder && <span className="co-badge co-badge-po"><Clock size={11} aria-hidden /> Pre-Order</span>}
           {low && !soldOut && <span className="co-badge co-badge-low">Terbatas</span>}
-          {!soldOut && !preorder && !low && pedas && (
-            <span className="co-badge co-badge-pedas"><Flame size={11} aria-hidden /> Pedas</span>
+          {ready && <span className="co-badge co-badge-ready"><Check size={11} aria-hidden /> Ready</span>}
+          {/* Pedas = indikator terpisah, kanan-atas, agar tak bentrok dgn badge stok. */}
+          {pedas && !soldOut && (
+            <span className="co-badge co-badge-pedas co-badge-tr"><Flame size={11} aria-hidden /> Pedas</span>
           )}
           {m.foto_url
             ? <img src={m.foto_url} alt={m.product_nama} loading="lazy" />
             : <div className="co-card-ph" aria-hidden><Soup size={30} /></div>}
+        </div>
+        <div className="co-card-body">
+          {/* FAB/stepper hidup di body (punya padding-top 22px utk overlap) — di frame ber-overflow:hidden ia kepotong. */}
           {soldOut ? (
             <button className="co-fab" disabled aria-label={`${m.product_nama} habis`}><Plus size={22} aria-hidden /></button>
           ) : qty === 0 ? (
@@ -154,8 +161,6 @@ export default function CeriaOrderRenderer({
               <button onClick={() => inc(m.pack_id)} aria-label={`Tambah ${m.product_nama}`}><Plus size={17} aria-hidden /></button>
             </div>
           )}
-        </div>
-        <div className="co-card-body">
           <h3 className="co-card-name">{m.product_nama}</h3>
           {m.deskripsi && <p className="co-card-desc">{m.deskripsi}</p>}
           <div className="co-card-foot">
@@ -536,17 +541,19 @@ function coCss(): string {
 .co-badge-po{background:var(--co-primary)}
 .co-badge-low{background:#B45309}
 .co-badge-out{background:#6E5D50}
+.co-badge-ready{background:var(--co-green)}
 .co-badge-pedas{background:var(--co-sunny);color:#5A3D00}
-.co-fab{position:absolute;right:10px;bottom:-18px;width:44px;height:44px;border:none;border-radius:14px;background:var(--co-primary);color:#fff;box-shadow:0 8px 18px rgba(255,107,53,.4);cursor:pointer;display:grid;place-items:center;transition:transform .2s var(--co-bounce),filter .2s;z-index:3}
+.co-badge-tr{left:auto;right:9px}
+.co-fab{position:absolute;right:10px;top:-22px;width:44px;height:44px;border:none;border-radius:14px;background:var(--co-primary);color:#fff;box-shadow:0 8px 18px rgba(255,107,53,.4);cursor:pointer;display:grid;place-items:center;transition:transform .2s var(--co-bounce),filter .2s;z-index:3}
 .co-fab:hover:not(:disabled){filter:brightness(1.06);transform:scale(1.1)}
 .co-fab:active:not(:disabled){transform:scale(.92)}
 .co-fab:disabled{background:var(--co-grey);box-shadow:none;cursor:not-allowed}
-.co-step{position:absolute;right:10px;bottom:-18px;display:inline-flex;align-items:center;gap:5px;background:var(--co-surface);border-radius:14px;box-shadow:0 8px 18px rgba(58,42,30,.2);padding:4px;z-index:3;animation:co-pop .2s var(--co-bounce)}
+.co-step{position:absolute;right:10px;top:-22px;display:inline-flex;align-items:center;gap:5px;background:var(--co-surface);border-radius:14px;box-shadow:0 8px 18px rgba(58,42,30,.2);padding:4px;z-index:3;animation:co-pop .2s var(--co-bounce)}
 @keyframes co-pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
 .co-step button{width:40px;height:40px;border:none;border-radius:10px;background:var(--co-tint);color:var(--co-deep);cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
 .co-step button:hover{background:var(--co-primary);color:#fff}
 .co-q{min-width:1.4ch;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:16px}
-.co-card-body{padding:22px 14px 16px;display:flex;flex-direction:column;gap:5px;flex:1}
+.co-card-body{position:relative;padding:22px 14px 16px;display:flex;flex-direction:column;gap:5px;flex:1}
 .co-card-name{font-family:var(--co-display);font-size:17px;font-weight:700;color:var(--co-ink);line-height:1.2}
 .co-card-desc{font-size:12.5px;color:var(--co-muted);font-weight:500;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .co-card-foot{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:4px}
