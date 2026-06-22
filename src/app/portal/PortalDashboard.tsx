@@ -257,7 +257,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <LivePreview slug={page.slug} published={page.status === 'published'} onClose={() => setShowPreview(false)} />
           )}
 
-          {/* Banner cutover Portal: orderasi/katalog/bayar dikelola di Portal Operasi eksternal. */}
+          {/* Banner cutover Portal: order/katalog/bayar dikelola di Portal Operasi eksternal. */}
           {portalManaged && (
             <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-apple-blue/20 bg-apple-blue/5 px-5 py-4 sm:flex-row sm:items-center">
               <div className="flex flex-1 items-start gap-3">
@@ -265,7 +265,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 <div>
                   <p className="text-sm font-bold text-gray-900">Pesanan, katalog &amp; pembayaran dikelola di Portal Operasi</p>
                   <p className="mt-0.5 text-[13px] leading-relaxed text-gray-500">
-                    Stok, menu, pesanan masuk, dan pembayaran {namaTenant} diatur di Portal Operasi — bukan di sini. Halaman ini untuk mengelola tampilan &amp; isi website Anda.
+                    {`Stok, menu, pesanan masuk, dan pembayaran ${namaTenant} diatur di Portal Operasi — bukan di sini. Halaman ini untuk mengelola tampilan & isi website Anda.`}
                   </p>
                 </div>
               </div>
