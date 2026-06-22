@@ -151,7 +151,7 @@ export default function CeriaOrderRenderer({
           {soldOut ? (
             <button className="co-fab" disabled aria-label={`${m.product_nama} habis`}><Plus size={22} aria-hidden /></button>
           ) : qty === 0 ? (
-            <button className="co-fab" onClick={() => add({ pack_id: m.pack_id, nama: m.product_nama, harga: m.harga, kategori: m.kategori, gambar: m.foto_url })} aria-label={`Tambah ${m.product_nama}`}>
+            <button className="co-fab" onClick={() => add({ pack_id: m.pack_id, nama: m.product_nama, harga: m.harga, kategori: m.kategori, gambar: m.foto_url, preorder })} aria-label={`Tambah ${m.product_nama}`}>
               <Plus size={22} aria-hidden />
             </button>
           ) : (
@@ -274,7 +274,7 @@ export default function CeriaOrderRenderer({
                         <button
                           className="co-mini"
                           disabled={soldOut}
-                          onClick={() => add({ pack_id: m.pack_id, nama: m.product_nama, harga: m.harga, kategori: m.kategori, gambar: m.foto_url })}
+                          onClick={() => add({ pack_id: m.pack_id, nama: m.product_nama, harga: m.harga, kategori: m.kategori, gambar: m.foto_url, preorder: m.avail_status === 'preorder' })}
                           aria-label={soldOut ? `${m.product_nama} habis` : `Tambah ${m.product_nama}`}
                         >
                           <Plus size={17} aria-hidden />
