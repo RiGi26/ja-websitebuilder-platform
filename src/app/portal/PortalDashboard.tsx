@@ -95,6 +95,11 @@ type Props = {
   // + yang sedang disembunyikan. Kosong → panel tak dirender (tema non-bespoke).
   susunanSections: HideableSectionKey[]
   hiddenSections: HideableSectionKey[]
+  // Tenant cutover Portal (source_of_truth='portal'): sembunyikan tab commerce
+  // WB-native (Pesanan/PO/Laporan/Setelan PO/Produk/Menu/Pembayaran) + tampilkan
+  // banner pengalih ke Portal Operasi. Default false → tenant WB biasa nol regresi.
+  portalManaged?: boolean
+  portalAdminUrl?: string
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
@@ -117,7 +122,7 @@ function reorderList<T extends { id: string; urutan: number }>(items: T[], idx: 
   return { next, updates }
 }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
@@ -252,6 +257,29 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <LivePreview slug={page.slug} published={page.status === 'published'} onClose={() => setShowPreview(false)} />
           )}
 
+          {/* Banner cutover Portal: orderasi/katalog/bayar dikelola di Portal Operasi eksternal. */}
+          {portalManaged && (
+            <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-apple-blue/20 bg-apple-blue/5 px-5 py-4 sm:flex-row sm:items-center">
+              <div className="flex flex-1 items-start gap-3">
+                <Store size={18} className="mt-0.5 shrink-0 text-apple-blue" />
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Pesanan, katalog &amp; pembayaran dikelola di Portal Operasi</p>
+                  <p className="mt-0.5 text-[13px] leading-relaxed text-gray-500">
+                    Stok, menu, pesanan masuk, dan pembayaran {namaTenant} diatur di Portal Operasi — bukan di sini. Halaman ini untuk mengelola tampilan &amp; isi website Anda.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={portalAdminUrl || 'https://stock.japanarena.id'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl bg-apple-blue px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white transition hover:brightness-110 sm:self-auto"
+              >
+                <ExternalLink size={14} /> Buka Portal Operasi
+              </a>
+            </div>
+          )}
+
           {/* Tab nav */}
           <div className="flex flex-wrap gap-2 mb-6">
             {hasContent && (
@@ -315,9 +343,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <button onClick={() => setTab('profil')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'profil' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
               <Store size={14} /> Profil
             </button>
-            <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
-              {paymentEntitled ? <CreditCard size={14} /> : <Lock size={14} />} Pembayaran
-            </button>
+            {!portalManaged && (
+              <button onClick={() => setTab('pembayaran')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'pembayaran' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                {paymentEntitled ? <CreditCard size={14} /> : <Lock size={14} />} Pembayaran
+              </button>
+            )}
           </div>
 
           {contentIsSample && (
