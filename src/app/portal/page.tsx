@@ -41,27 +41,37 @@ export default async function PortalPage() {
   }
 
   const konfig = (page?.konfigurasi ?? {}) as KonfigurasiWebsite
+  // Tenant "cutover Portal" (Bakso Fase 1, source_of_truth='portal'): pesanan,
+  // katalog (menu/produk), stok & pembayaran dikelola di Portal Operasi eksternal,
+  // BUKAN di tabel WB. Matikan tab commerce WB-native agar tak tabrakan/menyesatkan
+  // (order hantu, laporan basi, edit menu yg ditimpa sync, upsell Midtrans redundan).
+  // Tenant WB biasa (source_of_truth != 'portal') → nol perubahan.
+  const portalManaged = konfig.source_of_truth === 'portal'
+  const portalAdminUrl =
+    (typeof (konfig as { portal_admin_url?: unknown }).portal_admin_url === 'string'
+      && (konfig as { portal_admin_url?: string }).portal_admin_url)
+      || 'https://stock.japanarena.id'
   // Tab Tampilan — foto hero + titik fokus dari data_konten (whitelist).
   const dataKonten = (page?.data_konten ?? {}) as Record<string, unknown>
   const initialTampilan = {
     foto_hero: typeof dataKonten.foto_hero === 'string' ? dataKonten.foto_hero : '',
     foto_hero_focus: typeof dataKonten.foto_hero_focus === 'string' ? dataKonten.foto_hero_focus : '',
   }
-  const hasShop = !!konfig.features?.hasCart
+  const hasShop = !portalManaged && !!konfig.features?.hasCart
   const hasBooking = !!konfig.features?.hasBooking
-  const hasMenu = !!konfig.features?.hasMenu
+  const hasMenu = !portalManaged && !!konfig.features?.hasMenu
   const hasBlog = !!konfig.features?.hasBlog
   const hasGallery = !!konfig.features?.hasGallery
-  const hasPreorder = !!konfig.features?.hasPreorder
+  const hasPreorder = !portalManaged && !!konfig.features?.hasPreorder
   const contentIsSample = !!konfig.content_is_sample
 
   // Tab konten yang HARUS terbuka karena tema situs merender datanya tanpa
   // syarat add-on (bespoke/lux) — OR dengan flag add-on. Pesanan/Reservasi
   // (transaksi) tetap murni di-gate flag add-on.
   const themeTabs = themeContentTabs(konfig.branding, page?.tipe_industri)
-  const showProduk = hasShop || themeTabs.produk
+  const showProduk = !portalManaged && (hasShop || themeTabs.produk)
   const showLayanan = hasBooking || themeTabs.layanan
-  const showMenu = hasMenu || themeTabs.menu
+  const showMenu = !portalManaged && (hasMenu || themeTabs.menu)
   const showBlog = hasBlog || themeTabs.blog
   const showGallery = hasGallery || themeTabs.galeri
 
@@ -92,7 +102,7 @@ export default async function PortalPage() {
   const paymentStatus = await getTenantPaymentStatus(tenantId)
   // Tab Pembayaran = add-on `midtrans` (flag hasPayment); tenant yang sudah
   // terlanjur konfigurasi di-grandfather (lihat lib/addons/portal-tabs).
-  const hasPaymentTab = paymentEntitled(konfig.features, paymentStatus.configured)
+  const hasPaymentTab = !portalManaged && paymentEntitled(konfig.features, paymentStatus.configured)
 
   // Pesanan masuk (toko + pre-order F&B) — terbaru dulu, dengan item-nya.
   // PO juga tersimpan di shop_orders → muat juga saat hasPreorder.
@@ -177,6 +187,8 @@ export default async function PortalPage() {
     <PortalDashboard
       tenantId={tenantId}
       namaTenant={tenant?.nama ?? 'Website Saya'}
+      portalManaged={portalManaged}
+      portalAdminUrl={portalAdminUrl}
       susunanSections={susunanSections}
       hiddenSections={hiddenSections}
       page={page ? { id: page.id, nama_website: page.nama_website, slug: page.slug, status: page.status } : null}
