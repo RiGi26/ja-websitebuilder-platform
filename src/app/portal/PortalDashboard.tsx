@@ -7,7 +7,7 @@ import {
   Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
   FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette, Lock,
-  ClipboardList, BarChart3, Settings, Bike, ChevronUp, ChevronDown, HelpCircle, Quote,
+  ClipboardList, BarChart3, Settings, Bike, ChevronUp, ChevronDown, HelpCircle, Quote, MessageCircle,
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { getAddon } from '@/lib/addons/catalog'
@@ -19,6 +19,7 @@ import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
 import LivePreview from './LivePreview'
 import SampleContentBanner from './SampleContentBanner'
 import TampilanPanel, { type TampilanData } from './TampilanPanel'
+import NotifPanel from './NotifPanel'
 import { HIDEABLE_SECTION_LABEL, type HideableSectionKey } from '@/lib/portal/section-visibility'
 
 type PageInfo = { id: string; nama_website: string; slug: string | null; status: string }
@@ -125,7 +126,7 @@ function reorderList<T extends { id: string; urutan: number }>(items: T[], idx: 
 export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl }: Props) {
   const router = useRouter()
   const supabase = createClient()
-  type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran'
+  type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran' | 'notif'
   const hasBrand = kontenBrand.flags.stats || kontenBrand.flags.faq || kontenBrand.flags.statement
   const hasContent = initialSections.length > 0 || hasBrand
   const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : showProduk ? 'produk' : showLayanan ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
@@ -348,6 +349,11 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 {paymentEntitled ? <CreditCard size={14} /> : <Lock size={14} />} Pembayaran
               </button>
             )}
+            {portalManaged && (
+              <button onClick={() => setTab('notif')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'notif' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
+                <MessageCircle size={14} /> Notifikasi WA
+              </button>
+            )}
           </div>
 
           {contentIsSample && (
@@ -386,6 +392,8 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <GalleryPanel page={page} tenantId={tenantId} initial={initialGallery} />
           ) : tab === 'profil' ? (
             <ProfilePanel page={page} tenantId={tenantId} initial={initialProfile} />
+          ) : tab === 'notif' ? (
+            <NotifPanel businessName={namaTenant} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
