@@ -243,6 +243,7 @@ DEFINE   riset arah unik → CEK DESIGN_LEDGER.md (font/hero/motif/signature bel
 BUILD    renderer bespoke (+ mode sparse — pelajaran #132) + contrast self-test
 GATE-1   3-skill (kode): /ui-design + /make-interfaces-feel-better + /website-review
 GATE-2   pixel (§7.2): shoot → scorecard → iterate ≤2×
+GATE-3   interaksi (§7.5): renderer ber-state / order-storefront → UAT 2-viewport + state non-default (assert geometri)
 LEDGER   tambah baris tema di DESIGN_LEDGER.md (dalam PR yang sama)
 REVIEW   HTML sample + screenshot ke owner → PR → CI → merge atas perintah owner
 ```
@@ -252,3 +253,42 @@ REVIEW   HTML sample + screenshot ke owner → PR → CI → merge atas perintah
 Temuan visual/UX dari UAT atau order nyata → catat di `DESIGN_LEDGER.md`
 §Pelajaran **sekaligus** tanam aturannya di `design-rules/<mood>.md` / checklist
 brief / renderer. Pelajaran yang tidak ditanam = akan terulang.
+
+### 7.5 GATE-3 — UAT-interaksi (renderer ber-state / order-storefront)
+
+GATE-2 (shoot pixel) memotret **sample statik state-kosong** → buta terhadap bug yang
+hanya muncul saat ada STATE/DATA. Renderer **ber-state** (cart/stepper/drawer/badge stok)
+ATAU renderer non-bespoke yang **melewati GATE-2** (mis. `CeriaOrderRenderer` cutover
+Portal — tak terdaftar di `BESPOKE_RENDERERS`) **WAJIB** lolos gerbang ini sebelum
+aktivasi. (Akar 4 bug 2026-06-22 yang lolos ke produksi: stepper nutup judul, cart bar
+nutup footer, footer mepet di desktop — semua hanya muncul di state/viewport tertentu.)
+
+**Cara (Playwright-MCP di prod/preview — bukan shoot statik):** buka di **DUA** viewport
+`390×844` (mobile) + `1440×900` (desktop), picu **state non-default**, lalu **assert
+geometri** pakai `getBoundingClientRect` (banding kotak), bukan mata saja. Katalog live
+nihil state tertentu (mis. tak ada item preorder) → **inject sintetik** ke `localStorage`
+lalu reload.
+
+State yang WAJIB dipicu + di-assert:
+
+| State | Picu | Assert |
+|---|---|---|
+| `qty > 0` | klik FAB tambah | stepper (lebih tinggi dari FAB) tak menimpa judul kartu (`title.top ≥ control.bottom`) |
+| `count > 0` | ada item di cart | bottom cart bar (fixed) tak menutupi footer/konten terakhir (`wa.bottom ≤ bar.top`); halaman reserve clearance di ujung |
+| drawer/checkout terbuka | buka keranjang → bayar | form + ringkasan rapi di kedua viewport |
+| item preorder/habis | inject `localStorage` bila katalog live nihil | badge + notice PO tampil; tombol `habis` ter-disable |
+| viewport lebar | resize 1440 | baris footer/meta tak mepet jadi satu baris (`alamat.top ≥ jam.bottom`) |
+
+**Invarian CSS (tanam saat BUILD, cek saat gerbang):**
+
+1. **Kontrol mengambang di seam** (FAB/stepper `position:absolute; top:-N`): elemen di
+   bawahnya WAJIB `padding-top ≥ N + tinggi-kontrol-TERTINGGI`. Stepper biasanya lebih
+   tinggi dari FAB → hitung dari yang tertinggi.
+2. **Bar fixed bawah** (cart/CTA): clearance di **ujung halaman** (`.root.has-state{
+   padding-bottom:…}` di-toggle saat bar tampil), JANGAN cuma di satu section tengah
+   (gagal saat user scroll ke section setelahnya).
+3. **Baris footer/meta ter-center**: **block-level** (`display:flex;justify-content:
+   center` / `margin:auto`), JANGAN `inline-flex` — di mobile ia wrap (terlihat benar)
+   tapi di viewport lebar berbaris mepet (bug tersembunyi).
+
+Temuan baru di gerbang ini → §Pelajaran DESIGN_LEDGER + tambah invarian/baris di sini.
