@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
-import { notifyPreorder } from '@/lib/fonnte'
+import { sendWhatsApp } from '@/lib/fonnte'
+import { renderTemplate, type NotifVars } from '@/lib/notif/template'
+import { getTenantNotif, effectiveFonnteToken } from '@/lib/tenant-notif'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import { createPortalOrder } from '@/lib/portal/client'
 import {
@@ -155,31 +157,41 @@ export async function POST(request: Request) {
 
     // 7. Notifikasi WA — HANYA pada order BARU (201), bukan replay idempoten (200).
     //    Cegah struk/notif ganda saat double-submit (idempotency_key sama → Portal 200).
+    //    Token HYBRID: token Fonnte tenant (bila aktif) → fallback token platform.
+    //    Template per-event editable tenant (anti-rusak) → fallback default platform.
     //    Fire-and-forget — kegagalan WA tak menggagalkan order.
     if (result.status === 201) {
       const waAdmin = konfig.preorder?.wa_admin?.trim()
       const phoneCc = konfig.localeConfig?.phone_cc || '62'
       const { locale, currency } = moneyFromConfig(konfig.localeConfig)
       const itemsText = ringkasan.map((i) => `${i.nama} ×${i.qty}`).join(', ')
-      const fulfillmentText = `${METODE_LABEL[r.metode_bayar]}${tgl_kirim ? ` · kirim ${tgl_kirim}` : ''}`
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
       const trackUrl = `${baseUrl}/lacak/${r.tracking_token}`
-      const ctx = {
-        businessName: page.nama_website,
-        customerName: pembeli.nama.trim(),
-        orderShort: r.order_code,
-        itemsText,
-        totalText: formatMoney(r.total_gross, locale, currency),
-        fulfillmentText,
-        address: pembeli.alamat?.trim() || null,
-        note: pembeli.catatan?.trim() || null,
-        trackUrl,
+
+      const notif = page.tenant_id ? await getTenantNotif(page.tenant_id).catch(() => null) : null
+      const token = notif ? effectiveFonnteToken(notif) : (process.env.FONNTE_TOKEN || undefined)
+      const vars: NotifVars = {
+        nama: pembeli.nama.trim(),
+        bisnis: page.nama_website,
+        kode: r.order_code,
+        items: itemsText,
+        total: formatMoney(r.total_gross, locale, currency),
+        bayar: METODE_LABEL[r.metode_bayar],
+        lacak: trackUrl,
+        alamat: pembeli.alamat?.trim() || null,
+        catatan: pembeli.catatan?.trim() || null,
+        tanggal: tgl_kirim || null,
       }
+
+      // Struk ke pembeli — selalu.
+      const receiptMsg = renderTemplate('order_receipt', notif?.templates.order_receipt, vars)
+      sendWhatsApp(pembeli.telp.trim(), receiptMsg, phoneCc, token).catch((e: unknown) => console.error('[orders WA receipt]', (e as Error)?.message))
+
+      // Notif ke admin — bila wa_admin di-set.
       if (waAdmin) {
-        notifyPreorder({ type: 'preorder_admin' }, waAdmin, ctx, phoneCc).catch((e: unknown) => console.error('[orders WA admin]', (e as Error)?.message))
+        const adminMsg = renderTemplate('order_admin', notif?.templates.order_admin, vars)
+        sendWhatsApp(waAdmin, adminMsg, phoneCc, token).catch((e: unknown) => console.error('[orders WA admin]', (e as Error)?.message))
       }
-      // Struk pembeli — template preorder_receipt yg sebelumnya belum di-wire (§14).
-      notifyPreorder({ type: 'preorder_receipt' }, pembeli.telp.trim(), ctx, phoneCc).catch((e: unknown) => console.error('[orders WA receipt]', (e as Error)?.message))
     }
 
     // 8. Balas ke browser — total_* + instruksi_bayar dari Portal (BUKAN estimasi WB).

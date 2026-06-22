@@ -16,8 +16,8 @@ export function normalizeWa(phone: string, defaultCc = '62'): string {
 
 export type FonnteResult = { ok: true; id?: string } | { ok: false; error: string }
 
-export async function sendWhatsApp(target: string, message: string, defaultCc = '62'): Promise<FonnteResult> {
-  const token = process.env.FONNTE_TOKEN
+export async function sendWhatsApp(target: string, message: string, defaultCc = '62', tokenOverride?: string): Promise<FonnteResult> {
+  const token = tokenOverride || process.env.FONNTE_TOKEN
   if (!token) {
     console.warn('[fonnte] FONNTE_TOKEN tidak diset — skip kirim WA')
     return { ok: false, error: 'no_token' }
