@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 
 // Whitelist §5 (+ pembeli_nama: satu-satunya field pelanggan di proyeksi, token-gated).
 const SELECT_FIELDS =
-  'order_code, tenant_slug, pembeli_nama, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, tgl_kirim, created_at'
+  'order_code, tenant_slug, pembeli_nama, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, tgl_kirim, jam_kirim, created_at'
 
 type RingkasanItem = { nama: string; qty: number; harga: number }
 type Projection = {
@@ -31,6 +31,7 @@ type Projection = {
   biaya_kurir: number | string | null
   resi: string | null
   tgl_kirim: string | null
+  jam_kirim: string | null
   created_at: string | null
 }
 
@@ -148,10 +149,11 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
         {Number(order.total_courier) > 0 && <div style={rowLine}><span>Dibayar ke kurir</span><span>{fmt(Number(order.total_courier))}</span></div>}
       </div>
 
-      {(order.resi || order.tgl_kirim) && (
+      {(order.resi || order.tgl_kirim || order.jam_kirim) && (
         <div style={card}>
           <h2 style={h2}>Pengiriman</h2>
           {order.tgl_kirim ? <div style={rowLine}><span>Tanggal kirim</span><span>{String(order.tgl_kirim)}</span></div> : null}
+          {order.jam_kirim ? <div style={rowLine}><span>Jam kirim</span><span>{String(order.jam_kirim)}</span></div> : null}
           {order.resi ? <div style={rowLine}><span>No. resi</span><strong>{String(order.resi)}</strong></div> : null}
         </div>
       )}

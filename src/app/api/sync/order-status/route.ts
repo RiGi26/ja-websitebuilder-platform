@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   let body: {
     tenant_slug?: string; order_code?: string; tracking_token?: string
     status_bayar?: string; status_fulfillment?: string
-    resi?: string | null; tgl_kirim?: string | null; updated_at?: string
+    resi?: string | null; tgl_kirim?: string | null; jam_kirim?: string | null; updated_at?: string
   }
   try {
     body = JSON.parse(rawBody)
@@ -68,6 +68,8 @@ export async function POST(request: Request) {
         status_fulfillment,
         resi: body.resi ?? null,
         tgl_kirim: body.tgl_kirim ?? null,
+        // jam_kirim SENGAJA tak ikut di-update: nilainya immutable (di-set saat
+        // bootstrap order create) → biarkan apa adanya agar push status tak menimpanya null.
         source_updated_at: updated_at,
         synced_at: now,
       })
@@ -87,6 +89,7 @@ export async function POST(request: Request) {
       status_fulfillment,
       resi: body.resi ?? null,
       tgl_kirim: body.tgl_kirim ?? null,
+      jam_kirim: body.jam_kirim ?? null,
       source_updated_at: updated_at,
       synced_at: now,
     })

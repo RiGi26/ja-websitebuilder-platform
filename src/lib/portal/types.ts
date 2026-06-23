@@ -38,7 +38,10 @@ export interface PortalOrderRequest {
   pembeli: PortalPembeli
   metode_bayar: MetodeBayar
   fulfillment_mode: FulfillmentMode
+  /** Tanggal kirim (YYYY-MM-DD). Diisi otomatis server-side = hari order (same-day). */
   tgl_kirim?: string | null
+  /** Slot jam kirim same-day (cth '18:00〜20:00'); pelanggan pilih di checkout. */
+  jam_kirim?: string | null
   items: PortalOrderItemReq[]
   order_addons?: PortalAddonRef[]
   /** Estimasi ongkir website (kode_pos→region); Portal recompute otoritatif (§4.1). */
