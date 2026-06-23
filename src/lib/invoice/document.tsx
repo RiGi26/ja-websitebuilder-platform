@@ -1,6 +1,12 @@
 // Layout PDF faktur via @react-pdf/renderer (pure-JS, jalan di Node runtime Vercel —
 // tanpa headless Chrome). Hanya bergantung pada InvoiceData. Logo dikirim sebagai
 // data-URL (di-prefetch di generate.ts) agar render tak gagal kalau URL logo mati.
+//
+// CATATAN react-pdf + Next 16: Next merender elemen pakai React 19 (elemen
+// `react.transitional.element`). App memakai react@19 (lihat package.json) supaya
+// reconciler react-pdf yang dipilih = React-19 (reconciler-31/33) dan menerima elemen
+// itu — kalau react@18, reconciler-23 menolak → "Minified React error #31". Detail di
+// next.config (serverExternalPackages) + package.json.
 
 import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer'
 import { formatMoney } from '@/lib/format-money'
