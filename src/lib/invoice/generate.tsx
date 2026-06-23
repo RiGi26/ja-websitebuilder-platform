@@ -3,9 +3,9 @@
 //  • route /invoice/[token] (serve-or-generate, sudah punya projection),
 //  • hook /api/sync/order-status (pre-gen fire-and-forget saat status jadi paid).
 //
-// PDF disimpan di bucket 'tenant-uploads' path invoices/<slug>/<token>.pdf (token
-// 32-hex acak → tak bisa ditebak). TIDAK disajikan via public URL — route gated
-// (rate-limit + paid-gate) yang men-stream-nya, agar akses tetap terkontrol.
+// PDF disimpan di bucket PRIVAT 'invoices' path <slug>/<token>.pdf (token 32-hex
+// acak). Bucket privat + service-role: di-stream via route gated (rate-limit +
+// paid-gate), TIDAK ada public URL. (Bucket 'tenant-uploads' hanya izinkan gambar.)
 
 import { renderToBuffer } from '@react-pdf/renderer'
 import { supabaseAdmin } from '@/lib/supabase-admin'
@@ -14,7 +14,7 @@ import { InvoiceDocument } from './document'
 import { invoiceDataFromProjection, type ProjectionRow } from './from-projection'
 import type { InvoiceData } from './types'
 
-const BUCKET = 'tenant-uploads'
+const BUCKET = 'invoices'
 const SELECT_FIELDS =
   'order_code, tenant_slug, tracking_token, pembeli_nama, status_bayar, metode_bayar, ' +
   'ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, ' +
@@ -23,7 +23,7 @@ const SELECT_FIELDS =
 type ProjectionFull = ProjectionRow & { tracking_token: string; invoice_generated_at: string | null }
 
 function storagePath(tenantSlug: string, token: string): string {
-  return `invoices/${tenantSlug}/${token}.pdf`
+  return `${tenantSlug}/${token}.pdf`
 }
 
 // Prefetch logo → data-URL agar render PDF tak gagal jika URL logo mati. Best-effort.
