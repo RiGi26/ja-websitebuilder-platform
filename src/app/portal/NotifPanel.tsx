@@ -12,6 +12,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, Loader2, Check, Send, Sparkles, AlertTriangle, Link2 } from 'lucide-react'
 import { NOTIF_EVENTS, validateTemplate, renderTemplate, type NotifEventKey, type NotifVars } from '@/lib/notif/template'
+import { normalizeWa } from '@/lib/wa-normalize'
 
 type Status = {
   configured: boolean
@@ -43,7 +44,7 @@ const card = 'bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03
 const inp = 'w-full text-sm rounded-lg border border-black/10 p-2.5 focus:border-apple-blue focus:outline-none'
 const labelCls = 'text-[10px] font-bold text-gray-400 uppercase tracking-widest'
 
-export default function NotifPanel({ businessName }: { businessName: string }) {
+export default function NotifPanel({ businessName, phoneCc }: { businessName: string; phoneCc?: string }) {
   const [status, setStatus] = useState<Status | null>(null)
   const [loadErr, setLoadErr] = useState<string | null>(null)
 
@@ -153,6 +154,13 @@ export default function NotifPanel({ businessName }: { businessName: string }) {
       ? { t: 'Token tersimpan · nonaktif', c: 'bg-gray-100 text-gray-500' }
       : { t: 'Pakai nomor platform', c: 'bg-gray-100 text-gray-500' }
 
+  // Pratinjau "nomor yang akan dikirim" — pakai resolusi yang SAMA dengan server
+  // (route notifications memakai phone_cc tenant, fallback '62'), jadi yang dilihat
+  // owner persis = target yang muncul di log Fonnte. Mencegah salah kode negara.
+  const testTrimmed = testPhone.trim()
+  const testResolved = testTrimmed ? normalizeWa(testTrimmed, phoneCc || '62') : ''
+  const testTooShort = !!testResolved && testResolved.length < 10
+
   return (
     <div className="space-y-6">
       {/* ── Kartu 1: Koneksi WhatsApp ── */}
@@ -214,6 +222,15 @@ export default function NotifPanel({ businessName }: { businessName: string }) {
               {busyTest ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Kirim uji
             </button>
           </div>
+          {testResolved && (
+            <p className="text-[12px] mt-2 text-gray-600">
+              Akan dikirim ke nomor: <span className="font-mono font-semibold text-gray-800">{testResolved}</span>
+              {testTooShort && <span className="text-amber-600"> — sepertinya kurang lengkap, periksa lagi.</span>}
+            </p>
+          )}
+          <p className="text-[11px] mt-1.5 text-gray-500 leading-relaxed">
+            Nomor luar negeri? Tulis kode negara di depan pakai tanda <span className="font-semibold">+</span> — mis. <span className="font-mono">+8190…</span> untuk Jepang, <span className="font-mono">+62812…</span> untuk Indonesia.
+          </p>
           {testMsg && <p className="text-xs mt-2.5 text-gray-500">{testMsg}</p>}
         </div>
       </div>
