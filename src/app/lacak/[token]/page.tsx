@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit } from '@/lib/rate-limit'
 import { formatMoney } from '@/lib/format-money'
 import type { MetodeBayar } from '@/lib/portal/types'
+import { STATUS_BAYAR, STATUS_FULFILLMENT, METODE, STEPS, isPaidStatus } from '@/lib/portal/labels'
 
 // ============================================================
 // Halaman lacak pesanan Portal (Bakso Fase 1, BAKSO_PORTAL_CONTRACT.md §5).
@@ -35,20 +36,8 @@ type Projection = {
   created_at: string | null
 }
 
-const STATUS_BAYAR: Record<string, string> = {
-  belum_bayar: 'Belum bayar', menunggu_verifikasi: 'Menunggu verifikasi', lunas: 'Lunas',
-  cod: 'Bayar di kurir (COD)', gagal: 'Gagal', refund: 'Refund',
-}
-const STATUS_FULFILLMENT: Record<string, string> = {
-  menunggu: 'Menunggu', dikonfirmasi: 'Dikonfirmasi', diproduksi: 'Diproduksi', dikemas: 'Dikemas',
-  dikirim: 'Dikirim', selesai: 'Selesai', batal: 'Dibatalkan',
-}
-const METODE: Record<MetodeBayar, string> = {
-  transfer_jp: 'Transfer Bank (銀行振込)', transfer_id: 'Transfer Bank Indonesia', paypay: 'PayPay',
-  cod_full: '代引き (COD penuh)', cod_ongkir: '着払い (ongkir di kurir)',
-}
-// Langkah fulfillment utk timeline.
-const STEPS = ['menunggu', 'dikonfirmasi', 'diproduksi', 'dikemas', 'dikirim', 'selesai'] as const
+// Label maps (STATUS_BAYAR/STATUS_FULFILLMENT/METODE/STEPS) di @/lib/portal/labels
+// — dipakai bersama engine invoice agar istilah konsisten lintas tracking ↔ faktur.
 
 async function getProjection(token: string) {
   // EXACT match — satu query, tanpa normalisasi displayId/prefix/range.
@@ -149,6 +138,13 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
         {Number(order.total_courier) > 0 && <div style={rowLine}><span>Dibayar ke kurir</span><span>{fmt(Number(order.total_courier))}</span></div>}
       </div>
 
+      {/* Invoice PDF — hanya saat pembayaran sudah terverifikasi (lunas/COD). */}
+      {isPaidStatus(order.status_bayar) && (
+        <a href={`/invoice/${token}`} target="_blank" rel="noopener noreferrer" style={invoiceBtn}>
+          📄 Unduh Invoice (PDF)
+        </a>
+      )}
+
       {(order.resi || order.tgl_kirim || order.jam_kirim) && (
         <div style={card}>
           <h2 style={h2}>Pengiriman</h2>
@@ -182,6 +178,11 @@ const rowLine: React.CSSProperties = { display: 'flex', justifyContent: 'space-b
 const hr: React.CSSProperties = { border: 0, borderTop: '1px dashed rgba(43,26,18,.2)', margin: '.6rem 0' }
 function badge(bg: string, fg: string): React.CSSProperties {
   return { background: bg, color: fg, fontSize: 12, fontWeight: 700, padding: '.35rem .8rem', borderRadius: 999 }
+}
+const invoiceBtn: React.CSSProperties = {
+  display: 'block', textAlign: 'center', background: '#2B1A12', color: '#FFFBF2',
+  fontSize: 14, fontWeight: 700, textDecoration: 'none', padding: '.85rem 1rem',
+  borderRadius: 12, margin: '0 0 1rem',
 }
 function tlDot(on: boolean): React.CSSProperties {
   return { width: 14, height: 14, borderRadius: '50%', background: on ? '#C0432E' : '#e4d8c4', border: on ? 'none' : '1px solid rgba(43,26,18,.2)' }
