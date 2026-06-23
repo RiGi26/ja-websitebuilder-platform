@@ -393,7 +393,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           ) : tab === 'profil' ? (
             <ProfilePanel page={page} tenantId={tenantId} initial={initialProfile} />
           ) : tab === 'notif' ? (
-            <NotifPanel businessName={namaTenant} />
+            <NotifPanel businessName={namaTenant} phoneCc={localeConfig?.phone_cc} />
           ) : (
           <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
             <div className="flex items-center justify-between mb-5">
