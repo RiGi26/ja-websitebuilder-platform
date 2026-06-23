@@ -34,6 +34,16 @@ const nextConfig = {
   // @react-pdf/renderer (engine invoice PDF) = Node-only, deps berat (fontkit dll).
   // Jangan di-bundle webpack server — biarkan di-require runtime (hindari error build).
   serverExternalPackages: ['@react-pdf/renderer'],
+  // Karena di-externalize, file paket (data metrik font .afm, wasm fontkit, dll) HARUS
+  // dipaksa ikut ter-trace ke fungsi serverless route /invoice — kalau tidak, render
+  // sukses lokal tapi 500 (ENOENT) di Vercel. Sertakan scope @react-pdf + deps datanya.
+  outputFileTracingIncludes: {
+    '/invoice/[token]': [
+      './node_modules/@react-pdf/**/*',
+      './node_modules/@foliojs-fork/**/*',
+      './node_modules/fontkit/**/*',
+    ],
+  },
   async headers() {
     return [
       { source: '/:path*', headers: baseSecurityHeaders },
