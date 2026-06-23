@@ -48,6 +48,28 @@ const METODE_LABEL: Record<MetodeBayar, string> = Object.fromEntries(
   METODE_OPSI.map((o) => [o.v, o.label]),
 ) as Record<MetodeBayar, string>
 
+// Slot jam kirim same-day (pengiriman di HARI pesan). `startMin` = menit-of-day jam
+// MULAI window → slot di-disable bila waktu sekarang (zona Asia/Tokyo, lokasi toko)
+// sudah melewatinya. Pelanggan tak boleh memilih jam yang sudah lewat hari ini.
+const JAM_KIRIM_SLOTS: { label: string; startMin: number }[] = [
+  { label: '8:00〜12:00', startMin: 8 * 60 },
+  { label: '14:00〜16:00', startMin: 14 * 60 },
+  { label: '16:00〜18:00', startMin: 16 * 60 },
+  { label: '18:00〜20:00', startMin: 18 * 60 },
+  { label: '19:00〜21:00', startMin: 19 * 60 },
+]
+
+// Menit-of-day saat ini di Asia/Tokyo (toko beroperasi di Jepang). Dipakai untuk
+// menonaktifkan slot jam yang waktunya sudah lewat hari ini.
+function tokyoNowMinutes(): number {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(new Date())
+  const h = Number(parts.find((p) => p.type === 'hour')?.value ?? '0') % 24
+  const m = Number(parts.find((p) => p.type === 'minute')?.value ?? '0')
+  return h * 60 + m
+}
+
 type View = 'closed' | 'cart' | 'checkout' | 'done'
 type DoneState = { res: PortalOrderResponse; trackUrl: string }
 
@@ -213,7 +235,11 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
 }) {
   const [form, setForm] = useState({ nama: '', telp: '', email: '', ig: '', kode_pos: '', alamat: '', catatan: '' })
   const [metode, setMetode] = useState<MetodeBayar | ''>('')
-  const [tglKirim, setTglKirim] = useState('')
+  const [jamKirim, setJamKirim] = useState('')
+  // Waktu Tokyo saat checkout dibuka (fix di mount; sesi checkout pendek). Slot yang
+  // jam mulainya sudah lewat → disabled. Bila semua lewat → tampilkan catatan "penuh".
+  const [nowMin] = useState(() => tokyoNowMinutes())
+  const allSlotsPassed = JAM_KIRIM_SLOTS.every((s) => nowMin >= s.startMin)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [conflicts, setConflicts] = useState<StockConflictEntry[] | null>(null)
@@ -241,7 +267,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
           },
           metode_bayar: metode,
           fulfillment_mode: 'IMMEDIATE',
-          tgl_kirim: tglKirim || null,
+          jam_kirim: jamKirim || null,
           items: items.map((l) => ({ product_pack_id: l.pack_id, qty: l.qty })),
           idempotency_key: idemKey,
         }),
@@ -295,12 +321,33 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
           <div className="pcart-field"><label htmlFor="pc-email">Email</label><input id="pc-email" value={form.email} onChange={set('email')} inputMode="email" autoComplete="email" /></div>
           <div className="pcart-field"><label htmlFor="pc-ig">Instagram</label><input id="pc-ig" value={form.ig} onChange={set('ig')} placeholder="@akun" /></div>
         </div>
-        <div className="pcart-row">
-          <div className="pcart-field"><label htmlFor="pc-pos">Kode Pos 〒</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder="160-0023" /></div>
-          <div className="pcart-field"><label htmlFor="pc-kirim">Tanggal kirim</label><input id="pc-kirim" type="date" value={tglKirim} onChange={(e) => setTglKirim(e.target.value)} /></div>
-        </div>
+        <div className="pcart-field"><label htmlFor="pc-pos">Kode Pos 〒</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder="160-0023" /></div>
         <div className="pcart-field"><label htmlFor="pc-alamat">Alamat</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder="Prefektur · kota · banchi" /></div>
         <div className="pcart-field"><label htmlFor="pc-catatan">Catatan</label><textarea id="pc-catatan" value={form.catatan} onChange={set('catatan')} rows={2} /></div>
+
+        <h3 className="pcart-h3">Jam Kirim · hari ini</h3>
+        <div className="pcart-metode pcart-jamkirim">
+          {JAM_KIRIM_SLOTS.map((s) => {
+            const past = nowMin >= s.startMin
+            const sel = jamKirim === s.label
+            return (
+              <button
+                key={s.label}
+                type="button"
+                className={`pcart-metode-opt pcart-jam-opt${sel ? ' is-sel' : ''}`}
+                disabled={past}
+                aria-pressed={sel}
+                style={past ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+                onClick={() => { if (!past) setJamKirim(sel ? '' : s.label) }}
+              >
+                <span className="pcart-metode-label">{s.label}</span>
+              </button>
+            )
+          })}
+        </div>
+        {allSlotsPassed
+          ? <p className="pcart-hint" role="status">Pengiriman hari ini sudah penuh — silakan order untuk besok via WhatsApp.</p>
+          : <p className="pcart-hint">Perkiraan jam barang sampai di hari ini. Slot yang jamnya sudah lewat tidak bisa dipilih.</p>}
 
         <h3 className="pcart-h3">Metode Pembayaran *</h3>
         <div className="pcart-metode">
@@ -435,6 +482,10 @@ function pcartCss(primary: string, variant?: string): string {
 .pcart-metode-opt.is-sel{border-color:${primary};background:${primary}0F;box-shadow:inset 0 0 0 1px ${primary}}
 .pcart-metode-label{font-weight:600;font-size:.9rem}
 .pcart-metode-sub{color:${mutedText}}
+.pcart-jamkirim{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
+.pcart-jam-opt{align-items:center}
+.pcart-jam-opt .pcart-metode-label{font-variant-numeric:tabular-nums}
+.pcart-jam-opt:disabled{pointer-events:none}
 .pcart-alert{display:flex;gap:.6rem;background:#FBEAE6;border:1px solid #E8B4A8;border-radius:12px;padding:.8rem;margin-top:1rem;color:#7A2A1B;font-size:.85rem}
 .pcart-alert ul{margin:.3rem 0;padding-left:1.1rem}
 .pcart-link{background:none;border:none;color:${primary};font-weight:600;cursor:pointer;font-size:.85rem;padding:.3rem 0;text-decoration:underline}

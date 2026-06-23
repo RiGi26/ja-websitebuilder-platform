@@ -42,7 +42,15 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { slug, pembeli, metode_bayar, fulfillment_mode, tgl_kirim, items } = body
+    const { slug, pembeli, metode_bayar, fulfillment_mode, jam_kirim, items } = body
+
+    // Slot jam kirim same-day (cth '18:00〜20:00'). Pengiriman selalu di HARI order →
+    // tgl_kirim diisi otomatis = tanggal hari ini di Asia/Tokyo (lokasi toko), bukan
+    // dari browser. Hanya diset bila pelanggan memilih slot (opsional).
+    const jamKirim = typeof jam_kirim === 'string' && jam_kirim.trim() ? jam_kirim.trim() : null
+    const tglKirim = jamKirim
+      ? new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date()) // YYYY-MM-DD
+      : null
 
     // 1. Validasi payload
     if (!slug || !pembeli?.nama?.trim() || !pembeli?.telp?.trim()) {
@@ -114,7 +122,8 @@ export async function POST(request: Request) {
       },
       metode_bayar,
       fulfillment_mode: mode,
-      tgl_kirim: tgl_kirim || null,
+      tgl_kirim: tglKirim,
+      jam_kirim: jamKirim,
       items: reqItems,
       ongkir: 0,
     }
@@ -150,7 +159,8 @@ export async function POST(request: Request) {
       total_gross: r.total_gross,
       biaya_kurir: r.biaya_kurir,
       ringkasan_items: ringkasan,
-      tgl_kirim: tgl_kirim || null,
+      tgl_kirim: tglKirim,
+      jam_kirim: jamKirim,
       created_at: createdAt,
       source_updated_at: createdAt,
     }, { onConflict: 'order_code', ignoreDuplicates: true })
@@ -180,7 +190,7 @@ export async function POST(request: Request) {
         lacak: trackUrl,
         alamat: pembeli.alamat?.trim() || null,
         catatan: pembeli.catatan?.trim() || null,
-        tanggal: tgl_kirim || null,
+        tanggal: jamKirim ? `${tglKirim} · ${jamKirim}` : null,
       }
 
       // Struk ke pembeli — selalu.

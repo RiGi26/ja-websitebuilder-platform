@@ -17,6 +17,14 @@ import { createServerClient } from '@supabase/ssr'
 // Vercel oleh tim (aksi manual) sebelum ini berfungsi end-to-end.
 // ============================================================
 
+// Top-level route HOST-AGNOSTIC yang wajib resolve di subdomain tenant TANPA
+// prefix slug. `lacak` = halaman lacak pesanan pelanggan (token unik 32-hex →
+// tenant di-resolve dari token, lihat app/lacak/[token]). Ini tautan yang
+// dikirim via WhatsApp. Tanpa exempt, Mode 1 me-rewrite
+//   bakso-tini.webzoka.com/lacak/<token> → /bakso-tini/lacak/<token>
+// yang tak punya route (lacak ada di top-level, bukan di bawah [slug]) → 404.
+const TENANT_PASSTHROUGH = new Set(['lacak'])
+
 // Subdomain di bawah ROOT_DOMAIN yang BUKAN tenant: portal sistem + host
 // fungsional platform. `wb` = host builder (admin/order/portal/dst).
 const RESERVED_SUBDOMAINS = new Set([
@@ -94,6 +102,11 @@ export async function proxy(req: NextRequest) {
   const sub = tenantSubdomain(host)
   if (sub) {
     const { pathname } = req.nextUrl
+    // Route host-agnostic (mis. /lacak/<token>) lewat apa adanya ke route
+    // top-level — jangan di-prefix slug, kalau tidak jadi 404.
+    if (TENANT_PASSTHROUGH.has(pathname.split('/')[1])) {
+      return NextResponse.next()
+    }
     const url = req.nextUrl.clone()
     url.pathname = pathname === '/' ? `/${sub}` : `/${sub}${pathname}`
     return NextResponse.rewrite(url)

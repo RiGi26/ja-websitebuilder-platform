@@ -40,6 +40,7 @@ create table public.order_projection (
   ringkasan_items    jsonb,                         -- [{nama,qty,harga}]
   resi               text,
   tgl_kirim          date,
+  jam_kirim          text,                          -- slot jam kirim same-day (cth '18:00〜20:00')
   created_at         timestamptz,
   source_updated_at  timestamptz not null,          -- GUARD monotonic (§4.3, sync Fase 2)
   synced_at          timestamptz not null default now()
