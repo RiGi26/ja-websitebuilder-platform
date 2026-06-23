@@ -145,10 +145,9 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
         </a>
       )}
 
-      {(order.resi || order.tgl_kirim || order.jam_kirim) && (
+      {(order.resi || order.jam_kirim) && (
         <div style={card}>
           <h2 style={h2}>Pengiriman</h2>
-          {order.tgl_kirim ? <div style={rowLine}><span>Tanggal kirim</span><span>{String(order.tgl_kirim)}</span></div> : null}
           {order.jam_kirim ? <div style={rowLine}><span>Jam kirim</span><span>{String(order.jam_kirim)}</span></div> : null}
           {order.resi ? <div style={rowLine}><span>No. resi</span><strong>{String(order.resi)}</strong></div> : null}
         </div>
