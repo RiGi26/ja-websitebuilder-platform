@@ -71,13 +71,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ token: stri
   try {
     pdf = await ensureInvoicePdf(p)
   } catch (e) {
-    const err = e as Error
-    console.error('[invoice] generate error:', err?.message, err?.stack)
-    // TEMP DEBUG (UAT): ?debug=1 surface error detail — hapus di PR cleanup berikutnya.
-    if (new URL(request.url).searchParams.get('debug') === '1') {
-      return new Response(`name: ${err?.name}\nmessage: ${err?.message}\nstack:\n${err?.stack ?? ''}`,
-        { status: 500, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
-    }
+    console.error('[invoice] generate error:', (e as Error)?.message, (e as Error)?.stack)
     return htmlMessage('Gagal membuat invoice', 'Terjadi kesalahan saat menyiapkan PDF. Coba lagi sebentar.', 500)
   }
   if (!pdf) {
