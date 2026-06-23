@@ -12,6 +12,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isPaidStatus } from '@/lib/portal/labels'
 import { InvoiceDocument } from './document'
 import { invoiceDataFromProjection, type ProjectionRow } from './from-projection'
+import type { InvoiceData } from './types'
 
 const BUCKET = 'tenant-uploads'
 const SELECT_FIELDS =
@@ -50,10 +51,16 @@ async function downloadCached(path: string): Promise<Buffer | null> {
   return Buffer.from(await data.arrayBuffer())
 }
 
+/** Render PDF dari InvoiceData siap-pakai TANPA DB/Storage (dipakai test render +
+ *  reuse internal). Elemen <InvoiceDocument/> dibuat di sini (classic runtime). */
+export async function renderInvoicePdf(data: InvoiceData, logoDataUrl?: string | null): Promise<Buffer> {
+  return renderToBuffer(<InvoiceDocument data={data} logoDataUrl={logoDataUrl ?? null} />)
+}
+
 async function renderAndStore(p: ProjectionFull): Promise<Buffer> {
   const data = await invoiceDataFromProjection(p)
   const logoDataUrl = await fetchLogoDataUrl(data.seller.logoUrl)
-  const pdf = await renderToBuffer(<InvoiceDocument data={data} logoDataUrl={logoDataUrl} />)
+  const pdf = await renderInvoicePdf(data, logoDataUrl)
 
   const path = storagePath(p.tenant_slug, p.tracking_token)
   const { error: upErr } = await supabaseAdmin.storage.from(BUCKET).upload(path, pdf, {

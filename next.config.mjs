@@ -31,19 +31,13 @@ const noFrameHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
-  // @react-pdf/renderer (engine invoice PDF) = Node-only, deps berat (fontkit dll).
-  // Jangan di-bundle webpack server — biarkan di-require runtime (hindari error build).
+  // @react-pdf/renderer = Node-only, di-externalize (jangan di-bundle Turbopack server).
+  // Next 16 me-render elemen pakai React 19 (elemen `react.transitional.element`), maka
+  // react-pdf HARUS memuat reconciler React-19 (reconciler-31/33). react-pdf memilih
+  // reconciler dari `React.version`-nya → kita paksa react@19 di subtree react-pdf via
+  // `overrides` di package.json. Externalize = resolusi node_modules dipakai (react@19
+  // nested), bukan React vendored Next. Tanpa ini → reconciler-23 (R18) → "React #31".
   serverExternalPackages: ['@react-pdf/renderer'],
-  // Karena di-externalize, file paket (data metrik font .afm, wasm fontkit, dll) HARUS
-  // dipaksa ikut ter-trace ke fungsi serverless route /invoice — kalau tidak, render
-  // sukses lokal tapi 500 (ENOENT) di Vercel. Sertakan scope @react-pdf + deps datanya.
-  outputFileTracingIncludes: {
-    '/invoice/[token]': [
-      './node_modules/@react-pdf/**/*',
-      './node_modules/@foliojs-fork/**/*',
-      './node_modules/fontkit/**/*',
-    ],
-  },
   async headers() {
     return [
       { source: '/:path*', headers: baseSecurityHeaders },
