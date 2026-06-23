@@ -637,8 +637,9 @@ function coCss(): string {
   .co-loc{display:none}
   .co-hero{min-height:268px}
   .co-hero::before{background:linear-gradient(180deg,rgba(40,22,12,.45),rgba(40,22,12,.86))}
-  .co-halal{width:64px;height:64px;top:12px;right:12px}
+  .co-halal{width:60px;height:60px;top:12px;right:12px}
   .co-halal b{font-size:12px}
+  .co-pill{max-width:calc(100% - 76px);text-wrap:balance}
   .co-grid{grid-template-columns:1fr 1fr;gap:11px}
   .co-card-body{padding:26px 11px 13px}
   .co-card-name{font-size:15px}
