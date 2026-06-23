@@ -191,6 +191,9 @@ export async function POST(request: Request) {
         alamat: pembeli.alamat?.trim() || null,
         catatan: pembeli.catatan?.trim() || null,
         tanggal: jamKirim ? `${tglKirim} · ${jamKirim}` : null,
+        // Link invoice/faktur PDF — permanen, tapi PDF baru bisa diakses setelah
+        // pembayaran terverifikasi (route /invoice gated). Dikirim sejak awal.
+        invoice: baseUrl ? `${baseUrl}/invoice/${r.tracking_token}` : null,
       }
 
       // Struk ke pembeli — selalu.

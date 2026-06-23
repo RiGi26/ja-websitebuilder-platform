@@ -31,6 +31,9 @@ const noFrameHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // @react-pdf/renderer (engine invoice PDF) = Node-only, deps berat (fontkit dll).
+  // Jangan di-bundle webpack server — biarkan di-require runtime (hindari error build).
+  serverExternalPackages: ['@react-pdf/renderer'],
   async headers() {
     return [
       { source: '/:path*', headers: baseSecurityHeaders },

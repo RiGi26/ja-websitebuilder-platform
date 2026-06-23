@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifySignedRequest, SIG_HEADERS } from '@/lib/portal/sign'
 import { consumeIngestNonce } from '@/lib/portal/ingest-nonce'
+import { isPaidStatus } from '@/lib/portal/labels'
+import { pregenerateInvoiceByOrderCode } from '@/lib/invoice/generate'
 
 // ============================================================
 // WB INGEST — POST /api/sync/order-status (BAKSO_PORTAL_CONTRACT.md §4.3). Portal push
@@ -97,6 +99,16 @@ export async function POST(request: Request) {
       console.error('[sync/order-status] insert error:', error.message)
       return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 })
     }
+  }
+
+  // Pre-generate PDF invoice begitu pembayaran terverifikasi (lunas/cod) — fire-and-forget,
+  // JANGAN await: push status Portal tak boleh nunggu render/upload (CLAUDE.md after-pattern).
+  // pregenerate sendiri sudah guard (skip bila belum paid / sudah dibuat). Jaring pengaman:
+  // route /invoice/[token] tetap bisa render lazy bila pre-gen ini gagal.
+  if (isPaidStatus(status_bayar)) {
+    pregenerateInvoiceByOrderCode(order_code).catch((e: unknown) =>
+      console.error('[sync/order-status] invoice pre-gen:', (e as Error)?.message),
+    )
   }
 
   return NextResponse.json({ ok: true })
