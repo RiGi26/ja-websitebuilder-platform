@@ -105,7 +105,7 @@ Pembayaran = **manual + COD** (instruksi_bayar dihitung Portal per-metode, §7 k
 
 **D. Aktivasi + verifikasi**
 9. Renderer + gating **otomatis** ikut `source_of_truth='portal'` begitu kode live — tak perlu subah kode per tenant.
-10. UAT produksi (lihat §8). Halaman `/[slug]` = `force-dynamic`, jadi perubahan DB langsung tampil (no cache).
+10. UAT produksi (lihat §9) + lewati gerbang **Standar Performa & Ketahanan §8**. Halaman `/[slug]` = `force-dynamic`, jadi perubahan DB langsung tampil (no cache).
 
 ---
 
@@ -132,10 +132,26 @@ Kalau menambah tab commerce baru di `/portal`, **gate dengan `!portalManaged`**.
 4. **Vercel Hobby cap cron 1×/hari** — cron `hourly` GAGAL deploy walau CI hijau (CI tak validasi cron-vs-plan). Pakai `daily` atau upgrade Pro.
 5. **`PORTAL_API_URL` ber-trailing-newline** — aman di runtime (`.trim()` / WHATWG URL strip LF) tapi jebakan saat tes manual.
 6. **Storefront `/[slug]` hanya jalan via alias** `…-nfoa.vercel.app` (apex `.vercel.app` = 404). Cart simpan `pack_id` mirror ke `localStorage ja_portal_cart:<slug>` — clear saat re-test pasca rebuild mirror.
+7. **`await` panggilan lintas-repo di server action** (mis. `await pushOrderStatus`) = operator menunggu round-trip + cold-start partner; bila partner lambat/mati, aksi user ikut gagal. Pakai `after()` (fire-and-forget) + reconcile cron. Lihat **§8.1**. (Difix 2026-06-23.)
 
 ---
 
-## 8. Verifikasi / UAT (gerbang "selesai")
+## 8. Standar Performa & Ketahanan (WAJIB)
+
+Pelajaran optimasi Portal (2026-06-23). Integrasi lintas-repo + halaman dashboard rawan **"agak delay / rusak diam-diam"** — terapkan saat wiring dan saat menyentuh app. Versi lintas-app ringkas di root `CLAUDE.md` ("Standar performa & ketahanan"); pemandu langkah di skill `/wire-portal`; keputusan+alasan di vault `notes/decisions/2026-06-23-standar-wiring-portal-performa.md` (prinsip `lintas-repo-tahan-banting`).
+
+1. **Cross-repo call = fire-and-forget.** Tiap panggilan ke Portal/partner di server action/route (`pushOrderStatus`, `pushCatalog`, dll.) **WAJIB `after()`** — JANGAN `await` inline. Reconcile cron (§7.3) = jaring pengaman. Alasan: pembeli/operator tak boleh menunggu round-trip + cold-start partner (timeout 12 dtk), dan kegagalan partner tak boleh menggagalkan order. (Bug nyata: `pushOrderStatus` di-`await` inline di `ja-stock-platform/src/app/actions/pesanan.ts` → difix ke `after()` 2026-06-23.)
+2. **Region match.** `vercel.json` `regions` = region Supabase project (Portal `oyyfcmlquqfrdoffkgsd` = `ap-southeast-1` → `sin1`). Beda region = +150–250 ms PER round-trip; rantai auth+data beruntun = detik.
+3. **Auth dedupe.** Helper sesi (`requireTenant`/`requireAuth`) bungkus React `cache()` (dedupe layout+page per-request); baca `tenant_id`/`role` dari claim JWT; query enrichment (tenant+profile) `Promise.all`. `getUser()` = round-trip ke server auth, minimalkan.
+4. **Query independen → `Promise.all`** di server component/action, bukan `await` beruntun.
+5. **Lib berat (chart/recharts ~70 KB) → `next/dynamic`** (wrapper `'use client'`, `ssr:false`) → lepas dari bundle awal.
+6. **DB hygiene** (jalankan performance advisor pasca-DDL): tiap FK punya **covering index**; RLS bungkus `auth.<fn>()`/`current_setting()` jadi `(select …)` (init-plan, dieval 1×/query bukan per-baris); migrasi **behavior-preserving** (verifikasi qual policy identik).
+7. **Kalibrasi dulu.** Ukur volume data + region + jumlah round-trip SEBELUM optimasi. Data kecil → lag = latensi/round-trip/cold-start/bundle, bukan SQL. **Anti-cargo-cult:** di DB muda "unused index" = belum kepakai (jangan buang); lewati perubahan risiko-tinggi-manfaat-rendah (mis. konsolidasi policy permissive RLS yang bisa putus akses superadmin) — catat alasannya.
+8. **Verify khusus RLS produksi:** logika identik saja bukan bukti — **smoke-test login user nyata** (service-role bypass RLS).
+
+---
+
+## 9. Verifikasi / UAT (gerbang "selesai")
 
 - `npx tsc --noEmit` 0 → CI "Typecheck & Render Tests" hijau → Vercel production **Ready**.
 - UAT browser **di produksi** (Playwright MCP / skill `/uat-flow`):
@@ -148,7 +164,7 @@ Kalau menambah tab commerce baru di `/portal`, **gate dengan `!portalManaged`**.
 
 ---
 
-## 9. Rujukan
+## 10. Rujukan
 
 - **Kontrak wire-level (SSOT):** `BAKSO_PORTAL_CONTRACT.md` (§1 sync · §4 request/response · §7 pembayaran · §8 HMAC · §10 stok/FEFO · §11 cutover).
 - E-commerce WB-native (non-cutover): `PLAN_ECOMMERCE.md`.
