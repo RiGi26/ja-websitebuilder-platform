@@ -38,6 +38,21 @@ const nextConfig = {
   // `overrides` di package.json. Externalize = resolusi node_modules dipakai (react@19
   // nested), bukan React vendored Next. Tanpa ini → reconciler-23 (R18) → "React #31".
   serverExternalPackages: ['@react-pdf/renderer'],
+  // Karena di-externalize, Vercel hanya menyertakan file yang ter-trace ke fungsi.
+  // react-pdf/fontkit MEMBACA file data saat runtime (mis. fontkit *.trie utk shaping)
+  // → tanpa ini render sukses lokal (node_modules lengkap) tapi ENOENT/500 di Vercel.
+  // Paksa sertakan paket + deps pembawa-data ke fungsi route /invoice.
+  outputFileTracingIncludes: {
+    '/invoice/[token]': [
+      './node_modules/@react-pdf/**/*',
+      './node_modules/fontkit/**/*',
+      './node_modules/unicode-properties/**/*',
+      './node_modules/unicode-trie/**/*',
+      './node_modules/dfa/**/*',
+      './node_modules/brotli/**/*',
+      './node_modules/restructure/**/*',
+    ],
+  },
   async headers() {
     return [
       { source: '/:path*', headers: baseSecurityHeaders },
