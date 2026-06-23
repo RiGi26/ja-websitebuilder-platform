@@ -29,6 +29,9 @@ export interface NotifVars {
   alamat?: string | null
   catatan?: string | null
   tanggal?: string | null
+  /** Link invoice/faktur PDF (terisi hanya untuk struk pembeli). Opsional — baris
+   *  di-drop bila kosong. PDF baru bisa diakses setelah pembayaran terverifikasi. */
+  invoice?: string | null
 }
 
 type VarKey = keyof NotifVars
@@ -44,7 +47,7 @@ interface EventDef {
   default: string
 }
 
-const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal']
+const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal', 'invoice']
 
 /** Katalog event WA sisi-WB yang editable tenant. "Berapa banyak" = daftar ini. */
 export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
@@ -66,6 +69,7 @@ export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
       '',
       'Kami akan konfirmasi ketersediaan & detail pembayaran via chat ini. 😊',
       'Lacak: {lacak}',
+      '📄 Invoice: {invoice}',
     ].join('\n'),
   },
   order_admin: {

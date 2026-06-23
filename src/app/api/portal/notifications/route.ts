@@ -31,6 +31,7 @@ function sampleVars(bisnis: string): NotifVars {
     items: 'Bakso Campur ×2, Es Teh ×1', total: '¥1.800', bayar: 'Transfer Bank',
     lacak: 'https://situsanda.com/lacak/abc123', alamat: 'Shibuya 1-2-3, Tokyo',
     catatan: 'pedas sedang', tanggal: '2026-06-25',
+    invoice: 'https://situsanda.com/invoice/abc123',
   }
 }
 
