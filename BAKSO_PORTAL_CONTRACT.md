@@ -251,7 +251,8 @@ create table "order" (
   -- fulfillment
   fulfillment_mode fulfillment_mode not null default 'IMMEDIATE',
   status_fulfillment status_fulfillment not null default 'menunggu',
-  tgl_kirim        date,
+  tgl_kirim        date,                       -- tanggal kirim = hari order (same-day; diisi server WB zona Asia/Tokyo)
+  jam_kirim        text,                       -- slot jam kirim same-day (cth '18:00〜20:00'); pelanggan pilih di checkout
   resi             text,                       -- nomor resi kurir (Yamato/Sagawa/Japan Post)
   -- uang (lihat §7 utk rumus per metode)
   subtotal         numeric not null default 0, -- barang (item + addon)
@@ -390,6 +391,7 @@ create table order_projection (
   ringkasan_items    jsonb,            -- [{nama,qty,harga}] utk tampil di lacak/struk
   resi               text,
   tgl_kirim          date,
+  jam_kirim          text,             -- slot jam kirim same-day (cth '18:00〜20:00')
   created_at         timestamptz,
   source_updated_at  timestamptz not null,  -- updated_at otoritatif dari Portal — GUARD monotonic upsert (§4.3)
   synced_at          timestamptz not null default now()  -- waktu tulis lokal WB
@@ -427,7 +429,8 @@ Satu-satunya jalur write. Membuat order + reserve stok otoritatif, **dalam SATU 
                "kode_pos": "160-0023", "alamat": "...", "catatan": "..." },
   "metode_bayar": "transfer_jp",          // enum §7
   "fulfillment_mode": "IMMEDIATE",         // atau PREORDER
-  "tgl_kirim": "2026-06-27",               // opsional (PO window)
+  "tgl_kirim": "2026-06-27",               // opsional; same-day diisi server WB (zona Asia/Tokyo), bukan dari browser
+  "jam_kirim": "18:00〜20:00",             // opsional; slot jam kirim same-day (pelanggan pilih di checkout)
   "items": [
     { "product_pack_id": "uuid", "qty": 2,
       "addons": [ { "addon_id": "uuid", "qty": 1 } ] }
@@ -496,7 +499,7 @@ Portal panggil tiap status_bayar/status_fulfillment/resi berubah.
 ```jsonc
 { "tenant_slug": "bakso-tini", "order_code": "BT-2606-0042", "tracking_token": "a1b2...",
   "status_bayar": "lunas", "status_fulfillment": "dikirim",
-  "resi": "1234-5678-9012", "tgl_kirim": "2026-06-27", "updated_at": "2026-06-27T02:10:00Z" }
+  "resi": "1234-5678-9012", "tgl_kirim": "2026-06-27", "jam_kirim": "18:00〜20:00", "updated_at": "2026-06-27T02:10:00Z" }
 ```
 WB **upsert dengan GUARD monotonic**: tulis HANYA jika `incoming.updated_at >= order_projection.source_updated_at` (else abaikan = balas `{ ok:true, skipped:true }`). Jika baris belum ada → create-on-upsert. Balas `{ "ok": true }`.
 **Error:** `401 bad_signature` · `404 unknown_tenant` · `400 invalid_payload`.
@@ -524,7 +527,7 @@ WB terapkan sesuai `mode` (sama aturan §4.2): **delta TIDAK menonaktifkan pack 
 - **Token = kapabilitas 1 order** (rahasia 128-bit, non-enumerable): `encode(gen_random_bytes(16),'hex')` (32 hex) — pola `orders.tracking_token` WB.
 - **Hidup di:** `order.tracking_token` (Portal, SoR) **dan** `order_projection.tracking_token` (WB, proyeksi).
 - **Lookup (server route, BUKAN anon):** halaman lacak `GET {WB}/track?token=` → **server route pakai service-role admin client** → `.eq('tracking_token', token).maybeSingle()` pada `order_projection`. **EXACT-match saja** — JANGAN port cabang prefix/range 8-char `/api/track` (`route.ts:52-62`); itu membuat token enumerable. Rate-limit (60/min/IP, pola `/api/track`).
-- **Whitelist field aman** (yang dikembalikan route): `order_code, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, tgl_kirim, created_at`. **Jangan** email/telp/HPP/alamat penuh.
+- **Whitelist field aman** (yang dikembalikan route): `order_code, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, tgl_kirim, jam_kirim, created_at`. **Jangan** email/telp/HPP/alamat penuh.
 - **Tanpa akses anon** ke `order_projection` (no anon SELECT grant) — cegah dump PII (lubang yang ditutup hardening `/api/track`).
 - **Catatan supersesi plan:** endpoint lacak sengaja **dipindah** dari `GET {PORTAL}/api/orders/track` (plan) → WB-lokal `order_projection` per D-B (tahan portal-down).
 
