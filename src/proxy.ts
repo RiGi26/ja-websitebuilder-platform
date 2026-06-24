@@ -18,12 +18,14 @@ import { createServerClient } from '@supabase/ssr'
 // ============================================================
 
 // Top-level route HOST-AGNOSTIC yang wajib resolve di subdomain tenant TANPA
-// prefix slug. `lacak` = halaman lacak pesanan pelanggan (token unik 32-hex →
-// tenant di-resolve dari token, lihat app/lacak/[token]). Ini tautan yang
-// dikirim via WhatsApp. Tanpa exempt, Mode 1 me-rewrite
-//   bakso-tini.webzoka.com/lacak/<token> → /bakso-tini/lacak/<token>
-// yang tak punya route (lacak ada di top-level, bukan di bawah [slug]) → 404.
-const TENANT_PASSTHROUGH = new Set(['lacak'])
+// prefix slug. Token unik 32-hex → tenant di-resolve dari token, route ada di
+// top-level (bukan di bawah [slug]). Ini tautan yang dikirim via WhatsApp.
+//  - `lacak`   = halaman lacak pesanan pelanggan (app/lacak/[token]).
+//  - `invoice` = PDF faktur pesanan (app/invoice/[token]) — di-link dari /lacak.
+// Tanpa exempt, Mode 1 me-rewrite
+//   bakso-tini.webzoka.com/invoice/<token> → /bakso-tini/invoice/<token>
+// yang tak punya route → 404.
+const TENANT_PASSTHROUGH = new Set(['lacak', 'invoice'])
 
 // Subdomain di bawah ROOT_DOMAIN yang BUKAN tenant: portal sistem + host
 // fungsional platform. `wb` = host builder (admin/order/portal/dst).
