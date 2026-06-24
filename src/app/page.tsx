@@ -103,7 +103,7 @@ export default function Home() {
                     <p className="text-gray-400 text-sm font-medium">
                         Belum punya pesanan?{' '}
                         <a 
-                            href="https://ja-landingpage-platform.vercel.app" 
+                            href="https://www.webzoka.com"
                             className="text-apple-blue font-bold hover:underline"
                         >
                             Mulai Rakit Website Disini &rarr;
