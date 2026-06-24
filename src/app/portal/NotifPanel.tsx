@@ -21,7 +21,7 @@ type Status = {
   templates: Partial<Record<NotifEventKey, string>>
 }
 
-const EVENT_ORDER: NotifEventKey[] = ['order_receipt', 'order_admin']
+const EVENT_ORDER: NotifEventKey[] = ['order_receipt', 'order_admin', 'payment_confirmed', 'order_shipped']
 const RECIPIENT_LABEL: Record<'buyer' | 'admin', string> = {
   buyer: 'Ke pembeli', admin: 'Ke admin (Anda)',
 }
@@ -29,6 +29,7 @@ const VAR_HINT: Record<string, string> = {
   nama: 'nama pembeli', bisnis: 'nama bisnis', kode: 'kode pesanan', items: 'daftar item',
   total: 'total bayar', bayar: 'metode bayar', lacak: 'link lacak', alamat: 'alamat',
   catatan: 'catatan', tanggal: 'tanggal kirim', invoice: 'link invoice PDF',
+  resi: 'resi / kode pengiriman',
 }
 
 function sampleVars(bisnis: string): NotifVars {
@@ -38,6 +39,7 @@ function sampleVars(bisnis: string): NotifVars {
     lacak: 'https://situsanda.com/lacak/abc123', alamat: 'Shibuya 1-2-3, Tokyo',
     catatan: 'pedas sedang', tanggal: '2026-06-25',
     invoice: 'https://situsanda.com/invoice/abc123',
+    resi: 'JP-1234-5678',
   }
 }
 
@@ -61,10 +63,13 @@ export default function NotifPanel({ businessName, phoneCc }: { businessName: st
   const [testMsg, setTestMsg] = useState<string | null>(null)
 
   // Template
-  const [tpl, setTpl] = useState<Record<NotifEventKey, string>>({ order_receipt: '', order_admin: '' })
+  const emptyTpl = () => Object.fromEntries(EVENT_ORDER.map((k) => [k, ''])) as Record<NotifEventKey, string>
+  const [tpl, setTpl] = useState<Record<NotifEventKey, string>>(emptyTpl)
   const [busyTpl, setBusyTpl] = useState(false)
   const [tplMsg, setTplMsg] = useState<string | null>(null)
-  const refs = useRef<Record<NotifEventKey, HTMLTextAreaElement | null>>({ order_receipt: null, order_admin: null })
+  const refs = useRef<Record<NotifEventKey, HTMLTextAreaElement | null>>(
+    Object.fromEntries(EVENT_ORDER.map((k) => [k, null])) as Record<NotifEventKey, HTMLTextAreaElement | null>,
+  )
 
   useEffect(() => {
     let alive = true
@@ -75,9 +80,10 @@ export default function NotifPanel({ businessName, phoneCc }: { businessName: st
         if (!res.ok) throw new Error(json.error || 'gagal memuat')
         if (!alive) return
         setStatus(json.status)
-        setTpl({
-          order_receipt: json.status.templates?.order_receipt ?? '',
-          order_admin: json.status.templates?.order_admin ?? '',
+        setTpl(() => {
+          const next = emptyTpl()
+          for (const k of EVENT_ORDER) next[k] = json.status.templates?.[k] ?? ''
+          return next
         })
       } catch (e) { if (alive) setLoadErr((e as Error).message) }
     })()
@@ -118,7 +124,7 @@ export default function NotifPanel({ businessName, phoneCc }: { businessName: st
     try {
       const res = await fetch('/api/portal/notifications', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templates: { order_receipt: tpl.order_receipt, order_admin: tpl.order_admin } }),
+        body: JSON.stringify({ templates: Object.fromEntries(EVENT_ORDER.map((k) => [k, tpl[k]])) }),
       })
       const json = await res.json()
       if (!res.ok) {

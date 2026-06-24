@@ -32,6 +32,7 @@ function sampleVars(bisnis: string): NotifVars {
     lacak: 'https://situsanda.com/lacak/abc123', alamat: 'Shibuya 1-2-3, Tokyo',
     catatan: 'pedas sedang', tanggal: '2026-06-25',
     invoice: 'https://situsanda.com/invoice/abc123',
+    resi: 'JP-1234-5678',
   }
 }
 
@@ -56,7 +57,9 @@ export async function POST(request: Request) {
 
       const phone = String(body.phone || '').trim()
       if (!phone) return NextResponse.json({ ok: false, error: 'Nomor tujuan wajib diisi.' }, { status: 400 })
-      const event: NotifEventKey = body.event === 'order_admin' ? 'order_admin' : 'order_receipt'
+      const event: NotifEventKey = (typeof body.event === 'string' && body.event in NOTIF_EVENTS)
+        ? body.event as NotifEventKey
+        : 'order_receipt'
 
       const { data: page } = await supabaseAdmin
         .from('landing_pages')

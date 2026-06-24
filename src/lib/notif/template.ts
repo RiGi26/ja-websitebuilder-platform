@@ -15,7 +15,7 @@
 // `fonnte.ts` (Japan Arena → customer pembuatan situs) yang TIDAK editable tenant.
 // ============================================================
 
-export type NotifEventKey = 'order_receipt' | 'order_admin'
+export type NotifEventKey = 'order_receipt' | 'order_admin' | 'payment_confirmed' | 'order_shipped'
 
 /** Nilai placeholder untuk satu order — sudah jadi string siap-tempel. */
 export interface NotifVars {
@@ -32,6 +32,9 @@ export interface NotifVars {
   /** Link invoice/faktur PDF (terisi hanya untuk struk pembeli). Opsional — baris
    *  di-drop bila kosong. PDF baru bisa diakses setelah pembayaran terverifikasi. */
   invoice?: string | null
+  /** Nomor resi / kode pengiriman (terisi hanya untuk event order_shipped). Opsional —
+   *  baris di-drop bila kosong. */
+  resi?: string | null
 }
 
 type VarKey = keyof NotifVars
@@ -47,7 +50,7 @@ interface EventDef {
   default: string
 }
 
-const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal', 'invoice']
+const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal', 'invoice', 'resi']
 
 /** Katalog event WA sisi-WB yang editable tenant. "Berapa banyak" = daftar ini. */
 export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
@@ -91,6 +94,41 @@ export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
       '📝 {catatan}',
       '',
       'Kelola pesanan di dashboard Anda.',
+    ].join('\n'),
+  },
+  payment_confirmed: {
+    label: 'Pembayaran terkonfirmasi (saat admin verifikasi)',
+    recipient: 'buyer',
+    vars: ALL_VARS,
+    required: ['kode'],
+    default: [
+      'Halo {nama}! ✅',
+      '',
+      'Pembayaran untuk pesanan *{kode}* di *{bisnis}* sudah kami terima.',
+      '',
+      '🧾 {items}',
+      '💰 Total: *{total}*',
+      '',
+      'Pesanan Anda langsung kami proses. Terima kasih! 🙏',
+      'Lacak: {lacak}',
+    ].join('\n'),
+  },
+  order_shipped: {
+    label: 'Pesanan dikirim (resi / kode pengiriman)',
+    recipient: 'buyer',
+    vars: ALL_VARS,
+    required: ['kode'],
+    default: [
+      'Halo {nama}! 🚚',
+      '',
+      'Pesanan *{kode}* di *{bisnis}* sudah dikirim.',
+      '',
+      '📦 Resi / kode pengiriman: *{resi}*',
+      '🧾 {items}',
+      '',
+      'Lacak pesanan Anda: {lacak}',
+      '',
+      'Terima kasih sudah berbelanja! 😊',
     ].join('\n'),
   },
 }
@@ -150,6 +188,9 @@ export function validateTemplate(event: NotifEventKey, raw: string): TemplateChe
 
   if (event === 'order_receipt' && !used.has('total')) {
     warnings.push('Biasanya {total} disertakan agar pembeli langsung tahu jumlah yang harus dibayar.')
+  }
+  if (event === 'order_shipped' && !used.has('resi')) {
+    warnings.push('Biasanya {resi} disertakan agar pembeli tahu kode pengiriman pesanannya.')
   }
 
   return { ok: errors.length === 0, errors, warnings }
