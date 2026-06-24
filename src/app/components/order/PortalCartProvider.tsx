@@ -310,7 +310,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
         <div className="pcart-field"><label htmlFor="pc-alamat">Alamat</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder="Prefektur · kota · banchi" /></div>
         <div className="pcart-field"><label htmlFor="pc-catatan">Catatan</label><textarea id="pc-catatan" value={form.catatan} onChange={set('catatan')} rows={2} /></div>
 
-        <h3 className="pcart-h3">Jam Kirim · hari ini</h3>
+        <h3 className="pcart-h3">Jam Kirim</h3>
         <div className="pcart-metode pcart-jamkirim">
           {JAM_KIRIM_SLOTS.map((s) => {
             const sel = jamKirim === s
@@ -327,7 +327,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
             )
           })}
         </div>
-        <p className="pcart-hint">Pilih perkiraan jam barang sampai hari ini.</p>
+        <p className="pcart-hint">Pilih perkiraan jam barang sampai di tujuan.</p>
 
         <h3 className="pcart-h3">Metode Pembayaran *</h3>
         <div className="pcart-metode">
@@ -453,6 +453,7 @@ function pcartCss(primary: string, variant?: string): string {
 .pcart-field{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.7rem}
 .pcart-field label{font-size:.8rem;font-weight:600;color:${mutedText}}
 .pcart-hint{font-weight:400;color:${mutedText}}
+p.pcart-hint{margin:.45rem 0 0;font-size:.8rem}
 .pcart-field input,.pcart-field textarea{border:1px solid ${border};border-radius:10px;padding:.6rem .7rem;font:400 .92rem/1.4 system-ui,sans-serif;background:#fff;color:${text};width:100%}
 .pcart-field input:focus,.pcart-field textarea:focus{outline:2px solid ${primary};outline-offset:0;border-color:transparent}
 .pcart-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
