@@ -24,8 +24,11 @@ export async function sendWhatsApp(target: string, message: string, defaultCc = 
     return { ok: false, error: 'invalid_phone' }
   }
 
-  // x-www-form-urlencoded lebih reliable di Vercel/undici dibanding FormData
-  const body = new URLSearchParams({ target: phone, message })
+  // x-www-form-urlencoded lebih reliable di Vercel/undici dibanding FormData.
+  // countryCode:'0' MATIKAN auto-prefix Fonnte (default-nya 62 = Indonesia, yang
+  // menempel "62" ke nomor non-ID seperti Jepang 81… → "6281…" salah). `phone` dari
+  // normalizeWa SUDAH ber-kode-negara penuh (81…/62…), jadi kirim apa adanya.
+  const body = new URLSearchParams({ target: phone, message, countryCode: '0' })
 
   // 15s timeout supaya tidak hang ke API function timeout limit
   const controller = new AbortController()
