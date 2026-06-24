@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifySignedRequest, SIG_HEADERS } from '@/lib/portal/sign'
 import { consumeIngestNonce } from '@/lib/portal/ingest-nonce'
 import { isPaidStatus } from '@/lib/portal/labels'
 import { pregenerateInvoiceByOrderCode } from '@/lib/invoice/generate'
+import { notifyOrderStageChange } from '@/lib/notif/stage-notify'
 
 // ============================================================
 // WB INGEST — POST /api/sync/order-status (BAKSO_PORTAL_CONTRACT.md §4.3). Portal push
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
   const now = new Date().toISOString()
   const { data: existing } = await supabaseAdmin
     .from('order_projection')
-    .select('order_code, source_updated_at')
+    .select('order_code, source_updated_at, status_bayar, status_fulfillment, metode_bayar, pembeli_nama, pembeli_telp, tracking_token, total_gross, ringkasan_items, wa_paid_sent_at, wa_shipped_sent_at')
     .eq('order_code', order_code)
     .maybeSingle()
 
@@ -109,6 +110,29 @@ export async function POST(request: Request) {
     pregenerateInvoiceByOrderCode(order_code).catch((e: unknown) =>
       console.error('[sync/order-status] invoice pre-gen:', (e as Error)?.message),
     )
+  }
+
+  // WA tahap-lanjut ke pembeli pada transisi lunas / dikirim. after() = jangan blok
+  // response webhook (CLAUDE.md after-pattern); helper idempoten via *_sent_at columns.
+  // Hanya untuk order yang sudah ada projection-nya (punya prev-state + nomor pembeli).
+  if (existing) {
+    after(() => notifyOrderStageChange({
+      orderCode: order_code,
+      tenantSlug: tenant_slug,
+      trackingToken: tracking_token,
+      pembeliNama: existing.pembeli_nama as string | null,
+      pembeliTelp: existing.pembeli_telp as string | null,
+      metodeBayar: existing.metode_bayar as string | null,
+      totalGross: existing.total_gross as number | null,
+      ringkasanItems: existing.ringkasan_items as { nama: string; qty: number; harga: number }[] | null,
+      prevStatusBayar: existing.status_bayar as string | null,
+      prevStatusFulfillment: existing.status_fulfillment as string | null,
+      newStatusBayar: status_bayar ?? null,
+      newStatusFulfillment: status_fulfillment ?? null,
+      resi: body.resi ?? null,
+      waPaidSentAt: existing.wa_paid_sent_at as string | null,
+      waShippedSentAt: existing.wa_shipped_sent_at as string | null,
+    }).catch((e: unknown) => console.error('[sync/order-status] stage notif:', (e as Error)?.message)))
   }
 
   return NextResponse.json({ ok: true })

@@ -5,6 +5,7 @@ import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
 import { sendWhatsApp } from '@/lib/fonnte'
 import { renderTemplate, type NotifVars } from '@/lib/notif/template'
 import { getTenantNotif, effectiveFonnteToken } from '@/lib/tenant-notif'
+import { logWa } from '@/lib/notif/wa-log'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import { createPortalOrder } from '@/lib/portal/client'
 import {
@@ -151,6 +152,7 @@ export async function POST(request: Request) {
       tenant_slug: slug,
       tracking_token: r.tracking_token,
       pembeli_nama: pembeli.nama.trim(),
+      pembeli_telp: pembeli.telp.trim(),
       status_bayar: r.status_bayar,
       status_fulfillment: r.status_fulfillment,
       metode_bayar: r.metode_bayar,
@@ -196,14 +198,19 @@ export async function POST(request: Request) {
         invoice: baseUrl ? `${baseUrl}/invoice/${r.tracking_token}` : null,
       }
 
-      // Struk ke pembeli — selalu.
+      // Struk ke pembeli — selalu. Rekam hasil ke wa_log (keandalan: kegagalan tak hening).
+      const buyerPhone = pembeli.telp.trim()
       const receiptMsg = renderTemplate('order_receipt', notif?.templates.order_receipt, vars)
-      sendWhatsApp(pembeli.telp.trim(), receiptMsg, phoneCc, token).catch((e: unknown) => console.error('[orders WA receipt]', (e as Error)?.message))
+      sendWhatsApp(buyerPhone, receiptMsg, phoneCc, token)
+        .then((res) => logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_receipt', target: buyerPhone, result: res }))
+        .catch((e: unknown) => console.error('[orders WA receipt]', (e as Error)?.message))
 
       // Notif ke admin — bila wa_admin di-set.
       if (waAdmin) {
         const adminMsg = renderTemplate('order_admin', notif?.templates.order_admin, vars)
-        sendWhatsApp(waAdmin, adminMsg, phoneCc, token).catch((e: unknown) => console.error('[orders WA admin]', (e as Error)?.message))
+        sendWhatsApp(waAdmin, adminMsg, phoneCc, token)
+          .then((res) => logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_admin', target: waAdmin, result: res }))
+          .catch((e: unknown) => console.error('[orders WA admin]', (e as Error)?.message))
       }
     }
 
