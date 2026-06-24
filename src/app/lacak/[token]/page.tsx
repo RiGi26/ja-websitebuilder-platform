@@ -4,6 +4,7 @@ import { rateLimit } from '@/lib/rate-limit'
 import { formatMoney } from '@/lib/format-money'
 import type { MetodeBayar } from '@/lib/portal/types'
 import { STATUS_BAYAR, STATUS_FULFILLMENT, METODE, STEPS, isPaidStatus } from '@/lib/portal/labels'
+import AutoRefresh from './AutoRefresh'
 
 // ============================================================
 // Halaman lacak pesanan Portal (Bakso Fase 1, BAKSO_PORTAL_CONTRACT.md §5).
@@ -91,8 +92,12 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
   const stepIdx = STEPS.indexOf(sf as (typeof STEPS)[number])
   const cancelled = sf === 'batal'
 
+  // Auto-refresh status sampai pesanan mencapai status terminal (selesai/batal).
+  const terminal = cancelled || sf === 'selesai'
+
   return (
     <Shell>
+      <AutoRefresh active={!terminal} />
       <p style={{ ...eyebrow }}>{meta.nama}</p>
       <h1 style={h1}>Pesanan {String(order.order_code)}</h1>
       {order.pembeli_nama ? <p style={msg}>Halo {String(order.pembeli_nama)} 👋 Berikut status pesananmu.</p> : null}
