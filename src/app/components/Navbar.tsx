@@ -6,7 +6,7 @@ import { Button } from './ui/button'
 import { LayoutGrid, Menu, X, MapPin } from 'lucide-react'
 import Image from 'next/image'
 
-const CORP_URL = 'https://ja-landingpage-platform.vercel.app'
+const CORP_URL = 'https://www.webzoka.com'
 
 const NAV_LINKS = [
   { label: 'Track Pesanan', href: '/track' },

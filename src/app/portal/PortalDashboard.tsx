@@ -271,7 +271,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
                 </div>
               </div>
               <a
-                href={portalAdminUrl || 'https://stock.japanarena.id'}
+                href={portalAdminUrl || 'https://stock.webzoka.com'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl bg-apple-blue px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white transition hover:brightness-110 sm:self-auto"

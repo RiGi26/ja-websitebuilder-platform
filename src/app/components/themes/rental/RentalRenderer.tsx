@@ -599,7 +599,7 @@ export default function RentalRenderer({ nama, services, profile, wa, primary, k
           </div>
           <div style={{ borderTop: '1px solid #292524', paddingTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, fontWeight: 500 }}>
             <p style={{ margin: 0 }}>© 2024 {nama}. Semua hak dilindungi.</p>
-            <p style={{ margin: 0, color: '#44403C' }}>Dibuat dengan <a href="https://japanarena.com" style={{ color: accentLight, textDecoration: 'none', fontWeight: 700 }}>Japan Arena Website Builder</a></p>
+            <p style={{ margin: 0, color: '#44403C' }}>Dibuat dengan <a href="https://www.webzoka.com" style={{ color: accentLight, textDecoration: 'none', fontWeight: 700 }}>Webzoka</a></p>
           </div>
         </div>
       </footer>

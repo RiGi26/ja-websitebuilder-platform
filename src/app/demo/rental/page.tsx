@@ -509,8 +509,8 @@ export default function RentalDemo() {
             <p>© 2024 Nusantara Drive. Semua hak dilindungi.</p>
             <p className="text-stone-600">
               Dibuat dengan{' '}
-              <a href="https://japanarena.com" className="text-orange-500 hover:underline font-bold">
-                Japan Arena Website Builder
+              <a href="https://www.webzoka.com" className="text-orange-500 hover:underline font-bold">
+                Webzoka
               </a>
             </p>
           </div>
