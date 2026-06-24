@@ -225,7 +225,7 @@ function briefingReceivedTemplate(c: NotifContext): string {
     `Industri: ${c.industri ?? '-'}`,
     `Order: ${c.displayId}`,
     ``,
-    `Buka admin: ${c.adminUrl ?? 'https://ja-websitebuilder-platform-nfoa.vercel.app/admin'}`,
+    `Buka admin: ${c.adminUrl ?? 'https://wb.webzoka.com/admin'}`,
   ].join('\n')
 }
 
