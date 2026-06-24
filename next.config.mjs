@@ -51,6 +51,8 @@ const nextConfig = {
       './node_modules/dfa/**/*',
       './node_modules/brotli/**/*',
       './node_modules/restructure/**/*',
+      // Font Noto Sans JP (glyph CJK) dibaca dari disk saat render — wajib di-bundle.
+      './public/fonts/**/*',
     ],
   },
   async headers() {

@@ -15,6 +15,10 @@ import { invoiceDataFromProjection, type ProjectionRow } from './from-projection
 import type { InvoiceData } from './types'
 
 const BUCKET = 'invoices'
+// Versi layout faktur. Naikkan saat desain PDF berubah → path Storage berganti →
+// cache lama (path versi lawas) otomatis ter-bypass (cabang recovery ensureInvoicePdf
+// render ulang ke path baru). Tanpa SQL/purge manual. v2 = redesign brand + font JP.
+const LAYOUT_VERSION = 'v2'
 const SELECT_FIELDS =
   'order_code, tenant_slug, tracking_token, pembeli_nama, status_bayar, metode_bayar, ' +
   'ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, ' +
@@ -23,7 +27,7 @@ const SELECT_FIELDS =
 type ProjectionFull = ProjectionRow & { tracking_token: string; invoice_generated_at: string | null }
 
 function storagePath(tenantSlug: string, token: string): string {
-  return `${tenantSlug}/${token}.pdf`
+  return `${tenantSlug}/${token}-${LAYOUT_VERSION}.pdf`
 }
 
 // Prefetch logo → data-URL agar render PDF tak gagal jika URL logo mati. Best-effort.
