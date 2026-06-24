@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, clientIp, tooManyRequests } from '@/lib/rate-limit'
@@ -171,7 +171,10 @@ export async function POST(request: Request) {
     //    Cegah struk/notif ganda saat double-submit (idempotency_key sama → Portal 200).
     //    Token HYBRID: token Fonnte tenant (bila aktif) → fallback token platform.
     //    Template per-event editable tenant (anti-rusak) → fallback default platform.
-    //    Fire-and-forget — kegagalan WA tak menggagalkan order.
+    //    Kirim via after() — JANGAN fire-and-forget telanjang: di Vercel fungsi
+    //    suspend usai response → fetch ke Fonnte ke-abort ("operation was aborted")
+    //    → WA tak terkirim diam-diam. after() menjamin pekerjaan tetap jalan pasca-
+    //    response tanpa memblok pembeli. Kegagalan WA tak menggagalkan order.
     if (result.status === 201) {
       const waAdmin = konfig.preorder?.wa_admin?.trim()
       const phoneCc = konfig.localeConfig?.phone_cc || '62'
@@ -198,20 +201,21 @@ export async function POST(request: Request) {
         invoice: baseUrl ? `${baseUrl}/invoice/${r.tracking_token}` : null,
       }
 
-      // Struk ke pembeli — selalu. Rekam hasil ke wa_log (keandalan: kegagalan tak hening).
       const buyerPhone = pembeli.telp.trim()
-      const receiptMsg = renderTemplate('order_receipt', notif?.templates.order_receipt, vars)
-      sendWhatsApp(buyerPhone, receiptMsg, phoneCc, token)
-        .then((res) => logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_receipt', target: buyerPhone, result: res }))
-        .catch((e: unknown) => console.error('[orders WA receipt]', (e as Error)?.message))
+      after(async () => {
+        // Struk ke pembeli — selalu. Rekam hasil ke wa_log (keandalan: kegagalan tak hening).
+        // sendWhatsApp menangkap error internal → selalu balas FonnteResult (tak reject).
+        const receiptMsg = renderTemplate('order_receipt', notif?.templates.order_receipt, vars)
+        const rcpt = await sendWhatsApp(buyerPhone, receiptMsg, phoneCc, token)
+        await logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_receipt', target: buyerPhone, result: rcpt })
 
-      // Notif ke admin — bila wa_admin di-set.
-      if (waAdmin) {
-        const adminMsg = renderTemplate('order_admin', notif?.templates.order_admin, vars)
-        sendWhatsApp(waAdmin, adminMsg, phoneCc, token)
-          .then((res) => logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_admin', target: waAdmin, result: res }))
-          .catch((e: unknown) => console.error('[orders WA admin]', (e as Error)?.message))
-      }
+        // Notif ke admin — bila wa_admin di-set.
+        if (waAdmin) {
+          const adminMsg = renderTemplate('order_admin', notif?.templates.order_admin, vars)
+          const adm = await sendWhatsApp(waAdmin, adminMsg, phoneCc, token)
+          await logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_admin', target: waAdmin, result: adm })
+        }
+      })
     }
 
     // 8. Balas ke browser — total_* + instruksi_bayar dari Portal (BUKAN estimasi WB).
