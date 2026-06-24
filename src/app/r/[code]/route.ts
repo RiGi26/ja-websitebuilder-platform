@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 // builder (dibaca form /order), lalu redirect ke landing dengan ?ref= supaya
 // corp landing (static export) juga merekamnya di localStorage.
 
-const LANDING_URL = process.env.NEXT_PUBLIC_LANDING_URL ?? 'https://japanarena.com'
+const LANDING_URL = process.env.NEXT_PUBLIC_LANDING_URL ?? 'https://www.webzoka.com'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 
 export async function GET(

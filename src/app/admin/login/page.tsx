@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <Link 
-            href="https://ja-landingpage-platform.vercel.app" 
+            href="https://www.webzoka.com"
             className="group flex flex-col items-center gap-4 transition-all"
             title="Kembali ke Portal Utama"
           >

@@ -921,7 +921,7 @@ export default function TokoAtelierRenderer({
         <div className="ta-wrap">
           <div className="ta-footer-cr">
             <span>© {new Date().getUTCFullYear()} {content.nama}. Seluruh hak cipta.</span>
-            <span>Dibuat dengan Japan Arena</span>
+            <span>Dibuat dengan Webzoka</span>
           </div>
         </div>
       </footer>

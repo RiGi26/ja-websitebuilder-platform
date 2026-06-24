@@ -569,7 +569,7 @@ export default function RestaurantLuxRenderer({
             {content.contact?.email && <a href={`mailto:${content.contact.email}`}>Email</a>}
             {content.contact?.alamat && <span>{content.contact.alamat}</span>}
           </div>
-          <div className="rl-cr">© {new Date().getUTCFullYear()} {content.nama}. Dibuat dengan Japan Arena.</div>
+          <div className="rl-cr">© {new Date().getUTCFullYear()} {content.nama}. Dibuat dengan Webzoka.</div>
         </div>
       </footer>
 
