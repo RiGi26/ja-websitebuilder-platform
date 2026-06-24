@@ -563,7 +563,7 @@ function Footer({ nama, profile }: { nama: string; profile?: TenantProfile | nul
         </div>
         <p className="text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
           © {new Date().getFullYear()} {nama} ·{' '}
-          <a href="https://japanarena.com" style={{ color: BLUE, textDecoration: 'none' }}>Japan Arena</a>
+          <a href="https://www.webzoka.com" style={{ color: BLUE, textDecoration: 'none' }}>Webzoka</a>
         </p>
       </div>
     </footer>

@@ -50,7 +50,7 @@ export default async function PortalPage() {
   const portalAdminUrl =
     (typeof (konfig as { portal_admin_url?: unknown }).portal_admin_url === 'string'
       && (konfig as { portal_admin_url?: string }).portal_admin_url)
-      || 'https://stock.japanarena.id'
+      || 'https://stock.webzoka.com'
   // Tab Tampilan — foto hero + titik fokus dari data_konten (whitelist).
   const dataKonten = (page?.data_konten ?? {}) as Record<string, unknown>
   const initialTampilan = {

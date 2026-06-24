@@ -284,7 +284,7 @@ function Footer({ nama, pal }: { nama: string; pal: Pal }) {
   return (
     <footer className="py-10 px-6 text-center" style={{ backgroundColor: pal.darkBgDeep }}>
       <p className={`${display.className} text-lg`} style={{ color: pal.cream }}>{nama}</p>
-      <p className="text-[11px] uppercase tracking-[0.2em] mt-2" style={{ color: pal.muted }}>© {new Date().getFullYear()} · Dibuat dengan Japan Arena</p>
+      <p className="text-[11px] uppercase tracking-[0.2em] mt-2" style={{ color: pal.muted }}>© {new Date().getFullYear()} · Dibuat dengan Webzoka</p>
     </footer>
   )
 }
