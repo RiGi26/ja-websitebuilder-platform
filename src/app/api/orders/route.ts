@@ -6,6 +6,7 @@ import { sendWhatsApp } from '@/lib/fonnte'
 import { renderTemplate, type NotifVars } from '@/lib/notif/template'
 import { getTenantNotif, effectiveFonnteToken } from '@/lib/tenant-notif'
 import { logWa } from '@/lib/notif/wa-log'
+import { tenantSiteOrigin } from '@/lib/tenant-site-url'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import { createPortalOrder } from '@/lib/portal/client'
 import {
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
     // 2. Halaman published + gate cutover portal
     const { data: page } = await supabaseAdmin
       .from('landing_pages')
-      .select('id, tenant_id, nama_website, slug, konfigurasi')
+      .select('id, tenant_id, nama_website, slug, domain_custom, konfigurasi')
       .eq('slug', slug)
       .eq('status', 'published')
       .maybeSingle()
@@ -180,8 +181,10 @@ export async function POST(request: Request) {
       const phoneCc = konfig.localeConfig?.phone_cc || '62'
       const { locale, currency } = moneyFromConfig(konfig.localeConfig)
       const itemsText = ringkasan.map((i) => `${i.nama} ×${i.qty}`).join(', ')
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
-      const trackUrl = `${baseUrl}/lacak/${r.tracking_token}`
+      // Tautan customer-facing → origin SITUS TENANT (subdomain/custom domain),
+      // BUKAN NEXT_PUBLIC_BASE_URL (host platform www=app corp → /lacak 404).
+      const siteOrigin = tenantSiteOrigin(slug, page.domain_custom)
+      const trackUrl = `${siteOrigin}/lacak/${r.tracking_token}`
 
       const notif = page.tenant_id ? await getTenantNotif(page.tenant_id).catch(() => null) : null
       const token = notif ? effectiveFonnteToken(notif) : (process.env.FONNTE_TOKEN || undefined)
@@ -198,7 +201,7 @@ export async function POST(request: Request) {
         tanggal: jamKirim ? `${tglKirim} · ${jamKirim}` : null,
         // Link invoice/faktur PDF — permanen, tapi PDF baru bisa diakses setelah
         // pembayaran terverifikasi (route /invoice gated). Dikirim sejak awal.
-        invoice: baseUrl ? `${baseUrl}/invoice/${r.tracking_token}` : null,
+        invoice: `${siteOrigin}/invoice/${r.tracking_token}`,
       }
 
       const buyerPhone = pembeli.telp.trim()

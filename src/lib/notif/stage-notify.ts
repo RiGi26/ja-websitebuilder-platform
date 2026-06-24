@@ -16,6 +16,7 @@ import { renderTemplate, type NotifVars, type NotifEventKey } from '@/lib/notif/
 import { logWa } from '@/lib/notif/wa-log'
 import { isPaidStatus, METODE } from '@/lib/portal/labels'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
+import { tenantSiteOrigin } from '@/lib/tenant-site-url'
 import type { MetodeBayar } from '@/lib/portal/types'
 import type { KonfigurasiWebsite } from '@/types/websitebuilder'
 
@@ -62,7 +63,7 @@ export async function notifyOrderStageChange(input: StageNotifyInput): Promise<v
   // Tenant context: token Fonnte + phone_cc + nama bisnis. landing_pages by slug.
   const { data: page } = await supabaseAdmin
     .from('landing_pages')
-    .select('tenant_id, nama_website, konfigurasi')
+    .select('tenant_id, nama_website, domain_custom, konfigurasi')
     .eq('slug', input.tenantSlug)
     .eq('status', 'published')
     .maybeSingle()
@@ -74,7 +75,8 @@ export async function notifyOrderStageChange(input: StageNotifyInput): Promise<v
   const notif = await getTenantNotif(page.tenant_id).catch(() => null)
   const token = notif ? effectiveFonnteToken(notif) : (process.env.FONNTE_TOKEN || undefined)
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
+  // Tautan ke origin situs tenant (subdomain/custom domain), bukan host platform.
+  const siteOrigin = tenantSiteOrigin(input.tenantSlug, page.domain_custom)
   const metodeLabel = input.metodeBayar ? (METODE[input.metodeBayar as MetodeBayar] ?? input.metodeBayar) : ''
   const vars: NotifVars = {
     nama: input.pembeliNama || 'Pelanggan',
@@ -83,7 +85,7 @@ export async function notifyOrderStageChange(input: StageNotifyInput): Promise<v
     items: itemsText(input.ringkasanItems),
     total: formatMoney(input.totalGross ?? 0, locale, currency),
     bayar: metodeLabel,
-    lacak: baseUrl ? `${baseUrl}/lacak/${input.trackingToken}` : '',
+    lacak: `${siteOrigin}/lacak/${input.trackingToken}`,
     resi: input.resi,
   }
 
