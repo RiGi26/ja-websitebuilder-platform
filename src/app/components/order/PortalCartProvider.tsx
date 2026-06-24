@@ -48,27 +48,16 @@ const METODE_LABEL: Record<MetodeBayar, string> = Object.fromEntries(
   METODE_OPSI.map((o) => [o.v, o.label]),
 ) as Record<MetodeBayar, string>
 
-// Slot jam kirim same-day (pengiriman di HARI pesan). `startMin` = menit-of-day jam
-// MULAI window → slot di-disable bila waktu sekarang (zona Asia/Tokyo, lokasi toko)
-// sudah melewatinya. Pelanggan tak boleh memilih jam yang sudah lewat hari ini.
-const JAM_KIRIM_SLOTS: { label: string; startMin: number }[] = [
-  { label: '8:00〜12:00', startMin: 8 * 60 },
-  { label: '14:00〜16:00', startMin: 14 * 60 },
-  { label: '16:00〜18:00', startMin: 16 * 60 },
-  { label: '18:00〜20:00', startMin: 18 * 60 },
-  { label: '19:00〜21:00', startMin: 19 * 60 },
+// Slot jam kirim same-day (pengiriman di HARI pesan). Pelanggan bebas memilih slot
+// mana pun — pembatasan "slot yang jamnya sudah lewat tak bisa dipilih" sudah tidak
+// berlaku (keputusan owner 2026-06-24), jadi tak ada lagi perhitungan waktu Tokyo.
+const JAM_KIRIM_SLOTS: string[] = [
+  '8:00〜12:00',
+  '14:00〜16:00',
+  '16:00〜18:00',
+  '18:00〜20:00',
+  '19:00〜21:00',
 ]
-
-// Menit-of-day saat ini di Asia/Tokyo (toko beroperasi di Jepang). Dipakai untuk
-// menonaktifkan slot jam yang waktunya sudah lewat hari ini.
-function tokyoNowMinutes(): number {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(new Date())
-  const h = Number(parts.find((p) => p.type === 'hour')?.value ?? '0') % 24
-  const m = Number(parts.find((p) => p.type === 'minute')?.value ?? '0')
-  return h * 60 + m
-}
 
 type View = 'closed' | 'cart' | 'checkout' | 'done'
 type DoneState = { res: PortalOrderResponse; trackUrl: string }
@@ -236,10 +225,6 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
   const [form, setForm] = useState({ nama: '', telp: '', email: '', ig: '', kode_pos: '', alamat: '', catatan: '' })
   const [metode, setMetode] = useState<MetodeBayar | ''>('')
   const [jamKirim, setJamKirim] = useState('')
-  // Waktu Tokyo saat checkout dibuka (fix di mount; sesi checkout pendek). Slot yang
-  // jam mulainya sudah lewat → disabled. Bila semua lewat → tampilkan catatan "penuh".
-  const [nowMin] = useState(() => tokyoNowMinutes())
-  const allSlotsPassed = JAM_KIRIM_SLOTS.every((s) => nowMin >= s.startMin)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [conflicts, setConflicts] = useState<StockConflictEntry[] | null>(null)
@@ -328,26 +313,21 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
         <h3 className="pcart-h3">Jam Kirim · hari ini</h3>
         <div className="pcart-metode pcart-jamkirim">
           {JAM_KIRIM_SLOTS.map((s) => {
-            const past = nowMin >= s.startMin
-            const sel = jamKirim === s.label
+            const sel = jamKirim === s
             return (
               <button
-                key={s.label}
+                key={s}
                 type="button"
                 className={`pcart-metode-opt pcart-jam-opt${sel ? ' is-sel' : ''}`}
-                disabled={past}
                 aria-pressed={sel}
-                style={past ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
-                onClick={() => { if (!past) setJamKirim(sel ? '' : s.label) }}
+                onClick={() => setJamKirim(sel ? '' : s)}
               >
-                <span className="pcart-metode-label">{s.label}</span>
+                <span className="pcart-metode-label">{s}</span>
               </button>
             )
           })}
         </div>
-        {allSlotsPassed
-          ? <p className="pcart-hint" role="status">Pengiriman hari ini sudah penuh — silakan order untuk besok via WhatsApp.</p>
-          : <p className="pcart-hint">Perkiraan jam barang sampai di hari ini. Slot yang jamnya sudah lewat tidak bisa dipilih.</p>}
+        <p className="pcart-hint">Pilih perkiraan jam barang sampai hari ini.</p>
 
         <h3 className="pcart-h3">Metode Pembayaran *</h3>
         <div className="pcart-metode">
