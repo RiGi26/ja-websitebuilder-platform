@@ -31,6 +31,18 @@ const noFrameHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // Optimasi gambar (next/image). Host di-whitelist KETAT (bukan '**') supaya
+  // optimizer tak jadi proxy terbuka: storage Supabase ekosistem + Unsplash
+  // (dipakai aset template default). Host lain → renderer fallback ke <img>
+  // mentah (lihat SmartImg di CeriaOrderRenderer) agar tak ada gambar putus.
+  // AVIF/WebP otomatis + resize ke lebar viewport → PNG 0.8–2.3 MB jadi puluhan KB.
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.supabase.co' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+    ],
+  },
   // @react-pdf/renderer = Node-only, di-externalize (jangan di-bundle Turbopack server).
   // Next 16 me-render elemen pakai React 19 (elemen `react.transitional.element`), maka
   // react-pdf HARUS memuat reconciler React-19 (reconciler-31/33). react-pdf memilih
