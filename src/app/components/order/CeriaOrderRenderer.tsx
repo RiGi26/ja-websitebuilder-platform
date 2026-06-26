@@ -18,6 +18,7 @@
 // nama. "Menu Andalan" = kurasi manual owner (andalanIds dari data_konten).
 // ============================================================
 import { useMemo, useState } from 'react'
+import Image from 'next/image'
 import { Baloo_2, Plus_Jakarta_Sans } from 'next/font/google'
 import {
   ShoppingBag, Search, Plus, Minus, Truck, ShieldCheck, Wallet,
@@ -43,6 +44,48 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
   variable: '--co-font-body',
 })
+
+// Host yang boleh dioptimasi next/image (sinkron dgn remotePatterns next.config).
+// Foto bakso (hero 0.8 MB, menu s.d. 2.3 MB PNG) ada di storage Supabase → di-resize
+// + di-WebP/AVIF jadi puluhan KB. Host tak dikenal → fallback <img> mentah (tak putus).
+function isOptimizable(src?: string): boolean {
+  if (!src) return false
+  try {
+    const h = new URL(src).hostname
+    return /\.supabase\.co$/i.test(h) || h === 'images.unsplash.com'
+  } catch {
+    return false
+  }
+}
+
+// Gambar penutup-bingkai (object-fit:cover) untuk hero/kartu/about. Pakai next/image
+// `fill` bila host optimizable; selain itu <img> mentah dgn gaya cover yang sama.
+// Bingkai induk WAJIB position:relative + punya tinggi (aspect-ratio / min-height).
+function SmartImg({
+  src, alt, sizes, priority, className, objectPosition,
+}: {
+  src?: string
+  alt: string
+  sizes: string
+  priority?: boolean
+  className?: string
+  objectPosition?: string
+}) {
+  if (!src) return null
+  const style: React.CSSProperties = { objectFit: 'cover', objectPosition }
+  if (isOptimizable(src)) {
+    return (
+      <Image src={src} alt={alt} fill sizes={sizes} priority={priority}
+        className={className} style={style} />
+    )
+  }
+  return (
+    <img src={src} alt={alt} className={className} decoding="async"
+      loading={priority ? 'eager' : 'lazy'}
+      {...(priority ? { fetchPriority: 'high' as const } : {})}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', ...style }} />
+  )
+}
 
 export type CeriaOrderProps = BespokeProps & {
   /** Pack-id pilihan owner utk "Menu Andalan" (kurasi manual, data_konten.andalan). */
@@ -160,7 +203,7 @@ export default function CeriaOrderRenderer({
             <span className="co-badge co-badge-pedas co-badge-tr"><Flame size={11} aria-hidden /> Pedas</span>
           )}
           {m.foto_url
-            ? <img src={m.foto_url} alt={m.product_nama} loading="lazy" />
+            ? <SmartImg src={m.foto_url} alt={m.product_nama} sizes="(max-width:600px) 50vw, 210px" />
             : <div className="co-card-ph" aria-hidden><Soup size={30} /></div>}
         </div>
         <div className="co-card-body">
@@ -227,11 +270,12 @@ export default function CeriaOrderRenderer({
 
       <div className="co-wrap">
         {/* ── HERO ── */}
-        <section
-          className="co-hero"
-          id="beranda"
-          style={hero.image ? { backgroundImage: `url('${hero.image}')`, backgroundPosition: hero.imagePosition || 'center 38%' } : undefined}
-        >
+        <section className="co-hero" id="beranda">
+          {/* Hero = elemen LCP. priority → next/image preload + fetchpriority high,
+              di-WebP/AVIF + resize (sebelumnya PNG ~0.8 MB sbg CSS background yang
+              ditemukan telat). Duduk di z-0 di belakang gradient (::before z-1). */}
+          <SmartImg src={hero.image} alt="" priority sizes="100vw"
+            className="co-hero-media" objectPosition={hero.imagePosition || 'center 38%'} />
           {showHalal && (
             <div className="co-halal" role="img" aria-label="Sertifikasi seratus persen Halal">
               <ShieldCheck size={19} aria-hidden /><b>HALAL</b><small>100%</small>
@@ -281,7 +325,7 @@ export default function CeriaOrderRenderer({
                   <article className="co-lcard" key={m.pack_id}>
                     <div className="co-lf">
                       {m.foto_url
-                        ? <img src={m.foto_url} alt={m.product_nama} loading="lazy" />
+                        ? <SmartImg src={m.foto_url} alt={m.product_nama} sizes="158px" />
                         : <div className="co-card-ph" aria-hidden><Soup size={24} /></div>}
                     </div>
                     <div className="co-lbody">
@@ -367,7 +411,7 @@ export default function CeriaOrderRenderer({
                 <p className="co-about-body">{c.about.body}</p>
               </div>
               {c.about.image && (
-                <div className="co-about-img"><img src={c.about.image} alt={c.about.title} loading="lazy" /></div>
+                <div className="co-about-img"><SmartImg src={c.about.image} alt={c.about.title} sizes="(max-width:760px) 100vw, 540px" /></div>
               )}
             </div>
           </section>
@@ -494,8 +538,9 @@ function coCss(): string {
 .co-cart-badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;background:var(--co-primary);color:#fff;font-size:11px;font-weight:800;border-radius:999px;display:grid;place-items:center;padding:0 5px;border:2px solid var(--co-bg)}
 
 /* HERO */
-.co-hero{margin:16px 0 8px;border-radius:26px;overflow:hidden;position:relative;min-height:300px;display:flex;align-items:flex-end;background-color:#3A2A1E;background-size:cover;background-repeat:no-repeat;box-shadow:var(--co-shadow-lg)}
-.co-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(40,22,12,.9) 0%,rgba(40,22,12,.65) 38%,rgba(40,22,12,.05) 75%)}
+.co-hero{margin:16px 0 8px;border-radius:26px;overflow:hidden;position:relative;min-height:300px;display:flex;align-items:flex-end;background-color:#3A2A1E;box-shadow:var(--co-shadow-lg)}
+.co-hero-media{z-index:0}
+.co-hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(40,22,12,.9) 0%,rgba(40,22,12,.65) 38%,rgba(40,22,12,.05) 75%)}
 .co-hero-in{position:relative;z-index:2;padding:clamp(22px,4vw,38px);max-width:600px;color:#fff}
 .co-pill{display:inline-flex;align-items:center;gap:7px;background:var(--co-green);color:#fff;font-weight:800;font-size:12.5px;padding:6px 13px;border-radius:999px;margin-bottom:14px}
 .co-dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:co-blink 1.6s infinite}
@@ -599,7 +644,7 @@ function coCss(): string {
 .co-about-in.solo .co-about-body{margin-left:auto;margin-right:auto}
 .co-about-title{font-size:clamp(20px,3vw,28px);font-weight:800;color:var(--co-ink);margin-bottom:10px}
 .co-about-body{font-size:15px;color:var(--co-ink-dim);line-height:1.7;max-width:54ch;white-space:pre-line}
-.co-about-img{aspect-ratio:4/3;border-radius:22px;overflow:hidden;box-shadow:var(--co-shadow-lg)}
+.co-about-img{position:relative;aspect-ratio:4/3;border-radius:22px;overflow:hidden;box-shadow:var(--co-shadow-lg)}
 .co-about-img img{width:100%;height:100%;object-fit:cover}
 
 /* TESTIMONI */
