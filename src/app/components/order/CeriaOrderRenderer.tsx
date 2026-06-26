@@ -18,6 +18,7 @@
 // nama. "Menu Andalan" = kurasi manual owner (andalanIds dari data_konten).
 // ============================================================
 import { useMemo, useState } from 'react'
+import { Baloo_2, Plus_Jakarta_Sans } from 'next/font/google'
 import {
   ShoppingBag, Search, Plus, Minus, Truck, ShieldCheck, Wallet,
   Flame, Soup, ArrowRight, MessageCircle, Clock, MapPin, Sparkles, Check,
@@ -26,6 +27,22 @@ import { usePortalCart } from './PortalCartProvider'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import type { BespokeProps } from '@/app/components/themes/toko-bespoke/types'
 import type { PortalCatalogItem } from '@/lib/portal/types'
+
+// Font di-self-host via next/font (zero render-block). Sebelumnya dimuat lewat
+// CSS @import di dalam <style> → render-blocking berantai (perf P1). Variabel CSS
+// di-pasang di .co-root lalu dirujuk oleh --co-display / --co-body di coCss().
+const baloo2 = Baloo_2({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
+  variable: '--co-font-display',
+})
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--co-font-body',
+})
 
 export type CeriaOrderProps = BespokeProps & {
   /** Pack-id pilihan owner utk "Menu Andalan" (kurasi manual, data_konten.andalan). */
@@ -173,7 +190,7 @@ export default function CeriaOrderRenderer({
   }
 
   return (
-    <div className={`co-root${count > 0 ? ' has-cart' : ''}`} style={rootStyle}>
+    <div className={`co-root ${baloo2.variable} ${jakarta.variable}${count > 0 ? ' has-cart' : ''}`} style={rootStyle}>
       <style dangerouslySetInnerHTML={{ __html: coCss() }} />
 
       {/* ── APP BAR ── */}
@@ -437,15 +454,14 @@ export default function CeriaOrderRenderer({
 // ── CSS namespaced .co-* (port mockup "Ceria & Ramah", parametrik --co-primary) ──
 function coCss(): string {
   return `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 .co-root{
   --co-sunny:#FFB81C;--co-green:#15803D;--co-green-tint:#E3F6EE;
   --co-bg:#FFF8F0;--co-surface:#fff;--co-surface-soft:#FFF1E6;
   --co-ink:#3A2A1E;--co-ink-dim:#5E4A3A;--co-muted:#6E5D50;--co-grey:#A89B8E;
   --co-line:#F0E6DA;--co-line2:#F6EFE6;
   --co-shadow:0 6px 20px rgba(58,42,30,.08);--co-shadow-lg:0 18px 40px rgba(58,42,30,.16);
-  --co-display:'Baloo 2','Segoe UI',system-ui,sans-serif;
-  --co-body:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
+  --co-display:var(--co-font-display),'Baloo 2','Segoe UI',system-ui,sans-serif;
+  --co-body:var(--co-font-body),'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
   --co-bounce:cubic-bezier(.34,1.56,.64,1);
   font-family:var(--co-body);color:var(--co-ink);background:var(--co-bg);line-height:1.55;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;
