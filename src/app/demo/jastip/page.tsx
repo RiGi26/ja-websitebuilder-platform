@@ -19,7 +19,7 @@ export default function JastipDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-rose-600 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Custom Jastip · Japan Arena Studio ✦
+        ✦ Demo Template — Custom Jastip · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -207,7 +207,7 @@ export default function JastipDemo() {
           <span className="font-black text-lg">JastipKu <span className="text-rose-400">Express</span></span>
         </div>
         <p className="text-gray-400 text-sm mb-1">WA: 0812-xxxx-xxxx · IG: @jastipku_express</p>
-        <p className="text-gray-500 text-xs">© 2025 JastipKu Express · Powered by Japan Arena Studio</p>
+        <p className="text-gray-500 text-xs">© 2025 JastipKu Express · Powered by Webzoka Studio</p>
       </footer>
     </div>
   )

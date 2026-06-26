@@ -81,7 +81,7 @@ export default function MitraDashboard({
   const canRequest = stats.payableRp >= payoutMin && !hasPendingPayout && bankCompleteSaved
 
   const waShareText = encodeURIComponent(
-    `Halo! Mau punya website profesional untuk bisnismu? Pesan di Japan Arena pakai kode referral saya *${code}* — langsung dapat potongan harga! 🎉\n\n${refLink}`,
+    `Halo! Mau punya website profesional untuk bisnismu? Pesan di Webzoka pakai kode referral saya *${code}* — langsung dapat potongan harga! 🎉\n\n${refLink}`,
   )
 
   const copyText = async (text: string, which: 'link' | 'code') => {
@@ -408,7 +408,7 @@ export default function MitraDashboard({
         </section>
 
         <footer className="text-center text-[11px] text-gray-400 pb-4">
-          Program Mitra Japan Arena Studio · Komisi terkonfirmasi setelah order dilunasi customer.
+          Program Mitra Webzoka Studio · Komisi terkonfirmasi setelah order dilunasi customer.
         </footer>
       </div>
     </div>

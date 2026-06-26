@@ -12,7 +12,7 @@ export default function PersonalBrandingDemo() {
     <div className="min-h-screen bg-[#0A0A0F] font-sans text-white">
       {/* Demo Banner */}
       <div className="bg-violet-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Personal Branding · Japan Arena Studio ✦
+        ✦ Demo Template — Personal Branding · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -173,7 +173,7 @@ export default function PersonalBrandingDemo() {
       </section>
 
       <footer className="border-t border-white/5 py-8 px-6 text-center">
-        <p className="text-gray-600 text-sm">© 2025 Dimas Arief · Powered by Japan Arena Studio</p>
+        <p className="text-gray-600 text-sm">© 2025 Dimas Arief · Powered by Webzoka Studio</p>
       </footer>
     </div>
   )

@@ -10,7 +10,7 @@ export default function SekolahDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-indigo-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Website Sekolah/LPK · Japan Arena Studio ✦
+        ✦ Demo Template — Website Sekolah/LPK · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -163,7 +163,7 @@ export default function SekolahDemo() {
           <span className="font-black text-lg">LPK Cendekia Utama</span>
         </div>
         <p className="text-indigo-300 text-sm mb-2">Jl. Pahlawan No. 12, Semarang · (024) 7xxx-xxxx</p>
-        <p className="text-indigo-400 text-xs">© 2025 LPK Cendekia Utama · Powered by Japan Arena Studio</p>
+        <p className="text-indigo-400 text-xs">© 2025 LPK Cendekia Utama · Powered by Webzoka Studio</p>
       </footer>
     </div>
   )

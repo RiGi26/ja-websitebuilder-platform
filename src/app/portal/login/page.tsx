@@ -78,7 +78,7 @@ export default function PortalLoginPage() {
           </form>
         </div>
         <p className="text-center text-[11px] text-gray-400 mt-6">
-          Lupa password? Hubungi tim Japan Arena Studio.
+          Lupa password? Hubungi tim Webzoka Studio.
         </p>
       </div>
     </div>

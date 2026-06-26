@@ -37,7 +37,7 @@ export default function MitraLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <h1 className="text-2xl sf-display-heavy text-gray-900 tracking-tight">Dashboard Mitra</h1>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Program Mitra Japan Arena</p>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Program Mitra Webzoka</p>
         </div>
 
         <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
@@ -78,7 +78,7 @@ export default function MitraLoginPage() {
           </form>
         </div>
         <p className="text-center text-[11px] text-gray-400 mt-6">
-          Belum jadi mitra atau lupa password? Hubungi tim Japan Arena Studio.
+          Belum jadi mitra atau lupa password? Hubungi tim Webzoka Studio.
         </p>
       </div>
     </div>

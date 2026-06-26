@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     }
     sendEmail(
       result.email,
-      'Selamat datang di Program Mitra Japan Arena 🤝',
+      'Selamat datang di Program Mitra Webzoka 🤝',
       mitraWelcomeEmailHtml({
         nama: String(body?.nama ?? 'Mitra'),
         loginUrl: `${mitraUrl}/login`,
