@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
@@ -27,14 +28,17 @@ function tenantFaviconDataUri(name: string, primaryRaw?: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
-async function getPage(slug: string): Promise<LandingPageWithSections | null> {
+// Dibungkus React cache() → dedupe per-request: generateMetadata DAN komponen
+// page memanggil getPage(slug) dengan arg sama, tapi query Supabase hanya jalan
+// SEKALI per request (hilangkan 1 round-trip DB per load).
+const getPage = cache(async (slug: string): Promise<LandingPageWithSections | null> => {
   try {
     return await fetchPageBySlug(supabase, slug)
   } catch (e) {
     console.error('[slug] fetchPageBySlug error:', e)
     return null
   }
-}
+})
 
 export async function generateMetadata({
   params,
