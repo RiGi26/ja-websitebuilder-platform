@@ -178,7 +178,7 @@ export default function TemplateDetailPage() {
             <div className="sticky top-24 bg-white rounded-[40px] p-8 md:p-10 apple-shadow border border-black/[0.03] space-y-8">
               
               <div>
-                <h2 className="text-3xl md:text-4xl sf-display-heavy text-[#1D1D1F] tracking-tight mb-2" style={{ fontFamily: "'Fraunces', serif" }}>
+                <h2 className="text-3xl md:text-4xl sf-display-heavy text-[#1D1D1F] tracking-tight mb-2" style={{ fontFamily: "var(--font-fraunces), 'Fraunces', serif" }}>
                     {template.title}
                 </h2>
                 <div className="flex items-center gap-2">

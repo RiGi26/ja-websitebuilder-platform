@@ -145,7 +145,7 @@ export default function CaseStudyPage() {
                 <Quote className="w-32 h-32" />
               </div>
               <div className="relative z-10 max-w-3xl">
-                <p className="text-white text-xl md:text-2xl font-medium leading-relaxed mb-10 italic" style={{ fontFamily: "'Fraunces', serif" }}>
+                <p className="text-white text-xl md:text-2xl font-medium leading-relaxed mb-10 italic" style={{ fontFamily: "var(--font-fraunces), 'Fraunces', serif" }}>
                   &ldquo;{project.testimonial.quote}&rdquo;
                 </p>
                 <div className="flex items-center gap-5">

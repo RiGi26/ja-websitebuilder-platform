@@ -1,6 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
+/* Inter + Fraunces kini di-self-host via next/font di app/layout.tsx (var
+   --font-inter / --font-fraunces) → tak ada lagi @import render-blocking. */
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -173,7 +172,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     @apply text-[15px] md:text-base antialiased;
   }
 
