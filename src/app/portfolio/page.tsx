@@ -30,7 +30,7 @@ export default function PortfolioPage() {
             </span>
             <h1
               className="text-4xl sm:text-5xl md:text-6xl font-light mb-5 leading-tight"
-              style={{ fontFamily: "'Fraunces', serif" }}
+              style={{ fontFamily: "var(--font-fraunces), 'Fraunces', serif" }}
             >
               Apa yang Bisa Kami
               <br />

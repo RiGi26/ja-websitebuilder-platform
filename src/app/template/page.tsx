@@ -29,7 +29,7 @@ export default function TemplateCatalogPage() {
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-apple-blue mb-4 px-3 py-1 bg-blue-50 rounded-lg">
               Design Catalog
             </span>
-            <h1 className="text-4xl md:text-6xl sf-display-heavy text-[#1D1D1F] tracking-tight leading-tight mb-6" style={{ fontFamily: "'Fraunces', serif" }}>
+            <h1 className="text-4xl md:text-6xl sf-display-heavy text-[#1D1D1F] tracking-tight leading-tight mb-6" style={{ fontFamily: "var(--font-fraunces), 'Fraunces', serif" }}>
               Pilih Dasar <br className="hidden md:block" /> <span className="italic text-apple-blue">Website Anda</span>
             </h1>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto leading-relaxed font-medium">
