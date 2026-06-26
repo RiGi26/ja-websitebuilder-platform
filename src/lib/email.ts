@@ -14,7 +14,7 @@ export type EmailResult =
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<EmailResult> {
   const key = process.env.RESEND_API_KEY
-  const from = process.env.RESEND_FROM ?? 'Japan Arena <onboarding@resend.dev>'
+  const from = process.env.RESEND_FROM ?? 'Webzoka <onboarding@resend.dev>'
   if (!key) {
     console.warn('[email] RESEND_API_KEY belum diset — skip kirim email')
     return { ok: false, skipped: true }
@@ -82,7 +82,7 @@ export function mitraWelcomeEmailHtml(args: {
           <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6">Di dashboard Anda bisa pantau komisi, ajukan pencairan, dan atur rekening bank. Butuh bantuan? Balas email ini.</p>
         </td></tr>
       </table>
-      <p style="margin:16px 0 0;color:#94a3b8;font-size:11px">Japan Arena Studio</p>
+      <p style="margin:16px 0 0;color:#94a3b8;font-size:11px">Webzoka Studio</p>
     </td></tr>
   </table></body></html>`
 }
@@ -117,7 +117,7 @@ export function portalLoginEmailHtml(args: {
           <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6">Demi keamanan, ganti password Anda setelah login pertama. Butuh bantuan? Balas email ini.</p>
         </td></tr>
       </table>
-      <p style="margin:16px 0 0;color:#94a3b8;font-size:11px">Japan Arena Studio</p>
+      <p style="margin:16px 0 0;color:#94a3b8;font-size:11px">Webzoka Studio</p>
     </td></tr>
   </table></body></html>`
 }

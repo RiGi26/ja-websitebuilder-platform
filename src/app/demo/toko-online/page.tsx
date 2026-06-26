@@ -20,7 +20,7 @@ export default function TokoOnlineDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-orange-600 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Toko Online · Japan Arena Studio ✦
+        ✦ Demo Template — Toko Online · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -220,7 +220,7 @@ export default function TokoOnlineDemo() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
-          © 2025 NusantaraCraft · Powered by Japan Arena Studio
+          © 2025 NusantaraCraft · Powered by Webzoka Studio
         </div>
       </footer>
     </div>

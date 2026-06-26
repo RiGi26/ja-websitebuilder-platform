@@ -42,12 +42,12 @@ export default function Navbar() {
           <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 group transition-all active:scale-95">
             <Image
               src="/images/Icon.png"
-              alt="Japan Arena"
+              alt="Webzoka"
               width={32} height={32}
               className="w-8 h-8 object-contain drop-shadow-sm group-hover:rotate-12 transition-transform duration-300"
             />
             <span className="text-xl sf-display-heavy tracking-tight text-gray-900 group-hover:text-[#0071E3] transition-colors">
-              Japan Arena <span className="text-[#0071E3]">Studio</span>
+              Webzoka <span className="text-[#0071E3]">Studio</span>
             </span>
           </Link>
 

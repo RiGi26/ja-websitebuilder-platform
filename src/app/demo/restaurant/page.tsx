@@ -12,7 +12,7 @@ export default function RestaurantDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-amber-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Website Restaurant · Japan Arena Studio ✦
+        ✦ Demo Template — Website Restaurant · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -143,7 +143,7 @@ export default function RestaurantDemo() {
         <p className="text-2xl mb-2">🍽️</p>
         <p className="font-black text-lg mb-1">Dapur Mama Sari</p>
         <p className="text-stone-400 text-sm mb-1">Jl. Malioboro No. 88, Yogyakarta · 0812-xxxx-xxxx</p>
-        <p className="text-stone-500 text-xs">© 2025 Dapur Mama Sari · Powered by Japan Arena Studio</p>
+        <p className="text-stone-500 text-xs">© 2025 Dapur Mama Sari · Powered by Webzoka Studio</p>
       </footer>
     </div>
   )

@@ -177,7 +177,7 @@ export default function NotifPanel({ businessName, phoneCc }: { businessName: st
           <h2 className="text-lg font-bold text-gray-900">Koneksi WhatsApp</h2>
         </div>
         <p className="text-sm text-gray-500 mb-5">
-          Secara default, notifikasi order dikirim dari <strong>nomor WhatsApp platform Japan Arena</strong> — langsung jalan, gratis.
+          Secara default, notifikasi order dikirim dari <strong>nomor WhatsApp platform Webzoka</strong> — langsung jalan, gratis.
           Mau WA keluar dari <strong>nomor bisnis Anda sendiri</strong>? Hubungkan token Fonnte Anda di bawah, lalu aktifkan.
         </p>
 

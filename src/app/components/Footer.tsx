@@ -11,12 +11,12 @@ export default function Footer() {
         <div className="flex items-center gap-3">
           <Image 
             src="/images/Icon.png" 
-            alt="Japan Arena Logo" 
+            alt="Webzoka Logo"
             width={32} 
             height={32} 
             className="w-8 h-8 object-contain"
           />
-          <span className="font-bold text-gray-900">Japan Arena Studio</span>
+          <span className="font-bold text-gray-900">Webzoka Studio</span>
         </div>
         
         <div className="flex flex-wrap justify-center gap-8 text-sm font-medium text-gray-500">
@@ -34,7 +34,7 @@ export default function Footer() {
         </div>
 
         <p className="text-gray-400 text-xs">
-          © {new Date().getFullYear()} Japan Arena Corp. All rights reserved.
+          © {new Date().getFullYear()} Webzoka. All rights reserved.
         </p>
       </div>
     </footer>

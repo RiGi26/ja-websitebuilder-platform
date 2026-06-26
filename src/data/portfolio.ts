@@ -64,7 +64,7 @@ export const projectsData: Record<string, ProjectDetail> = {
       { title: 'Mobile View', description: 'Tampilan sempurna di smartphone' },
     ],
     testimonial: {
-      quote: 'Tim Japan Arena Studio benar-benar paham kebutuhan bisnis fashion. Sistemnya sangat mudah dikelola, bahkan staf toko saya yang awam teknologi pun bisa update stok sendiri.',
+      quote: 'Tim Webzoka Studio benar-benar paham kebutuhan bisnis fashion. Sistemnya sangat mudah dikelola, bahkan staf toko saya yang awam teknologi pun bisa update stok sendiri.',
       author: 'Riana Putri', role: 'Founder & CEO', company: 'Batik Warisan Store', avatar: 'RP',
     },
   },
@@ -249,7 +249,7 @@ export const projectsData: Record<string, ProjectDetail> = {
       { title: 'Waitlist Form', description: 'Form pendaftaran dengan counter pengguna yang sudah daftar (social proof)' },
     ],
     testimonial: {
-      quote: 'Landing page dari Japan Arena Studio bukan sekadar cantik — dia bekerja. Investor kami bilang website kami terlihat lebih matang dari startup yang sudah Series A.',
+      quote: 'Landing page dari Webzoka Studio bukan sekadar cantik — dia bekerja. Investor kami bilang website kami terlihat lebih matang dari startup yang sudah Series A.',
       author: 'Farid Nugroho', role: 'CEO & Co-Founder', company: 'PayKu', avatar: 'FN',
     },
   },

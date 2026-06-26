@@ -272,7 +272,7 @@ function Stats({ pal }: { pal: Pal }) {
 function Testimonials({ isi, pal }: { isi: Isi; pal: Pal }) {
   const items = asArray(isi.items ?? isi.testimoni)
   const fallback = [
-    { quote: 'Japan Arena merombak total sistem digital kami. Sekarang tim lebih efisien, klien lebih puas, dan revenue naik 40% dalam 6 bulan.', name: 'Budi S.', jabatan: 'CEO, PT Maju Bersama' },
+    { quote: 'Webzoka merombak total sistem digital kami. Sekarang tim lebih efisien, klien lebih puas, dan revenue naik 40% dalam 6 bulan.', name: 'Budi S.', jabatan: 'CEO, PT Maju Bersama' },
     { quote: 'Website dan CRM yang mereka bangun benar-benar game changer. Lead qualification jadi jauh lebih mudah dan terstruktur.', name: 'Dewi R.', jabatan: 'Marketing Director, Kreasi Nusantara' },
   ]
   const data = items.length ? items : fallback

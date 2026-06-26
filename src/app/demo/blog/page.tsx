@@ -14,7 +14,7 @@ export default function BlogDemo() {
     <div className="min-h-screen bg-[#0F1117] text-white font-sans">
       {/* Demo Banner */}
       <div className="bg-emerald-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Blog / Media · Japan Arena Studio ✦
+        ✦ Demo Template — Blog / Media · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -137,7 +137,7 @@ export default function BlogDemo() {
 
       <footer className="border-t border-white/5 py-8 px-6 text-center">
         <p className="font-black text-base mb-1">KABAR<span className="text-emerald-400">DIGITAL</span></p>
-        <p className="text-gray-500 text-xs">© 2025 KabarDigital · Powered by Japan Arena Studio</p>
+        <p className="text-gray-500 text-xs">© 2025 KabarDigital · Powered by Webzoka Studio</p>
       </footer>
     </div>
   )

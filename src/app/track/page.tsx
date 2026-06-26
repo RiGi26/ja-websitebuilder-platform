@@ -228,7 +228,7 @@ export default async function TrackPage({
                 </Link>
                 <a
                   href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
-                    `Halo Japan Arena, saya tidak bisa menemukan order saya dengan ID ${id}.`,
+                    `Halo Webzoka, saya tidak bisa menemukan order saya dengan ID ${id}.`,
                   )}`}
                   target="_blank"
                   className="py-3 px-6 bg-white border border-gray-200 text-gray-900 font-bold rounded-2xl hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2"
@@ -264,7 +264,7 @@ export default async function TrackPage({
       })
     : null
   const waMsg = encodeURIComponent(
-    `Halo Japan Arena, saya ingin tanya progress order ${displayId}`,
+    `Halo Webzoka, saya ingin tanya progress order ${displayId}`,
   )
 
   return (
@@ -335,7 +335,7 @@ export default async function TrackPage({
                 </p>
               </div>
               <a
-                href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Halo Japan Arena, saya sudah bayar untuk order ${displayId}. Mohon dikonfirmasi. Terima kasih.`)}`}
+                href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Halo Webzoka, saya sudah bayar untuk order ${displayId}. Mohon dikonfirmasi. Terima kasih.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 bg-amber-600 text-white font-black text-xs px-5 py-3 rounded-full hover:bg-amber-700 transition-colors whitespace-nowrap"

@@ -18,7 +18,7 @@ export default function PerusahaanDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-blue-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Website Perusahaan · Japan Arena Studio ✦
+        ✦ Demo Template — Website Perusahaan · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}
@@ -177,7 +177,7 @@ export default function PerusahaanDemo() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
-          © 2025 Meridian Konsultan Indonesia · Powered by Japan Arena Studio
+          © 2025 Meridian Konsultan Indonesia · Powered by Webzoka Studio
         </div>
       </footer>
     </div>

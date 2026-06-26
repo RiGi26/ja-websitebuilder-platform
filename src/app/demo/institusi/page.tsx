@@ -18,7 +18,7 @@ export default function InstitusiDemo() {
     <div className="min-h-screen bg-white font-sans">
       {/* Demo Banner */}
       <div className="bg-gray-700 text-white text-center py-2 text-xs font-bold uppercase tracking-widest">
-        ✦ Demo Template — Website Institusi · Japan Arena Studio ✦
+        ✦ Demo Template — Website Institusi · Webzoka Studio ✦
       </div>
 
       {/* Top Bar */}
@@ -154,7 +154,7 @@ export default function InstitusiDemo() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
-          © 2025 Pemerintah Desa Sukamaju · Powered by Japan Arena Studio
+          © 2025 Pemerintah Desa Sukamaju · Powered by Webzoka Studio
         </div>
       </footer>
     </div>
