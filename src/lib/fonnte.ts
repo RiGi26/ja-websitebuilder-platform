@@ -131,7 +131,7 @@ function launchTemplate(c: NotifContext): string {
     lines.push('', `Catatan tim:`, c.note)
   }
   lines.push('', `Lacak: ${c.trackUrl}`)
-  lines.push('', `Mohon review dalam 3×24 jam. Revisi & pertanyaan bisa langsung reply pesan ini. Terima kasih telah mempercayai Japan Arena! 🙏`)
+  lines.push('', `Mohon review dalam 3×24 jam. Revisi & pertanyaan bisa langsung reply pesan ini. Terima kasih telah mempercayai Webzoka! 🙏`)
   return lines.join('\n')
 }
 
@@ -165,7 +165,7 @@ function paymentLunasTemplate(c: NotifContext): string {
     `Website Anda sepenuhnya aktif dan siap digunakan.`,
     c.deliveredUrl ? `\n🌐 ${c.deliveredUrl}` : '',
     ``,
-    `Terima kasih telah mempercayai Japan Arena Studio!`,
+    `Terima kasih telah mempercayai Webzoka Studio!`,
     `Untuk pertanyaan atau bantuan, balas pesan ini. 🙏`,
   ].filter(Boolean).join('\n')
 }
@@ -190,7 +190,7 @@ function orderCreatedTemplate(c: NotifContext): string {
   return [
     `Halo ${c.clientName}! 👋`,
     ``,
-    `Pesanan website Anda berhasil dibuat di Japan Arena Studio.`,
+    `Pesanan website Anda berhasil dibuat di Webzoka Studio.`,
     ``,
     `📋 *Order ID: ${c.displayId}*`,
     `Simpan ID ini — gunakan untuk cek progress kapan saja.`,
@@ -289,7 +289,7 @@ const formatRp = (n: number) => `Rp ${Math.round(n).toLocaleString('id-ID')}`
 
 function referrerWelcomeTemplate(c: ReferrerNotifContext): string {
   return [
-    `🤝 *Selamat datang di Program Mitra Japan Arena!*`,
+    `🤝 *Selamat datang di Program Mitra Webzoka!*`,
     ``,
     `Halo ${c.referrerName}, akun mitra Anda sudah aktif.`,
     ``,
@@ -337,7 +337,7 @@ function payoutPaidTemplate(c: ReferrerNotifContext): string {
     ``,
     `Halo ${c.referrerName}, dana *${formatRp(c.amount ?? 0)}* sudah ditransfer ke rekening Anda.`,
     ``,
-    `Terima kasih telah menjadi Mitra Japan Arena! 🙏`,
+    `Terima kasih telah menjadi Mitra Webzoka! 🙏`,
     `Dashboard: ${c.mitraUrl}`,
   ].join('\n')
 }

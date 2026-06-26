@@ -542,7 +542,7 @@ function PaymentLockedPanel({ namaTenant }: { namaTenant: string }) {
   const maint = `Rp ${(addon?.yearlyMaint ?? 150000).toLocaleString('id-ID')}`
   const adminWa = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
   const waText = encodeURIComponent(
-    `Halo Admin Japan Arena, saya ingin mengaktifkan add-on Payment Gateway (Midtrans) untuk website saya (${namaTenant}).`,
+    `Halo Admin Webzoka, saya ingin mengaktifkan add-on Payment Gateway (Midtrans) untuk website saya (${namaTenant}).`,
   )
   return (
     <div className="bg-white rounded-[32px] p-10 apple-shadow border border-black/[0.03] text-center">

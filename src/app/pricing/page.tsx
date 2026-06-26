@@ -65,7 +65,7 @@ export default function PricingCalculatorPage() {
             <div className="absolute -top-32 -right-32 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
             <div className="relative z-10">
               <span className="inline-block px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-sm font-medium mb-6">
-                JapanArena Digital Studio
+                Webzoka Studio
               </span>
               <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
                 Smart Website Pricing Calculator

@@ -4,7 +4,7 @@ import { Toaster } from 'sonner'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
-  title: 'Japan Arena Studio — Solusi Website Bisnis Profesional',
+  title: 'Webzoka Studio — Solusi Website Bisnis Profesional',
   description: 'Bangun infrastruktur digital bisnismu mulai dari desain, hosting, hingga integrasi pembayaran otomatis. Terima beres, live dalam 7 hari.',
 }
 

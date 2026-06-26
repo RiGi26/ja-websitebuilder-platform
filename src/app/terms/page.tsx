@@ -2,7 +2,7 @@ import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
 
 const LAST_UPDATED = '28 Mei 2025'
-const COMPANY = 'Japan Arena Studio'
+const COMPANY = 'Webzoka Studio'
 const WA = '6281296917963'
 
 const sections = [

@@ -81,7 +81,7 @@ function MitraCredentialBox({ email, password, code, refLink }: {
     setTimeout(() => setCopied((c) => (c === key ? null : c)), 2000)
   }
   const allText = () => [
-    `Login Dashboard Mitra Japan Arena:`,
+    `Login Dashboard Mitra Webzoka:`,
     `URL: ${location.origin}/mitra/login`,
     `Email: ${email}`,
     `Password: ${password}`,

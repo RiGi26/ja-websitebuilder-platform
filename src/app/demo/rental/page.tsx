@@ -155,7 +155,7 @@ export default function RentalDemo() {
 
       {/* Demo Banner */}
       <div className="bg-amber-400 text-amber-950 text-center py-2 text-[11px] font-black uppercase tracking-widest">
-        ✦ Demo Template — Travel &amp; Rental · Japan Arena Studio ✦
+        ✦ Demo Template — Travel &amp; Rental · Webzoka Studio ✦
       </div>
 
       {/* Navbar */}

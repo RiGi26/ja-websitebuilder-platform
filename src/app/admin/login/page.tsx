@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
             </div>
             <div className="text-center">
               <h1 className="text-2xl sf-display-heavy text-gray-900 tracking-tight leading-none">Studio Admin</h1>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Japan Arena Studio</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Webzoka Studio</p>
             </div>
           </Link>
         </div>

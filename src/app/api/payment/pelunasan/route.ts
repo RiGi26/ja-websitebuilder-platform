@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         id: 'pelunasan',
         price: pelunasan,
         quantity: 1,
-        name: 'Pelunasan — Japan Arena Studio',
+        name: 'Pelunasan — Webzoka Studio',
       }],
       customer_details: {
         first_name: clientName,

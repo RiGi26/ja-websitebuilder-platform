@@ -33,7 +33,7 @@ async function checkEntitlement(tenantId: string) {
 }
 
 const FORBIDDEN = {
-  error: 'Fitur pembayaran online belum termasuk paket Anda. Hubungi admin Japan Arena untuk mengaktifkan.',
+  error: 'Fitur pembayaran online belum termasuk paket Anda. Hubungi admin Webzoka untuk mengaktifkan.',
 }
 
 // GET — status konfigurasi pembayaran toko (tanpa membuka server key)
