@@ -36,7 +36,19 @@ export function usePortalCart(): CartCtx {
   return v
 }
 
-const METODE_OPSI: { v: MetodeBayar; label: string; sub: string }[] = [
+// "Pasar" tenant turunan dari localeConfig — menentukan chrome checkout (metode bayar,
+// field alamat, jam kirim). Default 'id' (Indonesia domestik) selaras konvensi default
+// IDR/id-ID di format-money.ts; hanya tenant berkode Jepang (phone_cc 81 / JPY, mis.
+// Bakso Tini diaspora) yang masuk cabang 'jp'.
+type Market = 'jp' | 'id'
+function resolveMarket(cfg?: LocaleConfig | null): Market {
+  return cfg?.phone_cc === '81' || cfg?.currency === 'JPY' ? 'jp' : 'id'
+}
+
+type MetodeOpsi = { v: MetodeBayar; label: string; sub: string }
+
+// Pasar Jepang (diaspora — mis. Bakso Tini): set metode bayar khas Jepang.
+const METODE_OPSI_JP: MetodeOpsi[] = [
   { v: 'transfer_jp', label: 'Transfer Bank · 銀行振込', sub: 'Japan Post Bank — bayar penuh online' },
   { v: 'transfer_id', label: 'Transfer Bank Indonesia', sub: 'Bayar penuh (kurs ¥→Rp saat konfirmasi)' },
   { v: 'paypay', label: 'PayPay', sub: 'Bayar penuh via PayPay for Business' },
@@ -44,13 +56,28 @@ const METODE_OPSI: { v: MetodeBayar; label: string; sub: string }[] = [
   { v: 'cod_ongkir', label: '着払い · ongkir di kurir', sub: 'Barang dibayar online, ongkir ke kurir' },
 ]
 
-const METODE_LABEL: Record<MetodeBayar, string> = Object.fromEntries(
-  METODE_OPSI.map((o) => [o.v, o.label]),
-) as Record<MetodeBayar, string>
+// Pasar Indonesia (domestik): transfer bank lokal + COD bayar di tempat.
+const METODE_OPSI_ID: MetodeOpsi[] = [
+  { v: 'transfer_id', label: 'Transfer Bank', sub: 'Bayar penuh ke rekening, kirim bukti via WhatsApp' },
+  { v: 'cod_full', label: 'Bayar di Tempat (COD)', sub: 'Bayar tunai ke kurir saat barang tiba' },
+]
+
+const METODE_OPSI_BY_MARKET: Record<Market, MetodeOpsi[]> = { jp: METODE_OPSI_JP, id: METODE_OPSI_ID }
+
+// Label metode untuk struk konfirmasi (DoneView). Per pasar; fallback ke union semua
+// pasar supaya metode apa pun tetap punya label terbaca.
+function metodeLabel(market: Market, v: MetodeBayar): string {
+  return (
+    METODE_OPSI_BY_MARKET[market].find((o) => o.v === v)?.label ??
+    [...METODE_OPSI_JP, ...METODE_OPSI_ID].find((o) => o.v === v)?.label ??
+    v
+  )
+}
 
 // Slot jam kirim same-day (pengiriman di HARI pesan). Pelanggan bebas memilih slot
 // mana pun — pembatasan "slot yang jamnya sudah lewat tak bisa dipilih" sudah tidak
 // berlaku (keputusan owner 2026-06-24), jadi tak ada lagi perhitungan waktu Tokyo.
+// Hanya dirender untuk pasar Jepang ('jp'); pasar Indonesia atur jam via WA.
 const JAM_KIRIM_SLOTS: string[] = [
   '8:00〜12:00',
   '14:00〜16:00',
@@ -86,6 +113,7 @@ export default function PortalCartProvider({
   const storageKey = `ja_portal_cart:${slug}`
   const { locale, currency } = moneyFromConfig(localeConfig)
   const fmt = useCallback((n: number) => formatMoney(n, locale, currency), [locale, currency])
+  const market = resolveMarket(localeConfig)
 
   // Persist per-slug (pola CartProvider).
   useEffect(() => {
@@ -147,12 +175,12 @@ export default function PortalCartProvider({
                 onClose={() => setView('closed')} onCheckout={() => setView('checkout')} />
             )}
             {view === 'checkout' && (
-              <CheckoutView slug={slug} items={items} fmt={fmt} subtotal={subtotal} phoneCc={localeConfig?.phone_cc || '62'}
+              <CheckoutView slug={slug} items={items} fmt={fmt} subtotal={subtotal} phoneCc={localeConfig?.phone_cc || '62'} market={market}
                 onBack={() => setView('cart')} onClose={() => setView('closed')}
                 onDone={(d) => { clear(); setDoneState(d); setView('done') }} onAdjust={setQty} />
             )}
             {view === 'done' && done && (
-              <DoneView fmt={fmt} done={done} businessName={businessName} onClose={() => setView('closed')} />
+              <DoneView fmt={fmt} done={done} businessName={businessName} market={market} onClose={() => setView('closed')} />
             )}
           </div>
         </div>
@@ -218,8 +246,8 @@ function CartView({ items, fmt, subtotal, inc, dec, remove, onClose, onCheckout 
 }
 
 // ── Checkout view ───────────────────────────────────────────
-function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, onDone, onAdjust }: {
-  slug: string; items: CartLine[]; fmt: (n: number) => string; subtotal: number; phoneCc: string
+function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, onBack, onClose, onDone, onAdjust }: {
+  slug: string; items: CartLine[]; fmt: (n: number) => string; subtotal: number; phoneCc: string; market: Market
   onBack: () => void; onClose: () => void; onDone: (d: DoneState) => void; onAdjust: (id: string, qty: number) => void
 }) {
   const [form, setForm] = useState({ nama: '', telp: '', email: '', ig: '', kode_pos: '', alamat: '', catatan: '' })
@@ -306,32 +334,36 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
           <div className="pcart-field"><label htmlFor="pc-email">Email</label><input id="pc-email" value={form.email} onChange={set('email')} inputMode="email" autoComplete="email" /></div>
           <div className="pcart-field"><label htmlFor="pc-ig">Instagram</label><input id="pc-ig" value={form.ig} onChange={set('ig')} placeholder="@akun" /></div>
         </div>
-        <div className="pcart-field"><label htmlFor="pc-pos">Kode Pos 〒</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder="160-0023" /></div>
-        <div className="pcart-field"><label htmlFor="pc-alamat">Alamat</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder="Prefektur · kota · banchi" /></div>
+        <div className="pcart-field"><label htmlFor="pc-pos">{market === 'jp' ? 'Kode Pos 〒' : 'Kode Pos'}</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder={market === 'jp' ? '160-0023' : '40123'} /></div>
+        <div className="pcart-field"><label htmlFor="pc-alamat">Alamat</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder={market === 'jp' ? 'Prefektur · kota · banchi' : 'Kecamatan, kota, alamat lengkap'} /></div>
         <div className="pcart-field"><label htmlFor="pc-catatan">Catatan</label><textarea id="pc-catatan" value={form.catatan} onChange={set('catatan')} rows={2} /></div>
 
-        <h3 className="pcart-h3">Jam Kirim</h3>
-        <div className="pcart-metode pcart-jamkirim">
-          {JAM_KIRIM_SLOTS.map((s) => {
-            const sel = jamKirim === s
-            return (
-              <button
-                key={s}
-                type="button"
-                className={`pcart-metode-opt pcart-jam-opt${sel ? ' is-sel' : ''}`}
-                aria-pressed={sel}
-                onClick={() => setJamKirim(sel ? '' : s)}
-              >
-                <span className="pcart-metode-label">{s}</span>
-              </button>
-            )
-          })}
-        </div>
-        <p className="pcart-hint">Pilih perkiraan jam barang sampai di tujuan.</p>
+        {market === 'jp' && (
+          <>
+            <h3 className="pcart-h3">Jam Kirim</h3>
+            <div className="pcart-metode pcart-jamkirim">
+              {JAM_KIRIM_SLOTS.map((s) => {
+                const sel = jamKirim === s
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`pcart-metode-opt pcart-jam-opt${sel ? ' is-sel' : ''}`}
+                    aria-pressed={sel}
+                    onClick={() => setJamKirim(sel ? '' : s)}
+                  >
+                    <span className="pcart-metode-label">{s}</span>
+                  </button>
+                )
+              })}
+            </div>
+            <p className="pcart-hint">Pilih perkiraan jam barang sampai di tujuan.</p>
+          </>
+        )}
 
         <h3 className="pcart-h3">Metode Pembayaran *</h3>
         <div className="pcart-metode">
-          {METODE_OPSI.map((o) => (
+          {METODE_OPSI_BY_MARKET[market].map((o) => (
             <button key={o.v} type="button" className={`pcart-metode-opt${metode === o.v ? ' is-sel' : ''}`} onClick={() => setMetode(o.v)} aria-pressed={metode === o.v}>
               <span className="pcart-metode-label">{o.label}</span>
               <span className="pcart-metode-sub">{o.sub}</span>
@@ -362,7 +394,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, onBack, onClose, on
 }
 
 // ── Confirmation view ───────────────────────────────────────
-function DoneView({ fmt, done, businessName, onClose }: { fmt: (n: number) => string; done: DoneState; businessName: string; onClose: () => void }) {
+function DoneView({ fmt, done, businessName, market, onClose }: { fmt: (n: number) => string; done: DoneState; businessName: string; market: Market; onClose: () => void }) {
   const r = done.res
   const ib = r.instruksi_bayar
   return (
@@ -376,7 +408,7 @@ function DoneView({ fmt, done, businessName, onClose }: { fmt: (n: number) => st
         <p className="pcart-done-lead">Terima kasih! Pesanan <strong>{r.order_code}</strong> di {businessName} sudah masuk.</p>
 
         <div className="pcart-instr">
-          <h3>{METODE_LABEL[r.metode_bayar]}</h3>
+          <h3>{metodeLabel(market, r.metode_bayar)}</h3>
           {r.metode_bayar === 'cod_full' ? (
             <p>Bayar <strong>{fmt(r.total_courier)}</strong> ke kurir saat barang tiba.</p>
           ) : (
