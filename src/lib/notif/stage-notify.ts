@@ -105,3 +105,67 @@ export async function notifyOrderStageChange(input: StageNotifyInput): Promise<v
   if (wantPaid) await send('payment_confirmed', 'wa_paid_sent_at')
   if (wantShipped) await send('order_shipped', 'wa_shipped_sent_at')
 }
+
+export interface TotalFinalInput {
+  orderCode: string
+  tenantSlug: string
+  trackingToken: string
+  pembeliNama: string | null
+  pembeliTelp: string | null
+  metodeBayar: string | null
+  /** Total final (barang + ongkir) sesudah operator set ongkir. */
+  totalGross: number | null
+  ongkir: number | null
+  /** Rekening tujuan (dari instruksi_bayar); null utk metode COD → baris di-drop. */
+  rekening: string | null
+  ringkasanItems: { nama: string; qty: number; harga: number }[] | null
+}
+
+/**
+ * Kirim WA `total_final` ke pembeli saat operator selesai menghitung ongkir
+ * (transisi ongkir_status pending→set di /api/sync/order-status). Pembeli baru
+ * tahu TOTAL FINAL + rekening di sini → bayar SEKALI (model "operator finalisasi
+ * ongkir"). Idempoten via kolom wa_total_sent_at (di-set hanya saat kirim sukses).
+ * Server-only; dipanggil di dalam after().
+ */
+export async function notifyTotalFinal(input: TotalFinalInput): Promise<void> {
+  if (!input.pembeliTelp) return
+
+  const { data: page } = await supabaseAdmin
+    .from('landing_pages')
+    .select('tenant_id, nama_website, domain_custom, konfigurasi')
+    .eq('slug', input.tenantSlug)
+    .eq('status', 'published')
+    .maybeSingle()
+  if (!page?.tenant_id) return
+
+  const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
+  const phoneCc = konfig.localeConfig?.phone_cc || '62'
+  const { locale, currency } = moneyFromConfig(konfig.localeConfig)
+  const notif = await getTenantNotif(page.tenant_id).catch(() => null)
+  const token = notif ? effectiveFonnteToken(notif) : (process.env.FONNTE_TOKEN || undefined)
+
+  const siteOrigin = tenantSiteOrigin(input.tenantSlug, page.domain_custom)
+  const metodeLabel = input.metodeBayar ? (METODE[input.metodeBayar as MetodeBayar] ?? input.metodeBayar) : ''
+  const vars: NotifVars = {
+    nama: input.pembeliNama || 'Pelanggan',
+    bisnis: page.nama_website,
+    kode: input.orderCode,
+    items: itemsText(input.ringkasanItems),
+    total: formatMoney(input.totalGross ?? 0, locale, currency),
+    bayar: metodeLabel,
+    lacak: `${siteOrigin}/lacak/${input.trackingToken}`,
+    ongkir: formatMoney(input.ongkir ?? 0, locale, currency),
+    rekening: input.rekening,
+  }
+
+  const msg = renderTemplate('total_final', notif?.templates.total_final, vars)
+  const res = await sendWhatsApp(input.pembeliTelp.trim(), msg, phoneCc, token)
+  await logWa({ orderCode: input.orderCode, tenantSlug: input.tenantSlug, event: 'total_final', target: input.pembeliTelp, result: res })
+  if (res.ok) {
+    await supabaseAdmin
+      .from('order_projection')
+      .update({ wa_total_sent_at: new Date().toISOString() })
+      .eq('order_code', input.orderCode)
+  }
+}

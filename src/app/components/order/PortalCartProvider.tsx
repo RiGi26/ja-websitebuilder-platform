@@ -407,20 +407,34 @@ function DoneView({ fmt, done, businessName, market, onClose }: { fmt: (n: numbe
         <div className="pcart-done-icon"><CheckCircle2 size={44} aria-hidden /></div>
         <p className="pcart-done-lead">Terima kasih! Pesanan <strong>{r.order_code}</strong> di {businessName} sudah masuk.</p>
 
-        <div className="pcart-instr">
-          <h3>{metodeLabel(market, r.metode_bayar)}</h3>
-          {r.metode_bayar === 'cod_full' ? (
-            <p>Bayar <strong>{fmt(r.total_courier)}</strong> ke kurir saat barang tiba.</p>
-          ) : (
-            <p>Transfer <strong>{fmt(ib.nominal)}</strong>{ib.rekening ? <> ke <span className="pcart-rek">{ib.rekening}</span></> : null}, lalu kirim bukti via WhatsApp.</p>
-          )}
-          {ib.catatan && <p className="pcart-instr-note">{ib.catatan}</p>}
-          <dl className="pcart-totals">
-            <div><dt>Total barang + ongkir</dt><dd>{fmt(r.total_gross)}</dd></div>
-            {r.total_online > 0 && <div><dt>Dibayar online</dt><dd>{fmt(r.total_online)}</dd></div>}
-            {r.total_courier > 0 && <div><dt>Dibayar ke kurir</dt><dd>{fmt(r.total_courier)}</dd></div>}
-          </dl>
-        </div>
+        {market === 'id' ? (
+          // Pasar Indonesia: ongkir dihitung admin dulu (model "operator finalisasi
+          // ongkir") → JANGAN tampilkan nominal bayar di sini; pembeli tunggu total final.
+          <div className="pcart-instr">
+            <h3>Menunggu ongkir</h3>
+            <p>Admin akan menghitung <strong>ongkir pengiriman</strong>, lalu mengirim <strong>total final (barang + ongkir) + cara pembayaran</strong> via WhatsApp &amp; halaman lacak.</p>
+            <p className="pcart-instr-note">Mohon <strong>jangan transfer dulu</strong> sebelum total final keluar.</p>
+            <dl className="pcart-totals">
+              <div><dt>Subtotal barang</dt><dd>{fmt(r.total_gross)}</dd></div>
+              <div><dt>Ongkir</dt><dd>dihitung admin</dd></div>
+            </dl>
+          </div>
+        ) : (
+          <div className="pcart-instr">
+            <h3>{metodeLabel(market, r.metode_bayar)}</h3>
+            {r.metode_bayar === 'cod_full' ? (
+              <p>Bayar <strong>{fmt(r.total_courier)}</strong> ke kurir saat barang tiba.</p>
+            ) : (
+              <p>Transfer <strong>{fmt(ib.nominal)}</strong>{ib.rekening ? <> ke <span className="pcart-rek">{ib.rekening}</span></> : null}, lalu kirim bukti via WhatsApp.</p>
+            )}
+            {ib.catatan && <p className="pcart-instr-note">{ib.catatan}</p>}
+            <dl className="pcart-totals">
+              <div><dt>Total barang + ongkir</dt><dd>{fmt(r.total_gross)}</dd></div>
+              {r.total_online > 0 && <div><dt>Dibayar online</dt><dd>{fmt(r.total_online)}</dd></div>}
+              {r.total_courier > 0 && <div><dt>Dibayar ke kurir</dt><dd>{fmt(r.total_courier)}</dd></div>}
+            </dl>
+          </div>
+        )}
 
         <a className="pcart-cta pcart-cta-link" href={done.trackUrl}>Lacak Pesanan</a>
         <button className="pcart-link" onClick={onClose}>Tutup</button>

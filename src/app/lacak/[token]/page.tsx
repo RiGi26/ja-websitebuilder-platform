@@ -15,10 +15,12 @@ import AutoRefresh from './AutoRefresh'
 export const dynamic = 'force-dynamic'
 
 // Whitelist §5 (+ pembeli_nama: satu-satunya field pelanggan di proyeksi, token-gated).
+// instruksi_bayar.rekening = rekening tujuan (publik, memang utk ditampilkan ke pembeli).
 const SELECT_FIELDS =
-  'order_code, tenant_slug, pembeli_nama, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, total_online, total_courier, total_gross, biaya_kurir, resi, tgl_kirim, jam_kirim, created_at'
+  'order_code, tenant_slug, pembeli_nama, status_bayar, status_fulfillment, metode_bayar, ringkasan_items, subtotal, ongkir, total_online, total_courier, total_gross, biaya_kurir, instruksi_bayar, ongkir_status, resi, tgl_kirim, jam_kirim, created_at'
 
 type RingkasanItem = { nama: string; qty: number; harga: number }
+type InstruksiBayar = { metode?: string; nominal?: number | string | null; rekening?: string | null; catatan?: string | null }
 type Projection = {
   order_code: string
   tenant_slug: string
@@ -27,10 +29,14 @@ type Projection = {
   status_fulfillment: string
   metode_bayar: MetodeBayar
   ringkasan_items: RingkasanItem[] | null
+  subtotal: number | string | null
+  ongkir: number | string | null
   total_online: number | string | null
   total_courier: number | string | null
   total_gross: number | string | null
   biaya_kurir: number | string | null
+  instruksi_bayar: InstruksiBayar | null
+  ongkir_status: string | null
   resi: string | null
   tgl_kirim: string | null
   jam_kirim: string | null
@@ -138,10 +144,53 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
           ))}
         </ul>
         <hr style={hr} />
-        <div style={rowLine}><span>Total barang + ongkir</span><strong>{fmt(Number(order.total_gross))}</strong></div>
-        {Number(order.total_online) > 0 && <div style={rowLine}><span>Dibayar online</span><span>{fmt(Number(order.total_online))}</span></div>}
-        {Number(order.total_courier) > 0 && <div style={rowLine}><span>Dibayar ke kurir</span><span>{fmt(Number(order.total_courier))}</span></div>}
+        {order.ongkir_status === 'pending' ? (
+          // ID — ongkir belum dihitung admin: tampilkan subtotal, JANGAN klaim total final.
+          <>
+            <div style={rowLine}><span>Subtotal barang</span><strong>{fmt(Number(order.subtotal ?? order.total_gross))}</strong></div>
+            <div style={rowLine}><span>Ongkir</span><span style={{ color: '#9A6A22' }}>dihitung admin</span></div>
+          </>
+        ) : order.ongkir_status === 'set' ? (
+          // ID — ongkir sudah final.
+          <>
+            <div style={rowLine}><span>Subtotal barang</span><span>{fmt(Number(order.subtotal ?? (Number(order.total_gross) - Number(order.ongkir))))}</span></div>
+            {Number(order.ongkir) > 0 && <div style={rowLine}><span>Ongkir</span><span>{fmt(Number(order.ongkir))}</span></div>}
+            <div style={rowLine}><span>Total</span><strong>{fmt(Number(order.total_gross))}</strong></div>
+            {Number(order.total_online) > 0 && <div style={rowLine}><span>Dibayar online</span><span>{fmt(Number(order.total_online))}</span></div>}
+            {Number(order.total_courier) > 0 && <div style={rowLine}><span>Dibayar ke kurir</span><span>{fmt(Number(order.total_courier))}</span></div>}
+          </>
+        ) : (
+          // JP / legacy ('n/a') — perilaku lama, tak berubah.
+          <>
+            <div style={rowLine}><span>Total barang + ongkir</span><strong>{fmt(Number(order.total_gross))}</strong></div>
+            {Number(order.total_online) > 0 && <div style={rowLine}><span>Dibayar online</span><span>{fmt(Number(order.total_online))}</span></div>}
+            {Number(order.total_courier) > 0 && <div style={rowLine}><span>Dibayar ke kurir</span><span>{fmt(Number(order.total_courier))}</span></div>}
+          </>
+        )}
       </div>
+
+      {/* Status ongkir / instruksi bayar (model "operator finalisasi ongkir", ID). */}
+      {order.ongkir_status === 'pending' && !isPaidStatus(order.status_bayar) && (
+        <div style={{ ...card, background: '#FFF7E6', border: '1px solid #F4C892' }}>
+          <h2 style={h2}>⏳ Menunggu ongkir</h2>
+          <p style={{ ...msg, margin: 0 }}>
+            Admin sedang menghitung ongkir pengiriman. <strong>Total final + cara pembayaran</strong> akan muncul di sini
+            dan dikirim via WhatsApp. Mohon <strong>jangan transfer dulu</strong> sampai total final keluar. 🙏
+          </p>
+        </div>
+      )}
+      {order.ongkir_status === 'set' && !isPaidStatus(order.status_bayar) && order.instruksi_bayar?.rekening && (
+        <div style={{ ...card, background: '#EAF4FF', border: '1px solid #9DC3F0' }}>
+          <h2 style={h2}>💳 Cara Pembayaran</h2>
+          <p style={{ ...msg, marginBottom: '.4rem' }}>
+            Silakan transfer <strong>{fmt(Number(order.instruksi_bayar.nominal ?? order.total_online))}</strong> ke:
+          </p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: '#1d4ed8', margin: '0 0 .6rem', wordBreak: 'break-word' }}>
+            {String(order.instruksi_bayar.rekening)}
+          </p>
+          <p style={{ ...msg, margin: 0 }}>Lalu kirim bukti transfer via WhatsApp untuk verifikasi. Terima kasih! 🙏</p>
+        </div>
+      )}
 
       {/* Invoice PDF — hanya saat pembayaran sudah terverifikasi (lunas/COD). */}
       {isPaidStatus(order.status_bayar) && (
