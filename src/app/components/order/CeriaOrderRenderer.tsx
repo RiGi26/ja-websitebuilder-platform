@@ -318,7 +318,7 @@ export default function CeriaOrderRenderer({
               <h2><Flame size={22} aria-hidden /> Menu Andalan</h2>
               <span className="co-sub">Pilihan dari kami</span>
             </div>
-            <div className="co-laris">
+            <div className="co-laris" data-sparse={andalan.length <= 4 ? '' : undefined}>
               {andalan.map((m) => {
                 const soldOut = m.avail_status === 'habis'
                 return (
@@ -375,7 +375,7 @@ export default function CeriaOrderRenderer({
             <span className="co-sub">{filtered.length} menu</span>
           </div>
           {visible.length > 0 ? (
-            <div className="co-grid">
+            <div className="co-grid" data-sparse={visible.length <= 4 ? '' : undefined}>
               {visible.map((m) => renderCard(m))}
             </div>
           ) : (
@@ -571,6 +571,7 @@ function coCss(): string {
 
 /* MENU ANDALAN (carousel) */
 .co-laris{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:4px 16px 8px;margin:0 -16px;scroll-snap-type:x mandatory}
+.co-laris[data-sparse]{justify-content:safe center}
 .co-laris::-webkit-scrollbar{display:none}
 .co-lcard{flex:0 0 158px;scroll-snap-align:start;background:var(--co-surface);border:1px solid var(--co-line2);border-radius:18px;overflow:hidden;box-shadow:var(--co-shadow);transition:transform .25s,box-shadow .25s}
 .co-lcard:hover{transform:translateY(-4px);box-shadow:var(--co-shadow-lg)}
@@ -595,6 +596,8 @@ function coCss(): string {
 /* MENU GRID */
 .co-menu{padding-bottom:24px}
 .co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+/* Katalog kecil (≤4 item): cap lebar kartu + center supaya grid tak lengang di desktop. Tenant banyak-produk (default, tanpa [data-sparse]) tak terpengaruh. */
+.co-grid[data-sparse]{grid-template-columns:repeat(auto-fit,minmax(220px,300px));justify-content:center}
 .co-card{position:relative;background:var(--co-surface);border:1px solid var(--co-line2);border-radius:22px;overflow:hidden;box-shadow:var(--co-shadow);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column}
 .co-card:hover{transform:translateY(-4px);box-shadow:var(--co-shadow-lg)}
 .co-card-frame{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--co-surface-soft)}
@@ -702,6 +705,7 @@ function coCss(): string {
   .co-halal b{font-size:12px}
   .co-pill{max-width:calc(100% - 76px);text-wrap:balance}
   .co-grid{grid-template-columns:1fr 1fr;gap:11px}
+  .co-grid[data-sparse]{grid-template-columns:minmax(0,360px);justify-content:center}
   .co-card-body{padding:26px 11px 13px}
   .co-card-name{font-size:15px}
   .co-price{font-size:16px}
