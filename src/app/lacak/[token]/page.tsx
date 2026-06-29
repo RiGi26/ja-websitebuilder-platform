@@ -62,12 +62,32 @@ async function getTenantMeta(slug: string) {
     .select('nama_website, konfigurasi')
     .eq('slug', slug)
     .maybeSingle()
-  const konfig = (data?.konfigurasi ?? {}) as { localeConfig?: { locale?: string; currency?: string } }
+  const konfig = (data?.konfigurasi ?? {}) as {
+    localeConfig?: { locale?: string; currency?: string }
+    preorder?: { wa_admin?: string }
+  }
   return {
     nama: (data?.nama_website as string) || 'Toko',
     locale: konfig.localeConfig?.locale || 'id-ID',
     currency: konfig.localeConfig?.currency || 'IDR',
+    waAdmin: waDigits(konfig.preorder?.wa_admin),
   }
+}
+
+// Normalisasi nomor WA tenant ke format internasional utk tautan wa.me (0… → 62…).
+function waDigits(n?: string | null): string | null {
+  if (!n) return null
+  let d = String(n).replace(/\D/g, '')
+  if (!d) return null
+  if (d.startsWith('0')) d = '62' + d.slice(1)
+  return d
+}
+
+/** Bangun tautan wa.me ke nomor admin tenant + teks pesan terisi (chat langsung,
+ *  pembeli tak perlu ketik nomor manual). null bila tenant tak set nomor WA. */
+function waLink(waAdmin: string | null, text: string): string | null {
+  if (!waAdmin) return null
+  return `https://wa.me/${waAdmin}?text=${encodeURIComponent(text)}`
 }
 
 export default async function LacakPage({ params }: { params: Promise<{ token: string }> }) {
@@ -100,6 +120,13 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
 
   // Auto-refresh status sampai pesanan mencapai status terminal (selesai/batal).
   const terminal = cancelled || sf === 'selesai'
+
+  // Tautan WA langsung ke admin tenant (pembeli tak perlu ketik nomor manual).
+  const waProofUrl = waLink(
+    meta.waAdmin,
+    `Halo ${meta.nama}, saya sudah transfer untuk pesanan ${order.order_code} (Total ${fmt(Number(order.total_gross))}). Berikut bukti transfernya 🙏`,
+  )
+  const waAskUrl = waLink(meta.waAdmin, `Halo ${meta.nama}, saya mau tanya soal pesanan ${order.order_code}.`)
 
   return (
     <Shell>
@@ -177,6 +204,11 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
             Admin sedang menghitung ongkir pengiriman. <strong>Total final + cara pembayaran</strong> akan muncul di sini
             dan dikirim via WhatsApp. Mohon <strong>jangan transfer dulu</strong> sampai total final keluar. 🙏
           </p>
+          {waAskUrl && (
+            <a href={waAskUrl} target="_blank" rel="noopener noreferrer" style={{ ...waBtn, marginTop: '.9rem' }}>
+              <WaIcon /> Chat WhatsApp
+            </a>
+          )}
         </div>
       )}
       {order.ongkir_status === 'set' && !isPaidStatus(order.status_bayar) && order.instruksi_bayar?.rekening && (
@@ -188,7 +220,12 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
           <p style={{ fontSize: 15, fontWeight: 700, color: '#1d4ed8', margin: '0 0 .6rem', wordBreak: 'break-word' }}>
             {String(order.instruksi_bayar.rekening)}
           </p>
-          <p style={{ ...msg, margin: 0 }}>Lalu kirim bukti transfer via WhatsApp untuk verifikasi. Terima kasih! 🙏</p>
+          <p style={{ ...msg, marginBottom: waProofUrl ? '.9rem' : 0 }}>Sudah transfer? Kirim bukti via WhatsApp untuk verifikasi. Terima kasih! 🙏</p>
+          {waProofUrl && (
+            <a href={waProofUrl} target="_blank" rel="noopener noreferrer" style={waBtn}>
+              <WaIcon /> Kirim bukti via WhatsApp
+            </a>
+          )}
         </div>
       )}
 
@@ -216,6 +253,21 @@ function Shell({ children }: { children: React.ReactNode }) {
       <div style={{ maxWidth: 560, margin: '0 auto' }}>{children}</div>
     </main>
   )
+}
+
+// Ikon WhatsApp inline (hindari dependensi; halaman lacak ringan).
+function WaIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01c-1.52 0-3.01-.41-4.31-1.18l-.31-.18-3.2.84.85-3.12-.2-.32a8.2 8.2 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.24-8.24 8.24Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.48-.01a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/>
+    </svg>
+  )
+}
+
+const waBtn: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem',
+  background: '#25D366', color: '#fff', fontSize: 14, fontWeight: 700,
+  textDecoration: 'none', padding: '.8rem 1rem', borderRadius: 12,
 }
 
 // inline styles (server component, halaman ringan tanpa CSS framework)
