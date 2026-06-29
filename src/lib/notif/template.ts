@@ -15,7 +15,7 @@
 // `fonnte.ts` (Japan Arena → customer pembuatan situs) yang TIDAK editable tenant.
 // ============================================================
 
-export type NotifEventKey = 'order_receipt' | 'order_admin' | 'payment_confirmed' | 'order_shipped'
+export type NotifEventKey = 'order_receipt' | 'order_admin' | 'payment_confirmed' | 'order_shipped' | 'total_final'
 
 /** Nilai placeholder untuk satu order — sudah jadi string siap-tempel. */
 export interface NotifVars {
@@ -35,6 +35,11 @@ export interface NotifVars {
   /** Nomor resi / kode pengiriman (terisi hanya untuk event order_shipped). Opsional —
    *  baris di-drop bila kosong. */
   resi?: string | null
+  /** Ongkir (sudah diformat mata uang) — terisi hanya untuk event total_final. Opsional. */
+  ongkir?: string | null
+  /** Rekening tujuan transfer (dari instruksi_bayar) — terisi hanya untuk total_final.
+   *  Kosong utk metode COD → baris di-drop. Opsional. */
+  rekening?: string | null
 }
 
 type VarKey = keyof NotifVars
@@ -50,7 +55,7 @@ interface EventDef {
   default: string
 }
 
-const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal', 'invoice', 'resi']
+const ALL_VARS: VarKey[] = ['nama', 'bisnis', 'kode', 'items', 'total', 'bayar', 'lacak', 'alamat', 'catatan', 'tanggal', 'invoice', 'resi', 'ongkir', 'rekening']
 
 /** Katalog event WA sisi-WB yang editable tenant. "Berapa banyak" = daftar ini. */
 export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
@@ -129,6 +134,27 @@ export const NOTIF_EVENTS: Record<NotifEventKey, EventDef> = {
       'Lacak pesanan Anda: {lacak}',
       '',
       'Terima kasih sudah berbelanja! 😊',
+    ].join('\n'),
+  },
+  total_final: {
+    label: 'Total final + ongkir (saat admin set ongkir)',
+    recipient: 'buyer',
+    vars: ALL_VARS,
+    required: ['kode'],
+    default: [
+      'Halo {nama}! 🧾',
+      '',
+      'Ongkir untuk pesanan *{kode}* di *{bisnis}* sudah dihitung.',
+      '',
+      '🧾 {items}',
+      '🚚 Ongkir: {ongkir}',
+      '💰 *Total: {total}*',
+      '',
+      '💳 {bayar}',
+      '🏦 {rekening}',
+      '',
+      'Mohon selesaikan pembayaran sesuai metode di atas, lalu kirim bukti via chat ini. 🙏',
+      'Lacak: {lacak}',
     ].join('\n'),
   },
 }

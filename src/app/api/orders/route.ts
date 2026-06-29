@@ -37,6 +37,22 @@ const METODE_LABEL: Record<MetodeBayar, string> = {
   cod_ongkir: '着払い — ongkir dibayar ke kurir',
 }
 
+// Struk khusus order pasar Indonesia (model "operator finalisasi ongkir"): TANPA
+// nominal/total — ongkir belum dihitung, jadi pembeli diminta menunggu total final
+// (dikirim lewat event total_final). Dirender lewat engine order_receipt (var di-filter).
+const PENDING_ONGKIR_RECEIPT = [
+  'Halo {nama}! 🙏',
+  '',
+  'Terima kasih, pesanan Anda di *{bisnis}* sudah kami terima.',
+  '',
+  'Order: *{kode}*',
+  '🧾 {items}',
+  '📍 {alamat}',
+  '',
+  'Admin akan menghitung *ongkir* pengiriman, lalu mengirim *total final (barang + ongkir) + cara pembayaran* via chat ini. Mohon tunggu — *jangan transfer dulu* ya. 😊',
+  'Lacak: {lacak}',
+].join('\n')
+
 export async function POST(request: Request) {
   // Rate-limit best-effort (per-instance) — anti spam order-create (§8).
   const rl = rateLimit(`orders:create:${clientIp(request)}`, 8, 60_000)
@@ -146,6 +162,13 @@ export async function POST(request: Request) {
     const r = result.body
     const createdAt = r.created_at || new Date().toISOString()
 
+    // Pasar tenant (mirror logika checkout): tenant Jepang (phone_cc 81 / JPY) = alur
+    // lama (instruksi bayar langsung). Selain itu (Indonesia) = model "operator
+    // finalisasi ongkir" → ongkir_status='pending' sampai operator set ongkir di Portal.
+    const isJpMarket = konfig.localeConfig?.phone_cc === '81' || konfig.localeConfig?.currency === 'JPY'
+    // Saat order dibuat ongkir=0 (Portal recompute saat operator set) → subtotal = total_gross.
+    const ongkirStatus = isJpMarket ? 'n/a' : 'pending'
+
     // 6. Bootstrap order_projection (single-writer; guard monotonic milik §4.3 sync Fase 2).
     //    Replay (HTTP 200) → baris sudah ada → ignore-duplicate.
     await supabaseAdmin.from('order_projection').upsert({
@@ -157,10 +180,14 @@ export async function POST(request: Request) {
       status_bayar: r.status_bayar,
       status_fulfillment: r.status_fulfillment,
       metode_bayar: r.metode_bayar,
+      subtotal: r.total_gross,
+      ongkir: 0,
       total_online: r.total_online,
       total_courier: r.total_courier,
       total_gross: r.total_gross,
       biaya_kurir: r.biaya_kurir,
+      instruksi_bayar: r.instruksi_bayar,
+      ongkir_status: ongkirStatus,
       ringkasan_items: ringkasan,
       tgl_kirim: tglKirim,
       jam_kirim: jamKirim,
@@ -208,7 +235,10 @@ export async function POST(request: Request) {
       after(async () => {
         // Struk ke pembeli — selalu. Rekam hasil ke wa_log (keandalan: kegagalan tak hening).
         // sendWhatsApp menangkap error internal → selalu balas FonnteResult (tak reject).
-        const receiptMsg = renderTemplate('order_receipt', notif?.templates.order_receipt, vars)
+        // Pasar ID = ongkir menyusul → pakai struk pending (tanpa total final);
+        // pasar JP = struk normal (template tenant / default).
+        const receiptRaw = isJpMarket ? notif?.templates.order_receipt : PENDING_ONGKIR_RECEIPT
+        const receiptMsg = renderTemplate('order_receipt', receiptRaw, vars)
         const rcpt = await sendWhatsApp(buyerPhone, receiptMsg, phoneCc, token)
         await logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_receipt', target: buyerPhone, result: rcpt })
 
