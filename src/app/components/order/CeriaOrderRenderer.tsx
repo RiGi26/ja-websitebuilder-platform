@@ -571,7 +571,7 @@ function coCss(): string {
 
 /* MENU ANDALAN (carousel) */
 .co-laris{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:4px 16px 8px;margin:0 -16px;scroll-snap-type:x mandatory}
-.co-laris[data-sparse]{justify-content:center}
+.co-laris[data-sparse]{justify-content:safe center}
 .co-laris::-webkit-scrollbar{display:none}
 .co-lcard{flex:0 0 158px;scroll-snap-align:start;background:var(--co-surface);border:1px solid var(--co-line2);border-radius:18px;overflow:hidden;box-shadow:var(--co-shadow);transition:transform .25s,box-shadow .25s}
 .co-lcard:hover{transform:translateY(-4px);box-shadow:var(--co-shadow-lg)}
