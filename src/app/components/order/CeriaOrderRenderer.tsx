@@ -171,6 +171,11 @@ export default function CeriaOrderRenderer({
     return catalog.filter((m) => set.has(m.pack_id))
   }, [catalog, andalanIds])
 
+  // Storefront kecil (≤4 produk): rapikan jadi kolom ter-center (kartu, judul section,
+  // chip kategori). Storefront besar (mis. Bakso 37 menu) tetap kiri-rata/GoFood-like —
+  // lebih scannable, dan grid memang penuh sehingga tak ada ruang kosong.
+  const isSparse = catalog.length <= 4
+
   const rootStyle = {
     '--co-primary': primary || '#FF6B35',
     '--co-deep': '#C2410C',
@@ -233,7 +238,7 @@ export default function CeriaOrderRenderer({
   }
 
   return (
-    <div className={`co-root ${baloo2.variable} ${jakarta.variable}${count > 0 ? ' has-cart' : ''}`} style={rootStyle}>
+    <div className={`co-root ${baloo2.variable} ${jakarta.variable}${count > 0 ? ' has-cart' : ''}`} data-sparse={isSparse ? '' : undefined} style={rootStyle}>
       <style dangerouslySetInnerHTML={{ __html: coCss() }} />
 
       {/* ── APP BAR ── */}
@@ -318,7 +323,7 @@ export default function CeriaOrderRenderer({
               <h2><Flame size={22} aria-hidden /> Menu Andalan</h2>
               <span className="co-sub">Pilihan dari kami</span>
             </div>
-            <div className="co-laris" data-sparse={andalan.length <= 4 ? '' : undefined}>
+            <div className="co-laris" data-sparse={isSparse ? '' : undefined}>
               {andalan.map((m) => {
                 const soldOut = m.avail_status === 'habis'
                 return (
@@ -375,7 +380,7 @@ export default function CeriaOrderRenderer({
             <span className="co-sub">{filtered.length} menu</span>
           </div>
           {visible.length > 0 ? (
-            <div className="co-grid" data-sparse={visible.length <= 4 ? '' : undefined}>
+            <div className="co-grid" data-sparse={isSparse ? '' : undefined}>
               {visible.map((m) => renderCard(m))}
             </div>
           ) : (
@@ -568,6 +573,10 @@ function coCss(): string {
 .co-sec-head h2{font-size:clamp(19px,2.6vw,24px);font-weight:800;color:var(--co-ink);display:flex;align-items:center;gap:8px}
 .co-sec-head h2 svg{color:var(--co-primary)}
 .co-sec-head .co-sub{font-size:13px;color:var(--co-muted);font-weight:600;flex-shrink:0}
+/* Storefront kecil (root[data-sparse]): judul section + chip kategori ikut center,
+   selaras dgn kartu yang sudah ter-center. Judul jadi kolom (h2 di atas, sub di bawah). */
+.co-root[data-sparse] .co-sec-head{flex-direction:column;align-items:center;text-align:center;gap:4px}
+.co-root[data-sparse] .co-chips{justify-content:safe center}
 
 /* MENU ANDALAN (carousel) */
 .co-laris{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:4px 16px 8px;margin:0 -16px;scroll-snap-type:x mandatory}
