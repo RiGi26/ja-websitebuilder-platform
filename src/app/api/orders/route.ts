@@ -53,6 +53,21 @@ const PENDING_ONGKIR_RECEIPT = [
   'Lacak: {lacak}',
 ].join('\n')
 
+// Struk gate COD lokal (tenant ber-flag localCod): bayar tunai di tempat, ongkir 0 →
+// total final langsung (= subtotal), tanpa rekening. Beda dari PENDING_ONGKIR_RECEIPT.
+const LOCAL_COD_RECEIPT = [
+  'Halo {nama}! 🙏',
+  '',
+  'Terima kasih, pesanan Anda di *{bisnis}* sudah kami terima.',
+  '',
+  'Order: *{kode}*',
+  '🧾 {items}',
+  '📍 {alamat}',
+  '',
+  '💵 *Bayar di tempat (tunai)* — total *{total}*. Cukup bayar tunai saat pesanan diterima ya. 😊',
+  'Lacak: {lacak}',
+].join('\n')
+
 export async function POST(request: Request) {
   // Rate-limit best-effort (per-instance) — anti spam order-create (§8).
   const rl = rateLimit(`orders:create:${clientIp(request)}`, 8, 60_000)
@@ -93,6 +108,12 @@ export async function POST(request: Request) {
     const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
     if (konfig.source_of_truth !== 'portal') {
       return NextResponse.json({ ok: false, error: 'not_portal_tenant', message: 'Halaman ini belum memakai checkout portal.' }, { status: 400 })
+    }
+    // Tenant dua-gate (localCod): alamat WAJIB — Transfer butuh alamat kirim (hitung
+    // ongkir), COD butuh lantai/lokasi (dikomposisi klien ke alamat). Jangan percaya klien.
+    const localCodOn = konfig.localCod?.enabled === true
+    if (localCodOn && !String(pembeli?.alamat ?? '').trim()) {
+      return NextResponse.json({ ok: false, error: 'invalid_payload', message: 'Alamat / lokasi wajib diisi.' }, { status: 400 })
     }
 
     // 3. Reprice dari catalog_mirror (pre-flight WB; Portal reprice otoritatif lagi).
@@ -166,8 +187,11 @@ export async function POST(request: Request) {
     // lama (instruksi bayar langsung). Selain itu (Indonesia) = model "operator
     // finalisasi ongkir" → ongkir_status='pending' sampai operator set ongkir di Portal.
     const isJpMarket = konfig.localeConfig?.phone_cc === '81' || konfig.localeConfig?.currency === 'JPY'
+    // Gate COD lokal (tenant ber-flag): bayar tunai di tempat, ongkir 0 → ongkir final
+    // ('set') sejak awal (total = subtotal), tak perlu operator set ongkir lagi.
+    const isLocalCod = localCodOn && r.metode_bayar === 'cod_full'
     // Saat order dibuat ongkir=0 (Portal recompute saat operator set) → subtotal = total_gross.
-    const ongkirStatus = isJpMarket ? 'n/a' : 'pending'
+    const ongkirStatus = isLocalCod ? 'set' : isJpMarket ? 'n/a' : 'pending'
 
     // 6. Bootstrap order_projection (single-writer; guard monotonic milik §4.3 sync Fase 2).
     //    Replay (HTTP 200) → baris sudah ada → ignore-duplicate.
@@ -235,9 +259,10 @@ export async function POST(request: Request) {
       after(async () => {
         // Struk ke pembeli — selalu. Rekam hasil ke wa_log (keandalan: kegagalan tak hening).
         // sendWhatsApp menangkap error internal → selalu balas FonnteResult (tak reject).
-        // Pasar ID = ongkir menyusul → pakai struk pending (tanpa total final);
-        // pasar JP = struk normal (template tenant / default).
-        const receiptRaw = isJpMarket ? notif?.templates.order_receipt : PENDING_ONGKIR_RECEIPT
+        // Gate COD lokal = bayar tunai di tempat → struk dengan total langsung (tanpa
+        // rekening). Pasar ID (transfer/kirim) = ongkir menyusul → struk pending (tanpa
+        // total final). Pasar JP = struk normal (template tenant / default).
+        const receiptRaw = isLocalCod ? LOCAL_COD_RECEIPT : isJpMarket ? notif?.templates.order_receipt : PENDING_ONGKIR_RECEIPT
         const receiptMsg = renderTemplate('order_receipt', receiptRaw, vars)
         const rcpt = await sendWhatsApp(buyerPhone, receiptMsg, phoneCc, token)
         await logWa({ orderCode: r.order_code, tenantSlug: slug, event: 'order_receipt', target: buyerPhone, result: rcpt })

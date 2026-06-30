@@ -109,6 +109,11 @@ export interface KonfigurasiWebsite {
    *  catalog_mirror + checkout POST ke /api/orders (Portal SoR). Default/absen = jalur
    *  WB lama (menu_items + /api/preorder/create). Per-tenant; tenant lain nol regresi. */
   source_of_truth?: 'wb' | 'portal'
+  /** Checkout dua-gate via metode bayar (tenant Portal pasar ID tertentu, mis. Mama
+   *  Zafran). enabled → Transfer = dikirim (alamat WAJIB, ongkir 'pending') · COD =
+   *  bayar tunai di tempat (lantai/lokasi, ongkir 0, total langsung 'set'). Absen/false
+   *  → COD berperilaku lama (alur ongkir-pending); tenant lain nol regresi. */
+  localCod?: { enabled?: boolean }
 }
 
 export type TipeKomponen =
