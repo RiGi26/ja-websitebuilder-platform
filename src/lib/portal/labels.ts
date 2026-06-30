@@ -34,8 +34,14 @@ export const METODE: Record<MetodeBayar, string> = {
   cod_ongkir: '着払い (ongkir di kurir)',
 }
 
-// Langkah fulfillment utk timeline (lacak page).
+// Langkah fulfillment utk timeline (lacak page). Urutan PENUH — dipakai untuk
+// menghitung progres (stepIdx), termasuk `diproduksi` agar order preorder tetap
+// terpetakan benar walau tak ditampilkan.
 export const STEPS = ['menunggu', 'dikonfirmasi', 'diproduksi', 'dikemas', 'dikirim', 'selesai'] as const
+
+// Langkah yang DITAMPILKAN di timeline lacak. `diproduksi` disembunyikan — status
+// internal khusus preorder, tak relevan bagi pembeli.
+export const VISIBLE_STEPS = ['menunggu', 'dikonfirmasi', 'dikemas', 'dikirim'] as const
 
 // Status bayar yang dianggap "sudah dibayar" → invoice boleh dirender.
 export const PAID_STATUSES: ReadonlySet<string> = new Set(['lunas', 'cod'])
