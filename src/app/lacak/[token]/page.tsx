@@ -228,8 +228,10 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
           )}
         </div>
       )}
-      {/* Bayar di Tempat (COD lokal): ongkir 0, total final → bayar tunai saat terima. */}
-      {order.ongkir_status === 'set' && !isPaidStatus(order.status_bayar) && order.metode_bayar === 'cod_full' && (
+      {/* Bayar di Tempat (COD lokal): ongkir 0, total final → bayar tunai saat terima.
+          status_bayar='cod' = belum ditagih tunai (isPaidStatus('cod')=true utk gate invoice,
+          jadi JANGAN pakai !isPaid di sini); 'lunas' (sudah dibayar) → kartu hilang. */}
+      {order.ongkir_status === 'set' && order.metode_bayar === 'cod_full' && order.status_bayar === 'cod' && (
         <div style={{ ...card, background: '#EAF7EE', border: '1px solid #A6D9B8' }}>
           <h2 style={h2}>💵 Bayar di Tempat (COD)</h2>
           <p style={{ ...msg, margin: 0 }}>
