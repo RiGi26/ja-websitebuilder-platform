@@ -76,6 +76,7 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'umum', nama: 'Klinik Umum / Gigi', deskripsi: 'Klinik umum, dokter gigi, poli, layanan medis dasar.', icon: 'Stethoscope', ready: true },
     { id: 'estetik', nama: 'Skincare / Estetik', deskripsi: 'Klinik kecantikan, dermatologi, perawatan kulit & wajah.', icon: 'Sparkles', ready: true },
     { id: 'wellness', nama: 'Fisio / Wellness', deskripsi: 'Fisioterapi, terapi, spa medis, pusat kebugaran.', icon: 'HeartPulse', ready: true },
+    { id: 'fisioterapi', nama: 'Fisioterapi / Sport Therapy', deskripsi: 'Fisioterapi, cedera olahraga, rehabilitasi pasca-operasi, sport recovery.', icon: 'Activity', ready: true },
   ],
   // ── SEKOLAH (Wave 3) — reguler = bespoke "Almamater" (source services). Islami &
   // kursus menyusul (ready:false → belum tampil di picker). Picker tampil saat ≥1
@@ -346,6 +347,18 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         id: 'wellness-sanara', subKategori: 'wellness', nama: 'Sanara',
         deskripsi: 'Tenang & menyembuhkan — batu hangat, teal lembut, dan bentuk daun. Untuk fisioterapi, terapi, spa medis, pusat kebugaran.',
         icon: 'Sprout', mood: '#3E8378', bg: 'light', manifest: 'klinik-wellness',
+      },
+    ],
+    // ── KLINIK FISIOTERAPI / SPORT (flagship bespoke "Gerak", Wave 2 sport-rehab) ─
+    // KlinikFisioRenderer (athletic-clinical teal+oranye dwi-warna ber-pop, source
+    // services; signature busur gerak + kartu rating mengambang di hero + jalur
+    // pemulihan bernomor). 1 varian: gerak. manifest='klinik-fisio' (key registry;
+    // di-intercept generateContent SEBELUM getManifest).
+    fisioterapi: [
+      {
+        id: 'fisio-gerak', subKategori: 'fisioterapi', nama: 'Gerak',
+        deskripsi: 'Atletik & tepercaya — teal energik dengan aksen oranye, busur gerak. Untuk fisioterapi, cedera olahraga, sport rehabilitation, pemulihan pasca-operasi.',
+        icon: 'Activity', mood: '#0E7CB0', bg: 'light', manifest: 'klinik-fisio',
       },
     ],
   },
