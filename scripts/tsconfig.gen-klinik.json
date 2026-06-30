@@ -15,5 +15,5 @@
     "resolveJsonModule": true,
     "types": ["node", "react"]
   },
-  "include": ["gen-klinik-entry.tsx"]
+  "include": ["gen-klinik-entry.tsx", "gen-klinik-fisio-entry.tsx"]
 }

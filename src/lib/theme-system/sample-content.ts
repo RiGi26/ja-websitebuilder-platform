@@ -1617,6 +1617,84 @@ const KLINIK_WELLNESS: ComposableContent = {
   contact: { wa: '6281296917963', email: 'halo@terapihasta.id', alamat: 'Surabaya, Jawa Timur' },
 }
 
+// ── KLINIK · Fisioterapi / Sport Therapy (FLAGSHIP bespoke "Gerak", Wave 2) ─────
+// Sample dedikasi untuk renderer 'klinik-fisio' (varian gerak, source services).
+// Copy diambil dari mockup Kamy Physio (sport-rehab Depok/Cibubur): keluhan +
+// kenapa + layanan + harga + testimoni contoh + FAQ. Athletic-clinical, jujur.
+const KLINIK_FISIO: ComposableContent = {
+  nama: 'Kamy Physio',
+  hero: {
+    eyebrow: 'Klinik Sport-Physiotherapy',
+    title: 'Cedera bukan akhir. Kami bantu kamu bergerak bebas lagi.',
+    subtitle:
+      'Klinik fisioterapi & sport rehab. Dari cedera olahraga, pemulihan pasca-operasi, sampai pasca-stroke — ditangani langsung oleh terapis kami.',
+    ctaText: 'Konsultasi Gratis via WhatsApp',
+    ctaHref: '#konsultasi',
+    ctaText2: 'Siap gerak bebas tanpa khawatir?',
+    image: IMG('photo-1571019613454-1cb2f99b2d8b'),
+  },
+  featuresEyebrow: 'Kenapa Kami',
+  featuresTitle: 'Klinik yang fokus pada pemulihanmu',
+  features: [
+    { title: 'Fokus sport-rehab', desc: 'Bukan klinik serba-bisa. Kami terbiasa menangani cedera atlet dan pemulihan pasca-operasi.' },
+    { title: 'Dinilai pasien nyata', desc: 'Ulasan jujur dari pasien yang kembali bergerak bebas di tiap cabang kami.' },
+    { title: 'Dekat dari rumahmu', desc: 'Cabang yang mudah dijangkau, supaya rutin terapi tidak jadi beban.' },
+    { title: 'Mulai dari Free Assessment', desc: 'Tahu kondisimu dulu sebelum memutuskan lanjut. Tanpa tekanan.' },
+  ],
+  showcase: {
+    title: 'Penanganan yang disesuaikan dengan kondisimu',
+    subtitle: 'Tidak ada program seragam. Terapis menilai dulu, baru menyusun rencana.',
+    items: [
+      { nama: 'Cedera Olahraga', harga: 300000, desc: 'Keseleo, robek ligamen, cedera otot — balik bergerak dengan aman.', gambar: IMG('photo-1576091160550-2173dba999ef', 800), kategori: 'Sport Injury', durasi: 60 },
+      { nama: 'Rehabilitasi Pasca-Operasi', harga: 300000, desc: 'Pemulihan bertahap setelah operasi ACL, PCL, atau meniscus.', gambar: IMG('photo-1612349317150-e413f6a5b16d', 800), kategori: 'Rehab', durasi: 60 },
+      { nama: 'Fisioterapi Neurologi', harga: 300000, desc: 'Latihan terarah memulihkan fungsi gerak pasca-stroke.', gambar: IMG('photo-1559757175-5700dde675bc', 800), kategori: 'Neuro', durasi: 60 },
+      { nama: 'Nyeri Muskuloskeletal', harga: 300000, desc: 'Punggung, leher, bahu, lutut — cari sumbernya, bukan tutup gejala.', gambar: IMG('photo-1518611012118-696072aa579a', 800), kategori: 'Nyeri Kronis', durasi: 60 },
+      { nama: 'Sport Massage', harga: 350000, desc: 'Lepas tegang otot, percepat pemulihan, jaga performa.', gambar: IMG('photo-1600334129128-685c5582fd35', 800), kategori: 'Recovery', durasi: 60 },
+      { nama: 'Recovery Pump', harga: 50000, desc: 'Terapi kompresi mempercepat pemulihan otot. Bisa ditambahkan ke sesi mana pun.', gambar: IMG('photo-1574680096145-d05b474e2155', 800), kategori: 'Add-on', durasi: 30 },
+    ],
+  },
+  stats: [
+    { angka: '5,0', label: 'Rating Google' },
+    { angka: '286', label: 'Ulasan pasien' },
+    { angka: '2', label: 'Cabang' },
+    { angka: '1.000+', label: 'Pasien tertangani' },
+  ],
+  testimonials: [
+    { quote: 'Lutut saya pulih total setelah operasi ACL. Programnya jelas tiap minggu dan terapisnya sabar. Sekarang sudah bisa main bola lagi.', nama: 'Rizky A.', peran: 'Pasca-operasi ACL · Cabang Depok' },
+    { quote: 'Nyeri punggung yang saya keluhkan bertahun-tahun akhirnya ketemu sumbernya. Penjelasannya detail, nggak buru-buru jualan paket.', nama: 'Sari D.', peran: 'Nyeri punggung · Cabang Cibubur' },
+    { quote: 'Recovery pump-nya enak banget buat pemulihan habis lari jauh. Tempatnya bersih dan terapisnya ramah. Recommended!', nama: 'Bayu P.', peran: 'Pemulihan performa · Cabang Depok' },
+  ],
+  faq: [
+    { q: 'Berapa sesi yang saya butuhkan?', a: 'Tergantung kondisimu. Setelah assessment, terapis memberi perkiraan jujur, bukan paket yang dipaksakan. Untuk rehabilitasi seperti pasca-operasi, biasanya butuh beberapa sesi bertahap.' },
+    { q: 'Apakah terapinya sakit?', a: 'Kami sesuaikan dengan toleransimu. Tujuan kami memulihkan, bukan menyiksa. Kalau ada yang terasa tidak nyaman, sampaikan ke terapis dan intensitasnya akan disesuaikan.' },
+    { q: 'Berapa biayanya?', a: 'Fisioterapi mulai Rp 300.000 per kunjungan, dengan paket 5× dan 10× yang lebih hemat (sudah termasuk bonus Recovery Pump). Sport massage Rp 350.000.' },
+    { q: 'Perlu rujukan dokter dulu?', a: 'Tidak harus. Kamu bisa langsung konsultasi dengan kami via WhatsApp. Kalau kondisimu butuh penanganan dokter, kami akan sampaikan dengan jujur.' },
+    { q: 'Cabang mana yang terdekat?', a: 'Saat ini kami hadir di Depok dan Cibubur. Hubungi kami via WhatsApp, kami bantu arahkan ke cabang terdekat.' },
+  ],
+  info: {
+    jam: [
+      { hari: 'Senin – Sabtu', jam: '09.00 – 18.00' },
+      { hari: 'Minggu', jam: 'Dengan perjanjian' },
+    ],
+    alamat: 'Depok Mulya 1, Beji, Kota Depok',
+    mapsQuery: 'Beji Depok',
+    telp: '081290031908',
+    reservasiText: 'Konsultasi via WhatsApp',
+    reservasiHref: '#wa',
+  },
+  about: {
+    title: 'Tentang Kamy Physio',
+    body: 'Kami percaya pemulihan yang baik berangkat dari penilaian yang jujur, bukan paket yang dipaksakan. Terapis menilai kondisimu dulu, baru menyusun program yang terarah — supaya kamu bisa kembali bergerak bebas dengan aman, tanpa takut cedera berulang.',
+  },
+  cta: {
+    title: 'Jangan tunggu nyerinya makin parah',
+    subtitle: 'Konsultasi gratis via WhatsApp hari ini. Kami bantu kamu bergerak bebas lagi.',
+    ctaText: 'Konsultasi via WhatsApp',
+    ctaHref: '#wa',
+  },
+  contact: { wa: '6281290031908', email: 'halo@kamyphysio.id', alamat: 'Depok · Cibubur' },
+}
+
 // ── SEKOLAH · Reguler (SD/SMP/SMA) ─────────────────────────────
 const SEKOLAH_REGULER: ComposableContent = {
   nama: 'SMA Bina Bangsa',
@@ -2640,6 +2718,7 @@ const BY_SUBKATEGORI: Record<string, ComposableContent> = {
   umum: KLINIK_UMUM,
   estetik: KLINIK_ESTETIK,
   wellness: KLINIK_WELLNESS,
+  fisioterapi: KLINIK_FISIO,
   // Sekolah (Sprint 7): prefix id tema 'reguler-' / 'islami-' / 'kursus-'
   reguler: SEKOLAH_REGULER,
   islami: SEKOLAH_ISLAMI,
@@ -2892,6 +2971,8 @@ const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
   'estetik-lux': luxSample(KLINIK_ESTETIK, 'Filosofi Kami', 'Kecantikan sejati lahir dari kulit yang sehat — pendekatan kami berbasis bukti, mengutamakan keamanan dan hasil yang bertahan.'),
   // Bespoke klinik wellness (KlinikWellnessRenderer "Sanara", Wave 2 — source services).
   'wellness-lux': luxSample(KLINIK_WELLNESS, 'Filosofi Kami', 'Pemulihan terbaik berjalan dengan tenang dan terukur — kami menemani tiap langkah Anda kembali bergerak tanpa nyeri.'),
+  // Bespoke klinik fisioterapi/sport (KlinikFisioRenderer "Gerak", Wave 2 — source services).
+  'fisio-lux': luxSample(KLINIK_FISIO, 'Filosofi Kami', 'Pemulihan yang baik berangkat dari penilaian jujur, bukan paket yang dipaksakan — kami temani kamu kembali bergerak bebas, dengan aman.'),
   // Bespoke sekolah (SekolahAlmamaterRenderer "Almamater", Wave 3 — source services).
   // Pakai SEKOLAH_REGULER (kaya: program + stats + testimoni + faq + about) + statement visi.
   'sekolah-lux': luxSample(SEKOLAH_REGULER, 'Visi Kami', 'Kami percaya setiap anak menyimpan potensi besar; tugas kami menumbuhkannya dengan ilmu, karakter, dan ketekunan — bukan sekadar mengejar nilai.'),
