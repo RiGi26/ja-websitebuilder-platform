@@ -97,7 +97,7 @@ export async function renderSite({
       const orderMeta = (dk.order_meta ?? {}) as Record<string, unknown>
       const Renderer = bespoke.Renderer
       return (
-        <PortalCartProvider slug={slug} primary={primary} variant={variant} localeConfig={konfig.localeConfig} businessName={page.nama_website}>
+        <PortalCartProvider slug={slug} primary={primary} variant={variant} localeConfig={konfig.localeConfig} localCod={konfig.localCod} businessName={page.nama_website}>
           {variant === 'ceria' ? (
             <CeriaOrderRenderer
               content={content}
