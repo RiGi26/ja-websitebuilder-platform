@@ -144,20 +144,21 @@ describe('theme-system taxonomy (S0-1)', () => {
     expect(getTheme('restaurant', 'finedining-aurum')?.nama).toBe('Aurum')
   })
 
-  it('Klinik (Wave 2 TUNTAS): umum + estetik + wellness semua bespoke + READY', () => {
+  it('Klinik (Wave 2 TUNTAS): umum + estetik + wellness + fisioterapi semua bespoke + READY', () => {
     expect(hasSubKategori('klinik')).toBe(true)
     const subs = getSubKategori('klinik')
-    expect(subs.map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
-    // Wave 2: 3/3 sub-kat klinik bespoke + ready (Klinik Bersih · Lumen · Sanara).
-    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness'])
-    expect(getSubKategori('klinik').filter((s) => s.ready)).toHaveLength(3)
+    expect(subs.map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness', 'fisioterapi'])
+    // Wave 2: 4/4 sub-kat klinik bespoke + ready (Klinik Bersih · Lumen · Sanara · Gerak).
+    expect(getReadySubKategori('klinik').map((s) => s.id)).toEqual(['umum', 'estetik', 'wellness', 'fisioterapi'])
+    expect(getSubKategori('klinik').filter((s) => s.ready)).toHaveLength(4)
   })
 
-  it('Klinik 3 sub-kat = flagship bespoke (1 varian masing-masing, manifest = key registry)', () => {
+  it('Klinik 4 sub-kat = flagship bespoke (1 varian masing-masing, manifest = key registry)', () => {
     const expected: Record<string, { id: string; theme: string; nama: string }> = {
       umum: { id: 'klinik-bersih', theme: 'klinik-umum', nama: 'Klinik Bersih' },
       estetik: { id: 'estetik-lumen', theme: 'klinik-estetik', nama: 'Lumen' },
       wellness: { id: 'wellness-sanara', theme: 'klinik-wellness', nama: 'Sanara' },
+      fisioterapi: { id: 'fisio-gerak', theme: 'klinik-fisio', nama: 'Gerak' },
     }
     for (const [sub, e] of Object.entries(expected)) {
       const themes = getThemes('klinik', sub)

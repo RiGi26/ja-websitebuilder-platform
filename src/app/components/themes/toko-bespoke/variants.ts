@@ -49,6 +49,8 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   'estetik-lumen': { theme: 'klinik-estetik', variant: 'lumen', sample: 'estetik-lux' },
   // Klinik Wellness — Sanara (calm healing warm-stone/teal, signature bingkai daun + sprout).
   'wellness-sanara': { theme: 'klinik-wellness', variant: 'sanara', sample: 'wellness-lux' },
+  // Klinik Fisioterapi / Sport — Gerak (athletic teal+oranye dwi-warna ber-pop, signature busur gerak + kartu rating mengambang + jalur pemulihan bernomor).
+  'fisio-gerak': { theme: 'klinik-fisio', variant: 'gerak', sample: 'fisio-lux' },
   // ── WAVE 2 (restoran, source menu) ──
   // Warung/Kedai — Hangat (folk-warmth cream/brick/mustard, signature banderol tag harga).
   // Tema menu-source pertama lewat BESPOKE_VARIANTS (restaurant-lux sengaja di luar — isLux).
@@ -85,6 +87,7 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'klinik-umum': {},
   'klinik-estetik': {},
   'klinik-wellness': {},
+  'klinik-fisio': {},
   // Warung "Hangat": etalase = menu (source menu), tanpa galeri/social terpisah.
   'restaurant-warung': {},
   // Cafe "Seduh": etalase = menu (source menu), tanpa galeri/social terpisah.

@@ -19,6 +19,7 @@ import AnakLuxRenderer from './AnakLuxRenderer'
 import KlinikUmumRenderer from './KlinikUmumRenderer'
 import KlinikEstetikRenderer from './KlinikEstetikRenderer'
 import KlinikWellnessRenderer from './KlinikWellnessRenderer'
+import KlinikFisioRenderer from './KlinikFisioRenderer'
 import WarungRenderer from './WarungRenderer'
 import CafeRenderer from './CafeRenderer'
 import SekolahAlmamaterRenderer from './SekolahAlmamaterRenderer'
@@ -47,6 +48,7 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'klinik-umum': { Renderer: KlinikUmumRenderer, source: 'services', showcaseTitle: 'Layanan Kami' },
   'klinik-estetik': { Renderer: KlinikEstetikRenderer, source: 'services', showcaseTitle: 'Perawatan Kami' },
   'klinik-wellness': { Renderer: KlinikWellnessRenderer, source: 'services', showcaseTitle: 'Layanan Terapi' },
+  'klinik-fisio': { Renderer: KlinikFisioRenderer, source: 'services', showcaseTitle: 'Paket Terapi' },
   // Sekolah bespoke (Wave 3 "Almamater") — etalase = services (program/jenjang), tanpa keranjang.
   'sekolah-reguler': { Renderer: SekolahAlmamaterRenderer, source: 'services', showcaseTitle: 'Program Kami' },
   // Toko bespoke — etalase = products, keranjang aktif.
