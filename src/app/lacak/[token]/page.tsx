@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit } from '@/lib/rate-limit'
 import { formatMoney } from '@/lib/format-money'
 import type { MetodeBayar } from '@/lib/portal/types'
-import { STATUS_BAYAR, STATUS_FULFILLMENT, METODE, STEPS, isPaidStatus } from '@/lib/portal/labels'
+import { STATUS_BAYAR, STATUS_FULFILLMENT, METODE, STEPS, VISIBLE_STEPS, isPaidStatus } from '@/lib/portal/labels'
 import AutoRefresh from './AutoRefresh'
 
 // ============================================================
@@ -144,8 +144,8 @@ export default async function LacakPage({ params }: { params: Promise<{ token: s
       {/* Timeline fulfillment */}
       {!cancelled && (
         <ol style={timeline}>
-          {STEPS.slice(0, 5).map((s, i) => {
-            const reached = stepIdx >= i || sf === 'selesai'
+          {VISIBLE_STEPS.map((s) => {
+            const reached = stepIdx >= STEPS.indexOf(s) || sf === 'selesai'
             return (
               <li key={s} style={tlItem}>
                 <span style={tlDot(reached)} aria-hidden />
