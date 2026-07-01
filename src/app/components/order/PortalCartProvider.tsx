@@ -62,14 +62,6 @@ const METODE_OPSI_ID: MetodeOpsi[] = [
   { v: 'cod_full', label: 'Bayar di Tempat (COD)', sub: 'Bayar tunai ke kurir saat barang tiba' },
 ]
 
-// Checkout dua-gate (tenant ber-flag localCod, mis. Mama Zafran): metode = gerbang.
-// Transfer → dikirim (alamat wajib, ongkir dihitung admin). COD → bayar tunai di tempat
-// (cukup lantai/lokasi, ongkir 0, total langsung). Sub-label diperjelas sesuai konteks.
-const METODE_OPSI_LOCALCOD: MetodeOpsi[] = [
-  { v: 'transfer_id', label: 'Transfer Bank (dikirim)', sub: 'Isi alamat — admin hitung ongkir, lalu transfer' },
-  { v: 'cod_full', label: 'Bayar di Tempat (COD)', sub: 'Bayar tunai saat pesanan diterima' },
-]
-
 const METODE_OPSI_BY_MARKET: Record<Market, MetodeOpsi[]> = { jp: METODE_OPSI_JP, id: METODE_OPSI_ID }
 
 // Label metode untuk struk konfirmasi (DoneView). Per pasar; fallback ke union semua
@@ -102,7 +94,7 @@ export default function PortalCartProvider({
   primary = '#C0432E',
   variant,
   localeConfig,
-  localCod,
+  checkout,
   businessName,
   children,
 }: {
@@ -112,8 +104,9 @@ export default function PortalCartProvider({
    *  default → warung; primary '#0071E3' → biru. Tak ubah logika kontrak. */
   variant?: string
   localeConfig?: LocaleConfig
-  /** Dua-gate via metode (pasar ID): Transfer=dikirim, COD=bayar tunai di tempat. */
-  localCod?: { enabled?: boolean }
+  /** Penyesuaian checkout per-tenant: transferOnly (sembunyikan COD, alamat wajib),
+   *  catatanHint (placeholder field Catatan). */
+  checkout?: { transferOnly?: boolean; catatanHint?: string }
   businessName: string
   children: React.ReactNode
 }) {
@@ -125,8 +118,9 @@ export default function PortalCartProvider({
   const { locale, currency } = moneyFromConfig(localeConfig)
   const fmt = useCallback((n: number) => formatMoney(n, locale, currency), [locale, currency])
   const market = resolveMarket(localeConfig)
-  // Dua-gate hanya untuk pasar ID (Transfer=kirim/ongkir-pending, COD=tunai-di-tempat).
-  const localCodOn = localCod?.enabled === true && market === 'id'
+  // Transfer-saja (sembunyikan COD) hanya relevan pasar ID; catatanHint bebas pasar.
+  const transferOnly = checkout?.transferOnly === true && market === 'id'
+  const catatanHint = checkout?.catatanHint
 
   // Persist per-slug (pola CartProvider).
   useEffect(() => {
@@ -188,12 +182,12 @@ export default function PortalCartProvider({
                 onClose={() => setView('closed')} onCheckout={() => setView('checkout')} />
             )}
             {view === 'checkout' && (
-              <CheckoutView slug={slug} items={items} fmt={fmt} subtotal={subtotal} phoneCc={localeConfig?.phone_cc || '62'} market={market} localCod={localCodOn}
+              <CheckoutView slug={slug} items={items} fmt={fmt} subtotal={subtotal} phoneCc={localeConfig?.phone_cc || '62'} market={market} transferOnly={transferOnly} catatanHint={catatanHint}
                 onBack={() => setView('cart')} onClose={() => setView('closed')}
                 onDone={(d) => { clear(); setDoneState(d); setView('done') }} onAdjust={setQty} />
             )}
             {view === 'done' && done && (
-              <DoneView fmt={fmt} done={done} businessName={businessName} market={market} localCod={localCodOn} onClose={() => setView('closed')} />
+              <DoneView fmt={fmt} done={done} businessName={businessName} market={market} onClose={() => setView('closed')} />
             )}
           </div>
         </div>
@@ -259,22 +253,19 @@ function CartView({ items, fmt, subtotal, inc, dec, remove, onClose, onCheckout 
 }
 
 // ── Checkout view ───────────────────────────────────────────
-function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, onBack, onClose, onDone, onAdjust }: {
-  slug: string; items: CartLine[]; fmt: (n: number) => string; subtotal: number; phoneCc: string; market: Market; localCod: boolean
+function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, transferOnly, catatanHint, onBack, onClose, onDone, onAdjust }: {
+  slug: string; items: CartLine[]; fmt: (n: number) => string; subtotal: number; phoneCc: string; market: Market; transferOnly: boolean; catatanHint?: string
   onBack: () => void; onClose: () => void; onDone: (d: DoneState) => void; onAdjust: (id: string, qty: number) => void
 }) {
   const [form, setForm] = useState({ nama: '', telp: '', email: '', ig: '', kode_pos: '', alamat: '', catatan: '' })
-  const [metode, setMetode] = useState<MetodeBayar | ''>('')
-  const [lokasi, setLokasi] = useState('')
+  // transferOnly → COD disembunyikan, Transfer auto-terpilih (1 opsi).
+  const [metode, setMetode] = useState<MetodeBayar | ''>(transferOnly ? 'transfer_id' : '')
   const [jamKirim, setJamKirim] = useState('')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [conflicts, setConflicts] = useState<StockConflictEntry[] | null>(null)
   const hasPreorder = items.some((l) => l.preorder)
-  // Dua-gate: metode = gerbang. cod_full → bayar tunai di tempat (lantai/lokasi);
-  // transfer_id → dikirim (alamat wajib). gateMode='' selama metode belum dipilih.
-  const metodeOpsi = localCod ? METODE_OPSI_LOCALCOD : METODE_OPSI_BY_MARKET[market]
-  const gateMode: 'cod' | 'transfer' | '' = localCod ? (metode === 'cod_full' ? 'cod' : metode === 'transfer_id' ? 'transfer' : '') : ''
+  const metodeOpsi = transferOnly ? METODE_OPSI_ID.filter((o) => o.v === 'transfer_id') : METODE_OPSI_BY_MARKET[market]
   // Idempotency-Key per sesi checkout (tahan retry; ganti saat keranjang berubah).
   const [idemKey] = useState(() => (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.round(Math.random() * 1e9)}`))
 
@@ -285,14 +276,9 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
     setErr(null); setConflicts(null)
     if (!form.nama.trim() || !form.telp.trim()) { setErr('Nama & nomor WhatsApp wajib diisi.'); return }
     if (!metode) { setErr('Pilih metode pembayaran.'); return }
-    if (localCod && gateMode === 'cod' && !lokasi.trim()) { setErr('Isi lantai / lokasi penerimaan.'); return }
-    if (localCod && gateMode === 'transfer' && !form.alamat.trim()) { setErr('Alamat wajib untuk pengiriman (agar admin bisa hitung ongkir).'); return }
+    if (transferOnly && !form.alamat.trim()) { setErr('Alamat wajib diisi (agar admin bisa hitung ongkir).'); return }
     setBusy(true)
     try {
-      // Gate COD: tak ada alamat kirim → komposisi lantai/lokasi ke field alamat supaya
-      // tampil di Portal & halaman lacak; kode pos dikosongkan.
-      const alamatKirim = localCod && gateMode === 'cod' ? `Lantai/lokasi: ${lokasi.trim()}` : form.alamat
-      const kodePosKirim = localCod && gateMode === 'cod' ? '' : form.kode_pos
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -300,7 +286,7 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
           slug,
           pembeli: {
             nama: form.nama, telp: form.telp, email: form.email, ig: form.ig,
-            kode_pos: kodePosKirim, alamat: alamatKirim, catatan: form.catatan,
+            kode_pos: form.kode_pos, alamat: form.alamat, catatan: form.catatan,
           },
           metode_bayar: metode,
           fulfillment_mode: 'IMMEDIATE',
@@ -351,20 +337,6 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
 
         {hasPreorder && <PreorderNotice />}
 
-        {localCod && (
-          <>
-            <h3 className="pcart-h3">Metode Pembayaran *</h3>
-            <div className="pcart-metode">
-              {metodeOpsi.map((o) => (
-                <button key={o.v} type="button" className={`pcart-metode-opt${metode === o.v ? ' is-sel' : ''}`} onClick={() => setMetode(o.v)} aria-pressed={metode === o.v}>
-                  <span className="pcart-metode-label">{o.label}</span>
-                  <span className="pcart-metode-sub">{o.sub}</span>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
         <h3 className="pcart-h3">Data Pemesan</h3>
         <div className="pcart-field"><label htmlFor="pc-nama">Nama *</label><input id="pc-nama" value={form.nama} onChange={set('nama')} autoComplete="name" /></div>
         <div className="pcart-field"><label htmlFor="pc-telp">WhatsApp * <span className="pcart-hint">(+{phoneCc})</span></label><input id="pc-telp" value={form.telp} onChange={set('telp')} inputMode="tel" autoComplete="tel" placeholder={phoneCc === '81' ? '090-1234-5678' : '0812...'} /></div>
@@ -372,22 +344,9 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
           <div className="pcart-field"><label htmlFor="pc-email">Email</label><input id="pc-email" value={form.email} onChange={set('email')} inputMode="email" autoComplete="email" /></div>
           <div className="pcart-field"><label htmlFor="pc-ig">Instagram</label><input id="pc-ig" value={form.ig} onChange={set('ig')} placeholder="@akun" /></div>
         </div>
-        {localCod ? (
-          gateMode === 'cod' ? (
-            <div className="pcart-field"><label htmlFor="pc-lokasi">Lantai / lokasi *</label><input id="pc-lokasi" value={lokasi} onChange={(e) => setLokasi(e.target.value)} placeholder="mis. Lantai 12, dekat lift" /></div>
-          ) : gateMode === 'transfer' ? (
-            <>
-              <div className="pcart-field"><label htmlFor="pc-pos">Kode Pos</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder="40123" /></div>
-              <div className="pcart-field"><label htmlFor="pc-alamat">Alamat *</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder="Kecamatan, kota, alamat lengkap" /></div>
-            </>
-          ) : null
-        ) : (
-          <>
-            <div className="pcart-field"><label htmlFor="pc-pos">{market === 'jp' ? 'Kode Pos 〒' : 'Kode Pos'}</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder={market === 'jp' ? '160-0023' : '40123'} /></div>
-            <div className="pcart-field"><label htmlFor="pc-alamat">Alamat</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder={market === 'jp' ? 'Prefektur · kota · banchi' : 'Kecamatan, kota, alamat lengkap'} /></div>
-          </>
-        )}
-        <div className="pcart-field"><label htmlFor="pc-catatan">Catatan</label><textarea id="pc-catatan" value={form.catatan} onChange={set('catatan')} rows={2} /></div>
+        <div className="pcart-field"><label htmlFor="pc-pos">{market === 'jp' ? 'Kode Pos 〒' : 'Kode Pos'}</label><input id="pc-pos" value={form.kode_pos} onChange={set('kode_pos')} inputMode="numeric" placeholder={market === 'jp' ? '160-0023' : '40123'} /></div>
+        <div className="pcart-field"><label htmlFor="pc-alamat">Alamat{transferOnly ? ' *' : ''}</label><textarea id="pc-alamat" value={form.alamat} onChange={set('alamat')} rows={2} placeholder={market === 'jp' ? 'Prefektur · kota · banchi' : 'Kecamatan, kota, alamat lengkap'} /></div>
+        <div className="pcart-field"><label htmlFor="pc-catatan">Catatan</label><textarea id="pc-catatan" value={form.catatan} onChange={set('catatan')} rows={2} placeholder={catatanHint || undefined} /></div>
 
         {market === 'jp' && (
           <>
@@ -412,19 +371,15 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
           </>
         )}
 
-        {!localCod && (
-          <>
-            <h3 className="pcart-h3">Metode Pembayaran *</h3>
-            <div className="pcart-metode">
-              {METODE_OPSI_BY_MARKET[market].map((o) => (
-                <button key={o.v} type="button" className={`pcart-metode-opt${metode === o.v ? ' is-sel' : ''}`} onClick={() => setMetode(o.v)} aria-pressed={metode === o.v}>
-                  <span className="pcart-metode-label">{o.label}</span>
-                  <span className="pcart-metode-sub">{o.sub}</span>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+        <h3 className="pcart-h3">Metode Pembayaran *</h3>
+        <div className="pcart-metode">
+          {metodeOpsi.map((o) => (
+            <button key={o.v} type="button" className={`pcart-metode-opt${metode === o.v ? ' is-sel' : ''}`} onClick={() => setMetode(o.v)} aria-pressed={metode === o.v}>
+              <span className="pcart-metode-label">{o.label}</span>
+              <span className="pcart-metode-sub">{o.sub}</span>
+            </button>
+          ))}
+        </div>
 
         {conflicts && (
           <div className="pcart-alert" role="alert">
@@ -443,11 +398,9 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
           {busy ? <><Loader2 size={16} className="pcart-spin" aria-hidden /> Memproses…</> : 'Buat Pesanan'}
         </button>
         <p className="pcart-note">
-          {gateMode === 'cod'
-            ? 'Bayar tunai saat pesanan diterima — total tampil langsung.'
-            : gateMode === 'transfer'
-              ? 'Admin hitung ongkir → total final & rekening dikirim via WhatsApp.'
-              : 'Pembayaran manual / COD — instruksi tampil setelah pesanan dibuat.'}
+          {transferOnly
+            ? 'Admin hitung ongkir → total final & rekening dikirim via WhatsApp.'
+            : 'Pembayaran manual / COD — instruksi tampil setelah pesanan dibuat.'}
         </p>
       </footer>
     </>
@@ -455,11 +408,9 @@ function CheckoutView({ slug, items, fmt, subtotal, phoneCc, market, localCod, o
 }
 
 // ── Confirmation view ───────────────────────────────────────
-function DoneView({ fmt, done, businessName, market, localCod, onClose }: { fmt: (n: number) => string; done: DoneState; businessName: string; market: Market; localCod: boolean; onClose: () => void }) {
+function DoneView({ fmt, done, businessName, market, onClose }: { fmt: (n: number) => string; done: DoneState; businessName: string; market: Market; onClose: () => void }) {
   const r = done.res
   const ib = r.instruksi_bayar
-  // Gate COD lokal: bayar tunai di tempat, ongkir 0 → total langsung, tanpa rekening.
-  const isLocalCod = localCod && r.metode_bayar === 'cod_full'
   return (
     <>
       <header className="pcart-head">
@@ -470,16 +421,7 @@ function DoneView({ fmt, done, businessName, market, localCod, onClose }: { fmt:
         <div className="pcart-done-icon"><CheckCircle2 size={44} aria-hidden /></div>
         <p className="pcart-done-lead">Terima kasih! Pesanan <strong>{r.order_code}</strong> di {businessName} sudah masuk.</p>
 
-        {isLocalCod ? (
-          // Gate COD lokal: ongkir 0, bayar tunai saat terima → tampilkan total langsung.
-          <div className="pcart-instr">
-            <h3>Bayar di Tempat (COD)</h3>
-            <p>Bayar tunai <strong>{fmt(r.total_gross)}</strong> saat pesanan kamu diterima. Terima kasih! 🙏</p>
-            <dl className="pcart-totals">
-              <div><dt>Total</dt><dd>{fmt(r.total_gross)}</dd></div>
-            </dl>
-          </div>
-        ) : market === 'id' ? (
+        {market === 'id' ? (
           // Pasar Indonesia: ongkir dihitung admin dulu (model "operator finalisasi
           // ongkir") → JANGAN tampilkan nominal bayar di sini; pembeli tunggu total final.
           <div className="pcart-instr">
