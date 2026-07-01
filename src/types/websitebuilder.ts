@@ -109,11 +109,10 @@ export interface KonfigurasiWebsite {
    *  catalog_mirror + checkout POST ke /api/orders (Portal SoR). Default/absen = jalur
    *  WB lama (menu_items + /api/preorder/create). Per-tenant; tenant lain nol regresi. */
   source_of_truth?: 'wb' | 'portal'
-  /** Checkout dua-gate via metode bayar (tenant Portal pasar ID tertentu, mis. Mama
-   *  Zafran). enabled → Transfer = dikirim (alamat WAJIB, ongkir 'pending') · COD =
-   *  bayar tunai di tempat (lantai/lokasi, ongkir 0, total langsung 'set'). Absen/false
-   *  → COD berperilaku lama (alur ongkir-pending); tenant lain nol regresi. */
-  localCod?: { enabled?: boolean }
+  /** Penyesuaian checkout per-tenant (mis. Mama Zafran, bisnis dalam gedung kantor).
+   *  transferOnly → sembunyikan opsi COD, sisakan Transfer Bank saja (alamat WAJIB).
+   *  catatanHint → placeholder field Catatan (mis. arahkan tulis lantai/patokan lokasi). */
+  checkout?: { transferOnly?: boolean; catatanHint?: string }
 }
 
 export type TipeKomponen =
