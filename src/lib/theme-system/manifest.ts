@@ -217,6 +217,10 @@ export interface ComposableContent {
   // ShowcaseArticleFeed setelah alur manifest. Industri blog tidak memakainya
   // (showcase utamanya sudah article-feed).
   articles?: { title?: string; subtitle?: string; items: ShowcaseItem[] }
+  // Copy khas-tema editan klien (data_konten.theme_copy) — dibaca renderer via
+  // copyGetter() dengan fallback default manifest slot (slot-schema.ts). Absen
+  // = klien belum pernah mengedit → renderer pakai copy bawaan (nol regresi).
+  themeCopy?: Record<string, unknown>
 }
 
 // ── Registry manifest (pilot Kuliner ×3) ──────────────────────
