@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { findUnsafeContent } from '@/lib/portal/content-safety'
 
 // F5-3 — Self-edit konten halaman oleh klien (teks/gambar section).
 // Klien login portal → edit isi_komponen section miliknya. Tulis lewat
 // service role SETELAH verifikasi section ini milik tenant si klien
 // (tidak melebarkan RLS page_sections; konsisten dgn route portal lain).
+// XSS guard (audit 2026-06-13) di-share dgn theme-copy: lib/portal/content-safety.
 
 async function getSessionTenantId(): Promise<string | null> {
   const supabase = await createServerSupabaseClient()
@@ -13,34 +15,6 @@ async function getSessionTenantId(): Promise<string | null> {
   if (!user) return null
   const tid = (user.app_metadata as Record<string, unknown>)?.tenant_id
   return typeof tid === 'string' ? tid : null
-}
-
-// XSS guard (audit 2026-06-13): isi_komponen dirender apa adanya, dan tipe
-// custom_html dirender via dangerouslySetInnerHTML. Portal (klien) TIDAK boleh
-// menulis HTML mentah atau URL skema berbahaya. Studio (admin) tak lewat sini.
-// Mengembalikan alasan penolakan, atau null bila aman.
-function findUnsafeContent(value: unknown, key = ''): string | null {
-  if (key.toLowerCase() === 'html') return 'field "html" tidak diizinkan dari portal'
-  if (typeof value === 'string') {
-    if (/^\s*javascript:/i.test(value)) return 'URL javascript: tidak diizinkan'
-    if (/^\s*data:text\/html/i.test(value)) return 'data URL HTML tidak diizinkan'
-    return null
-  }
-  if (Array.isArray(value)) {
-    for (const v of value) {
-      const r = findUnsafeContent(v, key)
-      if (r) return r
-    }
-    return null
-  }
-  if (value && typeof value === 'object') {
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      const r = findUnsafeContent(v, k)
-      if (r) return r
-    }
-    return null
-  }
-  return null
 }
 
 // PATCH { sectionId, isi_komponen }  → update teks/gambar satu section.
