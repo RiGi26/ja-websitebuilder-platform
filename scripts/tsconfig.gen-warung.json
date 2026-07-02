@@ -11,9 +11,19 @@
     "outDir": "../.tmp-gen-warung",
     "rootDir": "..",
     "baseUrl": "..",
-    "paths": { "@/*": ["src/*"] },
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "resolveJsonModule": true,
-    "types": ["node", "react"]
+    "types": [
+      "node",
+      "react"
+    ],
+    "strictNullChecks": true
   },
-  "include": ["gen-warung-entry.tsx"]
+  "include": [
+    "gen-warung-entry.tsx"
+  ]
 }
