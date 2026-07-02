@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { BespokeProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
+import KlinikFisioBooking from './KlinikFisioBooking'
 
 // ============================================================
 // GERAK — Klinik Sport-Physiotherapy Bespoke Lux Renderer (Athletic-Clinical)
@@ -196,6 +197,9 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-step-title{font-size:1.18rem;font-weight:700;margin-bottom:.45rem;color:var(--kf-ink)}
 .kf-step-desc{font-size:.95rem;color:var(--kf-muted);line-height:1.65}
 @media(max-width:760px){.kf-track{grid-template-columns:1fr;gap:1.3rem}.kf-track-arc{display:none}}
+
+/* BOOKING — seksi flow native (B5) */
+.kf-booking{background:var(--kf-bg2)}
 
 /* SHOWCASE LAYANAN — kartu layanan + quick-look */
 .kf-showcase{background:linear-gradient(180deg,var(--kf-surface),#F2F8FB)}
@@ -396,12 +400,17 @@ function initials(name: string): string {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'P'
 }
 
-export default function KlinikFisioRenderer({ content: c, variant = 'gerak' }: BespokeProps) {
+export default function KlinikFisioRenderer({ content: c, variant = 'gerak', bookingSlug }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.gerak
   const [openFaq, setOpenFaq] = useState<number | null>(0)
 
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#konsultasi'
+  // B5: bila booking online aktif, CTA utama arahkan ke seksi #booking (flow native);
+  // WhatsApp tetap tersedia (floating + footer). Absen → perilaku lama (WA).
+  const booking = !!bookingSlug
+  const primaryHref = booking ? '#booking' : (c.hero?.ctaHref ?? waUrl)
+  const primaryLabel = booking ? 'Booking Online' : undefined
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
   const features = c.features ?? []
@@ -433,7 +442,9 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak' }: B
       {/* NAV */}
       <nav className="kf-nav" aria-label="Navigasi utama">
         <span className="kf-nav-logo">{c.nama ?? 'Klinik Fisio'}</span>
-        <a href={waUrl} className="kf-nav-cta"><IconWa />WhatsApp</a>
+        {booking
+          ? <a href="#booking" className="kf-nav-cta">Booking Online</a>
+          : <a href={waUrl} className="kf-nav-cta"><IconWa />WhatsApp</a>}
       </nav>
 
       {/* HERO — copy kiri + visual teal kanan + kartu rating mengambang + busur (signature) */}
@@ -449,8 +460,10 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak' }: B
             {hero.title && <h1 className="kf-hero-title">{hero.title}</h1>}
             {hero.subtitle && <p className="kf-hero-sub">{hero.subtitle}</p>}
             <div className="kf-hero-cta">
-              <a href={hero.ctaHref ?? waUrl} className="kf-btn-wa"><IconWa />{hero.ctaText ?? 'Konsultasi Gratis via WhatsApp'}</a>
-              <a href={hero.ctaHref2 ?? '#layanan'} className="kf-btn-ghost">Lihat Layanan</a>
+              <a href={primaryHref} className="kf-btn-wa">{booking ? null : <IconWa />}{primaryLabel ?? hero.ctaText ?? 'Konsultasi Gratis via WhatsApp'}</a>
+              {booking
+                ? <a href={waUrl} className="kf-btn-ghost"><IconWa />WhatsApp</a>
+                : <a href={hero.ctaHref2 ?? '#layanan'} className="kf-btn-ghost">Lihat Layanan</a>}
             </div>
             <p className="kf-hero-micro">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
@@ -608,6 +621,20 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak' }: B
         </section>
       )}
 
+      {/* BOOKING — flow native realtime (B5, hanya bila booking online aktif) */}
+      {booking && (
+        <section className="kf-section kf-booking" id="booking" aria-label="Booking online">
+          <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
+            <span className="kf-eyebrow">Booking Online</span>
+            <h2 className="kf-heading">Pilih jadwal &amp; amankan slotmu</h2>
+            <p className="kf-subtext">Cek ketersediaan real-time lalu booking langsung di sini — tanpa antre chat.</p>
+          </div>
+          <div className="kf-rv lx-reveal">
+            <KlinikFisioBooking slug={bookingSlug!} />
+          </div>
+        </section>
+      )}
+
       {/* STATEMENT — panel + busur */}
       {c.statement && (
         <div className="kf-statement">
@@ -736,8 +763,11 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak' }: B
             <h2 className="kf-cta-title">{c.cta.title}</h2>
             {c.cta.subtitle && <p className="kf-cta-sub">{c.cta.subtitle}</p>}
             <div className="kf-cta-btns">
-              <a href={waUrl} className="kf-btn-wa"><IconWa />{c.cta.ctaText ?? 'Konsultasi via WhatsApp'}</a>
-              <a href="#layanan" className="kf-btn-ghost">Lihat Layanan</a>
+              {booking
+                ? <><a href="#booking" className="kf-btn-wa">Booking Online</a>
+                    <a href={waUrl} className="kf-btn-ghost"><IconWa />Konsultasi via WhatsApp</a></>
+                : <><a href={waUrl} className="kf-btn-wa"><IconWa />{c.cta.ctaText ?? 'Konsultasi via WhatsApp'}</a>
+                    <a href="#layanan" className="kf-btn-ghost">Lihat Layanan</a></>}
             </div>
           </div>
         </section>

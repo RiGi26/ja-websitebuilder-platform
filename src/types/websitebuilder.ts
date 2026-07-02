@@ -113,6 +113,10 @@ export interface KonfigurasiWebsite {
    *  transferOnly → sembunyikan opsi COD, sisakan Transfer Bank saja (alamat WAJIB).
    *  catatanHint → placeholder field Catatan (mis. arahkan tulis lantai/patokan lokasi). */
   checkout?: { transferOnly?: boolean; catatanHint?: string }
+  /** B5 (Kamy): booking online realtime lewat Portal Klinik eksternal. Renderer klinik
+   *  bespoke merender flow booking native (pilih cabang→dokter→slot→data→konfirmasi) yang
+   *  memanggil Portal via proxy server WB (/api/booking-proxy/{slug}/…). Absen → tak dirender. */
+  booking?: { portal_base?: string; slug?: string }
 }
 
 export type TipeKomponen =

@@ -161,6 +161,7 @@ export async function renderSite({
         capabilities={konfig.capabilities}
         poUrl={poEnabled ? `/${slug}/po` : undefined}
         localeConfig={konfig.localeConfig}
+        bookingSlug={konfig.booking?.slug}
       />
     )
     return withCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer

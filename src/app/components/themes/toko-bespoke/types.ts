@@ -32,6 +32,9 @@ export interface BespokeProps {
    *  menu-source mengganti showcase link-only dgn etalase ber-keranjang (PortalMenuSection).
    *  SiteRenderer membungkus renderer dgn PortalCartProvider. Renderer lain mengabaikan. */
   portalCatalog?: PortalCatalogItem[]
+  /** B5 (Kamy): slug booking Portal Klinik. Bila ada, renderer klinik bespoke merender
+   *  flow booking native realtime (via proxy /api/booking-proxy/{slug}/…). Renderer lain abaikan. */
+  bookingSlug?: string
 }
 
 /** @deprecated alias — pakai BespokeProps. Dipertahankan utk renderer toko lama. */
