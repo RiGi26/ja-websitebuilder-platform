@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Eye, Loader2, Rocket, ExternalLink, CircleDot, History, RotateCcw, Save, X } from 'lucide-react'
+import { ChevronLeft, Eye, Loader2, Rocket, ExternalLink, CircleDot, History, RotateCcw, Save, X, Link2, Check } from 'lucide-react'
 
 type Props = {
   pageId: string
@@ -44,7 +44,33 @@ export default function PreviewBar({ pageId, slug, status: initialStatus }: Prop
   const [historyOpen, setHistoryOpen] = useState(false)
   const [versions, setVersions] = useState<Version[] | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [linkState, setLinkState] = useState<'idle' | 'busy' | 'copied'>('idle')
   const isLive = status === 'published'
+
+  // Link pratinjau klien (alur "mockup = draft build"): mint token → salin URL
+  // → admin kirim ke klien via WA. Klien lihat draft persis-live tanpa login.
+  const copyClientLink = async () => {
+    setLinkState('busy')
+    try {
+      const res = await fetch('/api/admin/preview-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pageId }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        alert(`Gagal membuat link: ${json.error ?? 'unknown'}`)
+        setLinkState('idle')
+        return
+      }
+      await navigator.clipboard.writeText(json.url)
+      setLinkState('copied')
+      setTimeout(() => setLinkState('idle'), 2500)
+    } catch {
+      alert('Error koneksi / clipboard')
+      setLinkState('idle')
+    }
+  }
 
   const publish = async () => {
     if (!confirm('Publish halaman ini sekarang? Setelah live, pengunjung bisa mengaksesnya.')) return
@@ -162,6 +188,21 @@ export default function PreviewBar({ pageId, slug, status: initialStatus }: Prop
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={copyClientLink}
+              disabled={linkState === 'busy'}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-gray-300 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50"
+              title="Salin link pratinjau untuk dikirim ke klien (berlaku 14 hari)"
+            >
+              {linkState === 'busy' ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : linkState === 'copied' ? (
+                <Check size={14} className="text-emerald-400" />
+              ) : (
+                <Link2 size={14} />
+              )}
+              <span className="hidden sm:inline">{linkState === 'copied' ? 'Tersalin' : 'Link Klien'}</span>
+            </button>
             <button
               onClick={toggleHistory}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${
