@@ -8,6 +8,7 @@ import type { KonfigurasiWebsite, Product, Service, MenuItem, BlogPost, GalleryI
 import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDashboard'
 import type { EditableSection } from './ContentPanel'
 import type { KontenBrandData } from './KontenBrandPanel'
+import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
 
 export const dynamic = 'force-dynamic'
 
@@ -98,6 +99,15 @@ export default async function PortalPage() {
       ? { eyebrow: sstr(rawStatement.eyebrow), quote: sstr(rawStatement.quote), cite: sstr(rawStatement.cite) }
       : { eyebrow: '', quote: '', cite: '' },
   }
+
+  // Kartu "Konten Tema" — copy khas-tema dari slot manifest (tema yang sudah
+  // dimigrasi zero-hardcode saja; absen = kartu tak tampil). Kirim manifest
+  // (plain data) + nilai editan tersimpan ke client.
+  const themeKey = typeof konfig.branding?.theme === 'string' ? konfig.branding.theme : undefined
+  const themeSlots = themeKey ? BESPOKE_RENDERERS[themeKey]?.slots ?? null : null
+  const themeCopyValues = dataKonten.theme_copy && typeof dataKonten.theme_copy === 'object' && !Array.isArray(dataKonten.theme_copy)
+    ? (dataKonten.theme_copy as Record<string, unknown>)
+    : {}
 
   const paymentStatus = await getTenantPaymentStatus(tenantId)
   // Tab Pembayaran = add-on `midtrans` (flag hasPayment); tenant yang sudah
@@ -216,6 +226,8 @@ export default async function PortalPage() {
       initialProfile={profile}
       initialSections={sections}
       initialTampilan={initialTampilan}
+      themeSlots={themeSlots}
+      themeCopyValues={themeCopyValues}
     />
   )
 }
