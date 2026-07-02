@@ -24,6 +24,7 @@ import KlinikFisioRenderer from './KlinikFisioRenderer'
 import WarungRenderer from './WarungRenderer'
 import CafeRenderer from './CafeRenderer'
 import SekolahAlmamaterRenderer from './SekolahAlmamaterRenderer'
+import { WARUNG_SLOTS } from './slots/restaurant-warung.slots'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -46,7 +47,8 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   // Restaurant-lux (finedining) — etalase = menu_items, tanpa keranjang.
   'restaurant-lux': { Renderer: RestaurantLuxRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Restaurant warung/kedai bespoke (Wave 2 "Hangat") — etalase = menu, tanpa keranjang.
-  'restaurant-warung': { Renderer: WarungRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
+  // Pilot zero-hardcoded-copy: slots manifest → panel "Konten Tema" portal.
+  'restaurant-warung': { Renderer: WarungRenderer, source: 'menu', showcaseTitle: 'Menu Kami', slots: WARUNG_SLOTS },
   // Restaurant cafe/coffee shop bespoke (Wave 2 "Seduh") — etalase = menu, tanpa keranjang.
   'restaurant-cafe': { Renderer: CafeRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Klinik bespoke (Wave 2) — etalase = services (jasa), tanpa keranjang.
