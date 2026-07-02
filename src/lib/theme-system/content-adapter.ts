@@ -106,6 +106,13 @@ export function composableContentFromSections(
   // merender row-nya via SectionRenderer).
   const bands = buildPresetBands(sections, base.contact?.wa)
 
+  // Copy khas-tema editan klien (portal "Konten Tema") — diteruskan mentah;
+  // renderer membacanya via copyGetter() yang memvalidasi bentuk + fallback ke
+  // default manifest slot. Bukan objek → undefined (defensif, pola konten lain).
+  const themeCopy = konten.theme_copy && typeof konten.theme_copy === 'object' && !Array.isArray(konten.theme_copy)
+    ? (konten.theme_copy as Record<string, unknown>)
+    : undefined
+
   // Penyembunyian per-section dari portal "Susunan Halaman"
   // (data_konten.hidden_sections). Null-kan blok yang dimatikan customer —
   // renderer bespoke/lux semua ber-guard `&& length > 0`, jadi blok hilang dari
@@ -135,6 +142,7 @@ export function composableContentFromSections(
     cta: base.cta ? { ...base.cta, image: ctaImage } : base.cta,
     contact: base.contact,
     bands,
+    themeCopy,
   }
 }
 
