@@ -7,6 +7,7 @@
 // ============================================================
 import type { ComponentType } from 'react'
 import type { BespokeProps } from './types'
+import type { ThemeSlotManifest } from '@/lib/theme-system/slot-schema'
 import RestaurantLuxRenderer from '../restaurant-lux/RestaurantLuxRenderer'
 import TokoAtelierRenderer from '../toko-atelier/TokoAtelierRenderer'
 import KulinerLuxRenderer from './KulinerLuxRenderer'
@@ -35,6 +36,10 @@ export interface BespokeEntry {
   hasCart?: boolean
   /** Judul default section showcase saat konten tak menyetelnya. */
   showcaseTitle?: string
+  /** Manifest field editable tema (slot-schema) — sumber form "Konten Tema" di
+   *  portal + validasi /api/portal/theme-copy. Absen = tema belum dimigrasi
+   *  zero-hardcode (portal tak menampilkan panel; route menolak tulis). */
+  slots?: ThemeSlotManifest
 }
 
 export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
