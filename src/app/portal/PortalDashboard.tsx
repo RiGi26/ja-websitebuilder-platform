@@ -142,6 +142,22 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
   const [draft, setDraft] = useState<Draft>(EMPTY)
   const [busy, setBusy] = useState<string | null>(null)
   const [showPreview, setShowPreview] = useState(false)
+  // Click-to-edit (Wave 2): key slot dari klik di LivePreview → pindah tab yang
+  // tepat + teruskan ke panel pemilik (prop, bukan event global — panel bisa
+  // baru mount setelah pindah tab). n = nonce supaya klik key sama tetap memicu.
+  const [editFocus, setEditFocus] = useState<{ key: string; n: number } | null>(null)
+  const onEditFocus = (key: string) => {
+    if (key.startsWith('item:')) {
+      const target = key.slice(5)
+      if (target === 'menu' && hasMenu) setTab('menu')
+      else if (target === 'produk' && showProduk) setTab('produk')
+      else if (target === 'layanan' && showLayanan) setTab('layanan')
+      return
+    }
+    // copy.* / konten:* / section:* semuanya hidup di tab Konten.
+    setTab('konten')
+    setEditFocus((p) => ({ key, n: (p?.n ?? 0) + 1 }))
+  }
 
   const logout = async () => {
     await supabase.auth.signOut()
@@ -261,7 +277,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
         ) : (
         <>
           {showPreview && (
-            <LivePreview slug={page.slug} published={page.status === 'published'} onClose={() => setShowPreview(false)} />
+            <LivePreview slug={page.slug} published={page.status === 'published'} onClose={() => setShowPreview(false)} onEditFocus={onEditFocus} />
           )}
 
           {/* Banner cutover Portal: order/katalog/bayar dikelola di Portal Operasi eksternal. */}
@@ -368,9 +384,9 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
 
           {tab === 'konten' ? (
             <div className="space-y-6">
-              {initialSections.length > 0 && <ContentPanel initial={initialSections} />}
-              {hasBrand && <KontenBrandPanel initial={kontenBrand} />}
-              {themeSlots && <ThemeCopyPanel manifest={themeSlots} initial={themeCopyValues ?? {}} />}
+              {initialSections.length > 0 && <ContentPanel initial={initialSections} focus={editFocus?.key.startsWith('section:') ? editFocus : null} />}
+              {hasBrand && <KontenBrandPanel initial={kontenBrand} focus={editFocus?.key.startsWith('konten:') ? editFocus : null} />}
+              {themeSlots && <ThemeCopyPanel manifest={themeSlots} initial={themeCopyValues ?? {}} focus={editFocus?.key.startsWith('copy.') ? editFocus : null} />}
             </div>
           ) : tab === 'tampilan' ? (
             <div className="space-y-6">
