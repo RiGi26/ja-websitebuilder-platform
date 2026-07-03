@@ -62,6 +62,19 @@ export async function renderSite({
   // plumbing data baru. Coexist dgn composable di bawah → nol regresi.
   const bespoke = theme ? BESPOKE_RENDERERS[theme] : undefined
   if (bespoke) {
+    // ── Style knobs (Wave 3) — pilihan tenant dari kurasi tema (konfigurasi.design).
+    // Palet = override variant (id divalidasi lawan daftar registry — nilai liar
+    // diabaikan, jatuh ke variant build). Font pairing diresolve jadi objek font
+    // untuk renderer. Absen/invalid = bawaan (nol regresi situs existing).
+    const design = konfig.design
+    const paletteOverride = design?.palette && bespoke.design?.palettes.some((p) => p.id === design.palette)
+      ? design.palette
+      : undefined
+    const bVariant = paletteOverride ?? variant
+    const pairing = design?.fontPairing
+      ? bespoke.design?.fontPairings?.find((fp) => fp.id === design.fontPairing)
+      : undefined
+    const bFont = pairing ? { importUrl: pairing.importUrl, display: pairing.display, body: pairing.body } : undefined
     // ── Cutover Portal (Bakso Fase 1, BAKSO_PORTAL_CONTRACT.md §11) ──
     // Tenant ber-flag source_of_truth='portal' pada renderer menu-source: storefront
     // baca catalog_mirror (service-role; mirror tanpa anon §3/§8) + etalase ber-keranjang
@@ -113,7 +126,8 @@ export async function renderSite({
           ) : (
             <Renderer
               content={content}
-              variant={variant}
+              variant={bVariant}
+              font={bFont}
               primary={primary}
               slug={slug}
               capabilities={konfig.capabilities}
@@ -150,7 +164,8 @@ export async function renderSite({
     const renderer = (
       <Renderer
         content={content}
-        variant={variant}
+        variant={bVariant}
+        font={bFont}
         primary={primary}
         // source = products mentah saat hasCart (toko) → cast aman; utk cocokkan
         // tombol keranjang per item. Non-toko (restaurant/jasa) tak terima products.

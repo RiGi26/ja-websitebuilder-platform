@@ -55,11 +55,17 @@ const EASE = 'cubic-bezier(.22,1,.36,1)'
 const BOUNCE = 'cubic-bezier(.34,1.4,.64,1)'
 const MUSTARD = '#E0A93C'
 
-function wrCss(): string {
+// Font parametrik (Wave 3 style knobs): default = konstanta bawaan (byte-identik
+// render lama; parity.test menjaga). Pairing alternatif datang dari kurasi
+// registry (BespokeEntry.design.fontPairings) via props.font.
+type WrFont = { importUrl: string; display: string; body: string }
+const DEFAULT_FONT: WrFont = { importUrl: FONT_IMPORT, display: DISPLAY, body: BODY }
+
+function wrCss(f: WrFont): string {
   return `
-@import url('${FONT_IMPORT}');
+@import url('${f.importUrl}');
 html,body{overflow-x:hidden;max-width:100%}
-.wr-root{font-family:${BODY};color:var(--wr-ink);background:var(--wr-bg);line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:hidden;max-width:100%}
+.wr-root{font-family:${f.body};color:var(--wr-ink);background:var(--wr-bg);line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:hidden;max-width:100%}
 .wr-root *,.wr-root *::before,.wr-root *::after{box-sizing:border-box;margin:0;padding:0}
 .wr-root img{max-width:100%;height:auto;display:block}
 .wr-root ::selection{background:rgba(192,67,46,.2);color:var(--wr-ink)}
@@ -67,7 +73,7 @@ html,body{overflow-x:hidden;max-width:100%}
 /* NAV */
 .wr-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0.9rem 7vw;display:flex;align-items:center;justify-content:space-between;transition:background .45s,box-shadow .45s,backdrop-filter .45s,padding .45s}
 .wr-root.lx-scrolled .wr-nav{background:rgba(251,243,228,.9);backdrop-filter:blur(10px);box-shadow:0 2px 0 var(--wr-line2);padding-top:.7rem;padding-bottom:.7rem}
-.wr-nav-logo{font-family:${DISPLAY};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em}
+.wr-nav-logo{font-family:${f.display};color:var(--wr-ink);font-size:1.6rem;text-decoration:none;letter-spacing:.005em}
 .wr-nav-cta{font-size:.86rem;color:var(--wr-onAccent);background:var(--wr-accentDeep);padding:.66rem 1.5rem;border-radius:999px;text-decoration:none;transition:transform .3s ${BOUNCE},background .3s}
 .wr-nav-cta:hover{transform:translateY(-2px) rotate(-1deg);background:var(--wr-ink)}
 
@@ -77,7 +83,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-hero{position:relative;min-height:60vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(1.5rem,4vw,3.5rem);padding:7.5rem 7vw 2.5rem;background:var(--wr-bg)}
 .wr-hero-text{position:relative;z-index:2}
 .wr-hero-ew{font-size:.92rem;color:var(--wr-accentDeep);margin-bottom:1.1rem;display:inline-flex;align-items:center;gap:.5rem;background:${MUSTARD};color:var(--wr-ink);padding:.4rem 1.1rem;border-radius:999px;transform:rotate(-1.5deg);font-weight:700}
-.wr-hero-title{font-family:${DISPLAY};font-size:clamp(2.4rem,5.2vw,4.2rem);line-height:1.05;color:var(--wr-ink);margin-bottom:1rem;letter-spacing:.005em}
+.wr-hero-title{font-family:${f.display};font-size:clamp(2.4rem,5.2vw,4.2rem);line-height:1.05;color:var(--wr-ink);margin-bottom:1rem;letter-spacing:.005em}
 .wr-hero-title em{font-style:normal;color:var(--wr-accentDeep);position:relative;white-space:nowrap}
 .wr-hero-title em::after{content:'';position:absolute;left:-.02em;right:-.02em;bottom:.04em;height:.2em;background:${MUSTARD};border-radius:999px;z-index:-1}
 .wr-hero-sub{font-size:1.02rem;color:var(--wr-inkDim);margin-bottom:1.5rem;max-width:44ch;line-height:1.7}
@@ -93,7 +99,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-hero-media{position:relative;z-index:1}
 .wr-hero-frame{position:relative;aspect-ratio:1/1;overflow:hidden;border-radius:28px;background:var(--wr-surface2);box-shadow:0 28px 60px var(--wr-shadowDeep);transform:rotate(1.5deg)}
 .wr-hero-frame img{width:100%;height:100%;object-fit:cover}
-.wr-hero-stamp{position:absolute;left:-1rem;bottom:1.5rem;z-index:3;background:${MUSTARD};color:var(--wr-ink);font-family:${DISPLAY};font-size:.95rem;padding:.8rem 1.3rem;border-radius:14px;transform:rotate(-3deg);box-shadow:0 12px 28px var(--wr-shadowDeep);display:flex;align-items:center;gap:.45rem}
+.wr-hero-stamp{position:absolute;left:-1rem;bottom:1.5rem;z-index:3;background:${MUSTARD};color:var(--wr-ink);font-family:${f.display};font-size:.95rem;padding:.8rem 1.3rem;border-radius:14px;transform:rotate(-3deg);box-shadow:0 12px 28px var(--wr-shadowDeep);display:flex;align-items:center;gap:.45rem}
 @media(max-width:880px){
   .wr-hero{grid-template-columns:1fr;min-height:unset;padding:6.5rem 7vw 1.5rem;gap:1.5rem}
   .wr-hero-media{order:-1;max-width:280px;margin:0 auto}
@@ -106,7 +112,7 @@ html,body{overflow-x:hidden;max-width:100%}
 /* PITA — kata warung hangat (BUKAN klaim) */
 .wr-ribbon{background:var(--wr-accentDeep);padding:0.6rem 7vw;overflow:hidden}
 .wr-ribbon-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.7rem 1.6rem}
-.wr-ribbon-item{font-family:${DISPLAY};font-size:1.05rem;color:#FCEBD2;display:inline-flex;align-items:center;gap:.7rem}
+.wr-ribbon-item{font-family:${f.display};font-size:1.05rem;color:#FCEBD2;display:inline-flex;align-items:center;gap:.7rem}
 .wr-ribbon-item::after{content:'●';color:${MUSTARD};font-size:.5rem}
 .wr-ribbon-item:last-child::after{display:none}
 
@@ -114,7 +120,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-section{padding:clamp(1.8rem,4vw,2.8rem) 7vw}
 .wr-eyebrow{font-size:.95rem;font-weight:700;color:var(--wr-accentDeep);margin-bottom:.85rem;display:inline-flex;align-items:center;gap:.5rem}
 .wr-eyebrow::before{content:'';width:1.6rem;height:4px;border-radius:999px;background:${MUSTARD}}
-.wr-heading{font-family:${DISPLAY};font-size:clamp(2.1rem,4vw,3.2rem);color:var(--wr-ink);line-height:1.1;letter-spacing:.005em;text-wrap:balance}
+.wr-heading{font-family:${f.display};font-size:clamp(2.1rem,4vw,3.2rem);color:var(--wr-ink);line-height:1.1;letter-spacing:.005em;text-wrap:balance}
 .wr-subtext{color:var(--wr-inkDim);font-size:1.04rem;margin-top:.9rem;max-width:54ch;line-height:1.8}
 .wr-sec-hdr{margin-bottom:1.2rem;max-width:60ch}
 
@@ -145,7 +151,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-card.is-soldout .wr-card-frame img{opacity:.5;filter:grayscale(.4)}
 .wr-card.is-soldout .wr-card-tag{opacity:.6}
 .wr-card-body{padding:1.2rem 1.3rem 1.3rem}
-.wr-card-name{font-family:${DISPLAY};font-size:1.45rem;color:var(--wr-ink);margin-bottom:.35rem;line-height:1.2}
+.wr-card-name{font-family:${f.display};font-size:1.45rem;color:var(--wr-ink);margin-bottom:.35rem;line-height:1.2}
 .wr-card-desc{font-size:.88rem;color:var(--wr-muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .wr-card-more{display:inline-flex;align-items:center;gap:.3rem;margin-top:.9rem;font-size:.82rem;font-weight:700;color:var(--wr-accentDeep);transition:gap .3s}
 .wr-card:hover .wr-card-more{gap:.6rem}
@@ -156,7 +162,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-statement{padding:clamp(1.5rem,3vw,2.2rem) 7vw}
 .wr-stmt-inner{position:relative;max-width:58ch;margin:0 auto;background:var(--wr-surface);border:2px solid var(--wr-line2);border-radius:28px;padding:clamp(1.2rem,3vw,2rem);text-align:center}
 .wr-stmt-ew{font-size:.92rem;font-weight:700;color:var(--wr-accentDeep);margin-bottom:1rem}
-.wr-stmt-quote{font-family:${DISPLAY};font-size:clamp(1.5rem,3vw,2.3rem);color:var(--wr-ink);line-height:1.3}
+.wr-stmt-quote{font-family:${f.display};font-size:clamp(1.5rem,3vw,2.3rem);color:var(--wr-ink);line-height:1.3}
 .wr-stmt-cite{display:block;font-size:.84rem;color:var(--wr-muted);font-weight:600;margin-top:1.2rem}
 
 /* ABOUT */
@@ -187,7 +193,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-tcar-track{display:flex;gap:1.4rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.4rem .25rem 1.5rem;-ms-overflow-style:none;scrollbar-width:none}
 .wr-tcar-track::-webkit-scrollbar{display:none}
 .wr-test-card{scroll-snap-align:start;background:var(--wr-surface);border:2px solid var(--wr-line2);border-radius:22px;padding:1.4rem;min-width:300px;max-width:360px;flex:0 0 auto;box-shadow:0 12px 28px var(--wr-shadow)}
-.wr-test-mark{font-family:${DISPLAY};font-size:2.2rem;color:${MUSTARD};line-height:.5;margin-bottom:.3rem}
+.wr-test-mark{font-family:${f.display};font-size:2.2rem;color:${MUSTARD};line-height:.5;margin-bottom:.3rem}
 .wr-test-quote{font-size:0.96rem;color:var(--wr-inkDim);line-height:1.6;margin:0 0 0.8rem}
 .wr-test-name{font-size:1.05rem;font-weight:700;color:var(--wr-ink)}
 .wr-test-role{font-size:.78rem;color:var(--wr-muted);font-weight:600;margin-top:.15rem}
@@ -213,7 +219,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-cta{background:var(--wr-bg)}
 .wr-cta-inner{position:relative;background:var(--wr-accentDeep);color:var(--wr-onAccent);border-radius:24px;padding:clamp(1.8rem,3.5vw,2.6rem) clamp(1rem,3.5vw,2.2rem);text-align:center;overflow:hidden}
 .wr-cta-inner::after{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:${MUSTARD};opacity:.18;top:-50px;right:-30px}
-.wr-cta-title{position:relative;font-family:${DISPLAY};font-size:clamp(1.8rem,3.8vw,2.6rem);margin-bottom:.8rem;line-height:1.12;text-wrap:balance}
+.wr-cta-title{position:relative;font-family:${f.display};font-size:clamp(1.8rem,3.8vw,2.6rem);margin-bottom:.8rem;line-height:1.12;text-wrap:balance}
 .wr-cta-sub{position:relative;font-size:0.98rem;opacity:.92;max-width:48ch;margin:0 auto 1.4rem;line-height:1.7}
 .wr-cta-btns{position:relative;display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
 .wr-cta .wr-btn-primary{background:${MUSTARD};color:var(--wr-ink)}
@@ -230,9 +236,9 @@ html,body{overflow-x:hidden;max-width:100%}
 /* FOOTER */
 .wr-footer{background:var(--wr-ink);color:rgba(255,251,242,.7);padding:2.8rem 7vw 1.8rem}
 .wr-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;margin-bottom:1.8rem}
-.wr-footer-brand{font-family:${DISPLAY};font-size:1.7rem;color:#fff;margin-bottom:.8rem}
+.wr-footer-brand{font-family:${f.display};font-size:1.7rem;color:#fff;margin-bottom:.8rem}
 .wr-footer-tagline{font-size:.9rem;color:rgba(255,251,242,.6);line-height:1.7;max-width:34ch}
-.wr-footer-h{font-family:${DISPLAY};font-size:.95rem;color:#fff;margin-bottom:1rem}
+.wr-footer-h{font-family:${f.display};font-size:.95rem;color:#fff;margin-bottom:1rem}
 .wr-footer-link{display:block;font-size:.9rem;color:rgba(255,251,242,.7);text-decoration:none;margin-bottom:.55rem;transition:color .25s}
 .wr-footer-link:hover{color:${MUSTARD}}
 .wr-footer-copy{border-top:2px solid rgba(255,251,242,.14);padding-top:1.5rem;font-size:.8rem;color:rgba(255,251,242,.55);text-align:center}
@@ -253,7 +259,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .wr-root .lx-lb-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .wr-root .lx-lb-body{padding:clamp(22px,3vw,42px);display:flex;flex-direction:column;gap:9px;justify-content:center}
 .wr-root .lx-lb-cat{font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--wr-accentDeep)}
-.wr-root .lx-lb-title{font-family:${DISPLAY};font-size:clamp(24px,2.8vw,32px);line-height:1.15;color:var(--wr-ink)}
+.wr-root .lx-lb-title{font-family:${f.display};font-size:clamp(24px,2.8vw,32px);line-height:1.15;color:var(--wr-ink)}
 .wr-root .lx-lb-price{font-size:20px;font-weight:700;color:var(--wr-accentDeep)}
 .wr-root .lx-lb-desc{color:var(--wr-muted);font-size:13.5px;line-height:1.8}
 .wr-root .lx-lb-cta{margin-top:14px;width:fit-content;display:inline-flex;align-items:center;background:var(--wr-accentDeep);color:var(--wr-onAccent);font-size:13px;font-weight:700;padding:12px 26px;border-radius:999px;text-decoration:none;transition:background .25s}
@@ -275,8 +281,9 @@ html,body{overflow-x:hidden;max-width:100%}
 `
 }
 
-export default function WarungRenderer({ content: c, variant = 'hangat', primary, poUrl, localeConfig, portalCatalog }: BespokeProps) {
+export default function WarungRenderer({ content: c, variant = 'hangat', primary, poUrl, localeConfig, portalCatalog, font }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.hangat
+  const f = font ?? DEFAULT_FONT
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   // Copy khas-tema (slot manifest) — editan klien dari portal "Konten Tema";
@@ -317,7 +324,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
 
   return (
     <div className="wr-root lx-root" data-variant={variant} style={rootStyle}>
-      <style dangerouslySetInnerHTML={{ __html: wrCss() }} />
+      <style dangerouslySetInnerHTML={{ __html: wrCss(f) }} />
 
       {/* NAV */}
       <nav className="wr-nav" aria-label="Navigasi utama">
