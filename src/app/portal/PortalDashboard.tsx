@@ -14,6 +14,8 @@ import { getAddon } from '@/lib/addons/catalog'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile, PreorderConfig, LocaleConfig } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
+import ThemeCopyPanel from './ThemeCopyPanel'
+import type { ThemeSlotManifest } from '@/lib/theme-system/slot-schema'
 import ImageUploadField from './ImageUploadField'
 import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
 import LivePreview from './LivePreview'
@@ -101,6 +103,10 @@ type Props = {
   // banner pengalih ke Portal Operasi. Default false → tenant WB biasa nol regresi.
   portalManaged?: boolean
   portalAdminUrl?: string
+  // Kartu "Konten Tema" — slot manifest tema (null = tema belum dimigrasi
+  // zero-hardcode → kartu tak dirender) + nilai editan tersimpan.
+  themeSlots?: ThemeSlotManifest | null
+  themeCopyValues?: Record<string, unknown>
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
@@ -123,12 +129,12 @@ function reorderList<T extends { id: string; urutan: number }>(items: T[], idx: 
   return { next, updates }
 }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl, themeSlots, themeCopyValues }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran' | 'notif'
   const hasBrand = kontenBrand.flags.stats || kontenBrand.flags.faq || kontenBrand.flags.statement
-  const hasContent = initialSections.length > 0 || hasBrand
+  const hasContent = initialSections.length > 0 || hasBrand || !!themeSlots
   const [tab, setTab] = useState<Tab>(hasContent ? 'konten' : showProduk ? 'produk' : showLayanan ? 'layanan' : hasMenu ? 'menu' : hasBlog ? 'blog' : 'profil')
   const [items, setItems] = useState<Product[]>(initialProducts)
   const [add, setAdd] = useState<Draft>(EMPTY)
@@ -364,6 +370,7 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             <div className="space-y-6">
               {initialSections.length > 0 && <ContentPanel initial={initialSections} />}
               {hasBrand && <KontenBrandPanel initial={kontenBrand} />}
+              {themeSlots && <ThemeCopyPanel manifest={themeSlots} initial={themeCopyValues ?? {}} />}
             </div>
           ) : tab === 'tampilan' ? (
             <div className="space-y-6">
