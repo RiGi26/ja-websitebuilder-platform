@@ -91,9 +91,11 @@ export const INDUSTRY_SUBKATEGORI: Partial<Record<TipeIndustri, SubKategoriOptio
     { id: 'profesional', nama: 'Profesional / Expert', deskripsi: 'Konsultan, freelancer, dokter, pengacara, portofolio.', icon: 'Briefcase', ready: false },
     { id: 'coach', nama: 'Coach / Mentor', deskripsi: 'Coach, trainer, pembicara, mentor bisnis.', icon: 'Compass', ready: false },
   ],
+  // ── CORPORATE (Wave 4) — agency = bespoke "Poster" (source services, hasil
+  // compiler HTML-first). Startup & korporat menyusul (ready:false).
   corporate: [
     { id: 'startup', nama: 'Startup / Tech', deskripsi: 'Startup, SaaS, aplikasi, perusahaan teknologi.', icon: 'Rocket', ready: false },
-    { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: false },
+    { id: 'agency', nama: 'Agency / Kreatif', deskripsi: 'Agensi digital, kreatif, branding, production house.', icon: 'Megaphone', ready: true },
     { id: 'korporat', nama: 'Korporat / Manufaktur', deskripsi: 'Perusahaan mapan, manufaktur, distributor, B2B.', icon: 'Building2', ready: false },
   ],
   travel: [
@@ -496,21 +498,16 @@ export const THEMES: Partial<Record<TipeIndustri, Record<string, ThemeOption[]>>
         icon: 'Boxes', mood: '#0C7A52', bg: 'light', manifest: 'startup-mint',
       },
     ],
+    // ── AGENCY (flagship bespoke "Poster", Wave 4 — tema pertama compiler
+    // HTML-first). AgencyPosterRenderer (Swiss-typographic paper/ink/ultramarine,
+    // signature Garis Proses). manifest:'corporate-agency' = key registry bespoke.
+    // Tema composable lama (agency-bold/noir/prisma di manifest.ts) tetap untuk
+    // situs existing, hanya tak ditawarkan lagi di brief form.
     agency: [
       {
-        id: 'agency-bold', subKategori: 'agency', nama: 'Bold',
-        deskripsi: 'Hitam-lime tegas & berani. Untuk agensi digital, branding, marketing.',
-        icon: 'Megaphone', mood: '#4D7C0F', bg: 'light', manifest: 'agency-bold',
-      },
-      {
-        id: 'agency-noir', subKategori: 'agency', nama: 'Noir',
-        deskripsi: 'Editorial gelap & artistik. Untuk creative studio, production house, portofolio agensi.',
-        icon: 'Layers', mood: '#F2F0EA', bg: 'dark', manifest: 'agency-noir',
-      },
-      {
-        id: 'agency-prisma', subKategori: 'agency', nama: 'Prisma',
-        deskripsi: 'Pink-peach vibrant & ceria. Untuk social media agency, event organizer, kreatif muda.',
-        icon: 'Palette', mood: '#DB2777', bg: 'light', manifest: 'agency-prisma',
+        id: 'agency-poster', subKategori: 'agency', nama: 'Poster',
+        deskripsi: 'Swiss-typographic tegas — paper, ink, ultramarine, tipografi poster. Untuk agensi digital, branding, studio kreatif.',
+        icon: 'Megaphone', mood: '#1B2AB8', bg: 'light', manifest: 'corporate-agency',
       },
     ],
     korporat: [

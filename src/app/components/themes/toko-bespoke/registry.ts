@@ -24,7 +24,9 @@ import KlinikFisioRenderer from './KlinikFisioRenderer'
 import WarungRenderer from './WarungRenderer'
 import CafeRenderer from './CafeRenderer'
 import SekolahAlmamaterRenderer from './SekolahAlmamaterRenderer'
+import AgencyPosterRenderer from './AgencyPosterRenderer'
 import { WARUNG_SLOTS } from './slots/restaurant-warung.slots'
+import { CORPORATE_AGENCY_SLOTS } from './slots/corporate-agency.slots'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -112,6 +114,39 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'klinik-fisio': { Renderer: KlinikFisioRenderer, source: 'services', showcaseTitle: 'Paket Terapi' },
   // Sekolah bespoke (Wave 3 "Almamater") — etalase = services (program/jenjang), tanpa keranjang.
   'sekolah-reguler': { Renderer: SekolahAlmamaterRenderer, source: 'services', showcaseTitle: 'Program Kami' },
+  // Corporate agency bespoke (Wave 4 "Poster") — tema PERTAMA hasil compiler
+  // HTML-first (theme-sources/corporate-agency). Etalase = services, tanpa
+  // keranjang. Slots + design ikut di-emit/kurasi dari sumber HTML; pairing
+  // alternatif lolos cek ledger (Bebas Neue/Oswald/Onest tak dipakai tema lain).
+  'corporate-agency': {
+    Renderer: AgencyPosterRenderer, source: 'services', showcaseTitle: 'Layanan Kami', slots: CORPORATE_AGENCY_SLOTS,
+    design: {
+      palettes: [
+        { id: 'bawaan', label: 'Paper (bawaan)', swatch: '#1B2AB8' },
+        { id: 'arang', label: 'Arang (gelap)', swatch: '#93A2FF' },
+      ],
+      fontPairings: [
+        {
+          id: 'bawaan', label: 'Poster (bawaan)',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Anton&family=Albert+Sans:wght@400;500;600;700;800&display=swap',
+          display: "'Anton','Arial Narrow',Impact,sans-serif",
+          body: "'Albert Sans','Segoe UI',system-ui,sans-serif",
+        },
+        {
+          id: 'klasik', label: 'Klasik Poster',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Onest:wght@400;500;600;700;800&display=swap',
+          display: "'Bebas Neue','Arial Narrow',Impact,sans-serif",
+          body: "'Onest','Segoe UI',system-ui,sans-serif",
+        },
+        {
+          id: 'ringkas', label: 'Ringkas',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Albert+Sans:wght@400;500;600;700;800&display=swap',
+          display: "'Oswald','Arial Narrow',Impact,sans-serif",
+          body: "'Albert Sans','Segoe UI',system-ui,sans-serif",
+        },
+      ],
+    },
+  },
   // Toko bespoke — etalase = products, keranjang aktif.
   'toko-atelier': { Renderer: TokoAtelierRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
   'toko-kuliner': { Renderer: KulinerLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Menu Kami' },

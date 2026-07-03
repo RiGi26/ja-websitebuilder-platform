@@ -10,7 +10,7 @@ dulu** sebelum bangun tema. Dokumen ini = SSOT roadmap; resume kerja: `lanjut <s
 
 ## Status
 
-**Bespoke live (14):** WAVE 1 TOKO TUNTAS (8/8) — `toko/fashion`→`toko-atelier` ·
+**Bespoke live (15):** WAVE 1 TOKO TUNTAS (8/8) — `toko/fashion`→`toko-atelier` ·
 `toko/kuliner`→`toko-kuliner` · `toko/kerajinan`→`toko-kerajinan` · `toko/kecantikan`→`toko-kecantikan`
 ("Embun") · `toko/gadget`→`toko-gadget` ("Onyx") · `toko/rumah`→`toko-rumah` ("Selaras") ·
 `toko/kesehatan`→`toko-kesehatan` ("Jamu") · `toko/anak`→`toko-anak` ("Ceria") ·
@@ -18,10 +18,16 @@ dulu** sebelum bangun tema. Dokumen ini = SSOT roadmap; resume kerja: `lanjut <s
 `klinik/estetik`→`klinik-estetik` ("Lumen") · `klinik/wellness`→`klinik-wellness` ("Sanara") —
 KLINIK TUNTAS 3/3 · `restaurant/warung`→`restaurant-warung` ("Hangat") ·
 `restaurant/cafe`→`restaurant-cafe` ("Seduh") — RESTAURANT TUNTAS 3/3 (warung·cafe·finedining)** ·
-**WAVE 3: `sekolah/reguler`→`sekolah-reguler` ("Almamater")**.
+**WAVE 3: `sekolah/reguler`→`sekolah-reguler` ("Almamater")** ·
+**WAVE 4: `corporate/agency`→`corporate-agency` ("Poster") — tema PERTAMA pipeline compiler
+HTML-first (`scripts/html-theme/`, sumber `theme-sources/corporate-agency/`)**.
 
-**Celah (8 sub-kategori):** sekolah (islami·kursus) · corporate · personal · travel ·
-blog · jastip (corporate/personal/travel/blog/jastip masing-masing 3).
+**Celah (7 sub-kategori):** sekolah (islami·kursus) · corporate (startup·korporat) · personal ·
+travel · blog · jastip (personal/travel/blog/jastip masing-masing 3).
+
+**Pipeline baru (pilar E, sejak Wave 4):** tema bisa di-author sebagai HTML beranotasi →
+compiler meng-emit renderer + slots + contrast test + sample (`scripts/html-theme/README.md`).
+Tema hasil compiler TIDAK perlu migrasi zero-hardcode (slot manifest ikut ter-emit).
 
 ## Engine (S0 — SELESAI, PR `feat/bespoke-engine-universal`)
 
@@ -62,7 +68,7 @@ cek anti-duplikat `DESIGN_LEDGER.md`.** Default 1 palet/tema (owner boleh minta 
 |---|---|---|
 | 1 — Toko | ~~kecantikan ("Embun")~~ · ~~gadget ("Onyx")~~ · ~~rumah ("Selaras")~~ · ~~kesehatan ("Jamu")~~ · ~~anak ("Ceria")~~ — **TUNTAS 8/8** | products |
 | 2 — Jasa & makan | ~~klinik/umum ("Klinik Bersih")~~ · ~~klinik/estetik ("Lumen")~~ · ~~klinik/wellness ("Sanara")~~ — **KLINIK TUNTAS 3/3** · ~~restaurant/warung ("Hangat")~~ · ~~restaurant/cafe ("Seduh")~~ — **RESTAURANT TUNTAS 3/3** | services / menu |
-| 3 — Edukasi & bisnis | sekolah (~~reguler "Almamater"~~ · islami · kursus) · corporate (startup/agency/korporat) | services |
+| 3 — Edukasi & bisnis | sekolah (~~reguler "Almamater"~~ · islami · kursus) · corporate (startup · ~~agency "Poster"~~ · korporat) | services |
 | 4 — Travel & personal | travel (kendaraan/wisata/akomodasi) · personal (kreator/profesional/coach) | services |
 | 5 — Konten & jastip | blog (jurnal/media/niche) · jastip (luar/lokal/preorder) | blog / products |
 

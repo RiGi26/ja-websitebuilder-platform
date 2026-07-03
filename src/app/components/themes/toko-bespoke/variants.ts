@@ -60,6 +60,9 @@ export const BESPOKE_VARIANTS: Record<string, BespokeVariantMap> = {
   // ── WAVE 3 (edukasi, source services) ──
   // Sekolah Umum — Almamater (collegiate prestige navy/krem/emas, signature lencana/crest perisai).
   'reguler-almamater': { theme: 'sekolah-reguler', variant: 'almamater', sample: 'sekolah-lux' },
+  // ── WAVE 4 (corporate, source services — tema pertama compiler HTML-first) ──
+  // Agency — Poster (Swiss-typographic paper/ink/ultramarine, signature Garis Proses).
+  'agency-poster': { theme: 'corporate-agency', variant: 'bawaan', sample: 'corporate-agency' },
 }
 
 // Blok opsional yang BENAR dikonsumsi tiap renderer bespoke dari ComposableContent
@@ -94,4 +97,6 @@ export const BESPOKE_RENDERED_BLOCKS: Record<string, BespokeRenderedBlocks> = {
   'restaurant-cafe': {},
   // Sekolah "Almamater": etalase = services (program), tanpa galeri/social terpisah.
   'sekolah-reguler': {},
+  // Agency "Poster": etalase = services (layanan), tanpa galeri/social terpisah.
+  'corporate-agency': {},
 }
