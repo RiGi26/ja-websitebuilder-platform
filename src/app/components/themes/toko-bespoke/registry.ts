@@ -41,14 +41,68 @@ export interface BespokeEntry {
    *  portal + validasi /api/portal/theme-copy. Absen = tema belum dimigrasi
    *  zero-hardcode (portal tak menampilkan panel; route menolak tulis). */
   slots?: ThemeSlotManifest
+  /** Style knobs (Wave 3) — pilihan KURASI per tema utk tenant: palet (id =
+   *  variant renderer, wajib punya contrast test) + font pairing (cek ledger:
+   *  jangan tabrak font identitas tema lain). [0] = bawaan. Absen = tema tak
+   *  menawarkan knob (portal tak menampilkan picker; route menolak tulis). */
+  design?: ThemeDesignOptions
+}
+
+export interface ThemeFontPairing {
+  id: string
+  label: string
+  /** URL Google Fonts css2 lengkap (display=swap). */
+  importUrl: string
+  /** Nilai font-family CSS display & body (dengan fallback stack). */
+  display: string
+  body: string
+}
+
+export interface ThemeDesignOptions {
+  /** id = key PALETTES/variant renderer; swatch utk picker portal. [0] = bawaan. */
+  palettes: { id: string; label: string; swatch: string }[]
+  /** [0] = bawaan (WAJIB identik konstanta renderer — parity situs existing). */
+  fontPairings?: ThemeFontPairing[]
+  /** true = tenant boleh set warna aksen hex bebas (belum dipakai tema mana pun). */
+  allowAccent?: boolean
 }
 
 export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   // Restaurant-lux (finedining) — etalase = menu_items, tanpa keranjang.
   'restaurant-lux': { Renderer: RestaurantLuxRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Restaurant warung/kedai bespoke (Wave 2 "Hangat") — etalase = menu, tanpa keranjang.
-  // Pilot zero-hardcoded-copy: slots manifest → panel "Konten Tema" portal.
-  'restaurant-warung': { Renderer: WarungRenderer, source: 'menu', showcaseTitle: 'Menu Kami', slots: WARUNG_SLOTS },
+  // Pilot zero-hardcoded-copy (slots) + style knobs (design). Pairing alternatif
+  // lolos cek ledger: Bree Serif/Karla & Alegreya tak dipakai tema lain (Karla =
+  // body warung sesuai ledger). Palet 'biru' sudah ber-contrast test.
+  'restaurant-warung': {
+    Renderer: WarungRenderer, source: 'menu', showcaseTitle: 'Menu Kami', slots: WARUNG_SLOTS,
+    design: {
+      palettes: [
+        { id: 'hangat', label: 'Hangat (bawaan)', swatch: '#C0432E' },
+        { id: 'biru', label: 'Biru Minimal', swatch: '#0071E3' },
+      ],
+      fontPairings: [
+        {
+          id: 'bawaan', label: 'Hangat Bulat (bawaan)',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Caprasimo&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap',
+          display: '"Caprasimo","Cooper Black",Georgia,serif',
+          body: '"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif',
+        },
+        {
+          id: 'rustik', label: 'Rustik',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Bree+Serif&family=Karla:wght@300;400;500;600;700;800&display=swap',
+          display: '"Bree Serif",Georgia,serif',
+          body: '"Karla","Segoe UI",system-ui,sans-serif',
+        },
+        {
+          id: 'klasik', label: 'Klasik Hangat',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Alegreya:wght@500;600;700&family=Alegreya+Sans:wght@300;400;500;700;800&display=swap',
+          display: '"Alegreya",Georgia,serif',
+          body: '"Alegreya Sans","Segoe UI",system-ui,sans-serif',
+        },
+      ],
+    },
+  },
   // Restaurant cafe/coffee shop bespoke (Wave 2 "Seduh") — etalase = menu, tanpa keranjang.
   'restaurant-cafe': { Renderer: CafeRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
   // Klinik bespoke (Wave 2) — etalase = services (jasa), tanpa keranjang.

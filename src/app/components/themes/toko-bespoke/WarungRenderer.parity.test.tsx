@@ -71,6 +71,25 @@ describe('WarungRenderer parity (themeCopy kosong = byte-identik)', () => {
     expect(html).not.toContain('Dimasak Dadakan')
   })
 
+  it('style knob font pairing mengganti font; tanpa prop = font bawaan', () => {
+    const base = renderToStaticMarkup(<WarungRenderer content={content} variant="hangat" />)
+    expect(base).toContain('Caprasimo')
+    expect(base).not.toContain('Bree Serif')
+    const rustik = renderToStaticMarkup(
+      <WarungRenderer
+        content={content}
+        variant="hangat"
+        font={{
+          importUrl: 'https://fonts.googleapis.com/css2?family=Bree+Serif&family=Karla:wght@300;400;500;600;700;800&display=swap',
+          display: '"Bree Serif",Georgia,serif',
+          body: '"Karla","Segoe UI",system-ui,sans-serif',
+        }}
+      />,
+    )
+    expect(rustik).toContain('Bree Serif')
+    expect(rustik).not.toContain('Caprasimo')
+  })
+
   it('badge soldout memakai slot copy (muncul saat item habis)', () => {
     const soldout = {
       ...content,

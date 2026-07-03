@@ -15,7 +15,9 @@ import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import type { Product, Service, MenuItem, BlogPost, GalleryImage, TenantProfile, PreorderConfig, LocaleConfig } from '@/types/websitebuilder'
 import ContentPanel, { type EditableSection } from './ContentPanel'
 import ThemeCopyPanel from './ThemeCopyPanel'
+import DesignPanel from './DesignPanel'
 import type { ThemeSlotManifest } from '@/lib/theme-system/slot-schema'
+import type { ThemeDesignOptions } from '@/app/components/themes/toko-bespoke/registry'
 import ImageUploadField from './ImageUploadField'
 import KontenBrandPanel, { type KontenBrandData } from './KontenBrandPanel'
 import LivePreview from './LivePreview'
@@ -107,6 +109,11 @@ type Props = {
   // zero-hardcode → kartu tak dirender) + nilai editan tersimpan.
   themeSlots?: ThemeSlotManifest | null
   themeCopyValues?: Record<string, unknown>
+  // Kartu "Gaya Tema" (Wave 3) — pilihan kurasi tema + pilihan tersimpan +
+  // bagian yang bisa "ditambah" (didukung tema, data kosong).
+  themeDesign?: ThemeDesignOptions | null
+  currentDesign?: { palette?: string; fontPairing?: string }
+  addableSections?: { key: string; label: string }[]
 }
 
 type Draft = { nama: string; harga: string; kategori: string; gambar_url: string; deskripsi: string; stok: string }
@@ -129,7 +136,7 @@ function reorderList<T extends { id: string; urutan: number }>(items: T[], idx: 
   return { next, updates }
 }
 
-export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl, themeSlots, themeCopyValues }: Props) {
+export default function PortalDashboard({ tenantId, namaTenant, page, initialProducts, hasShop, hasBooking, showProduk, showLayanan, hasMenu, hasBlog, hasGallery, hasPreorder, preorder, localeConfig, contentIsSample, kontenBrand, paymentStatus, paymentEntitled, initialOrders, initialServices, initialBookings, initialMenu, initialBlog, initialGallery, initialProfile, initialSections, initialTampilan, susunanSections, hiddenSections, portalManaged, portalAdminUrl, themeSlots, themeCopyValues, themeDesign, currentDesign, addableSections }: Props) {
   const router = useRouter()
   const supabase = createClient()
   type Tab = 'konten' | 'tampilan' | 'produk' | 'pesanan' | 'pesanan-po' | 'laporan' | 'po-settings' | 'layanan' | 'reservasi' | 'menu' | 'blog' | 'galeri' | 'profil' | 'pembayaran' | 'notif'
@@ -391,6 +398,19 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
           ) : tab === 'tampilan' ? (
             <div className="space-y-6">
               <TampilanPanel initial={initialTampilan} />
+              {themeDesign && (
+                <DesignPanel
+                  options={themeDesign}
+                  current={currentDesign ?? {}}
+                  addable={addableSections ?? []}
+                  // Tambah Bagian: 'tab:<nama>' = pindah tab; selain itu jalur
+                  // click-to-edit (Konten tab + fokus grup pemilik).
+                  onAddSection={(key) => {
+                    if (key.startsWith('tab:')) setTab(key.slice(4) as Tab)
+                    else onEditFocus(key)
+                  }}
+                />
+              )}
               {susunanSections.length > 0 && <SusunanPanel available={susunanSections} initialHidden={hiddenSections} />}
             </div>
           ) : tab === 'pembayaran' ? (
