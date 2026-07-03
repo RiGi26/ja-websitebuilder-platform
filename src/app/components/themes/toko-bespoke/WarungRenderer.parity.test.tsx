@@ -33,10 +33,11 @@ describe('WarungRenderer parity (themeCopy kosong = byte-identik)', () => {
   it('semua default copy yang selalu tampil muncul di render default', () => {
     const html = renderToStaticMarkup(<WarungRenderer content={content} variant="hangat" />)
     // Kondisional/fallback-only: tak selalu tampil dgn sample (soldout butuh item
-    // habis; hero_cta*/features_eyebrow/cta_primary tertimpa konten sample).
+    // habis; hero_cta*/features_eyebrow/cta_primary tertimpa konten sample;
+    // footer_jam_fallback tertimpa info.jam sample).
     const CONDITIONAL = new Set([
       'copy.soldout_badge', 'copy.hero_cta1', 'copy.hero_cta2',
-      'copy.features_eyebrow', 'copy.cta_primary',
+      'copy.features_eyebrow', 'copy.cta_primary', 'copy.footer_jam_fallback',
     ])
     for (const f of copyFields(WARUNG_SLOTS)) {
       if (CONDITIONAL.has(f.key)) continue
