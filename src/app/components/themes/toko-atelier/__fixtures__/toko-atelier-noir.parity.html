@@ -1,0 +1,518 @@
+<div class="ta-root" style="--ta-bg:#141210;--ta-bg2:#191613;--ta-surface:#201C18;--ta-ink:#F1EAE0;--ta-ink-dim:#D8CEC0;--ta-muted:#A89C8C;--ta-accent:#C5A572;--ta-on-accent:#181410;--ta-line:rgba(241,234,224,.10);--ta-line2:rgba(241,234,224,.06);--ta-scrim:#141210;background:#141210;color:#F1EAE0" data-theme="toko-atelier" data-variant="noir"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=Archivo:wght@400;500;600;700&display=swap');
+.ta-root{background:var(--ta-bg);color:var(--ta-ink);font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;overflow-x:clip}
+.ta-root h1,.ta-root h2,.ta-root h3{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-weight:500;letter-spacing:-.015em;line-height:1.04;margin:0}
+.ta-root h1,.ta-root h2{text-wrap:balance}
+.ta-root p{margin:0;text-wrap:pretty}
+.ta-root a{color:inherit;text-decoration:none}
+.ta-root img{display:block;max-width:100%}
+.ta-root [id]{scroll-margin-top:96px}
+.ta-root ::selection{background:var(--ta-accent);color:var(--ta-on-accent)}
+.ta-root :focus-visible{outline:2px solid var(--ta-accent);outline-offset:3px}
+.ta-wrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+.ta-pad{padding:clamp(88px,12vw,150px) 0}
+.ta-eyebrow{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--ta-accent);display:inline-flex;align-items:center;gap:14px}
+.ta-eyebrow::before{content:"";width:34px;height:1px;background:var(--ta-accent);opacity:.6}
+.ta-btn{display:inline-flex;align-items:center;gap:10px;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:17px 32px;border-radius:2px;transition:transform .35s cubic-bezier(.16,1,.3,1),background-color .3s ease,color .3s ease,border-color .3s ease,filter .3s ease}
+.ta-btn:active{transform:translateY(0) scale(.97)}
+.ta-btn-solid{background:var(--ta-accent);color:var(--ta-on-accent)}
+.ta-btn-solid:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.ta-btn-ghost{border:1px solid rgba(255,255,255,.28);color:#fff}
+.ta-btn-ghost:hover{border-color:var(--ta-accent);color:var(--ta-accent);transform:translateY(-2px)}
+.ta-sec-head{margin-bottom:clamp(40px,6vw,64px);max-width:62ch}
+.ta-sec-head .ta-eyebrow{margin-bottom:18px}
+.ta-sec-head h2{font-size:clamp(34px,4.8vw,58px)}
+.ta-sec-head p{color:var(--ta-muted);margin-top:16px;font-size:16px;max-width:52ch}
+/* ── reveal engine (digate .ta-js → no-JS tampil penuh) ── */
+.ta-js .ta-reveal{opacity:0;transform:translateY(28px);transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1),filter .85s cubic-bezier(.16,1,.3,1);transition-delay:var(--ta-d,0ms)}
+.ta-js .ta-reveal-l{transform:translateX(-36px)}
+.ta-js .ta-reveal-r{transform:translateX(36px)}
+.ta-js .ta-reveal-blur{filter:blur(12px)}
+.ta-js .ta-reveal-sc{transform:translateY(18px) scale(.955)}
+.ta-js .ta-reveal.ta-in{opacity:1;transform:none;filter:none}
+/* ── nav ── */
+.ta-nav{position:fixed;inset:0 0 auto 0;z-index:100;transition:background-color .4s ease,border-color .4s ease}
+.ta-nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1240px;margin:0 auto;padding:26px clamp(20px,4vw,48px);transition:padding .45s cubic-bezier(.16,1,.3,1)}
+.ta-scrolled .ta-nav{background:color-mix(in srgb,var(--ta-bg) 84%,transparent);backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--ta-line2)}
+.ta-scrolled .ta-nav-in{padding-top:13px;padding-bottom:13px}
+.ta-brand{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:24px;font-weight:500;letter-spacing:.02em;color:#fff;transition:color .3s ease}
+.ta-scrolled .ta-brand{color:var(--ta-ink)}
+.ta-brand small{display:block;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ta-muted);margin-top:0}
+.ta-nav-links{display:flex;gap:30px}
+.ta-nav-link{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);position:relative;padding:4px 0;transition:color .25s ease}
+.ta-scrolled .ta-nav-link{color:var(--ta-ink-dim,#D8CEC0)}
+.ta-nav-link::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.ta-nav-link:hover{color:var(--ta-accent)}
+.ta-nav-link:hover::after,.ta-nav-link:focus-visible::after{transform:scaleX(1)}
+.ta-nav-cta{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ta-accent);color:var(--ta-accent);padding:11px 22px;border-radius:2px;transition:background-color .3s,color .3s,border-color .3s}
+.ta-nav-cta:hover{background:var(--ta-accent);color:var(--ta-on-accent)}
+/* Ivoire: aksen perunggu gelap tak terbaca di atas foto hero → nav CTA putih
+   saat transparan, kembali ke aksen begitu nav memadat (scrolled). */
+[data-variant="ivoire"] .ta-nav-cta{border-color:rgba(255,255,255,.5);color:#fff}
+[data-variant="ivoire"].ta-scrolled .ta-nav-cta{border-color:var(--ta-accent);color:var(--ta-accent)}
+[data-variant="ivoire"] .ta-nav-cta:hover{background:var(--ta-accent);border-color:var(--ta-accent);color:var(--ta-on-accent)}
+@media(max-width:880px){.ta-nav-links{display:none}}
+/* ── hero "cover" ── */
+.ta-hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;color:#fff}
+.ta-sentinel{position:absolute;top:0;left:0;width:1px;height:140px;opacity:0;pointer-events:none}
+.ta-hero-bg{position:absolute;inset:0;background:#0d0b09 center/cover no-repeat;transform:scale(1.09);animation:taKb 16s ease-out forwards}
+@keyframes taKb{to{transform:scale(1)}}
+.ta-hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 96%,transparent) 0%,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 52%,transparent) 34%,transparent 66%),linear-gradient(135deg,rgba(20,18,16,.62),transparent 55%)}
+.ta-grain{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E") repeat;background-size:140px 140px;mix-blend-mode:overlay;pointer-events:none;z-index:1}
+.ta-hero-ghost{position:absolute;top:9vh;right:-2vw;z-index:1;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-weight:300;font-size:clamp(110px,23vw,330px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(241,234,224,.08);user-select:none;pointer-events:none;white-space:nowrap}
+.ta-hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,48px) clamp(76px,11vh,116px)}
+.ta-hero .ta-eyebrow{opacity:0;animation:taFadeUp .9s cubic-bezier(.16,1,.3,1) .15s forwards}
+.ta-hero h1{font-size:clamp(52px,9.4vw,126px);font-weight:400;letter-spacing:-.02em;line-height:.98;margin:24px 0 0;max-width:13ch;color:#fff}
+.ta-w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+.ta-w>span{display:inline-block;transform:translateY(118%);animation:taRise 1.05s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--ta-d,0ms)}
+@keyframes taRise{to{transform:translateY(0)}}
+@keyframes taFadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.ta-hero-sub{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:34px;margin-top:40px;opacity:0;animation:taFadeUp 1s cubic-bezier(.16,1,.3,1) .75s forwards}
+.ta-hero-sub p{max-width:46ch;font-size:17px;color:rgba(255,255,255,.88);line-height:1.75}
+.ta-hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.ta-hero-meta{position:absolute;right:clamp(18px,3vw,42px);bottom:110px;z-index:2;writing-mode:vertical-rl;display:flex;align-items:center;gap:16px;font-size:10px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:rgba(241,234,224,.5);opacity:0;animation:taFadeUp 1.2s cubic-bezier(.16,1,.3,1) 1.1s forwards}
+.ta-hero-meta::after{content:"";width:1px;height:56px;background:var(--ta-accent);opacity:.55}
+@media(max-width:980px){.ta-hero-ghost{display:none}.ta-hero-meta{display:none}}
+.ta-cue{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:2;width:1px;height:62px;overflow:hidden}
+.ta-cue span{display:block;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.75));animation:taCue 2.4s cubic-bezier(.16,1,.3,1) infinite}
+@keyframes taCue{0%{transform:translateY(-100%)}55%{transform:translateY(0)}100%{transform:translateY(102%)}}
+/* ── marquee ── */
+.ta-marquee{border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2);padding:22px 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.ta-mq-track{display:flex;width:max-content;animation:taMarquee 38s linear infinite}
+.ta-marquee:hover .ta-mq-track{animation-play-state:paused}
+@keyframes taMarquee{to{transform:translateX(-50%)}}
+.ta-mq-seq{display:flex;align-items:center;flex-shrink:0}
+.ta-mq-item{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-weight:400;font-size:clamp(17px,2.1vw,25px);color:var(--ta-ink-dim,#D8CEC0);white-space:nowrap;padding:0 26px}
+.ta-mq-sep{color:var(--ta-accent);font-size:9px;opacity:.85}
+/* ── lookbook / koleksi ── */
+.ta-look-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;flex-wrap:wrap;margin-bottom:clamp(40px,6vw,64px)}
+.ta-look-head .ta-sec-head{margin-bottom:0}
+.ta-chips{display:flex;gap:8px;flex-wrap:wrap}
+.ta-chip{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ta-muted);background:transparent;border:1px solid var(--ta-line);padding:9px 16px;border-radius:999px;cursor:pointer;transition:color .25s ease,background-color .25s ease,border-color .25s ease}
+.ta-chip:hover{color:var(--ta-ink);border-color:var(--ta-line)}
+@media(hover:none){.ta-chip{padding:13px 18px}}
+.ta-chip[aria-pressed="true"]{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
+.ta-hide{display:none!important}
+.ta-look-feat{display:grid;grid-template-columns:1.15fr .85fr;align-items:end;margin-bottom:clamp(52px,7vw,92px)}
+.ta-look-feat-media{position:relative;overflow:hidden;aspect-ratio:4/3;background:linear-gradient(160deg,var(--ta-surface),var(--ta-bg2))}
+.ta-look-feat-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.ta-look-feat:hover .ta-look-feat-media img{transform:scale(1.045)}
+.ta-look-feat-body{position:relative;z-index:2;margin-left:clamp(-170px,-11vw,-56px);margin-bottom:clamp(22px,4vw,54px);background:color-mix(in srgb,var(--ta-bg) 78%,transparent);backdrop-filter:blur(14px) saturate(1.15);border:1px solid var(--ta-line2);padding:clamp(26px,3.4vw,46px)}
+.ta-look-idx{position:absolute;top:-.52em;right:20px;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-size:clamp(64px,8vw,110px);line-height:1;color:var(--ta-accent);opacity:.2;pointer-events:none;font-variant-numeric:tabular-nums}
+.ta-look-feat-body h3{font-size:clamp(28px,3.6vw,46px);margin:10px 0 12px}
+.ta-look-feat-body>p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.75;max-width:44ch}
+.ta-look-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,30px);align-items:start}
+.ta-look-grid .ta-card:nth-child(3n+2){margin-top:52px}
+/* koleksi tipis (<3): simetris, tanpa stagger — editorial offset butuh koleksi penuh */
+.ta-look-duo{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,3.4vw,44px);max-width:920px;margin:0 auto}
+.ta-look-solo{grid-template-columns:minmax(0,1fr);max-width:520px;margin:0 auto}
+.ta-look-duo .ta-card:nth-child(3n+2),.ta-look-solo .ta-card:nth-child(3n+2){margin-top:0}
+.ta-card-media{position:relative;overflow:hidden;aspect-ratio:3/4;background:linear-gradient(160deg,var(--ta-surface),var(--ta-bg2))}
+.ta-card-media img{width:100%;height:100%;object-fit:cover;filter:grayscale(.85) contrast(1.02);transform:scale(1.01);transition:filter .7s ease,transform .95s cubic-bezier(.16,1,.3,1)}
+.ta-card:hover .ta-card-media img,.ta-card:focus-within .ta-card-media img{filter:grayscale(0) contrast(1);transform:scale(1.06)}
+.ta-card-ini{display:flex;align-items:center;justify-content:center;height:100%;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:54px;color:var(--ta-accent);opacity:.45}
+.ta-stok{position:absolute;top:14px;left:14px;z-index:2;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ta-bg) 72%,transparent);backdrop-filter:blur(6px);border:1px solid var(--ta-line);color:var(--ta-accent);padding:6px 10px}
+.ta-quick{position:absolute;left:50%;bottom:18px;transform:translate(-50%,12px);opacity:0;z-index:2;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--ta-ink);color:var(--ta-bg);border:0;padding:12px 20px;border-radius:2px;cursor:pointer;transition:opacity .35s ease,transform .35s cubic-bezier(.16,1,.3,1)}
+.ta-card:hover .ta-quick,.ta-look-feat:hover .ta-quick,.ta-quick:focus-visible{opacity:1;transform:translate(-50%,0)}
+@media(hover:none){.ta-quick{opacity:1;transform:translate(-50%,0);background:color-mix(in srgb,var(--ta-bg) 72%,transparent);color:var(--ta-ink);backdrop-filter:blur(8px);border:1px solid var(--ta-line)}}
+.ta-card-body{padding:16px 2px 0}
+.ta-cat{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-card-nm{font-size:21px;font-weight:500;margin:6px 0 4px}
+.ta-price{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:18px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
+.ta-card-meta{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:2px}
+.ta-cardbtn{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);background:transparent;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);padding:11px 18px;border-radius:2px;cursor:pointer;transition:background-color .3s ease,color .3s ease,border-color .3s ease}
+.ta-cardbtn:hover{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
+@media(max-width:880px){
+.ta-look-feat{grid-template-columns:1fr}
+.ta-look-feat-body{margin:-44px 14px 0}
+.ta-look-grid{grid-template-columns:repeat(2,1fr)}
+.ta-look-grid .ta-card{margin-top:0}
+.ta-look-grid .ta-card:nth-child(3n+2){margin-top:0}
+.ta-look-grid .ta-card:nth-child(2n){margin-top:36px}
+.ta-look-duo .ta-card:nth-child(2n),.ta-look-solo .ta-card:nth-child(2n){margin-top:0}
+.ta-look-solo{grid-template-columns:1fr}
+}
+/* ── statement ── */
+.ta-statement{background:var(--ta-bg2);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2)}
+.ta-statement .ta-wrap{display:grid;grid-template-columns:1fr 2.1fr;gap:clamp(28px,4vw,56px);align-items:start}
+.ta-statement-side{display:flex;flex-direction:column;gap:22px}
+.ta-rule{width:64px;height:1px;background:var(--ta-accent);transform-origin:left}
+.ta-js .ta-reveal .ta-rule{transform:scaleX(0);transition:transform 1.1s cubic-bezier(.16,1,.3,1) .3s}
+.ta-js .ta-reveal.ta-in .ta-rule{transform:scaleX(1)}
+.ta-quote{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-weight:400;font-size:clamp(28px,3.7vw,47px);line-height:1.2;position:relative}
+.ta-quote::before{content:"\201C";position:absolute;left:-.42em;top:-.3em;font-size:2.7em;color:var(--ta-accent);opacity:.14;font-style:normal}
+.ta-cite{display:block;margin-top:28px;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-style:normal;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-muted)}
+@media(max-width:780px){.ta-statement .ta-wrap{grid-template-columns:1fr;gap:24px}}
+/* ── keunggulan (sticky passage) ── */
+.ta-why .ta-wrap{display:grid;grid-template-columns:.9fr 1.4fr;gap:clamp(36px,6vw,88px);align-items:start}
+.ta-why-side{position:sticky;top:110px}
+.ta-why-side h2{font-size:clamp(34px,4.6vw,56px);margin-top:18px}
+.ta-why-side p{color:var(--ta-muted);margin-top:16px;font-size:16px;max-width:38ch}
+.ta-why-row{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,36px);padding:clamp(26px,3.4vw,40px) 0;border-top:1px solid var(--ta-line2);transition:padding-left .45s cubic-bezier(.16,1,.3,1)}
+.ta-why-rows .ta-why-row:last-child{border-bottom:1px solid var(--ta-line2)}
+.ta-why-row:hover{padding-left:14px}
+.ta-why-num{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-size:clamp(30px,3.6vw,44px);line-height:1.1;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-accent) 65%,transparent);min-width:2.2ch;transition:color .4s ease;font-variant-numeric:tabular-nums}
+.ta-why-row:hover .ta-why-num{color:var(--ta-accent)}
+.ta-why-row b{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:clamp(20px,2.4vw,26px);font-weight:500;display:block}
+.ta-why-row p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.75;margin-top:8px;max-width:52ch}
+@media(max-width:880px){.ta-why .ta-wrap{grid-template-columns:1fr}.ta-why-side{position:static}}
+/* ── cerita / about (split-screen) ── */
+.ta-about{display:grid;grid-template-columns:1fr 1fr;min-height:clamp(480px,82vh,820px);background:var(--ta-bg2);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2)}
+.ta-about-media{position:relative;overflow:hidden}
+.ta-about-media img{position:absolute;left:0;top:-7%;width:100%;height:114%;object-fit:cover;filter:grayscale(.3) contrast(1.02)}
+@supports(animation-timeline:view()){
+.ta-about-media img{animation:taDrift linear both;animation-timeline:view();animation-range:cover 0% cover 100%}
+@keyframes taDrift{from{transform:translateY(-3.5%)}to{transform:translateY(3.5%)}}
+}
+.ta-about-media::after{content:"";position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,color-mix(in srgb,var(--ta-bg2) 76%,transparent))}
+.ta-about-body{display:flex;flex-direction:column;justify-content:center;padding:clamp(56px,8vw,110px) clamp(24px,5vw,90px)}
+.ta-about-body h2{font-size:clamp(34px,4.4vw,56px);margin:18px 0 24px;position:relative;z-index:2;margin-left:clamp(-180px,-12vw,-48px);text-shadow:0 2px 30px rgba(0,0,0,.5)}
+.ta-about-noimg{grid-template-columns:1fr}
+.ta-about-noimg .ta-about-body{align-items:flex-start;max-width:840px;margin:0 auto}
+.ta-about-noimg .ta-about-body h2{margin-left:0;text-shadow:none}
+.ta-about-text{color:var(--ta-ink-dim,#D8CEC0);font-size:16px;line-height:1.9;max-width:54ch;white-space:pre-wrap}
+.ta-about-link{margin-top:32px;display:inline-flex;align-items:center;gap:10px;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);position:relative;width:fit-content}
+.ta-about-link::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.ta-about-link:hover::after{transform:scaleX(1)}
+@media(max-width:880px){.ta-about{grid-template-columns:1fr;min-height:0}.ta-about-media{aspect-ratio:16/10}.ta-about-body h2{margin-left:0}}
+/* ── stats (band hairline, count-up) ── */
+.ta-stats{border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2)}
+.ta-stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.ta-stat{display:flex;flex-direction:column;gap:12px;padding:clamp(36px,5vw,66px) clamp(18px,2.6vw,40px);border-left:1px solid var(--ta-line2)}
+.ta-stat:first-child{border-left:0}
+.ta-stat-num{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-weight:400;font-size:clamp(38px,4.6vw,62px);line-height:1;color:var(--ta-ink);font-variant-numeric:tabular-nums}
+.ta-stat-lbl{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+@media(max-width:780px){.ta-stats-grid{grid-template-columns:repeat(2,1fr)}.ta-stat{padding:26px 18px}.ta-stat:nth-child(odd){border-left:0}.ta-stat:nth-child(n+3){border-top:1px solid var(--ta-line2)}}
+/* ── galeri (editorial + breakout edge-to-edge) ── */
+.ta-gal-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:clamp(120px,16vw,236px);gap:clamp(14px,2vw,24px)}
+.ta-gal{position:relative;overflow:hidden;margin:0;background:linear-gradient(160deg,var(--ta-surface),var(--ta-bg2))}
+.ta-gal img{width:100%;height:100%;object-fit:cover;filter:grayscale(.25);transform:scale(1.005);transition:transform 1s cubic-bezier(.16,1,.3,1),filter .6s ease}
+.ta-gal:hover img,.ta-gal:focus-within img{transform:scale(1.05);filter:grayscale(0)}
+.ta-gal-grid .ta-gal:nth-child(1){grid-column:1/6;grid-row:span 2}
+.ta-gal-grid .ta-gal:nth-child(2){grid-column:6/13}
+.ta-gal-grid .ta-gal:nth-child(3){grid-column:6/10}
+.ta-gal-grid .ta-gal:nth-child(4){grid-column:10/13}
+.ta-gal figcaption{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:36px 16px 13px;background:linear-gradient(to top,rgba(10,8,7,.74),transparent);color:#F1EAE0;font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
+.ta-gal:hover figcaption,.ta-gal:focus-within figcaption{opacity:1;transform:none}
+@media(hover:none){.ta-gal figcaption{opacity:1;transform:none}}
+.ta-gal-zoom{position:absolute;inset:0;z-index:2;background:transparent;border:0;cursor:zoom-in;padding:0}
+.ta-gal-break{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.2vw,18px);width:100vw;margin:clamp(14px,2vw,24px) 0 0 calc(50% - 50vw)}
+.ta-gal-break .ta-gal{aspect-ratio:16/10}
+@media(max-width:780px){
+.ta-gal-grid{grid-auto-rows:clamp(110px,24vw,180px)}
+.ta-gal-grid .ta-gal:nth-child(1){grid-column:1/13}
+.ta-gal-grid .ta-gal:nth-child(2){grid-column:1/13}
+.ta-gal-grid .ta-gal:nth-child(3){grid-column:1/7}
+.ta-gal-grid .ta-gal:nth-child(4){grid-column:7/13}
+.ta-gal-break{grid-template-columns:1fr 1fr}
+.ta-gal-break .ta-gal:last-child{grid-column:1/-1}
+}
+/* ── testimoni (scroll-snap carousel) ── */
+.ta-tsec{background:var(--ta-bg2);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2)}
+.ta-tctrl{display:flex;gap:10px}
+.ta-tbtn{width:46px;height:46px;border-radius:999px;border:1px solid var(--ta-line);background:transparent;color:var(--ta-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .25s ease,color .25s ease,border-color .25s ease,opacity .25s ease}
+.ta-tbtn:hover:not(:disabled){background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
+.ta-tbtn:disabled{opacity:.32;cursor:default}
+.ta-tcar-track{display:flex;gap:clamp(16px,2vw,26px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:6px}
+.ta-tcar-track::-webkit-scrollbar{display:none}
+.ta-tslide{flex:0 0 min(100%,520px);scroll-snap-align:start;margin:0;display:flex;flex-direction:column;gap:28px;background:var(--ta-surface);border:1px solid var(--ta-line2);padding:clamp(28px,3.4vw,46px)}
+.ta-tslide blockquote{margin:0;position:relative;padding-top:30px}
+.ta-tslide blockquote::before{content:"\201C";position:absolute;left:-6px;top:-14px;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:74px;line-height:1;color:var(--ta-accent);opacity:.3}
+.ta-tquote{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-size:clamp(18px,1.9vw,22px);line-height:1.55;color:var(--ta-ink-dim,#D8CEC0)}
+.ta-tmeta{display:flex;align-items:center;gap:14px;margin-top:auto}
+.ta-tava{flex:0 0 auto;width:46px;height:46px;border-radius:999px;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);display:flex;align-items:center;justify-content:center;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:15px;color:var(--ta-accent)}
+.ta-tnm{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:14px;font-weight:600;color:var(--ta-ink);display:block}
+.ta-trole{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:12px;color:var(--ta-muted);display:block;margin-top:2px}
+.ta-dots{display:flex;gap:8px;margin-top:26px}
+.ta-dot{position:relative;width:8px;height:8px;border-radius:999px;background:var(--ta-line);border:0;padding:0;cursor:pointer;transition:width .3s cubic-bezier(.16,1,.3,1),background-color .3s ease}
+.ta-dot::after{content:"";position:absolute;inset:-16px}
+.ta-dot[aria-current="true"]{width:26px;background:var(--ta-accent)}
+/* ── faq (details CSS-only) ── */
+.ta-faq-grid{display:grid;grid-template-columns:.8fr 1.4fr;gap:clamp(36px,6vw,88px);align-items:start}
+.ta-faq-side{position:sticky;top:110px}
+.ta-faq-side h2{font-size:clamp(30px,3.8vw,46px);margin-top:18px}
+.ta-faq-side p{color:var(--ta-muted);margin-top:14px;font-size:15px;max-width:36ch}
+.ta-faq-side .ta-about-link{margin-top:24px}
+.ta-qa{border-top:1px solid var(--ta-line2)}
+.ta-faq-list .ta-qa:last-child{border-bottom:1px solid var(--ta-line2)}
+.ta-qa summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,2.6vw,28px) 0;font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:clamp(18px,2vw,22px);font-weight:500;color:var(--ta-ink);transition:color .25s ease}
+.ta-qa summary::-webkit-details-marker{display:none}
+.ta-qa summary:hover{color:var(--ta-accent)}
+.ta-qa-ic{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--ta-line);border-radius:999px;position:relative;transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s ease}
+.ta-qa-ic::before,.ta-qa-ic::after{content:"";position:absolute;left:50%;top:50%;background:var(--ta-accent);transform:translate(-50%,-50%)}
+.ta-qa-ic::before{width:12px;height:1px}
+.ta-qa-ic::after{width:1px;height:12px}
+.ta-qa[open] .ta-qa-ic{transform:rotate(45deg);border-color:var(--ta-accent)}
+.ta-qa>p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.85;max-width:58ch;padding:0 0 26px}
+@media(max-width:880px){.ta-faq-grid{grid-template-columns:1fr;gap:28px}.ta-faq-side{position:static}}
+/* ── cta band (duotone + magnetic) ── */
+.ta-cta{position:relative;overflow:hidden;text-align:center;color:#fff}
+.ta-cta-bg{position:absolute;inset:0;background:#0d0b09 center/cover no-repeat;filter:grayscale(1) contrast(1.06) brightness(.85)}
+.ta-cta-tint{position:absolute;inset:0;background:linear-gradient(120deg,var(--ta-accent),#241a12 70%);mix-blend-mode:color;opacity:.6}
+.ta-cta-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,11,9,.84),rgba(13,11,9,.6) 50%,rgba(13,11,9,.88))}
+.ta-cta-noimg .ta-cta-bg{background:radial-gradient(ellipse 70% 60% at 18% 85%,color-mix(in srgb,var(--ta-accent) 22%,transparent),transparent 60%),radial-gradient(ellipse 55% 45% at 85% 12%,color-mix(in srgb,var(--ta-accent) 12%,transparent),transparent 55%),var(--ta-bg2);filter:none}
+.ta-cta-noimg .ta-cta-tint{display:none}
+.ta-cta-noimg .ta-cta-scrim{background:transparent}
+.ta-cta-noimg{color:var(--ta-ink)}
+.ta-cta-noimg h2{color:var(--ta-ink)}
+.ta-cta-noimg .ta-cta-sub{color:var(--ta-ink-dim,#D8CEC0)}
+.ta-cta-in{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:clamp(110px,15vw,184px) clamp(20px,4vw,48px)}
+.ta-cta h2{font-size:clamp(40px,6.4vw,82px);font-weight:400;line-height:1.02;color:#fff}
+.ta-cta-sub{color:rgba(255,255,255,.84);font-size:clamp(15px,1.6vw,18px);max-width:52ch;margin:22px auto 0;line-height:1.8}
+.ta-cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:42px}
+.ta-cta .ta-btn-solid{box-shadow:0 14px 44px color-mix(in srgb,var(--ta-accent) 35%,transparent)}
+.ta-mag{will-change:transform;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+/* ── lightbox (quick-look) ── */
+.ta-lb{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:clamp(12px,3vw,40px)}
+.ta-lb[hidden]{display:none}
+.ta-lb-back{position:absolute;inset:0;background:rgba(10,8,7,.78);backdrop-filter:blur(8px);border:0;cursor:pointer}
+.ta-lb-panel{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;max-width:980px;width:100%;max-height:86vh;background:var(--ta-bg2);border:1px solid var(--ta-line);margin:0;opacity:0;transform:translateY(16px) scale(.985);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1,.3,1)}
+.ta-lb-in .ta-lb-panel{opacity:1;transform:none}
+.ta-lb-media{position:relative;overflow:hidden;background:var(--ta-surface);min-height:340px}
+.ta-lb-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ta-lb-body{padding:clamp(24px,3.4vw,44px);display:flex;flex-direction:column;gap:10px;justify-content:center}
+.ta-lb-cat{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-lb-title{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:clamp(24px,2.8vw,34px);font-weight:500;line-height:1.12}
+.ta-lb-price{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-size:20px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
+.ta-lb-desc{color:var(--ta-ink-dim,#D8CEC0);font-size:14px;line-height:1.8}
+.ta-lb-cta{margin-top:14px;width:fit-content}
+.ta-lb-x{position:absolute;top:10px;right:10px;z-index:3;width:44px;height:44px;border-radius:999px;background:color-mix(in srgb,var(--ta-bg) 70%,transparent);border:1px solid var(--ta-line);color:var(--ta-ink);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .25s ease,color .25s ease,border-color .25s ease}
+.ta-lb-x:hover{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
+.ta-lb-prev,.ta-lb-next{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:999px;background:color-mix(in srgb,var(--ta-bg) 70%,transparent);border:1px solid var(--ta-line);color:var(--ta-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .25s ease,color .25s ease,border-color .25s ease}
+.ta-lb-prev{left:-22px}.ta-lb-next{right:-22px}
+.ta-lb-prev:hover,.ta-lb-next:hover{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
+@media(max-width:780px){.ta-lb-panel{grid-template-columns:1fr;overflow:auto;max-height:92vh}.ta-lb-media{min-height:0;aspect-ratio:4/3}.ta-lb-prev{left:10px;top:31vw}.ta-lb-next{right:10px;top:31vw}}
+/* ── band add-on (newsletter/career) ── */
+.ta-band{background:var(--ta-surface);border-top:1px solid var(--ta-line2);border-bottom:1px solid var(--ta-line2);padding:clamp(46px,6vw,68px) 0}
+.ta-band-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.ta-band h2{font-size:clamp(24px,3.2vw,32px)}
+.ta-band p{color:var(--ta-muted);margin-top:10px;font-size:14px;max-width:56ch}
+/* ── footer ── */
+.ta-footer{background:color-mix(in srgb,var(--ta-bg) 84%,#000);border-top:1px solid var(--ta-line2)}
+.ta-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(32px,5vw,56px);padding:clamp(56px,8vw,84px) 0 48px}
+.ta-footer .ta-brand{font-size:30px;color:var(--ta-ink)}
+.ta-footer-tag{color:var(--ta-muted);font-size:14px;line-height:1.8;margin-top:14px;max-width:34ch}
+.ta-f-label{font-family:'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--ta-muted);margin-bottom:18px}
+.ta-f-rows{display:grid;gap:10px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
+.ta-f-rows a{position:relative;width:fit-content}
+.ta-f-rows a::after{content:"";position:absolute;left:0;bottom:-2px;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.ta-f-rows a:hover{color:var(--ta-accent)}
+.ta-f-rows a:hover::after{transform:scaleX(1)}
+.ta-f-jam{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
+.ta-f-jam span:nth-child(odd){color:var(--ta-muted)}
+.ta-footer-markwrap{overflow:hidden;pointer-events:none}
+.ta-footer-mark{font-family:'Fraunces', Georgia, 'Times New Roman', serif;font-style:italic;font-weight:300;font-size:clamp(88px,17.5vw,250px);line-height:.78;white-space:nowrap;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-ink) 9%,transparent);transform:translateY(33%);user-select:none}
+.ta-footer-cr{border-top:1px solid var(--ta-line2);padding:22px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ta-muted)}
+@media(max-width:880px){.ta-footer-grid{grid-template-columns:1fr;gap:36px}}
+/* ── WA float ── */
+.ta-wa{position:fixed;right:22px;bottom:22px;z-index:90;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(37,211,102,.38);transition:transform .25s cubic-bezier(.16,1,.3,1)}
+.ta-wa:hover{transform:scale(1.08)}
+/* ── reduced motion: matikan semua, tampilkan semua ── */
+@media(prefers-reduced-motion:reduce){
+.ta-root *,.ta-root *::before,.ta-root *::after{animation:none!important;transition:none!important}
+.ta-hero-bg{transform:none}
+.ta-w>span{transform:none}
+.ta-hero .ta-eyebrow,.ta-hero-sub,.ta-hero-meta{opacity:1}
+.ta-js .ta-reveal{opacity:1;transform:none;filter:none}
+.ta-js .ta-reveal .ta-rule{transform:none}
+.ta-quick{opacity:1;transform:translate(-50%,0)}
+.ta-lb-panel{opacity:1;transform:none}
+.ta-mag{transform:none!important}
+.ta-gal figcaption{opacity:1;transform:none}
+.ta-tcar-track{scroll-behavior:auto}
+}
+</style><script>(function(){
+if(window.__taInit)return;window.__taInit=1;
+function init(){
+  var root=document.querySelector('.ta-root');if(!root)return;
+  root.classList.add('ta-js');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasIO=typeof IntersectionObserver!=='undefined';
+
+  /* reveal — satu observer untuk semua .ta-reveal */
+  var els=[].slice.call(root.querySelectorAll('.ta-reveal'));
+  if(reduce||!hasIO){for(var i=0;i<els.length;i++)els[i].classList.add('ta-in');}
+  else{
+    var io=new IntersectionObserver(function(es){
+      for(var j=0;j<es.length;j++){if(es[j].isIntersecting){es[j].target.classList.add('ta-in');io.unobserve(es[j].target);}}
+    },{rootMargin:'0px 0px -8% 0px',threshold:0.08});
+    for(var k=0;k<els.length;k++)io.observe(els[k]);
+  }
+
+  /* navState — sentinel di puncak hero; lewat 140px → nav kompak */
+  var s=root.querySelector('.ta-sentinel');
+  if(s&&hasIO){
+    new IntersectionObserver(function(es){
+      root.classList.toggle('ta-scrolled',!es[0].isIntersecting);
+    }).observe(s);
+  }else{root.classList.add('ta-scrolled');}
+
+  /* filter — chips kategori lookbook; CSS yang menyembunyikan (.ta-hide) */
+  var chips=[].slice.call(root.querySelectorAll('.ta-chip'));
+  if(chips.length){
+    var cards=[].slice.call(root.querySelectorAll('.ta-look [data-cat]'));
+    chips.forEach(function(ch){
+      ch.addEventListener('click',function(){
+        chips.forEach(function(c){c.setAttribute('aria-pressed',c===ch?'true':'false');});
+        var f=ch.getAttribute('data-f');
+        cards.forEach(function(card){
+          var hide=f!=='*'&&card.getAttribute('data-cat')!==f;
+          card.classList.toggle('ta-hide',hide);
+        });
+      });
+    });
+  }
+
+  /* lightbox — quick-look produk/galeri. Dialog SSR tunggal, diisi dari
+     data-* trigger. Fokus terkunci, Esc/backdrop menutup, panah = navigasi. */
+  var lb=root.querySelector('.ta-lb');
+  if(lb){
+    var trig=[].slice.call(root.querySelectorAll('.ta-lb-open'));
+    var img=lb.querySelector('.ta-lb-media img');
+    var cta=lb.querySelector('.ta-lb-cta');
+    var cur=-1,lastFocus=null;
+    function put(sel,txt){var el=lb.querySelector(sel);if(!el)return;el.textContent=txt||'';el.style.display=txt?'':'none';}
+    function fill(i){
+      if(!trig.length)return;
+      cur=((i%trig.length)+trig.length)%trig.length;
+      var d=trig[cur].dataset;
+      if(img){img.src=d.src||'';img.alt=d.title||'';}
+      put('.ta-lb-cat',d.cat);put('.ta-lb-title',d.title);put('.ta-lb-price',d.price);put('.ta-lb-desc',d.desc);
+      if(cta){if(d.href){cta.setAttribute('href',d.href);cta.style.display='';}else{cta.style.display='none';}}
+    }
+    function open(i,t){
+      lastFocus=t||document.activeElement;
+      fill(i);
+      lb.removeAttribute('hidden');
+      requestAnimationFrame(function(){lb.classList.add('ta-lb-in');});
+      document.body.style.overflow='hidden';
+      var x=lb.querySelector('.ta-lb-x');if(x)x.focus();
+    }
+    function close(){
+      lb.classList.remove('ta-lb-in');
+      lb.setAttribute('hidden','');
+      document.body.style.overflow='';
+      if(lastFocus&&lastFocus.focus)lastFocus.focus();
+    }
+    trig.forEach(function(t,i){t.addEventListener('click',function(){open(i,t);});});
+    lb.addEventListener('click',function(e){
+      var el=e.target;
+      while(el&&el!==lb){if(el.getAttribute&&el.hasAttribute('data-lb-close')){close();return;}el=el.parentNode;}
+      if(e.target===lb)close();
+    });
+    var pv=lb.querySelector('.ta-lb-prev'),nx=lb.querySelector('.ta-lb-next');
+    if(pv)pv.addEventListener('click',function(){fill(cur-1);});
+    if(nx)nx.addEventListener('click',function(){fill(cur+1);});
+    document.addEventListener('keydown',function(e){
+      if(lb.hasAttribute('hidden'))return;
+      if(e.key==='Escape'){close();return;}
+      if(e.key==='ArrowLeft'){fill(cur-1);return;}
+      if(e.key==='ArrowRight'){fill(cur+1);return;}
+      if(e.key==='Tab'){
+        var f=lb.querySelectorAll('button,a[href]');
+        if(!f.length)return;
+        var first=f[0],last=f[f.length-1];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+        else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      }
+    });
+  }
+
+  /* countUp — SSR menulis nilai FINAL (kontrak no-JS); dengan JS angka di-reset
+     ke 0 saat init lalu naik ke final ketika band terlihat. Format (pemisah
+     ribuan/desimal, prefix/suffix "rb+", " jam") direkonstruksi dari teks asli.
+     reduce/tanpa-IO → biarkan final. */
+  function cuFmt(v,dec,sepD,sepT){
+    var s=v.toFixed(dec),ip=s.split('.')[0],dp=dec?s.split('.')[1]:'';
+    if(sepT)ip=ip.replace(/\B(?=(\d{3})+(?!\d))/g,sepT);
+    return ip+(dec?sepD+dp:'');
+  }
+  var cus=[].slice.call(root.querySelectorAll('[data-cu]'));
+  if(cus.length&&hasIO&&!reduce){
+    var cuItems=[];
+    cus.forEach(function(el){
+      var m=(el.textContent||'').match(/^([^0-9]*)([0-9][0-9.,]*)(.*)$/);
+      if(!m)return;
+      var num=m[2],parts=num.split(/[.,]/),dec=0,sepD='',sepT='';
+      if(parts.length>1){
+        var last=parts[parts.length-1];
+        if(last.length<3){dec=last.length;sepD=num.charAt(num.length-last.length-1);if(parts.length>2)sepT=num.charAt(parts[0].length);}
+        else sepT=num.charAt(parts[0].length);
+      }
+      var val=parseFloat(dec>0?parts.slice(0,-1).join('')+'.'+parts[parts.length-1]:parts.join(''));
+      if(!isFinite(val))return;
+      el.setAttribute('data-cu-i',String(cuItems.length));
+      cuItems.push({el:el,pre:m[1],suf:m[3],val:val,dec:dec,sepD:sepD,sepT:sepT});
+      el.textContent=m[1]+cuFmt(0,dec,sepD,sepT)+m[3];
+    });
+    var cuIO=new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(!en.isIntersecting)return;
+        cuIO.unobserve(en.target);
+        var it=cuItems[parseInt(en.target.getAttribute('data-cu-i'),10)];
+        if(!it)return;
+        var t0=0,D=1400;
+        function step(now){
+          if(!t0)t0=now;
+          var p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);
+          it.el.textContent=it.pre+cuFmt(it.val*e,it.dec,it.sepD,it.sepT)+it.suf;
+          if(p<1)requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    },{threshold:.5});
+    cuItems.forEach(function(it){cuIO.observe(it.el);});
+  }
+
+  /* carousel — testimoni scroll-snap; JS hanya tombol/dot/sinkronisasi.
+     Geser jari/scroll horizontal tetap murni native. */
+  var car=root.querySelector('.ta-tcar');
+  if(car){
+    var track=car.querySelector('.ta-tcar-track');
+    var slides=track?[].slice.call(track.children):[];
+    var dots=[].slice.call(root.querySelectorAll('.ta-dot'));
+    var tPrev=root.querySelector('.ta-tprev'),tNext=root.querySelector('.ta-tnext');
+    if(track&&slides.length){
+      var curIdx=function(){
+        /* mentok kanan = slide terakhir (slide tak selalu bisa snap ke start) */
+        if(track.scrollWidth>track.clientWidth+4&&track.scrollLeft>=track.scrollWidth-track.clientWidth-2)return slides.length-1;
+        var x=track.scrollLeft,b=0,d=1e9;
+        for(var j=0;j<slides.length;j++){var dd=Math.abs(slides[j].offsetLeft-track.offsetLeft-x);if(dd<d){d=dd;b=j;}}
+        return b;
+      };
+      var go=function(i){
+        i=Math.max(0,Math.min(slides.length-1,i));
+        track.scrollTo({left:slides[i].offsetLeft-track.offsetLeft,behavior:reduce?'auto':'smooth'});
+      };
+      var sync=function(){
+        var i=curIdx();
+        dots.forEach(function(dt,j){dt.setAttribute('aria-current',j===i?'true':'false');});
+        if(tPrev)tPrev.disabled=i===0;
+        if(tNext)tNext.disabled=i===slides.length-1;
+      };
+      var raf=0;
+      track.addEventListener('scroll',function(){
+        if(raf)return;
+        raf=requestAnimationFrame(function(){raf=0;sync();});
+      });
+      dots.forEach(function(dt,j){dt.addEventListener('click',function(){go(j);});});
+      if(tPrev)tPrev.addEventListener('click',function(){go(curIdx()-1);});
+      if(tNext)tNext.addEventListener('click',function(){go(curIdx()+1);});
+      sync();
+    }
+  }
+
+  /* magnetic — tombol CTA menarik halus ke kursor; hanya pointer presisi,
+     mati total saat reduced-motion. Kembali memantul via transition CSS. */
+  if(!reduce&&window.matchMedia&&window.matchMedia('(pointer:fine)').matches){
+    [].slice.call(root.querySelectorAll('.ta-mag')).forEach(function(btn){
+      btn.addEventListener('pointermove',function(e){
+        var r=btn.getBoundingClientRect();
+        var dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
+        btn.style.transform='translate('+(dx*.22).toFixed(1)+'px,'+(dy*.3).toFixed(1)+'px)';
+      });
+      btn.addEventListener('pointerleave',function(){btn.style.transform='';});
+    });
+  }
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+})();</script><header class="ta-nav"><div class="ta-nav-in"><a class="ta-brand" href="#atas" aria-label="KALA Atelier">KALA Atelier<small data-edit="copy.brand_sub">Atelier</small></a><nav class="ta-nav-links" aria-label="Navigasi utama"><a class="ta-nav-link" href="#koleksi" data-edit="copy.nav_koleksi">Koleksi</a><a class="ta-nav-link" href="#filosofi" data-edit="copy.nav_filosofi">Filosofi</a><a class="ta-nav-link" href="#cerita" data-edit="copy.nav_cerita">Cerita</a><a class="ta-nav-link" href="#galeri" data-edit="copy.nav_galeri">Galeri</a><a class="ta-nav-link" href="#kontak" data-edit="copy.nav_kontak">Kontak</a></nav><a class="ta-nav-cta" href="https://wa.me/6281296917963" data-edit="copy.contact_cta">Hubungi Kami</a></div></header><main><section class="ta-hero" id="atas"><span class="ta-sentinel" aria-hidden="true"></span><div class="ta-hero-bg" style="background-image:url(https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&amp;q=80&amp;auto=format&amp;fit=crop);background-position:center"></div><div class="ta-hero-scrim"></div><div class="ta-grain"></div><span class="ta-hero-ghost" aria-hidden="true">KALA</span><span class="ta-hero-meta" aria-hidden="true">Bandung, Jawa Barat</span><div class="ta-hero-in"><span class="ta-eyebrow">Atelier Busana — Bandung, Sejak 2017</span><h1><span class="ta-w"><span style="--ta-d:180ms">Pakaian</span> </span><span class="ta-w"><span style="--ta-d:250ms">yang</span> </span><span class="ta-w"><span style="--ta-d:320ms">Dijahit</span> </span><span class="ta-w"><span style="--ta-d:390ms">untuk</span> </span><span class="ta-w"><span style="--ta-d:460ms">Dikenang</span></span></h1><div class="ta-hero-sub"><p>Siluet tenang, bahan alam, dan jahitan tangan yang teliti. Tiap koleksi lahir terbatas dari atelier kami — sekali habis, tidak diulang.</p><div class="ta-hero-actions"><a class="ta-btn ta-btn-solid" href="#koleksi">Jelajahi Koleksi</a><a class="ta-btn ta-btn-ghost" href="#cerita">Kisah Kami</a></div></div></div><span class="ta-cue" aria-hidden="true"><span></span></span></section><div class="ta-marquee" aria-hidden="true"><div class="ta-mq-track"><div class="ta-mq-seq" aria-hidden="false"><span class="ta-mq-item">KALA Atelier <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Edisi Terbatas <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Bahan Alam <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Dijahit Utuh oleh Satu Tangan <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Reparasi Seumur Hidup <span class="ta-mq-sep">  ◆</span></span></div><div class="ta-mq-seq" aria-hidden="true"><span class="ta-mq-item">KALA Atelier <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Edisi Terbatas <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Bahan Alam <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Dijahit Utuh oleh Satu Tangan <span class="ta-mq-sep">  ◆</span></span><span class="ta-mq-item">Reparasi Seumur Hidup <span class="ta-mq-sep">  ◆</span></span></div></div></div><section class="ta-look ta-pad" id="koleksi"><div class="ta-wrap"><div class="ta-look-head"><div class="ta-sec-head ta-reveal"><span class="ta-eyebrow" data-edit="copy.lookbook_eyebrow">Lookbook</span><h2 data-edit="copy.lookbook_title">Koleksi Tahun Ini</h2><p>Sembilan potong inti — dirancang saling padu, dirilis terbatas.</p></div><div class="ta-chips ta-reveal" role="group" aria-label="Filter kategori"><button class="ta-chip" type="button" aria-pressed="true" data-f="*" data-edit="copy.chip_semua">Semua</button><button class="ta-chip" type="button" aria-pressed="false" data-f="Outerwear">Outerwear</button><button class="ta-chip" type="button" aria-pressed="false" data-f="Atasan">Atasan</button><button class="ta-chip" type="button" aria-pressed="false" data-f="Bawahan">Bawahan</button><button class="ta-chip" type="button" aria-pressed="false" data-f="Aksesori">Aksesori</button></div></div><article class="ta-look-feat ta-reveal" data-cat="Outerwear"><div class="ta-look-feat-media"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Mantel Tenun “Pagi Buta”" loading="lazy"/><span class="ta-stok" data-edit="copy.stok_sisa">Sisa 4</span><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Outerwear" data-title="Mantel Tenun “Pagi Buta”" data-price="Rp1.250.000" data-desc="Mantel panjang tenun ikat, pewarna indigo alami, lapis katun organik." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Mantel%20Tenun%20%E2%80%9CPagi%20Buta%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-look-feat-body"><span class="ta-look-idx" aria-hidden="true">01</span><span class="ta-cat">Outerwear</span><h3>Mantel Tenun “Pagi Buta”</h3><p>Mantel panjang tenun ikat, pewarna indigo alami, lapis katun organik.</p><div class="ta-card-meta"><span class="ta-price">Rp1.250.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Mantel%20Tenun%20%E2%80%9CPagi%20Buta%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><div class="ta-look-grid"><article class="ta-card ta-reveal" data-cat="Outerwear" style="--ta-d:0ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Linen Overshirt “Renjana”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Outerwear" data-title="Linen Overshirt “Renjana”" data-price="Rp685.000" data-desc="Linen Eropa 230 gsm, jatuh sempurna, kancing kerang asli." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Linen%20Overshirt%20%E2%80%9CRenjana%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Outerwear</span><h3 class="ta-card-nm">Linen Overshirt “Renjana”</h3><div class="ta-card-meta"><span class="ta-price">Rp685.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Linen%20Overshirt%20%E2%80%9CRenjana%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Atasan" style="--ta-d:90ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Kemeja “Subuh”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Atasan" data-title="Kemeja “Subuh”" data-price="Rp485.000" data-desc="Katun organik, kerah tegak, potongan santai untuk harian." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Kemeja%20%E2%80%9CSubuh%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Atasan</span><h3 class="ta-card-nm">Kemeja “Subuh”</h3><div class="ta-card-meta"><span class="ta-price">Rp485.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Kemeja%20%E2%80%9CSubuh%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Atasan" style="--ta-d:180ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Kaus Berat “Tanah”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Atasan" data-title="Kaus Berat “Tanah”" data-price="Rp285.000" data-desc="Katun 240 gsm celup tanah liat — makin dicuci makin berkarakter." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Kaus%20Berat%20%E2%80%9CTanah%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Atasan</span><h3 class="ta-card-nm">Kaus Berat “Tanah”</h3><div class="ta-card-meta"><span class="ta-price">Rp285.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Kaus%20Berat%20%E2%80%9CTanah%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Bawahan" style="--ta-d:0ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Celana Wol “Lembah”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Bawahan" data-title="Celana Wol “Lembah”" data-price="Rp565.000" data-desc="Pinggang tinggi, lipit tunggal, wol tropis yang tetap sejuk." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Celana%20Wol%20%E2%80%9CLembah%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Bawahan</span><h3 class="ta-card-nm">Celana Wol “Lembah”</h3><div class="ta-card-meta"><span class="ta-price">Rp565.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Celana%20Wol%20%E2%80%9CLembah%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Bawahan" style="--ta-d:90ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Celana Linen “Muara”" loading="lazy"/><span class="ta-stok" data-edit="copy.stok_sisa">Sisa 3</span><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Bawahan" data-title="Celana Linen “Muara”" data-price="Rp525.000" data-desc="Potongan lurus sebatas mata kaki, ringan untuk iklim tropis." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Celana%20Linen%20%E2%80%9CMuara%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Bawahan</span><h3 class="ta-card-nm">Celana Linen “Muara”</h3><div class="ta-card-meta"><span class="ta-price">Rp525.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Celana%20Linen%20%E2%80%9CMuara%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Aksesori" style="--ta-d:180ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Selendang Tenun “Arsa”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Aksesori" data-title="Selendang Tenun “Arsa”" data-price="Rp425.000" data-desc="Ditenun dua minggu di Sumba, pewarna alam penuh." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Selendang%20Tenun%20%E2%80%9CArsa%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Aksesori</span><h3 class="ta-card-nm">Selendang Tenun “Arsa”</h3><div class="ta-card-meta"><span class="ta-price">Rp425.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Selendang%20Tenun%20%E2%80%9CArsa%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Aksesori" style="--ta-d:0ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Tas Kanvas “Pasar”" loading="lazy"/><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Aksesori" data-title="Tas Kanvas “Pasar”" data-price="Rp385.000" data-desc="Kanvas lilin 18 oz dan kulit nabati — menua dengan anggun." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Tas%20Kanvas%20%E2%80%9CPasar%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Aksesori</span><h3 class="ta-card-nm">Tas Kanvas “Pasar”</h3><div class="ta-card-meta"><span class="ta-price">Rp385.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Tas%20Kanvas%20%E2%80%9CPasar%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article><article class="ta-card ta-reveal" data-cat="Aksesori" style="--ta-d:90ms"><div class="ta-card-media"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Ikat Pinggang “Akar”" loading="lazy"/><span class="ta-stok" data-edit="copy.stok_sisa">Sisa 5</span><button class="ta-quick ta-lb-open" type="button" data-src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Aksesori" data-title="Ikat Pinggang “Akar”" data-price="Rp325.000" data-desc="Kulit nabati utuh, gesper kuningan padat." data-href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Ikat%20Pinggang%20%E2%80%9CAkar%E2%80%9D%22." data-edit="copy.quick_detail">Lihat Detail</button></div><div class="ta-card-body"><span class="ta-cat">Aksesori</span><h3 class="ta-card-nm">Ikat Pinggang “Akar”</h3><div class="ta-card-meta"><span class="ta-price">Rp325.000</span></div><a class="ta-cardbtn" href="https://wa.me/6281296917963?text=Halo%20KALA%20Atelier%2C%20saya%20ingin%20memesan%20%22Ikat%20Pinggang%20%E2%80%9CAkar%E2%80%9D%22." target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">Pesan</a></div></article></div></div></section><section class="ta-statement ta-pad" id="filosofi"><div class="ta-wrap ta-reveal ta-reveal-blur"><div class="ta-statement-side"><span class="ta-eyebrow" data-edit="copy.statement_eyebrow">Filosofi</span><span class="ta-rule" aria-hidden="true"></span></div><div><p class="ta-quote">Kami tidak mengejar musim. Pakaian yang baik justru dimulai ketika tren selesai — dipakai bertahun-tahun, dan makin lama makin berarti.</p><span class="ta-cite">Kala Anjani — Pendiri &amp; Perancang</span></div></div></section><section class="ta-why ta-pad"><div class="ta-wrap"><div class="ta-why-side ta-reveal"><span class="ta-eyebrow" data-edit="copy.features_eyebrow">Cara Kami Bekerja</span><h2 data-edit="copy.features_title">Lambat itu disengaja</h2><p>Empat prinsip yang menjaga setiap helai tetap bernilai — hari ini dan sepuluh tahun lagi.</p></div><div class="ta-why-rows"><div class="ta-why-row ta-reveal ta-reveal-r" style="--ta-d:0ms"><span class="ta-why-num" aria-hidden="true">01</span><div><b>Edisi Terbatas</b><p>Maksimal 40 potong per desain, bernomor di label dalam. Milik Anda tidak akan pasaran.</p></div></div><div class="ta-why-row ta-reveal ta-reveal-r" style="--ta-d:90ms"><span class="ta-why-num" aria-hidden="true">02</span><div><b>Bahan Alam</b><p>Linen Eropa, katun organik, dan tenun pewarna alami dari mitra perajin di Jawa dan Sumba.</p></div></div><div class="ta-why-row ta-reveal ta-reveal-r" style="--ta-d:180ms"><span class="ta-why-num" aria-hidden="true">03</span><div><b>Dijahit Utuh oleh Satu Tangan</b><p>Satu penjahit menyelesaikan satu potong dari awal sampai akhir — bukan lini produksi.</p></div></div><div class="ta-why-row ta-reveal ta-reveal-r" style="--ta-d:270ms"><span class="ta-why-num" aria-hidden="true">04</span><div><b>Reparasi Seumur Hidup</b><p>Kancing lepas, kelim turun? Kirimkan kembali — kami perbaiki tanpa biaya. Selamanya.</p></div></div></div></div></section><section class="ta-about" id="cerita"><div class="ta-about-media"><img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=1200&amp;q=80&amp;auto=format&amp;fit=crop" alt="Atelier Kecil yang Keras Kepala" loading="lazy"/></div><div class="ta-about-body"><span class="ta-eyebrow ta-reveal" data-edit="copy.about_eyebrow">Cerita Kami</span><h2 class="ta-reveal">Atelier Kecil yang Keras Kepala</h2><p class="ta-about-text ta-reveal" style="--ta-d:120ms">KALA berdiri tahun 2017 di sebuah garasi di Bandung — satu mesin jahit dan keyakinan sederhana: pakaian terbaik tidak berteriak. Sampai hari ini kami tetap kecil, delapan penjahit dalam satu atelier, karena justru di situ kualitas tinggal. Setiap bahan dipilih langsung dari perajinnya, dan setiap potong melewati delapan belas titik periksa sebelum dilipat, dibungkus, dan dikirim.</p><a class="ta-about-link ta-reveal" style="--ta-d:220ms" href="#kontak">Kunjungi Atelier →</a></div></section><section class="ta-stats" aria-label="Pencapaian kami"><div class="ta-wrap"><div class="ta-stats-grid"><div class="ta-stat ta-reveal" style="--ta-d:0ms"><span class="ta-stat-num" data-cu="true">4.9</span><span class="ta-stat-lbl">Rating pembeli</span></div><div class="ta-stat ta-reveal" style="--ta-d:80ms"><span class="ta-stat-num" data-cu="true">12rb+</span><span class="ta-stat-lbl">Potong terkirim</span></div><div class="ta-stat ta-reveal" style="--ta-d:160ms"><span class="ta-stat-num" data-cu="true">48 jam</span><span class="ta-stat-lbl">Kirim seluruh Indonesia</span></div><div class="ta-stat ta-reveal" style="--ta-d:240ms"><span class="ta-stat-num" data-cu="true">18</span><span class="ta-stat-lbl">Titik periksa mutu</span></div></div></div></section><section class="ta-pad" id="galeri"><div class="ta-wrap"><div class="ta-sec-head ta-reveal"><span class="ta-eyebrow" data-edit="copy.gallery_eyebrow">Galeri</span><h2 data-edit="copy.gallery_title">Dari Atelier</h2><p>Tangan, bahan, dan proses di balik tiap potong.</p></div><div class="ta-gal-grid"><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:0ms"><img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Pemilihan kain" loading="lazy"/><figcaption>Pemilihan kain</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Pemilihan kain" data-src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Pemilihan kain"></button></figure><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:80ms"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Meja potong" loading="lazy"/><figcaption>Meja potong</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Meja potong" data-src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Meja potong"></button></figure><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:160ms"><img src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Pewarnaan alami" loading="lazy"/><figcaption>Pewarnaan alami</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Pewarnaan alami" data-src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Pewarnaan alami"></button></figure><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:240ms"><img src="https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Detail tenun" loading="lazy"/><figcaption>Detail tenun</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Detail tenun" data-src="https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Detail tenun"></button></figure></div></div><div class="ta-gal-break"><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:0ms"><img src="https://images.unsplash.com/photo-1606744837616-56c9a5c6a6eb?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Benang songket" loading="lazy"/><figcaption>Benang songket</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Benang songket" data-src="https://images.unsplash.com/photo-1606744837616-56c9a5c6a6eb?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Benang songket"></button></figure><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:90ms"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Uji tekstur bahan" loading="lazy"/><figcaption>Uji tekstur bahan</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Uji tekstur bahan" data-src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Uji tekstur bahan"></button></figure><figure class="ta-gal ta-reveal ta-reveal-sc" style="--ta-d:180ms"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&amp;q=80&amp;auto=format&amp;fit=crop" alt="Pengepasan akhir" loading="lazy"/><figcaption>Pengepasan akhir</figcaption><button type="button" class="ta-gal-zoom ta-lb-open" aria-label="Perbesar foto: Pengepasan akhir" data-src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&amp;q=80&amp;auto=format&amp;fit=crop" data-cat="Dari Atelier" data-title="Pengepasan akhir"></button></figure></div></section><section class="ta-tsec ta-pad"><div class="ta-wrap"><div class="ta-look-head"><div class="ta-sec-head ta-reveal"><span class="ta-eyebrow" data-edit="copy.testi_eyebrow">Testimoni</span><h2 data-edit="copy.testi_title">Kata mereka yang memakainya</h2></div><div class="ta-tctrl ta-reveal"><button type="button" class="ta-tbtn ta-tprev" aria-label="Testimoni sebelumnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button><button type="button" class="ta-tbtn ta-tnext" aria-label="Testimoni berikutnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div></div><div class="ta-tcar ta-reveal" role="region" aria-roledescription="carousel" aria-label="Testimoni pelanggan"><div class="ta-tcar-track" tabindex="0" role="group" aria-label="Daftar testimoni — gulir horizontal atau pakai tombol panah"><figure class="ta-tslide" role="group" aria-roledescription="slide" aria-label="1 dari 4"><blockquote><p class="ta-tquote">Mantelnya saya pakai hampir tiap hari selama dua tahun — bentuknya tidak berubah. Ini pakaian yang menua bersama pemiliknya.</p></blockquote><figcaption class="ta-tmeta"><span class="ta-tava" aria-hidden="true">S</span><span><span class="ta-tnm">Sarasvati</span><span class="ta-trole">Arsitek, Jakarta</span></span></figcaption></figure><figure class="ta-tslide" role="group" aria-roledescription="slide" aria-label="2 dari 4"><blockquote><p class="ta-tquote">Saya datang untuk satu kemeja, pulang dengan cara pandang baru soal pakaian. Reparasi seumur hidupnya bukan gimik — mereka serius.</p></blockquote><figcaption class="ta-tmeta"><span class="ta-tava" aria-hidden="true">D</span><span><span class="ta-tnm">Dimas</span><span class="ta-trole">Kolektor wastra</span></span></figcaption></figure><figure class="ta-tslide" role="group" aria-roledescription="slide" aria-label="3 dari 4"><blockquote><p class="ta-tquote">Jahitan dalamnya lebih rapi daripada jahitan luar merek lain. Sulit dipercaya sampai dilihat sendiri.</p></blockquote><figcaption class="ta-tmeta"><span class="ta-tava" aria-hidden="true">M</span><span><span class="ta-tnm">Maya</span><span class="ta-trole">Desainer grafis</span></span></figcaption></figure><figure class="ta-tslide" role="group" aria-roledescription="slide" aria-label="4 dari 4"><blockquote><p class="ta-tquote">Edisinya bernomor, ada ceritanya, dan tidak pasaran. Hadiah paling berkesan yang pernah saya beli.</p></blockquote><figcaption class="ta-tmeta"><span class="ta-tava" aria-hidden="true">R</span><span><span class="ta-tnm">Rendra</span><span class="ta-trole">Pelanggan sejak 2019</span></span></figcaption></figure></div><div class="ta-dots" role="group" aria-label="Pilih testimoni"><button type="button" class="ta-dot" aria-label="Ke testimoni 1" aria-current="true"></button><button type="button" class="ta-dot" aria-label="Ke testimoni 2" aria-current="false"></button><button type="button" class="ta-dot" aria-label="Ke testimoni 3" aria-current="false"></button><button type="button" class="ta-dot" aria-label="Ke testimoni 4" aria-current="false"></button></div></div></div></section><section class="ta-pad" id="tanya"><div class="ta-wrap ta-faq-grid"><div class="ta-faq-side ta-reveal"><span class="ta-eyebrow" data-edit="copy.faq_eyebrow">Tanya Jawab</span><h2 data-edit="copy.faq_title">Hal yang sering ditanyakan</h2><p data-edit="copy.faq_sub">Tidak menemukan jawaban Anda? Kami senang mengobrol.</p><a class="ta-about-link" href="https://wa.me/6281296917963" target="_blank" rel="noopener noreferrer" data-edit="copy.faq_wa">Tanya via WhatsApp →</a></div><div class="ta-faq-list"><details class="ta-qa ta-reveal" style="--ta-d:0ms"><summary>Apakah bisa custom ukuran?<span class="ta-qa-ic" aria-hidden="true"></span></summary><p>Bisa. Panjang lengan, badan, dan celana dapat disesuaikan tanpa biaya tambahan — sampaikan lewat WhatsApp setelah memesan.</p></details><details class="ta-qa ta-reveal" style="--ta-d:70ms"><summary>Bagaimana klaim reparasi seumur hidup?<span class="ta-qa-ic" aria-hidden="true"></span></summary><p>Hubungi kami via WhatsApp dengan foto bagian yang rusak, lalu kirimkan potongnya. Ongkos kirim kembali kami tanggung; pengerjaan 5–7 hari kerja.</p></details><details class="ta-qa ta-reveal" style="--ta-d:140ms"><summary>Apakah melayani pengiriman internasional?<span class="ta-qa-ic" aria-hidden="true"></span></summary><p>Ya, kami mengirim ke seluruh dunia. Estimasi 3–5 hari kerja; bea masuk negara tujuan ditanggung pembeli.</p></details><details class="ta-qa ta-reveal" style="--ta-d:210ms"><summary>Kapan koleksi baru dirilis?<span class="ta-qa-ic" aria-hidden="true"></span></summary><p>Sekali setahun, biasanya bulan Maret. Pelanggan terdaftar mendapat akses 48 jam lebih awal — daftar lewat WhatsApp.</p></details></div></div></section><section class="ta-cta"><div class="ta-cta-bg" style="background-image:url(https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&amp;q=80&amp;auto=format&amp;fit=crop)"></div><div class="ta-cta-tint"></div><div class="ta-cta-scrim"></div><div class="ta-grain"></div><div class="ta-cta-in ta-reveal"><h2>Sekali Habis, Tidak Diulang</h2><p class="ta-cta-sub">Koleksi tahun ini tersisa di bawah 30%. Potong yang Anda taksir hari ini mungkin tidak ada besok.</p><div class="ta-cta-actions"><a class="ta-btn ta-btn-solid ta-mag" href="https://wa.me/6281296917963" target="_blank" rel="noopener noreferrer" data-edit="copy.contact_cta">Pesan via WhatsApp</a><a class="ta-btn ta-btn-ghost" href="#koleksi" data-edit="copy.cta_ghost">Lihat Koleksi</a></div></div></section></main><footer class="ta-footer" id="kontak"><div class="ta-wrap"><div class="ta-footer-grid"><div><span class="ta-brand">KALA Atelier</span><p class="ta-footer-tag" data-edit="copy.footer_tagline">Siluet tenang, bahan alam, dan jahitan tangan yang teliti. Tiap koleksi lahir terbatas dari atelier kami — sekali habis, tidak diulang.</p></div><div><div class="ta-f-label" data-edit="copy.footer_kunjungi_h">Kunjungi</div><div class="ta-f-rows"><span>Bandung, Jawa Barat</span><a href="mailto:halo@kala-atelier.id">halo@kala-atelier.id</a><a href="https://wa.me/6281296917963" target="_blank" rel="noopener noreferrer">WhatsApp</a><a href="#">@kala.atelier</a><a href="#">tiktok</a><a href="#">shopee</a></div></div><div><div class="ta-f-label" data-edit="copy.footer_jam_h">Jam Buka</div><div class="ta-f-jam"><span style="display:contents"><span>Senin–Jumat</span><span>10.00–18.00</span></span><span style="display:contents"><span>Sabtu</span><span>10.00–15.00</span></span><span style="display:contents"><span>Minggu</span><span>Dengan janji temu</span></span></div></div></div></div><div class="ta-footer-markwrap" aria-hidden="true"><div class="ta-footer-mark">KALA Atelier</div></div><div class="ta-wrap"><div class="ta-footer-cr"><span data-edit="copy.footer_copyright">© YYYY KALA Atelier. Seluruh hak cipta.</span><span data-edit="copy.footer_credit">Dibuat dengan Webzoka</span></div></div></footer><a class="ta-wa" href="https://wa.me/6281296917963" target="_blank" rel="noopener noreferrer" aria-label="Pesan via WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.207zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path></svg></a><div class="ta-lb" role="dialog" aria-modal="true" aria-label="Pratinjau produk" hidden=""><div class="ta-lb-back" data-lb-close="true" aria-hidden="true"></div><figure class="ta-lb-panel"><button type="button" class="ta-lb-x" data-lb-close="true" aria-label="Tutup pratinjau">×</button><div class="ta-lb-media"><img alt=""/></div><figcaption class="ta-lb-body"><span class="ta-lb-cat"></span><span class="ta-lb-title"></span><span class="ta-lb-price"></span><p class="ta-lb-desc"></p><a class="ta-btn ta-btn-solid ta-lb-cta" href="#" target="_blank" rel="noopener noreferrer" data-edit="copy.lightbox_cta">Pesan via WhatsApp</a></figcaption><button type="button" class="ta-lb-prev" aria-label="Item sebelumnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button><button type="button" class="ta-lb-next" aria-label="Item berikutnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></figure></div></div>

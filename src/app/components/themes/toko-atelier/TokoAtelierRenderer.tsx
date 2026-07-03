@@ -22,6 +22,8 @@ import type { ComponentType, CSSProperties } from 'react'
 import type { ComposableContent, ShowcaseItem } from '@/lib/theme-system/manifest'
 import type { Product } from '@/types/websitebuilder'
 import { ATELIER_JS } from './atelier-script'
+import { copyGetter } from '@/lib/theme-system/theme-copy'
+import { TOKO_ATELIER_SLOTS } from '../toko-bespoke/slots/toko-atelier.slots'
 
 // ── Palet peran semantik (noir = default flagship) ────────────
 // `scrim` = dasar gelap overlay foto (hero/CTA). Foto SELALU di-scrim gelap +
@@ -53,11 +55,17 @@ function getPal(variant?: string): TaPal {
   return PALETTES[variant ?? 'noir'] ?? PALETTES.noir
 }
 
-const FONT_IMPORT =
-  "@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=Archivo:wght@400;500;600;700&display=swap');"
+const FONT_URL =
+  'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=Archivo:wght@400;500;600;700&display=swap'
 const SERIF = "'Fraunces', Georgia, 'Times New Roman', serif"
 const SANS = "'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
 const EASE = 'cubic-bezier(.16,1,.3,1)'
+
+// Font parametrik (style knobs Wave 3): default = konstanta bawaan (byte-identik
+// render lama; parity.test menjaga). Pairing alternatif datang dari kurasi
+// registry (BespokeEntry.design.fontPairings) via props.font.
+type TaFont = { importUrl: string; display: string; body: string }
+const DEFAULT_FONT: TaFont = { importUrl: FONT_URL, display: SERIF, body: SANS }
 
 // Grain halus (SVG feTurbulence inline, ter-encode) — atmosfer film, offline-safe.
 const GRAIN =
@@ -73,10 +81,10 @@ function initials(nama: string): string {
   return ini.toUpperCase() || 'A'
 }
 
-function taCss(): string {
-  return `${FONT_IMPORT}
-.ta-root{background:var(--ta-bg);color:var(--ta-ink);font-family:${SANS};line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;overflow-x:clip}
-.ta-root h1,.ta-root h2,.ta-root h3{font-family:${SERIF};font-weight:500;letter-spacing:-.015em;line-height:1.04;margin:0}
+function taCss(f: TaFont): string {
+  return `@import url('${f.importUrl}');
+.ta-root{background:var(--ta-bg);color:var(--ta-ink);font-family:${f.body};line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;overflow-x:clip}
+.ta-root h1,.ta-root h2,.ta-root h3{font-family:${f.display};font-weight:500;letter-spacing:-.015em;line-height:1.04;margin:0}
 .ta-root h1,.ta-root h2{text-wrap:balance}
 .ta-root p{margin:0;text-wrap:pretty}
 .ta-root a{color:inherit;text-decoration:none}
@@ -86,9 +94,9 @@ function taCss(): string {
 .ta-root :focus-visible{outline:2px solid var(--ta-accent);outline-offset:3px}
 .ta-wrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
 .ta-pad{padding:clamp(88px,12vw,150px) 0}
-.ta-eyebrow{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--ta-accent);display:inline-flex;align-items:center;gap:14px}
+.ta-eyebrow{font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--ta-accent);display:inline-flex;align-items:center;gap:14px}
 .ta-eyebrow::before{content:"";width:34px;height:1px;background:var(--ta-accent);opacity:.6}
-.ta-btn{display:inline-flex;align-items:center;gap:10px;font-family:${SANS};font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:17px 32px;border-radius:2px;transition:transform .35s ${EASE},background-color .3s ease,color .3s ease,border-color .3s ease,filter .3s ease}
+.ta-btn{display:inline-flex;align-items:center;gap:10px;font-family:${f.body};font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:17px 32px;border-radius:2px;transition:transform .35s ${EASE},background-color .3s ease,color .3s ease,border-color .3s ease,filter .3s ease}
 .ta-btn:active{transform:translateY(0) scale(.97)}
 .ta-btn-solid{background:var(--ta-accent);color:var(--ta-on-accent)}
 .ta-btn-solid:hover{transform:translateY(-2px);filter:brightness(1.07)}
@@ -110,16 +118,16 @@ function taCss(): string {
 .ta-nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1240px;margin:0 auto;padding:26px clamp(20px,4vw,48px);transition:padding .45s ${EASE}}
 .ta-scrolled .ta-nav{background:color-mix(in srgb,var(--ta-bg) 84%,transparent);backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--ta-line2)}
 .ta-scrolled .ta-nav-in{padding-top:13px;padding-bottom:13px}
-.ta-brand{font-family:${SERIF};font-size:24px;font-weight:500;letter-spacing:.02em;color:#fff;transition:color .3s ease}
+.ta-brand{font-family:${f.display};font-size:24px;font-weight:500;letter-spacing:.02em;color:#fff;transition:color .3s ease}
 .ta-scrolled .ta-brand{color:var(--ta-ink)}
-.ta-brand small{display:block;font-family:${SANS};font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ta-muted);margin-top:0}
+.ta-brand small{display:block;font-family:${f.body};font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ta-muted);margin-top:0}
 .ta-nav-links{display:flex;gap:30px}
-.ta-nav-link{font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);position:relative;padding:4px 0;transition:color .25s ease}
+.ta-nav-link{font-family:${f.body};font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);position:relative;padding:4px 0;transition:color .25s ease}
 .ta-scrolled .ta-nav-link{color:var(--ta-ink-dim,#D8CEC0)}
 .ta-nav-link::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s ${EASE}}
 .ta-nav-link:hover{color:var(--ta-accent)}
 .ta-nav-link:hover::after,.ta-nav-link:focus-visible::after{transform:scaleX(1)}
-.ta-nav-cta{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ta-accent);color:var(--ta-accent);padding:11px 22px;border-radius:2px;transition:background-color .3s,color .3s,border-color .3s}
+.ta-nav-cta{font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ta-accent);color:var(--ta-accent);padding:11px 22px;border-radius:2px;transition:background-color .3s,color .3s,border-color .3s}
 .ta-nav-cta:hover{background:var(--ta-accent);color:var(--ta-on-accent)}
 /* Ivoire: aksen perunggu gelap tak terbaca di atas foto hero → nav CTA putih
    saat transparan, kembali ke aksen begitu nav memadat (scrolled). */
@@ -134,7 +142,7 @@ function taCss(): string {
 @keyframes taKb{to{transform:scale(1)}}
 .ta-hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 96%,transparent) 0%,color-mix(in srgb,var(--ta-scrim,var(--ta-bg)) 52%,transparent) 34%,transparent 66%),linear-gradient(135deg,rgba(20,18,16,.62),transparent 55%)}
 .ta-grain{position:absolute;inset:0;background:url("${GRAIN}") repeat;background-size:140px 140px;mix-blend-mode:overlay;pointer-events:none;z-index:1}
-.ta-hero-ghost{position:absolute;top:9vh;right:-2vw;z-index:1;font-family:${SERIF};font-style:italic;font-weight:300;font-size:clamp(110px,23vw,330px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(241,234,224,.08);user-select:none;pointer-events:none;white-space:nowrap}
+.ta-hero-ghost{position:absolute;top:9vh;right:-2vw;z-index:1;font-family:${f.display};font-style:italic;font-weight:300;font-size:clamp(110px,23vw,330px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(241,234,224,.08);user-select:none;pointer-events:none;white-space:nowrap}
 .ta-hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:0 clamp(20px,4vw,48px) clamp(76px,11vh,116px)}
 .ta-hero .ta-eyebrow{opacity:0;animation:taFadeUp .9s ${EASE} .15s forwards}
 .ta-hero h1{font-size:clamp(52px,9.4vw,126px);font-weight:400;letter-spacing:-.02em;line-height:.98;margin:24px 0 0;max-width:13ch;color:#fff}
@@ -157,13 +165,13 @@ function taCss(): string {
 .ta-marquee:hover .ta-mq-track{animation-play-state:paused}
 @keyframes taMarquee{to{transform:translateX(-50%)}}
 .ta-mq-seq{display:flex;align-items:center;flex-shrink:0}
-.ta-mq-item{font-family:${SERIF};font-style:italic;font-weight:400;font-size:clamp(17px,2.1vw,25px);color:var(--ta-ink-dim,#D8CEC0);white-space:nowrap;padding:0 26px}
+.ta-mq-item{font-family:${f.display};font-style:italic;font-weight:400;font-size:clamp(17px,2.1vw,25px);color:var(--ta-ink-dim,#D8CEC0);white-space:nowrap;padding:0 26px}
 .ta-mq-sep{color:var(--ta-accent);font-size:9px;opacity:.85}
 /* ── lookbook / koleksi ── */
 .ta-look-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;flex-wrap:wrap;margin-bottom:clamp(40px,6vw,64px)}
 .ta-look-head .ta-sec-head{margin-bottom:0}
 .ta-chips{display:flex;gap:8px;flex-wrap:wrap}
-.ta-chip{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ta-muted);background:transparent;border:1px solid var(--ta-line);padding:9px 16px;border-radius:999px;cursor:pointer;transition:color .25s ease,background-color .25s ease,border-color .25s ease}
+.ta-chip{font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ta-muted);background:transparent;border:1px solid var(--ta-line);padding:9px 16px;border-radius:999px;cursor:pointer;transition:color .25s ease,background-color .25s ease,border-color .25s ease}
 .ta-chip:hover{color:var(--ta-ink);border-color:var(--ta-line)}
 @media(hover:none){.ta-chip{padding:13px 18px}}
 .ta-chip[aria-pressed="true"]{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
@@ -173,7 +181,7 @@ function taCss(): string {
 .ta-look-feat-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s ${EASE}}
 .ta-look-feat:hover .ta-look-feat-media img{transform:scale(1.045)}
 .ta-look-feat-body{position:relative;z-index:2;margin-left:clamp(-170px,-11vw,-56px);margin-bottom:clamp(22px,4vw,54px);background:color-mix(in srgb,var(--ta-bg) 78%,transparent);backdrop-filter:blur(14px) saturate(1.15);border:1px solid var(--ta-line2);padding:clamp(26px,3.4vw,46px)}
-.ta-look-idx{position:absolute;top:-.52em;right:20px;font-family:${SERIF};font-style:italic;font-size:clamp(64px,8vw,110px);line-height:1;color:var(--ta-accent);opacity:.2;pointer-events:none;font-variant-numeric:tabular-nums}
+.ta-look-idx{position:absolute;top:-.52em;right:20px;font-family:${f.display};font-style:italic;font-size:clamp(64px,8vw,110px);line-height:1;color:var(--ta-accent);opacity:.2;pointer-events:none;font-variant-numeric:tabular-nums}
 .ta-look-feat-body h3{font-size:clamp(28px,3.6vw,46px);margin:10px 0 12px}
 .ta-look-feat-body>p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.75;max-width:44ch}
 .ta-look-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,30px);align-items:start}
@@ -185,17 +193,17 @@ function taCss(): string {
 .ta-card-media{position:relative;overflow:hidden;aspect-ratio:3/4;background:linear-gradient(160deg,var(--ta-surface),var(--ta-bg2))}
 .ta-card-media img{width:100%;height:100%;object-fit:cover;filter:grayscale(.85) contrast(1.02);transform:scale(1.01);transition:filter .7s ease,transform .95s ${EASE}}
 .ta-card:hover .ta-card-media img,.ta-card:focus-within .ta-card-media img{filter:grayscale(0) contrast(1);transform:scale(1.06)}
-.ta-card-ini{display:flex;align-items:center;justify-content:center;height:100%;font-family:${SERIF};font-size:54px;color:var(--ta-accent);opacity:.45}
-.ta-stok{position:absolute;top:14px;left:14px;z-index:2;font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ta-bg) 72%,transparent);backdrop-filter:blur(6px);border:1px solid var(--ta-line);color:var(--ta-accent);padding:6px 10px}
-.ta-quick{position:absolute;left:50%;bottom:18px;transform:translate(-50%,12px);opacity:0;z-index:2;font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--ta-ink);color:var(--ta-bg);border:0;padding:12px 20px;border-radius:2px;cursor:pointer;transition:opacity .35s ease,transform .35s ${EASE}}
+.ta-card-ini{display:flex;align-items:center;justify-content:center;height:100%;font-family:${f.display};font-size:54px;color:var(--ta-accent);opacity:.45}
+.ta-stok{position:absolute;top:14px;left:14px;z-index:2;font-family:${f.body};font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ta-bg) 72%,transparent);backdrop-filter:blur(6px);border:1px solid var(--ta-line);color:var(--ta-accent);padding:6px 10px}
+.ta-quick{position:absolute;left:50%;bottom:18px;transform:translate(-50%,12px);opacity:0;z-index:2;font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--ta-ink);color:var(--ta-bg);border:0;padding:12px 20px;border-radius:2px;cursor:pointer;transition:opacity .35s ease,transform .35s ${EASE}}
 .ta-card:hover .ta-quick,.ta-look-feat:hover .ta-quick,.ta-quick:focus-visible{opacity:1;transform:translate(-50%,0)}
 @media(hover:none){.ta-quick{opacity:1;transform:translate(-50%,0);background:color-mix(in srgb,var(--ta-bg) 72%,transparent);color:var(--ta-ink);backdrop-filter:blur(8px);border:1px solid var(--ta-line)}}
 .ta-card-body{padding:16px 2px 0}
-.ta-cat{font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-cat{font-family:${f.body};font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
 .ta-card-nm{font-size:21px;font-weight:500;margin:6px 0 4px}
-.ta-price{font-family:${SERIF};font-size:18px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
+.ta-price{font-family:${f.display};font-size:18px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
 .ta-card-meta{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:2px}
-.ta-cardbtn{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);background:transparent;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);padding:11px 18px;border-radius:2px;cursor:pointer;transition:background-color .3s ease,color .3s ease,border-color .3s ease}
+.ta-cardbtn{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);background:transparent;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);padding:11px 18px;border-radius:2px;cursor:pointer;transition:background-color .3s ease,color .3s ease,border-color .3s ease}
 .ta-cardbtn:hover{background:var(--ta-accent);color:var(--ta-on-accent);border-color:var(--ta-accent)}
 @media(max-width:880px){
 .ta-look-feat{grid-template-columns:1fr}
@@ -214,9 +222,9 @@ function taCss(): string {
 .ta-rule{width:64px;height:1px;background:var(--ta-accent);transform-origin:left}
 .ta-js .ta-reveal .ta-rule{transform:scaleX(0);transition:transform 1.1s ${EASE} .3s}
 .ta-js .ta-reveal.ta-in .ta-rule{transform:scaleX(1)}
-.ta-quote{font-family:${SERIF};font-style:italic;font-weight:400;font-size:clamp(28px,3.7vw,47px);line-height:1.2;position:relative}
+.ta-quote{font-family:${f.display};font-style:italic;font-weight:400;font-size:clamp(28px,3.7vw,47px);line-height:1.2;position:relative}
 .ta-quote::before{content:"\\201C";position:absolute;left:-.42em;top:-.3em;font-size:2.7em;color:var(--ta-accent);opacity:.14;font-style:normal}
-.ta-cite{display:block;margin-top:28px;font-family:${SANS};font-style:normal;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-cite{display:block;margin-top:28px;font-family:${f.body};font-style:normal;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-muted)}
 @media(max-width:780px){.ta-statement .ta-wrap{grid-template-columns:1fr;gap:24px}}
 /* ── keunggulan (sticky passage) ── */
 .ta-why .ta-wrap{display:grid;grid-template-columns:.9fr 1.4fr;gap:clamp(36px,6vw,88px);align-items:start}
@@ -226,9 +234,9 @@ function taCss(): string {
 .ta-why-row{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,36px);padding:clamp(26px,3.4vw,40px) 0;border-top:1px solid var(--ta-line2);transition:padding-left .45s ${EASE}}
 .ta-why-rows .ta-why-row:last-child{border-bottom:1px solid var(--ta-line2)}
 .ta-why-row:hover{padding-left:14px}
-.ta-why-num{font-family:${SERIF};font-style:italic;font-size:clamp(30px,3.6vw,44px);line-height:1.1;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-accent) 65%,transparent);min-width:2.2ch;transition:color .4s ease;font-variant-numeric:tabular-nums}
+.ta-why-num{font-family:${f.display};font-style:italic;font-size:clamp(30px,3.6vw,44px);line-height:1.1;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-accent) 65%,transparent);min-width:2.2ch;transition:color .4s ease;font-variant-numeric:tabular-nums}
 .ta-why-row:hover .ta-why-num{color:var(--ta-accent)}
-.ta-why-row b{font-family:${SERIF};font-size:clamp(20px,2.4vw,26px);font-weight:500;display:block}
+.ta-why-row b{font-family:${f.display};font-size:clamp(20px,2.4vw,26px);font-weight:500;display:block}
 .ta-why-row p{color:var(--ta-ink-dim,#D8CEC0);font-size:15px;line-height:1.75;margin-top:8px;max-width:52ch}
 @media(max-width:880px){.ta-why .ta-wrap{grid-template-columns:1fr}.ta-why-side{position:static}}
 /* ── cerita / about (split-screen) ── */
@@ -246,7 +254,7 @@ function taCss(): string {
 .ta-about-noimg .ta-about-body{align-items:flex-start;max-width:840px;margin:0 auto}
 .ta-about-noimg .ta-about-body h2{margin-left:0;text-shadow:none}
 .ta-about-text{color:var(--ta-ink-dim,#D8CEC0);font-size:16px;line-height:1.9;max-width:54ch;white-space:pre-wrap}
-.ta-about-link{margin-top:32px;display:inline-flex;align-items:center;gap:10px;font-family:${SANS};font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);position:relative;width:fit-content}
+.ta-about-link{margin-top:32px;display:inline-flex;align-items:center;gap:10px;font-family:${f.body};font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ta-accent);position:relative;width:fit-content}
 .ta-about-link::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s ${EASE}}
 .ta-about-link:hover::after{transform:scaleX(1)}
 @media(max-width:880px){.ta-about{grid-template-columns:1fr;min-height:0}.ta-about-media{aspect-ratio:16/10}.ta-about-body h2{margin-left:0}}
@@ -255,8 +263,8 @@ function taCss(): string {
 .ta-stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
 .ta-stat{display:flex;flex-direction:column;gap:12px;padding:clamp(36px,5vw,66px) clamp(18px,2.6vw,40px);border-left:1px solid var(--ta-line2)}
 .ta-stat:first-child{border-left:0}
-.ta-stat-num{font-family:${SERIF};font-weight:400;font-size:clamp(38px,4.6vw,62px);line-height:1;color:var(--ta-ink);font-variant-numeric:tabular-nums}
-.ta-stat-lbl{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-stat-num{font-family:${f.display};font-weight:400;font-size:clamp(38px,4.6vw,62px);line-height:1;color:var(--ta-ink);font-variant-numeric:tabular-nums}
+.ta-stat-lbl{font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
 @media(max-width:780px){.ta-stats-grid{grid-template-columns:repeat(2,1fr)}.ta-stat{padding:26px 18px}.ta-stat:nth-child(odd){border-left:0}.ta-stat:nth-child(n+3){border-top:1px solid var(--ta-line2)}}
 /* ── galeri (editorial + breakout edge-to-edge) ── */
 .ta-gal-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:clamp(120px,16vw,236px);gap:clamp(14px,2vw,24px)}
@@ -267,7 +275,7 @@ function taCss(): string {
 .ta-gal-grid .ta-gal:nth-child(2){grid-column:6/13}
 .ta-gal-grid .ta-gal:nth-child(3){grid-column:6/10}
 .ta-gal-grid .ta-gal:nth-child(4){grid-column:10/13}
-.ta-gal figcaption{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:36px 16px 13px;background:linear-gradient(to top,rgba(10,8,7,.74),transparent);color:#F1EAE0;font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ${EASE}}
+.ta-gal figcaption{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:36px 16px 13px;background:linear-gradient(to top,rgba(10,8,7,.74),transparent);color:#F1EAE0;font-family:${f.body};font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ${EASE}}
 .ta-gal:hover figcaption,.ta-gal:focus-within figcaption{opacity:1;transform:none}
 @media(hover:none){.ta-gal figcaption{opacity:1;transform:none}}
 .ta-gal-zoom{position:absolute;inset:0;z-index:2;background:transparent;border:0;cursor:zoom-in;padding:0}
@@ -292,12 +300,12 @@ function taCss(): string {
 .ta-tcar-track::-webkit-scrollbar{display:none}
 .ta-tslide{flex:0 0 min(100%,520px);scroll-snap-align:start;margin:0;display:flex;flex-direction:column;gap:28px;background:var(--ta-surface);border:1px solid var(--ta-line2);padding:clamp(28px,3.4vw,46px)}
 .ta-tslide blockquote{margin:0;position:relative;padding-top:30px}
-.ta-tslide blockquote::before{content:"\\201C";position:absolute;left:-6px;top:-14px;font-family:${SERIF};font-size:74px;line-height:1;color:var(--ta-accent);opacity:.3}
-.ta-tquote{font-family:${SERIF};font-style:italic;font-size:clamp(18px,1.9vw,22px);line-height:1.55;color:var(--ta-ink-dim,#D8CEC0)}
+.ta-tslide blockquote::before{content:"\\201C";position:absolute;left:-6px;top:-14px;font-family:${f.display};font-size:74px;line-height:1;color:var(--ta-accent);opacity:.3}
+.ta-tquote{font-family:${f.display};font-style:italic;font-size:clamp(18px,1.9vw,22px);line-height:1.55;color:var(--ta-ink-dim,#D8CEC0)}
 .ta-tmeta{display:flex;align-items:center;gap:14px;margin-top:auto}
-.ta-tava{flex:0 0 auto;width:46px;height:46px;border-radius:999px;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);display:flex;align-items:center;justify-content:center;font-family:${SERIF};font-size:15px;color:var(--ta-accent)}
-.ta-tnm{font-family:${SANS};font-size:14px;font-weight:600;color:var(--ta-ink);display:block}
-.ta-trole{font-family:${SANS};font-size:12px;color:var(--ta-muted);display:block;margin-top:2px}
+.ta-tava{flex:0 0 auto;width:46px;height:46px;border-radius:999px;border:1px solid color-mix(in srgb,var(--ta-accent) 45%,transparent);display:flex;align-items:center;justify-content:center;font-family:${f.display};font-size:15px;color:var(--ta-accent)}
+.ta-tnm{font-family:${f.body};font-size:14px;font-weight:600;color:var(--ta-ink);display:block}
+.ta-trole{font-family:${f.body};font-size:12px;color:var(--ta-muted);display:block;margin-top:2px}
 .ta-dots{display:flex;gap:8px;margin-top:26px}
 .ta-dot{position:relative;width:8px;height:8px;border-radius:999px;background:var(--ta-line);border:0;padding:0;cursor:pointer;transition:width .3s ${EASE},background-color .3s ease}
 .ta-dot::after{content:"";position:absolute;inset:-16px}
@@ -310,7 +318,7 @@ function taCss(): string {
 .ta-faq-side .ta-about-link{margin-top:24px}
 .ta-qa{border-top:1px solid var(--ta-line2)}
 .ta-faq-list .ta-qa:last-child{border-bottom:1px solid var(--ta-line2)}
-.ta-qa summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,2.6vw,28px) 0;font-family:${SERIF};font-size:clamp(18px,2vw,22px);font-weight:500;color:var(--ta-ink);transition:color .25s ease}
+.ta-qa summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,2.6vw,28px) 0;font-family:${f.display};font-size:clamp(18px,2vw,22px);font-weight:500;color:var(--ta-ink);transition:color .25s ease}
 .ta-qa summary::-webkit-details-marker{display:none}
 .ta-qa summary:hover{color:var(--ta-accent)}
 .ta-qa-ic{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--ta-line);border-radius:999px;position:relative;transition:transform .35s ${EASE},border-color .3s ease}
@@ -346,9 +354,9 @@ function taCss(): string {
 .ta-lb-media{position:relative;overflow:hidden;background:var(--ta-surface);min-height:340px}
 .ta-lb-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ta-lb-body{padding:clamp(24px,3.4vw,44px);display:flex;flex-direction:column;gap:10px;justify-content:center}
-.ta-lb-cat{font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
-.ta-lb-title{font-family:${SERIF};font-size:clamp(24px,2.8vw,34px);font-weight:500;line-height:1.12}
-.ta-lb-price{font-family:${SERIF};font-size:20px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
+.ta-lb-cat{font-family:${f.body};font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--ta-muted)}
+.ta-lb-title{font-family:${f.display};font-size:clamp(24px,2.8vw,34px);font-weight:500;line-height:1.12}
+.ta-lb-price{font-family:${f.display};font-size:20px;color:color-mix(in srgb,var(--ta-accent) 75%,#fff);font-variant-numeric:tabular-nums}
 .ta-lb-desc{color:var(--ta-ink-dim,#D8CEC0);font-size:14px;line-height:1.8}
 .ta-lb-cta{margin-top:14px;width:fit-content}
 .ta-lb-x{position:absolute;top:10px;right:10px;z-index:3;width:44px;height:44px;border-radius:999px;background:color-mix(in srgb,var(--ta-bg) 70%,transparent);border:1px solid var(--ta-line);color:var(--ta-ink);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .25s ease,color .25s ease,border-color .25s ease}
@@ -367,7 +375,7 @@ function taCss(): string {
 .ta-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(32px,5vw,56px);padding:clamp(56px,8vw,84px) 0 48px}
 .ta-footer .ta-brand{font-size:30px;color:var(--ta-ink)}
 .ta-footer-tag{color:var(--ta-muted);font-size:14px;line-height:1.8;margin-top:14px;max-width:34ch}
-.ta-f-label{font-family:${SANS};font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--ta-muted);margin-bottom:18px}
+.ta-f-label{font-family:${f.body};font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--ta-muted);margin-bottom:18px}
 .ta-f-rows{display:grid;gap:10px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
 .ta-f-rows a{position:relative;width:fit-content}
 .ta-f-rows a::after{content:"";position:absolute;left:0;bottom:-2px;width:100%;height:1px;background:var(--ta-accent);transform:scaleX(0);transform-origin:left;transition:transform .35s ${EASE}}
@@ -376,7 +384,7 @@ function taCss(): string {
 .ta-f-jam{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;color:var(--ta-ink-dim,#D8CEC0)}
 .ta-f-jam span:nth-child(odd){color:var(--ta-muted)}
 .ta-footer-markwrap{overflow:hidden;pointer-events:none}
-.ta-footer-mark{font-family:${SERIF};font-style:italic;font-weight:300;font-size:clamp(88px,17.5vw,250px);line-height:.78;white-space:nowrap;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-ink) 9%,transparent);transform:translateY(33%);user-select:none}
+.ta-footer-mark{font-family:${f.display};font-style:italic;font-weight:300;font-size:clamp(88px,17.5vw,250px);line-height:.78;white-space:nowrap;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ta-ink) 9%,transparent);transform:translateY(33%);user-select:none}
 .ta-footer-cr{border-top:1px solid var(--ta-line2);padding:22px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ta-muted)}
 @media(max-width:880px){.ta-footer-grid{grid-template-columns:1fr;gap:36px}}
 /* ── WA float ── */
@@ -424,10 +432,10 @@ function HeroTitle({ title }: { title: string }) {
   )
 }
 
-function StokBadge({ stok }: { stok?: number }) {
+function StokBadge({ stok, habis, sisa }: { stok?: number; habis: string; sisa: string }) {
   if (typeof stok !== 'number') return null
-  if (stok === 0) return <span className="ta-stok">Habis</span>
-  if (stok <= 5) return <span className="ta-stok">Sisa {stok}</span>
+  if (stok === 0) return <span className="ta-stok" data-edit="copy.stok_habis">{habis}</span>
+  if (stok <= 5) return <span className="ta-stok" data-edit="copy.stok_sisa">{sisa} {stok}</span>
   return null
 }
 
@@ -440,13 +448,19 @@ export interface TokoAtelierProps {
   hasCart?: boolean
   /** Slot tombol keranjang (SiteRenderer mengirim AtelierCartButton saat hasCart). */
   CartButton?: ComponentType<{ product: Product }>
+  /** Style knobs (Wave 3): font pairing terpilih tenant — sudah diresolve SiteRenderer. */
+  font?: { importUrl: string; display: string; body: string }
 }
 
 export default function TokoAtelierRenderer({
-  content, variant, primary, products, hasCart, CartButton,
+  content, variant, primary, products, hasCart, CartButton, font,
 }: TokoAtelierProps) {
   const pal = getPal(variant)
   const accent = (primary && primary.trim()) || pal.accent
+  const f = font ?? DEFAULT_FONT
+  // Copy khas-tema (slot manifest) — editan klien dari portal "Konten Tema";
+  // default = copy bawaan tema (byte-identik hardcode lama; parity.test menjaga).
+  const cp = copyGetter(content.themeCopy, TOKO_ATELIER_SLOTS)
   const rootStyle = {
     '--ta-bg': pal.bg, '--ta-bg2': pal.bg2, '--ta-surface': pal.surface, '--ta-ink': pal.ink,
     '--ta-ink-dim': pal.inkDim, '--ta-muted': pal.muted, '--ta-accent': accent,
@@ -478,7 +492,7 @@ export default function TokoAtelierRenderer({
     if (prod && CartButton) return <CartButton product={prod} />
     const href = waItem(it.nama)
     if (!href) return null
-    return <a className="ta-cardbtn" href={href} target="_blank" rel="noopener noreferrer">Pesan</a>
+    return <a className="ta-cardbtn" href={href} target="_blank" rel="noopener noreferrer" data-edit="copy.card_pesan">{cp.t('copy.card_pesan')}</a>
   }
   // Trigger quick-look (lightbox) — hanya item bergambar.
   const quickProps = (it: ShowcaseItem) => ({
@@ -497,12 +511,12 @@ export default function TokoAtelierRenderer({
   const mq = [content.nama, ...(content.features ?? []).map((f) => f.title)].filter(Boolean)
 
   // Nav sadar-konten — hanya section yang benar-benar dirender (anti anchor mati).
-  const nav: { label: string; href: string }[] = []
-  if (items.length) nav.push({ label: 'Koleksi', href: '#koleksi' })
-  if (content.statement) nav.push({ label: 'Filosofi', href: '#filosofi' })
-  if (content.about) nav.push({ label: 'Cerita', href: '#cerita' })
-  if (content.gallery?.images?.length) nav.push({ label: 'Galeri', href: '#galeri' })
-  nav.push({ label: 'Kontak', href: '#kontak' })
+  const nav: { label: string; href: string; edit: string }[] = []
+  if (items.length) nav.push({ label: cp.t('copy.nav_koleksi'), href: '#koleksi', edit: 'copy.nav_koleksi' })
+  if (content.statement) nav.push({ label: cp.t('copy.nav_filosofi'), href: '#filosofi', edit: 'copy.nav_filosofi' })
+  if (content.about) nav.push({ label: cp.t('copy.nav_cerita'), href: '#cerita', edit: 'copy.nav_cerita' })
+  if (content.gallery?.images?.length) nav.push({ label: cp.t('copy.nav_galeri'), href: '#galeri', edit: 'copy.nav_galeri' })
+  nav.push({ label: cp.t('copy.nav_kontak'), href: '#kontak', edit: 'copy.nav_kontak' })
 
   // Galeri: 4 pertama = mosaik editorial, sisanya pita breakout edge-to-edge.
   const galImgs = (content.gallery?.images ?? []).slice(0, 7)
@@ -521,21 +535,21 @@ export default function TokoAtelierRenderer({
 
   return (
     <div className="ta-root" style={rootStyle} data-theme="toko-atelier" data-variant={variant ?? 'noir'}>
-      <style dangerouslySetInnerHTML={{ __html: taCss() }} />
+      <style dangerouslySetInnerHTML={{ __html: taCss(f) }} />
       <script dangerouslySetInnerHTML={{ __html: ATELIER_JS }} />
 
       {/* NAV */}
       <header className="ta-nav">
         <div className="ta-nav-in">
           <a className="ta-brand" href="#atas" aria-label={content.nama}>
-            {content.nama}<small>Atelier</small>
+            {content.nama}<small data-edit="copy.brand_sub">{cp.t('copy.brand_sub')}</small>
           </a>
           {nav.length > 0 && (
             <nav className="ta-nav-links" aria-label="Navigasi utama">
-              {nav.map((l) => <a key={l.href} className="ta-nav-link" href={l.href}>{l.label}</a>)}
+              {nav.map((l) => <a key={l.href} className="ta-nav-link" href={l.href} data-edit={l.edit}>{l.label}</a>)}
             </nav>
           )}
-          <a className="ta-nav-cta" href={waLink ?? '#kontak'}>Hubungi Kami</a>
+          <a className="ta-nav-cta" href={waLink ?? '#kontak'} data-edit="copy.contact_cta">{cp.t('copy.contact_cta')}</a>
         </div>
       </header>
 
@@ -589,13 +603,13 @@ export default function TokoAtelierRenderer({
             <div className="ta-wrap">
               <div className="ta-look-head">
                 <div className="ta-sec-head ta-reveal">
-                  <span className="ta-eyebrow">Lookbook</span>
-                  <h2>{content.showcase?.title ?? 'Koleksi Kami'}</h2>
+                  <span className="ta-eyebrow" data-edit="copy.lookbook_eyebrow">{cp.t('copy.lookbook_eyebrow')}</span>
+                  <h2 data-edit="copy.lookbook_title">{content.showcase?.title ?? cp.t('copy.lookbook_title')}</h2>
                   {content.showcase?.subtitle && <p>{content.showcase.subtitle}</p>}
                 </div>
                 {cats.length > 1 && (
                   <div className="ta-chips ta-reveal" role="group" aria-label="Filter kategori">
-                    <button className="ta-chip" type="button" aria-pressed="true" data-f="*">Semua</button>
+                    <button className="ta-chip" type="button" aria-pressed="true" data-f="*" data-edit="copy.chip_semua">{cp.t('copy.chip_semua')}</button>
                     {cats.map((c) => (
                       <button className="ta-chip" type="button" aria-pressed="false" data-f={c} key={c}>{c}</button>
                     ))}
@@ -607,8 +621,8 @@ export default function TokoAtelierRenderer({
                 <article className="ta-look-feat ta-reveal" data-cat={feat.kategori ?? ''}>
                   <div className="ta-look-feat-media">
                     <img src={feat.gambar} alt={feat.nama} loading="lazy" />
-                    <StokBadge stok={feat.stok} />
-                    <button className="ta-quick ta-lb-open" type="button" {...quickProps(feat)}>Lihat Detail</button>
+                    <StokBadge stok={feat.stok} habis={cp.t('copy.stok_habis')} sisa={cp.t('copy.stok_sisa')} />
+                    <button className="ta-quick ta-lb-open" type="button" {...quickProps(feat)} data-edit="copy.quick_detail">{cp.t('copy.quick_detail')}</button>
                   </div>
                   <div className="ta-look-feat-body">
                     <span className="ta-look-idx" aria-hidden>01</span>
@@ -633,9 +647,9 @@ export default function TokoAtelierRenderer({
                         ) : (
                           <span className="ta-card-ini" aria-hidden>{initials(it.nama)}</span>
                         )}
-                        <StokBadge stok={it.stok} />
+                        <StokBadge stok={it.stok} habis={cp.t('copy.stok_habis')} sisa={cp.t('copy.stok_sisa')} />
                         {it.gambar && (
-                          <button className="ta-quick ta-lb-open" type="button" {...quickProps(it)}>Lihat Detail</button>
+                          <button className="ta-quick ta-lb-open" type="button" {...quickProps(it)} data-edit="copy.quick_detail">{cp.t('copy.quick_detail')}</button>
                         )}
                       </div>
                       <div className="ta-card-body">
@@ -659,7 +673,7 @@ export default function TokoAtelierRenderer({
           <section className="ta-statement ta-pad" id="filosofi">
             <div className="ta-wrap ta-reveal ta-reveal-blur">
               <div className="ta-statement-side">
-                <span className="ta-eyebrow">{content.statement.eyebrow ?? 'Filosofi'}</span>
+                <span className="ta-eyebrow" data-edit="copy.statement_eyebrow">{content.statement.eyebrow ?? cp.t('copy.statement_eyebrow')}</span>
                 <span className="ta-rule" aria-hidden />
               </div>
               <div>
@@ -675,8 +689,8 @@ export default function TokoAtelierRenderer({
           <section className="ta-why ta-pad">
             <div className="ta-wrap">
               <div className="ta-why-side ta-reveal">
-                <span className="ta-eyebrow">{content.featuresEyebrow ?? 'Keunggulan'}</span>
-                <h2>{content.featuresTitle ?? 'Yang membuat kami berbeda'}</h2>
+                <span className="ta-eyebrow" data-edit="copy.features_eyebrow">{content.featuresEyebrow ?? cp.t('copy.features_eyebrow')}</span>
+                <h2 data-edit="copy.features_title">{content.featuresTitle ?? cp.t('copy.features_title')}</h2>
                 {content.featuresSubtitle && <p>{content.featuresSubtitle}</p>}
               </div>
               <div className="ta-why-rows">
@@ -703,7 +717,7 @@ export default function TokoAtelierRenderer({
               </div>
             )}
             <div className="ta-about-body">
-              <span className="ta-eyebrow ta-reveal">Cerita Kami</span>
+              <span className="ta-eyebrow ta-reveal" data-edit="copy.about_eyebrow">{cp.t('copy.about_eyebrow')}</span>
               <h2 className="ta-reveal">{content.about.title}</h2>
               <p className="ta-about-text ta-reveal" style={{ '--ta-d': '120ms' } as CSSProperties}>{content.about.body}</p>
               {content.about.ctaText && (
@@ -736,8 +750,8 @@ export default function TokoAtelierRenderer({
           <section className="ta-pad" id="galeri">
             <div className="ta-wrap">
               <div className="ta-sec-head ta-reveal">
-                <span className="ta-eyebrow">Galeri</span>
-                <h2>{content.gallery?.title ?? 'Dari Atelier'}</h2>
+                <span className="ta-eyebrow" data-edit="copy.gallery_eyebrow">{cp.t('copy.gallery_eyebrow')}</span>
+                <h2 data-edit="copy.gallery_title">{content.gallery?.title ?? cp.t('copy.gallery_title')}</h2>
                 {content.gallery?.subtitle && <p>{content.gallery.subtitle}</p>}
               </div>
               <div className="ta-gal-grid">
@@ -748,7 +762,7 @@ export default function TokoAtelierRenderer({
                     <button
                       type="button" className="ta-gal-zoom ta-lb-open"
                       aria-label={`Perbesar foto: ${g.caption ?? `galeri ${i + 1}`}`}
-                      data-src={g.src} data-cat="Dari Atelier" data-title={g.caption ?? content.gallery?.title ?? 'Galeri'}
+                      data-src={g.src} data-cat={cp.t('copy.gallery_lb_cat')} data-title={g.caption ?? content.gallery?.title ?? cp.t('copy.gallery_eyebrow')}
                     />
                   </figure>
                 ))}
@@ -763,7 +777,7 @@ export default function TokoAtelierRenderer({
                     <button
                       type="button" className="ta-gal-zoom ta-lb-open"
                       aria-label={`Perbesar foto: ${g.caption ?? `galeri ${galMosaic.length + i + 1}`}`}
-                      data-src={g.src} data-cat="Dari Atelier" data-title={g.caption ?? content.gallery?.title ?? 'Galeri'}
+                      data-src={g.src} data-cat={cp.t('copy.gallery_lb_cat')} data-title={g.caption ?? content.gallery?.title ?? cp.t('copy.gallery_eyebrow')}
                     />
                   </figure>
                 ))}
@@ -778,8 +792,8 @@ export default function TokoAtelierRenderer({
             <div className="ta-wrap">
               <div className="ta-look-head">
                 <div className="ta-sec-head ta-reveal">
-                  <span className="ta-eyebrow">Testimoni</span>
-                  <h2>Kata mereka yang memakainya</h2>
+                  <span className="ta-eyebrow" data-edit="copy.testi_eyebrow">{cp.t('copy.testi_eyebrow')}</span>
+                  <h2 data-edit="copy.testi_title">{cp.t('copy.testi_title')}</h2>
                 </div>
                 {content.testimonials.length > 1 && (
                   <div className="ta-tctrl ta-reveal">
@@ -822,11 +836,11 @@ export default function TokoAtelierRenderer({
           <section className="ta-pad" id="tanya">
             <div className="ta-wrap ta-faq-grid">
               <div className="ta-faq-side ta-reveal">
-                <span className="ta-eyebrow">Tanya Jawab</span>
-                <h2>Hal yang sering ditanyakan</h2>
-                <p>Tidak menemukan jawaban Anda? Kami senang mengobrol.</p>
+                <span className="ta-eyebrow" data-edit="copy.faq_eyebrow">{cp.t('copy.faq_eyebrow')}</span>
+                <h2 data-edit="copy.faq_title">{cp.t('copy.faq_title')}</h2>
+                <p data-edit="copy.faq_sub">{cp.t('copy.faq_sub')}</p>
                 {waLink && (
-                  <a className="ta-about-link" href={waLink} target="_blank" rel="noopener noreferrer">Tanya via WhatsApp →</a>
+                  <a className="ta-about-link" href={waLink} target="_blank" rel="noopener noreferrer" data-edit="copy.faq_wa">{cp.t('copy.faq_wa')} →</a>
                 )}
               </div>
               <div className="ta-faq-list">
@@ -855,11 +869,11 @@ export default function TokoAtelierRenderer({
               <h2>{content.cta.title}</h2>
               {content.cta.subtitle && <p className="ta-cta-sub">{content.cta.subtitle}</p>}
               <div className="ta-cta-actions">
-                <a className="ta-btn ta-btn-solid ta-mag" href={ctaHref} {...(ctaHref.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                  {content.cta.ctaText ?? 'Hubungi Kami'}
+                <a className="ta-btn ta-btn-solid ta-mag" href={ctaHref} {...(ctaHref.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})} data-edit="copy.contact_cta">
+                  {content.cta.ctaText ?? cp.t('copy.contact_cta')}
                 </a>
                 {items.length > 0 && (
-                  <a className="ta-btn ta-btn-ghost" href="#koleksi">Lihat Koleksi</a>
+                  <a className="ta-btn ta-btn-ghost" href="#koleksi" data-edit="copy.cta_ghost">{cp.t('copy.cta_ghost')}</a>
                 )}
               </div>
             </div>
@@ -888,10 +902,10 @@ export default function TokoAtelierRenderer({
           <div className="ta-footer-grid">
             <div>
               <span className="ta-brand">{content.nama}</span>
-              <p className="ta-footer-tag">{content.hero.subtitle ?? 'Dibuat perlahan, dipakai bertahun-tahun.'}</p>
+              <p className="ta-footer-tag" data-edit="copy.footer_tagline">{content.hero.subtitle ?? cp.t('copy.footer_tagline')}</p>
             </div>
             <div>
-              <div className="ta-f-label">Kunjungi</div>
+              <div className="ta-f-label" data-edit="copy.footer_kunjungi_h">{cp.t('copy.footer_kunjungi_h')}</div>
               <div className="ta-f-rows">
                 {content.contact?.alamat && <span>{content.contact.alamat}</span>}
                 {content.contact?.email && <a href={`mailto:${content.contact.email}`}>{content.contact.email}</a>}
@@ -904,7 +918,7 @@ export default function TokoAtelierRenderer({
             <div>
               {content.info?.jam && content.info.jam.length > 0 && (
                 <>
-                  <div className="ta-f-label">Jam Buka</div>
+                  <div className="ta-f-label" data-edit="copy.footer_jam_h">{cp.t('copy.footer_jam_h')}</div>
                   <div className="ta-f-jam">
                     {content.info.jam.map((j, i) => (
                       <span key={i} style={{ display: 'contents' }}><span>{j.hari}</span><span>{j.jam}</span></span>
@@ -920,8 +934,8 @@ export default function TokoAtelierRenderer({
         </div>
         <div className="ta-wrap">
           <div className="ta-footer-cr">
-            <span>© {new Date().getUTCFullYear()} {content.nama}. Seluruh hak cipta.</span>
-            <span>Dibuat dengan Webzoka</span>
+            <span data-edit="copy.footer_copyright">© {new Date().getUTCFullYear()} {content.nama}. {cp.t('copy.footer_copyright')}</span>
+            <span data-edit="copy.footer_credit">{cp.t('copy.footer_credit')}</span>
           </div>
         </div>
       </footer>
@@ -942,7 +956,7 @@ export default function TokoAtelierRenderer({
               <span className="ta-lb-title" />
               <span className="ta-lb-price" />
               <p className="ta-lb-desc" />
-              <a className="ta-btn ta-btn-solid ta-lb-cta" href="#" target="_blank" rel="noopener noreferrer">Pesan via WhatsApp</a>
+              <a className="ta-btn ta-btn-solid ta-lb-cta" href="#" target="_blank" rel="noopener noreferrer" data-edit="copy.lightbox_cta">{cp.t('copy.lightbox_cta')}</a>
             </figcaption>
             <button type="button" className="ta-lb-prev" aria-label="Item sebelumnya">{CHEV_L}</button>
             <button type="button" className="ta-lb-next" aria-label="Item berikutnya">{CHEV_R}</button>
