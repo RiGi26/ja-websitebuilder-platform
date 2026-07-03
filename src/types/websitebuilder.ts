@@ -117,6 +117,11 @@ export interface KonfigurasiWebsite {
    *  bespoke merender flow booking native (pilih cabang→dokter→slot→data→konfirmasi) yang
    *  memanggil Portal via proxy server WB (/api/booking-proxy/{slug}/…). Absen → tak dirender. */
   booking?: { portal_base?: string; slug?: string }
+  /** Style knobs (Wave 3 full-editability) — pilihan tenant dari daftar KURASI tema
+   *  (BespokeEntry.design): palet (= variant renderer) + font pairing. Divalidasi
+   *  /api/portal/design lawan daftar registry; absen = bawaan tema (nol regresi).
+   *  Nilai default TIDAK disalin ke sini (pilih bawaan = key dihapus). */
+  design?: { palette?: string; fontPairing?: string; accent?: string }
 }
 
 export type TipeKomponen =

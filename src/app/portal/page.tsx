@@ -112,6 +112,15 @@ export default async function PortalPage() {
     ? (dataKonten.theme_copy as Record<string, unknown>)
     : {}
 
+  // Kartu "Gaya Tema" (Wave 3 style knobs) — pilihan kurasi tema + pilihan
+  // tersimpan. Gate portal-cutover sama dgn Konten Tema (skin order tak
+  // membaca variant/font override).
+  const themeDesign = !portalManaged && themeKey ? BESPOKE_RENDERERS[themeKey]?.design ?? null : null
+  const currentDesign = {
+    palette: typeof konfig.design?.palette === 'string' ? konfig.design.palette : undefined,
+    fontPairing: typeof konfig.design?.fontPairing === 'string' ? konfig.design.fontPairing : undefined,
+  }
+
   const paymentStatus = await getTenantPaymentStatus(tenantId)
   // Tab Pembayaran = add-on `midtrans` (flag hasPayment); tenant yang sudah
   // terlanjur konfigurasi di-grandfather (lihat lib/addons/portal-tabs).
@@ -196,6 +205,15 @@ export default async function PortalPage() {
   if (brandFlags.statement && hasStatement) susunanSections.push('statement')
   if (themeTabs.galeri && (gallery.length > 0 || fotoItems.length > 0)) susunanSections.push('gallery')
 
+  // "Tambah Bagian" (Wave 3, kartu Gaya Tema): kebalikan susunan — bagian yang
+  // DIDUKUNG tema tapi datanya masih kosong. Klik = lompat ke form pengisinya
+  // (jalur click-to-edit); begitu berisi, bagian tampil & pindah ke Susunan.
+  const addableSections: { key: string; label: string }[] = []
+  if (brandFlags.stats && initialKontenBrand.stats.length === 0) addableSections.push({ key: 'konten:stats', label: 'Angka Pencapaian' })
+  if (brandFlags.faq && initialKontenBrand.faq.length === 0) addableSections.push({ key: 'konten:faq', label: 'Tanya Jawab (FAQ)' })
+  if (brandFlags.statement && !hasStatement) addableSections.push({ key: 'konten:statement', label: 'Filosofi / Kutipan' })
+  if (themeTabs.galeri && gallery.length === 0 && fotoItems.length === 0) addableSections.push({ key: 'tab:galeri', label: 'Galeri Foto' })
+
   return (
     <PortalDashboard
       tenantId={tenantId}
@@ -231,6 +249,9 @@ export default async function PortalPage() {
       initialTampilan={initialTampilan}
       themeSlots={themeSlots}
       themeCopyValues={themeCopyValues}
+      themeDesign={themeDesign}
+      currentDesign={currentDesign}
+      addableSections={addableSections}
     />
   )
 }
