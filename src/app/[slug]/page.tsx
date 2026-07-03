@@ -50,8 +50,15 @@ export async function generateMetadata({
   if (!page) return { title: 'Halaman tidak ditemukan' }
 
   const konten = (page.data_konten ?? {}) as Record<string, any>
-  const title = konten.meta_title ?? page.nama_website
-  const description = konten.meta_description ?? konten.deskripsi ?? konten.tagline ?? undefined
+  // SEO editan klien (panel "Konten Tema" portal, slot copy.seo_*) menang atas
+  // meta_* studio; kosong/absen → fallback rantai lama (nol regresi).
+  const themeCopy = (konten.theme_copy ?? {}) as Record<string, unknown>
+  const seoTitle = typeof themeCopy['copy.seo_title'] === 'string' && (themeCopy['copy.seo_title'] as string).trim()
+    ? (themeCopy['copy.seo_title'] as string).trim() : undefined
+  const seoDesc = typeof themeCopy['copy.seo_description'] === 'string' && (themeCopy['copy.seo_description'] as string).trim()
+    ? (themeCopy['copy.seo_description'] as string).trim() : undefined
+  const title = seoTitle ?? konten.meta_title ?? page.nama_website
+  const description = seoDesc ?? konten.meta_description ?? konten.deskripsi ?? konten.tagline ?? undefined
   const primary = (page.konfigurasi as any)?.branding?.primary as string | undefined
   return {
     title,
