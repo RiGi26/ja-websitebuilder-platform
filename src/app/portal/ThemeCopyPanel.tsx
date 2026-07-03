@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, Check, AlertCircle, ChevronDown, ChevronRight, Plus, Trash2, RotateCcw } from 'lucide-react'
 import type { ThemeSlotManifest, SlotField } from '@/lib/theme-system/slot-schema'
+import { focusEditTarget } from './edit-focus'
 
 // Tab Konten — kartu "Konten Tema": copy khas-tema (pita, stempel, judul
 // bagian, footer, SEO) dari slot manifest tema (BespokeEntry.slots). Form
@@ -25,9 +26,12 @@ function initialValue(f: SlotField, stored: unknown): Value {
   return typeof stored === 'string' ? stored : ''
 }
 
-export default function ThemeCopyPanel({ manifest, initial }: {
+export default function ThemeCopyPanel({ manifest, initial, focus }: {
   manifest: ThemeSlotManifest
   initial: Record<string, unknown>
+  // Click-to-edit (Wave 2): key 'copy.*' dari klik LivePreview → buka grup
+  // pemilik + fokus inputnya. n = nonce (klik key sama tetap memicu ulang).
+  focus?: { key: string; n: number } | null
 }) {
   const fields = manifest.fields.filter((f) => (f.source ?? 'copy') === 'copy')
   const groups = [...new Set(fields.map((f) => f.group))]
@@ -44,6 +48,19 @@ export default function ThemeCopyPanel({ manifest, initial }: {
   savedRef.current = saved
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(saved)
+
+  // Click-to-edit: buka grup pemilik key lalu fokuskan inputnya.
+  useEffect(() => {
+    if (!focus) return
+    const field = fields.find((f) => f.key === focus.key)
+    if (!field) return
+    setOpen(field.group)
+    focusEditTarget(
+      `[data-slot-key="${field.key}"] input, [data-slot-key="${field.key}"] textarea`,
+      `[data-slot-key="${field.key}"]`,
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus?.n])
 
   // Kirim HANYA key yang berubah. String kosong = reset ke bawaan (route
   // menghapus key); array dikirim penuh (baris kosong dibuang dulu).

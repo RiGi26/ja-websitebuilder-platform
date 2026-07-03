@@ -8,11 +8,14 @@ import { RefreshCw, ExternalLink, Monitor, Smartphone, X } from 'lucide-react'
 // (mis. dari tab Konten) + tombol refresh manual. Situs `force-dynamic` → reload
 // tampilkan perubahan terbaru.
 export default function LivePreview({
-  slug, published, onClose,
+  slug, published, onClose, onEditFocus,
 }: {
   slug: string | null
   published: boolean
   onClose: () => void
+  // Click-to-edit (Wave 2): elemen ber-data-edit diklik di iframe → key slot
+  // pemiliknya. Parent (PortalDashboard) memetakan key → tab + form field.
+  onEditFocus?: (key: string) => void
 }) {
   const [key, setKey] = useState(0)
   const [mobile, setMobile] = useState(false)
@@ -23,6 +26,20 @@ export default function LivePreview({
     window.addEventListener('portal:saved', h)
     return () => window.removeEventListener('portal:saved', h)
   }, [refresh])
+
+  // Pesan 'ja:edit' dari EditBridge di iframe — validasi ORIGIN (same-origin
+  // saja) + bentuk payload sebelum diteruskan.
+  useEffect(() => {
+    if (!onEditFocus) return
+    const h = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return
+      const d = e.data as { type?: unknown; key?: unknown } | null
+      if (!d || d.type !== 'ja:edit' || typeof d.key !== 'string') return
+      onEditFocus(d.key)
+    }
+    window.addEventListener('message', h)
+    return () => window.removeEventListener('message', h)
+  }, [onEditFocus])
 
   const btn = 'p-1.5 rounded-lg text-gray-400 hover:bg-white hover:text-gray-700 transition-colors'
   const active = 'p-1.5 rounded-lg bg-white text-apple-blue shadow-sm'
@@ -49,7 +66,7 @@ export default function LivePreview({
         <div className="flex justify-center bg-gray-100 p-3">
           <iframe
             key={key}
-            src={`/${slug}`}
+            src={`/${slug}${onEditFocus ? '?portalEdit=1' : ''}`}
             title="Pratinjau website"
             className={`bg-white border border-black/5 rounded-lg shrink-0 ${mobile ? 'w-[390px]' : 'w-full'}`}
             style={{ height: '62vh' }}

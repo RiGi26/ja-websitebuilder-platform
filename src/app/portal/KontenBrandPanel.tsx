@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, Check, AlertCircle, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
 import type { KontenBrandFlags } from '@/lib/addons/portal-tabs'
+import { focusEditTarget } from './edit-focus'
 
 // Tab Konten — kartu kedua: konten brand di data_konten (stats/faq/statement)
 // yang dirender tema bespoke/lux tapi sebelumnya tak punya permukaan edit
@@ -28,7 +29,11 @@ const MAX_FAQ = 10
 type Group = 'stats' | 'faq' | 'statement'
 type Draft = { stats: StatRow[]; faq: FaqRow[]; statement: StatementDraft }
 
-export default function KontenBrandPanel({ initial }: { initial: KontenBrandData }) {
+export default function KontenBrandPanel({ initial, focus }: {
+  initial: KontenBrandData
+  // Click-to-edit (Wave 2): key 'konten:stats|faq|statement' → buka grupnya.
+  focus?: { key: string; n: number } | null
+}) {
   const { flags } = initial
   const [draft, setDraft] = useState<Draft>({
     stats: initial.stats,
@@ -44,6 +49,17 @@ export default function KontenBrandPanel({ initial }: { initial: KontenBrandData
   draftRef.current = draft
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(saved)
+
+  // Click-to-edit: 'konten:<grup>' → buka grup + scroll/fokus input pertamanya.
+  useEffect(() => {
+    if (!focus) return
+    const g = focus.key.slice('konten:'.length) as Group
+    if (g !== 'stats' && g !== 'faq' && g !== 'statement') return
+    if (!flags[g]) return
+    setOpen(g)
+    focusEditTarget(`[data-brand-group="${g}"] input, [data-brand-group="${g}"] textarea`, `[data-brand-group="${g}"]`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus?.n])
 
   // Hanya baris lengkap yang dikirim — baris setengah jadi tetap di draft lokal.
   const payloadOf = (d: Draft) => {
@@ -131,7 +147,7 @@ export default function KontenBrandPanel({ initial }: { initial: KontenBrandData
 
       <div className="space-y-3">
         {flags.stats && (
-          <div className="rounded-2xl border border-black/5 overflow-hidden">
+          <div className="rounded-2xl border border-black/5 overflow-hidden" data-brand-group="stats">
             {groupHeader('stats', 'Angka Pencapaian', `${draft.stats.length}/${MAX_STATS}`)}
             {open === 'stats' && (
               <div className="p-4 space-y-3">
@@ -173,7 +189,7 @@ export default function KontenBrandPanel({ initial }: { initial: KontenBrandData
         )}
 
         {flags.faq && (
-          <div className="rounded-2xl border border-black/5 overflow-hidden">
+          <div className="rounded-2xl border border-black/5 overflow-hidden" data-brand-group="faq">
             {groupHeader('faq', 'Tanya Jawab (FAQ)', `${draft.faq.length}/${MAX_FAQ}`)}
             {open === 'faq' && (
               <div className="p-4 space-y-3">
@@ -220,7 +236,7 @@ export default function KontenBrandPanel({ initial }: { initial: KontenBrandData
         )}
 
         {flags.statement && (
-          <div className="rounded-2xl border border-black/5 overflow-hidden">
+          <div className="rounded-2xl border border-black/5 overflow-hidden" data-brand-group="statement">
             {groupHeader('statement', 'Filosofi / Kutipan Brand', draft.statement.quote.trim() ? 'Terisi' : 'Kosong')}
             {open === 'statement' && (
               <div className="p-4 space-y-3">
