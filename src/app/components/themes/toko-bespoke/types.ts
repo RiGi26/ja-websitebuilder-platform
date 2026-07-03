@@ -35,6 +35,10 @@ export interface BespokeProps {
   /** B5 (Kamy): slug booking Portal Klinik. Bila ada, renderer klinik bespoke merender
    *  flow booking native realtime (via proxy /api/booking-proxy/{slug}/…). Renderer lain abaikan. */
   bookingSlug?: string
+  /** Style knobs (Wave 3): font pairing terpilih tenant — SUDAH diresolve
+   *  SiteRenderer dari daftar kurasi registry (konfigurasi.design.fontPairing).
+   *  Absen = font bawaan tema (konstanta renderer; parity terjaga). */
+  font?: { importUrl: string; display: string; body: string }
 }
 
 /** @deprecated alias — pakai BespokeProps. Dipertahankan utk renderer toko lama. */
