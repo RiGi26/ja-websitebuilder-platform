@@ -8,6 +8,7 @@
 // (terverifikasi 200) agar hero fullbleed + lookbook fashion tampil hidup.
 // ============================================================
 import type { ComposableContent } from './manifest'
+import { CORPORATE_AGENCY_SAMPLE } from './samples/corporate-agency.sample'
 
 const IMG = (id: string, w = 1200) =>
   `https://images.unsplash.com/${id}?w=${w}&q=80&auto=format&fit=crop`
@@ -2930,6 +2931,8 @@ const CAFE_LUX: ComposableContent = {
 }
 
 const LUX_SAMPLE_ALIAS: Record<string, ComposableContent> = {
+  // Wave 4 — sample GENERATED dari mockup compiler HTML-first (samples/*.sample.ts).
+  'corporate-agency': CORPORATE_AGENCY_SAMPLE,
   'lux-restaurant': FINEDINING, // sudah punya statement kaya
   'lux-klinik': luxSample(KLINIK_UMUM, 'Komitmen Kami', 'Kesehatan Anda prioritas kami — dilayani dengan ramah, teliti, dan menjaga kenyamanan Anda di setiap kunjungan.'),
   // Sprint 2 — pinjam sample industri terdekat (yang paling kaya balok) + statement.

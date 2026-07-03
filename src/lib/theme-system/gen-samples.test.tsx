@@ -21,6 +21,7 @@ import KerajinanLuxRenderer from '@/app/components/themes/toko-bespoke/Kerajinan
 import KecantikanLuxRenderer from '@/app/components/themes/toko-bespoke/KecantikanLuxRenderer'
 import GadgetLuxRenderer from '@/app/components/themes/toko-bespoke/GadgetLuxRenderer'
 import RumahLuxRenderer from '@/app/components/themes/toko-bespoke/RumahLuxRenderer'
+import AgencyPosterRenderer from '@/app/components/themes/toko-bespoke/AgencyPosterRenderer'
 import { MANIFESTS, type ComposableContent } from '@/lib/theme-system/manifest'
 import { THEMES, type ThemeOption } from '@/lib/theme-system/taxonomy'
 import { sampleContentForTheme } from '@/lib/theme-system/sample-content'
@@ -55,6 +56,9 @@ const LUX: Record<string, BespokeEntry> = {
   'gadget-onyx': { sample: 'gadget-lux', variant: 'onyx', label: 'Toko Gadget — Onyx (elektronik dark-tech)', sw: '#22D3EE', Renderer: GadgetLuxRenderer },
   // FLAGSHIP lux rumah (RumahLuxRenderer) — Selaras, Japandi light-calm arched-alcove.
   'rumah-selaras': { sample: 'rumah-lux', variant: 'selaras', label: 'Toko Rumah — Selaras (mebel & dekor Japandi)', sw: '#6F7A66', Renderer: RumahLuxRenderer },
+  // WAVE 4 — Corporate Agency "Poster" (tema pertama compiler HTML-first).
+  'agency-poster': { sample: 'corporate-agency', variant: 'bawaan', label: 'Corporate Agency — Poster (Swiss typographic)', sw: '#1B2AB8', Renderer: AgencyPosterRenderer },
+  'agency-poster-arang': { sample: 'corporate-agency', variant: 'arang', label: 'Corporate Agency — Poster Arang (gelap)', sw: '#93A2FF', Renderer: AgencyPosterRenderer },
 }
 
 const GEN = process.env.GEN_SAMPLES

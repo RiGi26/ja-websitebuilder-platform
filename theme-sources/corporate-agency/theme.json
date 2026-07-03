@@ -1,0 +1,28 @@
+{
+  "theme": "corporate-agency",
+  "rendererName": "AgencyPosterRenderer",
+  "ns": "ag",
+  "source": "services",
+  "defaultVariant": "bawaan",
+  "identity": "POSTER — corporate/agency Swiss-typographic. Anton (display condensed poster, uppercase) + Albert Sans | paper #F4F3EF · ink #101012 · ultramarine #2438E8 | sudut TAJAM 0px | motif: hairline rule + tab indeks | signature: Garis Proses (timeline draw scaleX saat reveal)",
+  "extraPalettes": {
+    "arang": {
+      "bg": "#101014",
+      "bg2": "#17171C",
+      "surface": "#1B1B21",
+      "ink": "#F4F3EF",
+      "inkDim": "#C9C8C1",
+      "muted": "#9C9B94",
+      "accent": "#6D7DFF",
+      "accentDeep": "#93A2FF",
+      "onAccent": "#101014",
+      "line": "rgba(244,243,239,.18)",
+      "line2": "rgba(244,243,239,.08)"
+    }
+  },
+  "sampleExtra": {
+    "contact.wa": "6281234567890",
+    "contact.email": "halo@naravi.studio",
+    "about.ctaHref": "#kontak"
+  }
+}
