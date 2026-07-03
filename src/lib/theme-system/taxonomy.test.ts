@@ -224,16 +224,31 @@ describe('theme-system taxonomy (S0-1)', () => {
     }
   })
 
-  it('Company: 9 tema terdaftar (DISEMBUNYIKAN dari brief form), VARIASI bg gelap↔terang', () => {
+  it('Corporate (Wave 4): agency READY (bespoke "Poster"), startup + korporat belum', () => {
     expect(hasSubKategori('corporate')).toBe(true)
-    expect(getReadySubKategori('corporate')).toEqual([])
+    const subs = getSubKategori('corporate')
+    expect(subs.map((s) => s.id)).toEqual(['startup', 'agency', 'korporat'])
+    expect(getReadySubKategori('corporate').map((s) => s.id)).toEqual(['agency'])
+    expect(subs.find((s) => s.id === 'startup')?.ready).toBe(false)
+    expect(subs.find((s) => s.id === 'korporat')?.ready).toBe(false)
+  })
+
+  it('Corporate agency = flagship bespoke "Poster" (1 varian, manifest = key registry, tema pertama compiler HTML-first)', () => {
+    const themes = getThemes('corporate', 'agency')
+    expect(themes.map((t) => t.id)).toEqual(['agency-poster'])
+    expect(themes.every((t) => t.manifest === 'corporate-agency')).toBe(true)
+    expect('corporate-agency' in BESPOKE_RENDERERS).toBe(true)
+    expect(getTheme('corporate', 'agency-poster')?.nama).toBe('Poster')
+  })
+
+  it('Corporate startup & korporat tetap 3 gaya composable, VARIASI bg gelap↔terang', () => {
     const all = getThemes('corporate', 'startup')
       .concat(getThemes('corporate', 'agency'), getThemes('corporate', 'korporat'))
-    expect(new Set(all.map((t) => t.id)).size).toBe(9)
-    expect(all.every((t) => t.manifest === t.id)).toBe(true)
-    for (const sub of ['startup', 'agency', 'korporat']) {
+    expect(new Set(all.map((t) => t.id)).size).toBe(7) // 1 agency bespoke + 3 startup + 3 korporat
+    for (const sub of ['startup', 'korporat']) {
       const themes = getThemes('corporate', sub)
       expect(themes).toHaveLength(3)
+      expect(themes.every((t) => t.manifest === t.id)).toBe(true)
       const bgs = new Set(themes.map((t) => t.bg))
       expect(bgs.has('dark')).toBe(true)
       expect(bgs.has('light') || bgs.has('warm')).toBe(true)

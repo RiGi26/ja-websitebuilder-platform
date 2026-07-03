@@ -21,6 +21,10 @@ theme-samples/
 
 # Generator output sementara (tsc→run-gen.cjs: gen-rumah, theme-registry, dll)
 .tmp-gen-*/
+.tmp-html-theme/
+
+# Playwright MCP artifacts (browser UAT lokal)
+.playwright-mcp/
 
 # Editor
 .vscode/
