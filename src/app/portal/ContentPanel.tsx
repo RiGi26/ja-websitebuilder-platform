@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Loader2, Check, ChevronDown, ChevronRight, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react'
 import ImageUploadField from './ImageUploadField'
+import { focusEditTarget } from './edit-focus'
 
 export type EditableSection = {
   id: string
@@ -77,7 +78,12 @@ function isLongText(key: string, val: string): boolean {
 type DraftMap = Record<string, Record<string, unknown>>
 type SaveState = 'saving' | 'saved' | 'error'
 
-export default function ContentPanel({ initial }: { initial: EditableSection[] }) {
+export default function ContentPanel({ initial, focus }: {
+  initial: EditableSection[]
+  // Click-to-edit (Wave 2): key 'section:<tipe>.<field>' → buka accordion
+  // section pertama ber-tipe itu + fokus field-nya (field tak ketemu → cukup buka).
+  focus?: { key: string; n: number } | null
+}) {
   const [sections, setSections] = useState<EditableSection[]>(() => [...initial].sort((a, b) => a.urutan - b.urutan))
   const [drafts, setDrafts] = useState<DraftMap>(() =>
     Object.fromEntries(initial.map((s) => [s.id, structuredClone(s.isi_komponen ?? {})])),
@@ -102,6 +108,21 @@ export default function ContentPanel({ initial }: { initial: EditableSection[] }
 
   const isDirty = (sectionId: string): boolean =>
     JSON.stringify(drafts[sectionId]) !== JSON.stringify(saved[sectionId])
+
+  // Click-to-edit: buka section pemilik lalu fokuskan field-nya.
+  useEffect(() => {
+    if (!focus) return
+    const m = /^section:([^.]+)(?:\.(.+))?$/.exec(focus.key)
+    if (!m) return
+    const target = sections.find((s) => s.tipe_komponen === m[1])
+    if (!target) return
+    setOpen(target.id)
+    const fieldSel = m[2]
+      ? `[data-section-id="${target.id}"] [data-field-key="${m[2]}"] input, [data-section-id="${target.id}"] [data-field-key="${m[2]}"] textarea`
+      : `[data-section-id="${target.id}"] input, [data-section-id="${target.id}"] textarea`
+    focusEditTarget(fieldSel, `[data-section-id="${target.id}"]`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus?.n])
 
   const save = async (sectionId: string) => {
     setState((s) => ({ ...s, [sectionId]: 'saving' }))
@@ -189,10 +210,14 @@ export default function ContentPanel({ initial }: { initial: EditableSection[] }
   // Render satu field string (input / textarea / gambar).
   const renderStringField = (sectionId: string, key: string, value: string, onChange: (v: string) => void) => {
     if (isImageKey(key)) {
-      return <ImageUploadField key={key} label={fieldLabel(key)} value={value} onChange={onChange} />
+      return (
+        <div key={key} data-field-key={key}>
+          <ImageUploadField label={fieldLabel(key)} value={value} onChange={onChange} />
+        </div>
+      )
     }
     return (
-      <div key={key}>
+      <div key={key} data-field-key={key}>
         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{fieldLabel(key)}</label>
         {isLongText(key, value) && !isLinkKey(key) ? (
           <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className={`${inp} mt-1`} />
@@ -227,7 +252,7 @@ export default function ContentPanel({ initial }: { initial: EditableSection[] }
             const editableCount = stringKeys.length + arrayKeys.length
 
             return (
-              <div key={s.id} className={`rounded-2xl border overflow-hidden ${s.is_visible ? 'border-black/5' : 'border-dashed border-black/15 bg-gray-50/40'}`}>
+              <div key={s.id} data-section-id={s.id} className={`rounded-2xl border overflow-hidden ${s.is_visible ? 'border-black/5' : 'border-dashed border-black/15 bg-gray-50/40'}`}>
                 <div className="flex items-center gap-2 p-3 sm:p-4 bg-gray-50">
                   <button
                     onClick={() => setOpen(isOpen ? null : s.id)}

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
 import { renderSite } from '@/app/components/SiteRenderer'
+import EditBridge from '@/app/components/EditBridge'
 import type { LandingPageWithSections } from '@/types/websitebuilder'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
@@ -69,12 +70,24 @@ export async function generateMetadata({
 
 export default async function PublicSitePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const { slug } = await params
   const page = await getPage(slug)
   if (!page) notFound()
 
-  return renderSite({ page, slug, client: supabase })
+  // Click-to-edit (Wave 2): LivePreview portal memuat iframe dgn ?portalEdit=1
+  // → suntik bridge (aktif hanya di dalam iframe; publik tanpa param = nol byte).
+  const { portalEdit } = await searchParams
+  const rendered = await renderSite({ page, slug, client: supabase })
+  if (portalEdit !== '1') return rendered
+  return (
+    <>
+      {rendered}
+      <EditBridge />
+    </>
+  )
 }
