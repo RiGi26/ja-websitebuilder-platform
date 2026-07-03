@@ -27,6 +27,9 @@ import SekolahAlmamaterRenderer from './SekolahAlmamaterRenderer'
 import AgencyPosterRenderer from './AgencyPosterRenderer'
 import { WARUNG_SLOTS } from './slots/restaurant-warung.slots'
 import { CORPORATE_AGENCY_SLOTS } from './slots/corporate-agency.slots'
+import { RESTAURANT_LUX_SLOTS } from './slots/restaurant-lux.slots'
+import { KLINIK_FISIO_SLOTS } from './slots/klinik-fisio.slots'
+import { TOKO_ATELIER_SLOTS } from './slots/toko-atelier.slots'
 
 /** Sumber etalase yang di-fetch SiteRenderer untuk renderer ini. */
 export type BespokeSource = 'products' | 'menu' | 'services' | 'blog'
@@ -71,7 +74,44 @@ export interface ThemeDesignOptions {
 
 export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   // Restaurant-lux (finedining) — etalase = menu_items, tanpa keranjang.
-  'restaurant-lux': { Renderer: RestaurantLuxRenderer, source: 'menu', showcaseTitle: 'Menu Kami' },
+  // Migrasi zero-hardcode Wave 5 (slots) + style knobs. Palet [0] = SENTINEL
+  // "bawaan paket" (id bukan key PALETTES; route design menghapus key utk [0],
+  // jadi sentinel tak pernah tersimpan) — build variant lux bisa aurum/noir/
+  // hearth, sentinel membuat ketiganya tetap bisa dipilih EKSPLISIT. Ketiga
+  // palet ber-contrast test (RestaurantLuxRenderer.contrast.test.ts). Pairing
+  // alternatif lolos cek ledger: Playfair Display & EB Garamond tak dipakai
+  // tema lain (Cormorant = identitas lux; body Inter tetap).
+  'restaurant-lux': {
+    Renderer: RestaurantLuxRenderer, source: 'menu', showcaseTitle: 'Menu Kami', slots: RESTAURANT_LUX_SLOTS,
+    design: {
+      palettes: [
+        { id: 'bawaan', label: 'Bawaan paket', swatch: '#C9A24B' },
+        { id: 'aurum', label: 'Aurum Emas', swatch: '#C9A24B' },
+        { id: 'noir', label: 'Noir Sampanye', swatch: '#C7B07E' },
+        { id: 'hearth', label: 'Hearth Tembaga', swatch: '#CB8A4E' },
+      ],
+      fontPairings: [
+        {
+          id: 'bawaan', label: 'Cormorant (bawaan)',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap',
+          display: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
+          body: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+        {
+          id: 'playfair', label: 'Playfair Klasik',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap',
+          display: "'Playfair Display', Georgia, 'Times New Roman', serif",
+          body: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+        {
+          id: 'garamond', label: 'Garamond Buku',
+          importUrl: 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap',
+          display: "'EB Garamond', Georgia, 'Times New Roman', serif",
+          body: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+      ],
+    },
+  },
   // Restaurant warung/kedai bespoke (Wave 2 "Hangat") — etalase = menu, tanpa keranjang.
   // Pilot zero-hardcoded-copy (slots) + style knobs (design). Pairing alternatif
   // lolos cek ledger: Bree Serif/Karla & Alegreya tak dipakai tema lain (Karla =
@@ -111,7 +151,38 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
   'klinik-umum': { Renderer: KlinikUmumRenderer, source: 'services', showcaseTitle: 'Layanan Kami' },
   'klinik-estetik': { Renderer: KlinikEstetikRenderer, source: 'services', showcaseTitle: 'Perawatan Kami' },
   'klinik-wellness': { Renderer: KlinikWellnessRenderer, source: 'services', showcaseTitle: 'Layanan Terapi' },
-  'klinik-fisio': { Renderer: KlinikFisioRenderer, source: 'services', showcaseTitle: 'Paket Terapi' },
+  // Migrasi zero-hardcode Wave 5 (slots) + style knobs. Palet tunggal 'gerak'
+  // ([0] = bawaan, sudah ber-contrast test). Pairing alternatif lolos cek
+  // ledger: Lexend & Urbanist tak dipakai tema lain (Sora = identitas fisio;
+  // body Plus Jakarta Sans tetap).
+  'klinik-fisio': {
+    Renderer: KlinikFisioRenderer, source: 'services', showcaseTitle: 'Paket Terapi', slots: KLINIK_FISIO_SLOTS,
+    design: {
+      palettes: [
+        { id: 'gerak', label: 'Gerak (bawaan)', swatch: '#0E7CB0' },
+      ],
+      fontPairings: [
+        {
+          id: 'bawaan', label: 'Sora (bawaan)',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap',
+          display: '"Sora","Segoe UI",system-ui,sans-serif',
+          body: '"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif',
+        },
+        {
+          id: 'lexend', label: 'Lexend Tegas',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap',
+          display: '"Lexend","Segoe UI",system-ui,sans-serif',
+          body: '"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif',
+        },
+        {
+          id: 'urbanist', label: 'Urbanist Ramping',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Urbanist:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap',
+          display: '"Urbanist","Segoe UI",system-ui,sans-serif',
+          body: '"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif',
+        },
+      ],
+    },
+  },
   // Sekolah bespoke (Wave 3 "Almamater") — etalase = services (program/jenjang), tanpa keranjang.
   'sekolah-reguler': { Renderer: SekolahAlmamaterRenderer, source: 'services', showcaseTitle: 'Program Kami' },
   // Corporate agency bespoke (Wave 4 "Poster") — tema PERTAMA hasil compiler
@@ -148,7 +219,41 @@ export const BESPOKE_RENDERERS: Record<string, BespokeEntry> = {
     },
   },
   // Toko bespoke — etalase = products, keranjang aktif.
-  'toko-atelier': { Renderer: TokoAtelierRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
+  // Migrasi zero-hardcode Wave 5 (slots) + style knobs. Palet [0] = SENTINEL
+  // "bawaan paket" (build variant bisa noir ATAU ivoire — sentinel membuat
+  // keduanya tetap bisa dipilih eksplisit; keduanya ber-contrast test).
+  // Pairing alternatif lolos cek ledger: Prata & Crimson Pro tak dipakai tema
+  // lain (Fraunces = identitas atelier; body Archivo tetap).
+  'toko-atelier': {
+    Renderer: TokoAtelierRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami', slots: TOKO_ATELIER_SLOTS,
+    design: {
+      palettes: [
+        { id: 'bawaan', label: 'Bawaan paket', swatch: '#C5A572' },
+        { id: 'noir', label: 'Noir Gelap', swatch: '#C5A572' },
+        { id: 'ivoire', label: 'Ivoire Terang', swatch: '#7A5C32' },
+      ],
+      fontPairings: [
+        {
+          id: 'bawaan', label: 'Fraunces (bawaan)',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=Archivo:wght@400;500;600;700&display=swap',
+          display: "'Fraunces', Georgia, 'Times New Roman', serif",
+          body: "'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+        {
+          id: 'prata', label: 'Prata Editorial',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Prata&family=Archivo:wght@400;500;600;700&display=swap',
+          display: "'Prata', Georgia, 'Times New Roman', serif",
+          body: "'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+        {
+          id: 'crimson', label: 'Crimson Halus',
+          importUrl: 'https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Archivo:wght@400;500;600;700&display=swap',
+          display: "'Crimson Pro', Georgia, 'Times New Roman', serif",
+          body: "'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+      ],
+    },
+  },
   'toko-kuliner': { Renderer: KulinerLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Menu Kami' },
   'toko-kerajinan': { Renderer: KerajinanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kerajinan' },
   'toko-kecantikan': { Renderer: KecantikanLuxRenderer, source: 'products', hasCart: true, showcaseTitle: 'Koleksi Kami' },
