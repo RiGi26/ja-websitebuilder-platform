@@ -4,6 +4,8 @@ import type { BespokeProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
 import KlinikFisioBooking from './KlinikFisioBooking'
+import { copyGetter } from '@/lib/theme-system/theme-copy'
+import { KLINIK_FISIO_SLOTS } from './slots/klinik-fisio.slots'
 
 // ============================================================
 // GERAK — Klinik Sport-Physiotherapy Bespoke Lux Renderer (Athletic-Clinical)
@@ -49,6 +51,12 @@ const BODY = '"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif'
 const EASE = 'cubic-bezier(.16,1,.3,1)'
 const SPRING = 'cubic-bezier(.34,1.56,.64,1)'
 
+// Font parametrik (style knobs Wave 3): default = konstanta bawaan (byte-identik
+// render lama; parity.test menjaga). Pairing alternatif datang dari kurasi
+// registry (BespokeEntry.design.fontPairings) via props.font.
+type KfFont = { importUrl: string; display: string; body: string }
+const DEFAULT_FONT: KfFont = { importUrl: FONT_IMPORT, display: DISPLAY, body: BODY }
+
 // Ikon WhatsApp (glyph) — dipakai tombol WA primer. aria-hidden (dekoratif).
 function IconWa({ className = '' }: { className?: string }) {
   return (
@@ -78,13 +86,13 @@ function MotionArc({ className = '' }: { className?: string }) {
   )
 }
 
-function kfCss(): string {
+function kfCss(f: KfFont): string {
   return `
-@import url('${FONT_IMPORT}');
+@import url('${f.importUrl}');
 html,body{overflow-x:hidden;max-width:100%}
-.kf-root{font-family:${BODY};color:var(--kf-ink);background:var(--kf-bg);line-height:1.65;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:hidden;max-width:100%}
+.kf-root{font-family:${f.body};color:var(--kf-ink);background:var(--kf-bg);line-height:1.65;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:hidden;max-width:100%}
 .kf-root *,.kf-root *::before,.kf-root *::after{box-sizing:border-box;margin:0;padding:0}
-.kf-root h1,.kf-root h2,.kf-root h3,.kf-root h4{font-family:${DISPLAY};color:var(--kf-ink);line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
+.kf-root h1,.kf-root h2,.kf-root h3,.kf-root h4{font-family:${f.display};color:var(--kf-ink);line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
 .kf-root p{text-wrap:pretty}
 .kf-root img{max-width:100%;height:auto;display:block}
 .kf-root ::selection{background:rgba(14,124,176,.18);color:var(--kf-ink)}
@@ -98,10 +106,10 @@ html,body{overflow-x:hidden;max-width:100%}
 /* NAV */
 .kf-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.05rem 7vw;display:flex;align-items:center;justify-content:space-between;transition:background .45s,box-shadow .45s,backdrop-filter .45s,padding .45s}
 .kf-root.lx-scrolled .kf-nav{background:rgba(245,249,251,.84);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--kf-line),0 6px 24px var(--kf-shadow);padding-top:.8rem;padding-bottom:.8rem}
-.kf-nav-logo{font-family:${DISPLAY};font-weight:800;letter-spacing:-.02em;color:var(--kf-ink);font-size:1.4rem;text-decoration:none;display:flex;align-items:center;gap:.55rem}
+.kf-nav-logo{font-family:${f.display};font-weight:800;letter-spacing:-.02em;color:var(--kf-ink);font-size:1.4rem;text-decoration:none;display:flex;align-items:center;gap:.55rem}
 .kf-nav-logo::before{content:'';width:11px;height:11px;border-radius:50%;background:var(--kf-accent);box-shadow:0 0 0 4px rgba(14,124,176,.16)}
 .kf-nav-logo b{color:var(--kf-pop);font-weight:800}
-.kf-nav-cta{display:inline-flex;align-items:center;gap:.5rem;font-family:${DISPLAY};font-size:.86rem;font-weight:700;color:var(--kf-ink);background:var(--kf-pop);padding:.62rem 1.3rem;border-radius:999px;text-decoration:none;transition:transform .25s ${SPRING},background .25s,box-shadow .25s;box-shadow:0 10px 22px -10px rgba(243,156,18,.7)}
+.kf-nav-cta{display:inline-flex;align-items:center;gap:.5rem;font-family:${f.display};font-size:.86rem;font-weight:700;color:var(--kf-ink);background:var(--kf-pop);padding:.62rem 1.3rem;border-radius:999px;text-decoration:none;transition:transform .25s ${SPRING},background .25s,box-shadow .25s;box-shadow:0 10px 22px -10px rgba(243,156,18,.7)}
 .kf-nav-cta:hover{transform:translateY(-2px);background:var(--kf-popDeep)}
 .kf-nav-cta svg{width:17px;height:17px;flex:none}
 
@@ -112,17 +120,17 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-hero::before{content:'';position:absolute;top:-220px;right:-160px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(27,156,216,.20),rgba(243,156,18,.10) 55%,transparent 72%);z-index:0;pointer-events:none}
 .kf-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(2rem,5vw,3.4rem);padding:9rem 7vw 5rem}
 .kf-hero-text{position:relative;z-index:2}
-.kf-eyebrow{font-family:${DISPLAY};font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--kf-accentDeep)}
+.kf-eyebrow{font-family:${f.display};font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--kf-accentDeep)}
 .kf-hero-tagline{display:inline-flex;align-items:center;gap:.5rem;background:var(--kf-bg2);color:var(--kf-accentDeep);font-weight:600;font-size:.86rem;padding:.5rem 1rem;border-radius:999px;margin:1.1rem 0 1.3rem}
 .kf-hero-tagline svg{width:16px;height:16px;flex:none}
 .kf-hero-title{font-size:clamp(2.3rem,5.4vw,3.85rem);font-weight:800;line-height:1.06;color:var(--kf-ink);letter-spacing:-.025em}
 .kf-hero-title em{font-style:normal;color:var(--kf-accent)}
 .kf-hero-sub{font-size:1.12rem;color:var(--kf-inkDim);margin:1.4rem 0 1.9rem;max-width:50ch;line-height:1.75}
 .kf-hero-cta{display:flex;gap:.9rem;flex-wrap:wrap}
-.kf-btn-wa{display:inline-flex;align-items:center;gap:.55rem;font-family:${DISPLAY};font-weight:700;font-size:1rem;background:var(--kf-pop);color:var(--kf-ink);padding:.95rem 1.7rem;border-radius:999px;text-decoration:none;border:1px solid transparent;transition:transform .25s ${SPRING},background .2s,box-shadow .25s;box-shadow:0 14px 28px -12px rgba(243,156,18,.7)}
+.kf-btn-wa{display:inline-flex;align-items:center;gap:.55rem;font-family:${f.display};font-weight:700;font-size:1rem;background:var(--kf-pop);color:var(--kf-ink);padding:.95rem 1.7rem;border-radius:999px;text-decoration:none;border:1px solid transparent;transition:transform .25s ${SPRING},background .2s,box-shadow .25s;box-shadow:0 14px 28px -12px rgba(243,156,18,.7)}
 .kf-btn-wa:hover{background:var(--kf-popDeep);transform:translateY(-2px)}
 .kf-btn-wa svg{width:19px;height:19px;flex:none}
-.kf-btn-ghost{display:inline-flex;align-items:center;gap:.5rem;font-family:${DISPLAY};font-weight:700;font-size:1rem;background:var(--kf-surface);color:var(--kf-accentDeep);padding:.95rem 1.6rem;border-radius:999px;text-decoration:none;border:1px solid var(--kf-bg2);box-shadow:0 4px 14px -8px var(--kf-shadow);transition:transform .25s ${SPRING},border-color .2s}
+.kf-btn-ghost{display:inline-flex;align-items:center;gap:.5rem;font-family:${f.display};font-weight:700;font-size:1rem;background:var(--kf-surface);color:var(--kf-accentDeep);padding:.95rem 1.6rem;border-radius:999px;text-decoration:none;border:1px solid var(--kf-bg2);box-shadow:0 4px 14px -8px var(--kf-shadow);transition:transform .25s ${SPRING},border-color .2s}
 .kf-btn-ghost:hover{border-color:var(--kf-accentLight);transform:translateY(-2px)}
 .kf-hero-micro{margin-top:1.1rem;font-size:.86rem;color:var(--kf-muted);display:flex;align-items:center;gap:.45rem}
 .kf-hero-micro svg{width:16px;height:16px;flex:none}
@@ -130,7 +138,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-trust{display:flex;align-items:center;gap:1.1rem;margin-top:2rem;padding-top:1.6rem;border-top:1px solid var(--kf-line);flex-wrap:wrap}
 .kf-trust-stars{display:flex;gap:2px}
 .kf-trust-stars svg{width:18px;height:18px;color:var(--kf-pop)}
-.kf-trust b{color:var(--kf-ink);font-family:${DISPLAY};font-weight:700;font-variant-numeric:tabular-nums}
+.kf-trust b{color:var(--kf-ink);font-family:${f.display};font-weight:700;font-variant-numeric:tabular-nums}
 .kf-trust small{font-size:.78rem;color:var(--kf-muted);display:block}
 .kf-trust-div{width:1px;height:30px;background:var(--kf-line)}
 /* visual kanan */
@@ -143,8 +151,8 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-hero-arc{position:absolute;left:0;right:0;bottom:-1px;height:46%;z-index:2;pointer-events:none}
 .kf-float-card{position:absolute;left:-1.6rem;bottom:2.1rem;z-index:3;background:var(--kf-surface);border-radius:18px;padding:.95rem 1.2rem;box-shadow:0 16px 40px -18px var(--kf-shadowDeep);display:flex;align-items:center;gap:.8rem}
 .kf-float-ring{width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--kf-accentLight),var(--kf-pop),var(--kf-accentLight));display:grid;place-items:center;flex:none}
-.kf-float-ring i{width:38px;height:38px;border-radius:50%;background:var(--kf-surface);display:grid;place-items:center;font-family:${DISPLAY};font-weight:800;color:var(--kf-ink);font-size:.92rem;font-style:normal;font-variant-numeric:tabular-nums}
-.kf-float-card b{font-family:${DISPLAY};color:var(--kf-ink);font-size:.92rem;display:block}
+.kf-float-ring i{width:38px;height:38px;border-radius:50%;background:var(--kf-surface);display:grid;place-items:center;font-family:${f.display};font-weight:800;color:var(--kf-ink);font-size:.92rem;font-style:normal;font-variant-numeric:tabular-nums}
+.kf-float-card b{font-family:${f.display};color:var(--kf-ink);font-size:.92rem;display:block}
 .kf-float-card small{font-size:.74rem;color:var(--kf-muted)}
 .kf-float-badge{position:absolute;right:-1rem;top:1.9rem;z-index:3;background:var(--kf-surface);border-radius:14px;padding:.65rem .9rem;box-shadow:0 16px 40px -18px var(--kf-shadowDeep);font-size:.78rem;font-weight:700;color:var(--kf-accentDeep);display:flex;align-items:center;gap:.5rem}
 .kf-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
@@ -167,7 +175,7 @@ html,body{overflow-x:hidden;max-width:100%}
 
 /* KELUHAN — pill grid */
 .kf-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.kf-pill{background:var(--kf-surface);border:1px solid var(--kf-line);border-radius:18px;padding:1.35rem;display:flex;align-items:center;gap:.9rem;font-family:${DISPLAY};font-weight:600;font-size:.96rem;color:var(--kf-ink);box-shadow:0 4px 14px -8px var(--kf-shadow);transition:transform .25s ${EASE},border-color .2s}
+.kf-pill{background:var(--kf-surface);border:1px solid var(--kf-line);border-radius:18px;padding:1.35rem;display:flex;align-items:center;gap:.9rem;font-family:${f.display};font-weight:600;font-size:.96rem;color:var(--kf-ink);box-shadow:0 4px 14px -8px var(--kf-shadow);transition:transform .25s ${EASE},border-color .2s}
 .kf-pill:hover{transform:translateY(-4px);border-color:var(--kf-bg2)}
 .kf-pill-ic{flex:none;width:46px;height:46px;border-radius:13px;background:var(--kf-bg2);display:grid;place-items:center;color:var(--kf-accent)}
 .kf-pill-ic svg{width:24px;height:24px}
@@ -191,7 +199,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-track{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;counter-reset:kf-step}
 .kf-track-arc{position:absolute;top:1.4rem;left:8%;right:8%;height:64px;z-index:0;color:var(--kf-accentLight);opacity:.55;pointer-events:none}
 .kf-step{position:relative;z-index:1;padding:.4rem .3rem}
-.kf-step-n{width:54px;height:54px;border-radius:50%;background:var(--kf-surface);border:2px solid var(--kf-bg2);color:var(--kf-accent);font-family:${DISPLAY};font-weight:800;font-size:1.25rem;display:grid;place-items:center;margin-bottom:1.1rem;box-shadow:0 8px 22px -12px var(--kf-shadow);position:relative}
+.kf-step-n{width:54px;height:54px;border-radius:50%;background:var(--kf-surface);border:2px solid var(--kf-bg2);color:var(--kf-accent);font-family:${f.display};font-weight:800;font-size:1.25rem;display:grid;place-items:center;margin-bottom:1.1rem;box-shadow:0 8px 22px -12px var(--kf-shadow);position:relative}
 .kf-step:nth-child(2) .kf-step-n{border-color:rgba(243,156,18,.4);color:var(--kf-ink)}
 .kf-step-n::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:1px dashed var(--kf-line)}
 .kf-step-title{font-size:1.18rem;font-weight:700;margin-bottom:.45rem;color:var(--kf-ink)}
@@ -213,12 +221,12 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-card:hover .kf-card-frame img{transform:scale(1.05)}
 .kf-card-frame-ph{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(150deg,var(--kf-accent),var(--kf-accentLight));color:rgba(255,255,255,.85)}
 .kf-card-frame-ph svg{width:40px;height:40px}
-.kf-card-cat{position:absolute;top:.7rem;left:.7rem;z-index:2;font-family:${DISPLAY};font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--kf-accentDeep);background:rgba(255,255,255,.94);padding:.3rem .64rem;border-radius:8px;box-shadow:0 3px 9px -4px var(--kf-shadow)}
+.kf-card-cat{position:absolute;top:.7rem;left:.7rem;z-index:2;font-family:${f.display};font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--kf-accentDeep);background:rgba(255,255,255,.94);padding:.3rem .64rem;border-radius:8px;box-shadow:0 3px 9px -4px var(--kf-shadow)}
 .kf-card-body{padding:1.2rem 1.25rem 1.3rem;display:flex;flex-direction:column;flex:1}
 .kf-card-name{font-size:1.14rem;font-weight:700;color:var(--kf-ink);margin-bottom:.35rem;line-height:1.3}
 .kf-card-desc{font-size:.88rem;color:var(--kf-muted);margin-bottom:1rem;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .kf-card-foot{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin-top:auto;padding-top:.85rem;border-top:1px solid var(--kf-line)}
-.kf-card-price{font-family:${DISPLAY};font-size:1.04rem;font-weight:800;color:var(--kf-accentDeep);font-variant-numeric:tabular-nums}
+.kf-card-price{font-family:${f.display};font-size:1.04rem;font-weight:800;color:var(--kf-accentDeep);font-variant-numeric:tabular-nums}
 .kf-card-price-soft{font-size:.92rem;font-weight:700;color:var(--kf-muted)}
 .kf-card-dur{font-size:.76rem;font-weight:600;color:var(--kf-muted);display:inline-flex;align-items:center;gap:.35rem}
 .kf-card-dur::before{content:'';width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-top-color:transparent;opacity:.7}
@@ -229,8 +237,8 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-statement{padding:clamp(3.5rem,7vw,6rem) 7vw}
 .kf-stmt-inner{position:relative;max-width:62ch;margin:0 auto;background:var(--kf-surface);border:1px solid var(--kf-line);border-radius:24px;padding:clamp(2.4rem,5vw,3.6rem);text-align:center;box-shadow:0 18px 44px -22px var(--kf-shadow);overflow:hidden}
 .kf-stmt-arc{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:200px;height:90px;opacity:.5}
-.kf-stmt-ew{font-family:${DISPLAY};font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--kf-accentDeep);margin-bottom:1rem}
-.kf-stmt-quote{font-family:${DISPLAY};font-size:clamp(1.4rem,2.8vw,2.05rem);font-weight:700;color:var(--kf-ink);line-height:1.35;letter-spacing:-.015em}
+.kf-stmt-ew{font-family:${f.display};font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--kf-accentDeep);margin-bottom:1rem}
+.kf-stmt-quote{font-family:${f.display};font-size:clamp(1.4rem,2.8vw,2.05rem);font-weight:700;color:var(--kf-ink);line-height:1.35;letter-spacing:-.015em}
 .kf-stmt-cite{display:block;font-size:.82rem;color:var(--kf-muted);font-weight:600;margin-top:1.2rem}
 
 /* ABOUT — split + bingkai foto */
@@ -240,7 +248,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-about-solo .kf-eyebrow{display:block}
 .kf-about-solo .kf-about-body{margin-left:auto;margin-right:auto}
 .kf-about-body{font-size:1.04rem;color:var(--kf-inkDim);line-height:1.9;margin-top:1.1rem;white-space:pre-line}
-.kf-about-cta{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.7rem;font-family:${DISPLAY};font-size:.95rem;font-weight:700;color:var(--kf-accentDeep);text-decoration:none;transition:gap .3s,color .3s}
+.kf-about-cta{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.7rem;font-family:${f.display};font-size:.95rem;font-weight:700;color:var(--kf-accentDeep);text-decoration:none;transition:gap .3s,color .3s}
 .kf-about-cta:hover{gap:.8rem;color:var(--kf-ink)}
 .kf-about-img{position:relative}
 .kf-about-frame{position:relative;z-index:1;aspect-ratio:4/3;border-radius:22px;overflow:hidden;box-shadow:0 28px 60px -30px var(--kf-shadowDeep)}
@@ -251,7 +259,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-stats{background:var(--kf-surface);border-top:1px solid var(--kf-line);border-bottom:1px solid var(--kf-line)}
 .kf-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.3rem;text-align:center}
 .kf-stat{padding:1.4rem 1rem}
-.kf-stat-num{font-family:${DISPLAY};font-size:clamp(2.1rem,4.4vw,3rem);font-weight:800;color:var(--kf-accent);line-height:1;font-variant-numeric:tabular-nums}
+.kf-stat-num{font-family:${f.display};font-size:clamp(2.1rem,4.4vw,3rem);font-weight:800;color:var(--kf-accent);line-height:1;font-variant-numeric:tabular-nums}
 .kf-stat-label{font-size:.78rem;color:var(--kf-muted);font-weight:600;margin-top:.6rem}
 @media(max-width:560px){.kf-stats-grid{grid-template-columns:repeat(2,1fr);gap:1rem}}
 
@@ -265,8 +273,8 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-test-stars svg{width:16px;height:16px;color:var(--kf-pop)}
 .kf-test-quote{color:var(--kf-ink);font-size:.98rem;line-height:1.7;margin:0 0 1.3rem}
 .kf-test-person{display:flex;align-items:center;gap:.75rem}
-.kf-test-av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:${DISPLAY};font-weight:700;color:#fff;font-size:1rem;flex:none;background:var(--kf-accent)}
-.kf-test-name{font-family:${DISPLAY};font-weight:700;font-size:.95rem;color:var(--kf-ink)}
+.kf-test-av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:${f.display};font-weight:700;color:#fff;font-size:1rem;flex:none;background:var(--kf-accent)}
+.kf-test-name{font-family:${f.display};font-weight:700;font-size:.95rem;color:var(--kf-ink)}
 .kf-test-role{font-size:.76rem;color:var(--kf-muted);margin-top:.1rem}
 .kf-tcar-ctrl{display:flex;align-items:center;justify-content:center;gap:1.1rem;margin-top:1.4rem}
 .kf-tcar-btn{width:44px;height:44px;border-radius:12px;background:var(--kf-surface);border:1px solid var(--kf-line);color:var(--kf-ink);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .25s,color .25s,border-color .25s,opacity .25s,transform .25s ${EASE}}
@@ -280,7 +288,7 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-faq{background:var(--kf-surface)}
 .kf-faq-wrap{max-width:780px;margin:0 auto}
 .kf-faq-item{background:var(--kf-surface);border:1px solid var(--kf-line);border-radius:18px;margin-bottom:.75rem;overflow:hidden;box-shadow:0 4px 14px -8px var(--kf-shadow)}
-.kf-faq-q{display:flex;justify-content:space-between;align-items:center;gap:1rem;width:100%;padding:1.25rem 1.5rem;cursor:pointer;font-family:${DISPLAY};font-size:1.04rem;font-weight:700;color:var(--kf-ink);background:none;border:none;text-align:left}
+.kf-faq-q{display:flex;justify-content:space-between;align-items:center;gap:1rem;width:100%;padding:1.25rem 1.5rem;cursor:pointer;font-family:${f.display};font-size:1.04rem;font-weight:700;color:var(--kf-ink);background:none;border:none;text-align:left}
 .kf-faq-q:focus-visible{outline:2px solid var(--kf-accentLight);outline-offset:-2px;border-radius:14px}
 .kf-faq-pl{flex:none;width:24px;height:24px;border-radius:50%;background:var(--kf-bg2);color:var(--kf-accent);display:grid;place-items:center;transition:transform .25s ${EASE}}
 .kf-faq-pl svg{width:14px;height:14px}
@@ -302,18 +310,18 @@ html,body{overflow-x:hidden;max-width:100%}
 
 /* BAND ADD-ON */
 .kf-band{background:var(--kf-surface);border-top:1px solid var(--kf-line);border-bottom:1px solid var(--kf-line);padding:3.2rem 7vw;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.4rem}
-.kf-band-ew{font-family:${DISPLAY};font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--kf-accentDeep);margin-bottom:.5rem}
+.kf-band-ew{font-family:${f.display};font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--kf-accentDeep);margin-bottom:.5rem}
 .kf-band .kf-heading{font-size:clamp(1.5rem,2.4vw,2rem)}
 .kf-band-sub{color:var(--kf-muted);font-size:.95rem;line-height:1.6;margin-top:.5rem;max-width:56ch}
 
 /* FOOTER — navy gelap */
 .kf-footer{background:var(--kf-dark);color:#9FBED0;padding:4.2rem 7vw 2.4rem}
 .kf-footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:3rem;margin-bottom:2.6rem}
-.kf-footer-brand{display:inline-flex;align-items:center;gap:.6rem;font-family:${DISPLAY};font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:1rem}
+.kf-footer-brand{display:inline-flex;align-items:center;gap:.6rem;font-family:${f.display};font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:1rem}
 .kf-footer-brand::before{content:'';width:11px;height:11px;border-radius:50%;background:var(--kf-accentLight);box-shadow:0 0 0 4px rgba(27,156,216,.3)}
 .kf-footer-brand b{color:var(--kf-pop)}
 .kf-footer-tagline{font-size:.9rem;color:#9FBED0;line-height:1.7;max-width:36ch}
-.kf-footer-h{font-family:${DISPLAY};font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:1rem}
+.kf-footer-h{font-family:${f.display};font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:1rem}
 .kf-footer-link{display:block;font-size:.9rem;color:#9FBED0;text-decoration:none;margin-bottom:.55rem;transition:color .25s}
 .kf-footer-link:hover{color:#fff}
 .kf-footer-copy{border-top:1px solid rgba(255,255,255,.1);padding-top:1.5rem;font-size:.8rem;color:#6B8A9B;text-align:center}
@@ -338,11 +346,11 @@ html,body{overflow-x:hidden;max-width:100%}
 .kf-root .lx-lb-media{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--kf-accent),var(--kf-accentLight));min-height:300px}
 .kf-root .lx-lb-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .kf-root .lx-lb-body{padding:clamp(22px,3vw,42px);display:flex;flex-direction:column;gap:9px;justify-content:center}
-.kf-root .lx-lb-cat{font-family:${DISPLAY};font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--kf-accentDeep)}
-.kf-root .lx-lb-title{font-family:${DISPLAY};font-size:clamp(22px,2.6vw,29px);font-weight:700;line-height:1.2;color:var(--kf-ink)}
-.kf-root .lx-lb-price{font-family:${DISPLAY};font-size:19px;font-weight:800;color:var(--kf-accentDeep)}
+.kf-root .lx-lb-cat{font-family:${f.display};font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--kf-accentDeep)}
+.kf-root .lx-lb-title{font-family:${f.display};font-size:clamp(22px,2.6vw,29px);font-weight:700;line-height:1.2;color:var(--kf-ink)}
+.kf-root .lx-lb-price{font-family:${f.display};font-size:19px;font-weight:800;color:var(--kf-accentDeep)}
 .kf-root .lx-lb-desc{color:var(--kf-muted);font-size:13.5px;line-height:1.8}
-.kf-root .lx-lb-cta{margin-top:14px;width:fit-content;display:inline-flex;align-items:center;gap:.45rem;background:var(--kf-pop);color:var(--kf-ink);font-family:${DISPLAY};font-size:13px;font-weight:700;padding:12px 24px;border-radius:999px;text-decoration:none;transition:background .25s}
+.kf-root .lx-lb-cta{margin-top:14px;width:fit-content;display:inline-flex;align-items:center;gap:.45rem;background:var(--kf-pop);color:var(--kf-ink);font-family:${f.display};font-size:13px;font-weight:700;padding:12px 24px;border-radius:999px;text-decoration:none;transition:background .25s}
 .kf-root .lx-lb-cta:hover{background:var(--kf-popDeep)}
 .kf-root .lx-lb-x{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border-radius:11px;background:var(--kf-surface);border:1px solid var(--kf-line);color:var(--kf-ink);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s}
 .kf-root .lx-lb-x:hover{background:var(--kf-accentDeep);color:var(--kf-onAccent);border-color:var(--kf-accentDeep)}
@@ -388,6 +396,8 @@ const WHY_ICONS = [
 // Jalur pemulihan bernomor (SIGNATURE) — 3 langkah default; copy dari mockup.
 // Mood sport-rehab: Konsultasi → Program terarah → Pulih. Selalu tampil (bukan
 // dari ComposableContent — identitas tema; klaim spesifik klien tetap di konten).
+// Belum di-slot: butuh array objek {title,desc}; ThemeCopyPanel belum punya
+// editor item-array — follow-up saat editor itu dibangun (header seksi sudah slot).
 const RECOVERY_STEPS = [
   { title: 'Cerita keluhanmu', desc: 'Hubungi via WhatsApp, ceritakan keluhanmu, dan kami bantu jadwalkan kunjungan.' },
   { title: 'Assessment & program', desc: 'Terapis menilai kondisimu, lalu menyusun program terarah sesuai target pemulihanmu.' },
@@ -400,9 +410,14 @@ function initials(name: string): string {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'P'
 }
 
-export default function KlinikFisioRenderer({ content: c, variant = 'gerak', bookingSlug }: BespokeProps) {
+export default function KlinikFisioRenderer({ content: c, variant = 'gerak', bookingSlug, font }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.gerak
+  const f = font ?? DEFAULT_FONT
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+
+  // Copy khas-tema (slot manifest) — editan klien dari portal "Konten Tema";
+  // default = copy bawaan tema (byte-identik hardcode lama; parity.test menjaga).
+  const cp = copyGetter(c.themeCopy, KLINIK_FISIO_SLOTS)
 
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#konsultasi'
@@ -410,7 +425,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
   // WhatsApp tetap tersedia (floating + footer). Absen → perilaku lama (WA).
   const booking = !!bookingSlug
   const primaryHref = booking ? '#booking' : (c.hero?.ctaHref ?? waUrl)
-  const primaryLabel = booking ? 'Booking Online' : undefined
+  const primaryLabel = booking ? cp.t('copy.booking_cta') : undefined
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
   const features = c.features ?? []
@@ -418,7 +433,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
   const testimonials = c.testimonials ?? []
   const faqs = c.faq ?? []
   const jamRows = c.info?.jam ?? []
-  const jamSingkat = jamRows[0]?.jam ?? '09.00–18.00'
+  const jamSingkat = jamRows[0]?.jam ?? cp.t('copy.jam_fallback')
 
   const rootStyle = {
     '--kf-bg': p.bg, '--kf-bg2': p.bg2, '--kf-surface': p.surface, '--kf-surface2': p.surface2,
@@ -430,21 +445,21 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
   } as React.CSSProperties
 
   const fmt = (n: number) => 'Rp ' + n.toLocaleString('id-ID')
-  const priceText = (n?: number) => (typeof n === 'number' && n > 0 ? fmt(n) : 'Konsultasi')
+  const priceText = (n?: number) => (typeof n === 'number' && n > 0 ? fmt(n) : cp.t('copy.price_fallback'))
 
   // Rating utk kartu mengambang & trust strip — dari stats bila ada, jika tidak '5,0'.
   const ratingStat = stats.find((s) => /^[0-9][.,][0-9]/.test(s.angka))?.angka ?? '5,0'
 
   return (
     <div className="kf-root lx-root" data-variant={variant} style={rootStyle}>
-      <style dangerouslySetInnerHTML={{ __html: kfCss() }} />
+      <style dangerouslySetInnerHTML={{ __html: kfCss(f) }} />
 
       {/* NAV */}
       <nav className="kf-nav" aria-label="Navigasi utama">
         <span className="kf-nav-logo">{c.nama ?? 'Klinik Fisio'}</span>
         {booking
-          ? <a href="#booking" className="kf-nav-cta">Booking Online</a>
-          : <a href={waUrl} className="kf-nav-cta"><IconWa />WhatsApp</a>}
+          ? <a href="#booking" className="kf-nav-cta" data-edit="copy.booking_cta">{cp.t('copy.booking_cta')}</a>
+          : <a href={waUrl} className="kf-nav-cta" data-edit="copy.wa_cta"><IconWa />{cp.t('copy.wa_cta')}</a>}
       </nav>
 
       {/* HERO — copy kiri + visual teal kanan + kartu rating mengambang + busur (signature) */}
@@ -453,28 +468,28 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
         <div className="kf-hero-grid">
           <div className="kf-hero-text">
             {hero.eyebrow && <span className="kf-eyebrow">{hero.eyebrow}</span>}
-            <div className="kf-hero-tagline">
+            <div className="kf-hero-tagline" data-edit="copy.hero_tagline">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="m5 12 5 5L20 7" /></svg>
-              {hero.ctaText2 ?? 'Siap gerak bebas tanpa khawatir?'}
+              {hero.ctaText2 ?? cp.t('copy.hero_tagline')}
             </div>
             {hero.title && <h1 className="kf-hero-title">{hero.title}</h1>}
             {hero.subtitle && <p className="kf-hero-sub">{hero.subtitle}</p>}
             <div className="kf-hero-cta">
-              <a href={primaryHref} className="kf-btn-wa">{booking ? null : <IconWa />}{primaryLabel ?? hero.ctaText ?? 'Konsultasi Gratis via WhatsApp'}</a>
+              <a href={primaryHref} className="kf-btn-wa" data-edit={booking ? 'copy.booking_cta' : 'copy.hero_cta'}>{booking ? null : <IconWa />}{primaryLabel ?? hero.ctaText ?? cp.t('copy.hero_cta')}</a>
               {booking
-                ? <a href={waUrl} className="kf-btn-ghost"><IconWa />WhatsApp</a>
-                : <a href={hero.ctaHref2 ?? '#layanan'} className="kf-btn-ghost">Lihat Layanan</a>}
+                ? <a href={waUrl} className="kf-btn-ghost" data-edit="copy.wa_cta"><IconWa />{cp.t('copy.wa_cta')}</a>
+                : <a href={hero.ctaHref2 ?? '#layanan'} className="kf-btn-ghost" data-edit="copy.hero_cta2">{cp.t('copy.hero_cta2')}</a>}
             </div>
-            <p className="kf-hero-micro">
+            <p className="kf-hero-micro" data-edit="copy.hero_micro">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-              Balas cepat di jam kerja. Tanpa komitmen.
+              {cp.t('copy.hero_micro')}
             </p>
             <div className="kf-trust">
               <div>
                 <div className="kf-trust-stars" aria-label={`Rating ${ratingStat} dari 5`}>
                   {[0, 1, 2, 3, 4].map((i) => <IconStar key={i} />)}
                 </div>
-                <small><b>{ratingStat}</b> · ulasan pasien</small>
+                <small data-edit="copy.trust_reviews"><b>{ratingStat}</b> · {cp.t('copy.trust_reviews')}</small>
               </div>
               {stats.slice(0, 2).map((s, i) =>
                 /^[0-9][.,][0-9]/.test(s.angka) ? null : (
@@ -506,9 +521,9 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
             </div>
             <div className="kf-float-card">
               <div className="kf-float-ring"><i>{ratingStat}</i></div>
-              <div><b>Rating {ratingStat} di Google</b><small>Ulasan dari pasien</small></div>
+              <div><b data-edit="copy.float_rating_prefix">{cp.t('copy.float_rating_prefix')} {ratingStat} {cp.t('copy.float_rating_suffix')}</b><small data-edit="copy.float_rating_sub">{cp.t('copy.float_rating_sub')}</small></div>
             </div>
-            <div className="kf-float-badge"><span className="kf-dot" aria-hidden /> Buka · {jamSingkat}</div>
+            <div className="kf-float-badge" data-edit="copy.badge_open"><span className="kf-dot" aria-hidden /> {cp.t('copy.badge_open')} · {jamSingkat}</div>
           </div>
         </div>
       </section>
@@ -517,9 +532,9 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {items.length > 0 && (
         <section className="kf-section" id="keluhan">
           <div className="kf-sec-hdr kf-rv lx-reveal">
-            <span className="kf-eyebrow">Yang kami tangani</span>
-            <h2 className="kf-heading">Nyeri yang bikin kamu berhenti bergerak?</h2>
-            <p className="kf-subtext">Kami bantu cari sumbernya, bukan cuma redakan sementara.</p>
+            <span className="kf-eyebrow" data-edit="copy.keluhan_eyebrow">{cp.t('copy.keluhan_eyebrow')}</span>
+            <h2 className="kf-heading" data-edit="copy.keluhan_title">{cp.t('copy.keluhan_title')}</h2>
+            <p className="kf-subtext" data-edit="copy.keluhan_sub">{cp.t('copy.keluhan_sub')}</p>
           </div>
           <div className="kf-pills">
             {items.slice(0, 6).map((item, i) => (
@@ -536,7 +551,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {features.length > 0 && (
         <section className="kf-section kf-why" id="kenapa">
           <div className="kf-sec-hdr kf-rv lx-reveal">
-            <span className="kf-eyebrow">{c.featuresEyebrow ?? 'Kenapa Kami'}</span>
+            <span className="kf-eyebrow" data-edit="copy.features_eyebrow">{c.featuresEyebrow ?? cp.t('copy.features_eyebrow')}</span>
             {c.featuresTitle && <h2 className="kf-heading">{c.featuresTitle}</h2>}
           </div>
           <div className="kf-why-grid">
@@ -554,8 +569,8 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {/* RECOVERY TRACK (SIGNATURE) — jalur pemulihan bernomor ber-busur */}
       <section className="kf-section" id="cara">
         <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
-          <span className="kf-eyebrow">Cara kerja</span>
-          <h2 className="kf-heading">Jalur pemulihan dalam tiga langkah</h2>
+          <span className="kf-eyebrow" data-edit="copy.steps_eyebrow">{cp.t('copy.steps_eyebrow')}</span>
+          <h2 className="kf-heading" data-edit="copy.steps_title">{cp.t('copy.steps_title')}</h2>
         </div>
         <div className="kf-track">
           <MotionArc className="kf-track-arc" />
@@ -573,7 +588,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {items.length > 0 && (
         <section className="kf-section kf-showcase" id="layanan">
           <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
-            <span className="kf-eyebrow">Layanan</span>
+            <span className="kf-eyebrow" data-edit="copy.layanan_eyebrow">{cp.t('copy.layanan_eyebrow')}</span>
             {c.showcase?.title && <h2 className="kf-heading">{c.showcase.title}</h2>}
             {c.showcase?.subtitle && <p className="kf-subtext">{c.showcase.subtitle}</p>}
           </div>
@@ -611,7 +626,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
                       {priceText(item.harga)}
                     </span>
                     {typeof item.durasi === 'number' && item.durasi > 0 && (
-                      <span className="kf-card-dur">± {item.durasi} menit</span>
+                      <span className="kf-card-dur">± {item.durasi} {cp.t('copy.durasi_suffix')}</span>
                     )}
                   </div>
                 </div>
@@ -625,9 +640,9 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {booking && (
         <section className="kf-section kf-booking" id="booking" aria-label="Booking online">
           <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
-            <span className="kf-eyebrow">Booking Online</span>
-            <h2 className="kf-heading">Pilih jadwal &amp; amankan slotmu</h2>
-            <p className="kf-subtext">Cek ketersediaan real-time lalu booking langsung di sini — tanpa antre chat.</p>
+            <span className="kf-eyebrow" data-edit="copy.booking_eyebrow">{cp.t('copy.booking_eyebrow')}</span>
+            <h2 className="kf-heading" data-edit="copy.booking_title">{cp.t('copy.booking_title')}</h2>
+            <p className="kf-subtext" data-edit="copy.booking_sub">{cp.t('copy.booking_sub')}</p>
           </div>
           <div className="kf-rv lx-reveal">
             <KlinikFisioBooking slug={bookingSlug!} />
@@ -652,12 +667,12 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
         <section className="kf-section kf-about" id="tentang">
           <div className={`kf-about-inner${c.about.image ? '' : ' kf-about-solo'}`}>
             <div className="kf-rv lx-reveal">
-              <span className="kf-eyebrow">Tentang Kami</span>
+              <span className="kf-eyebrow" data-edit="copy.about_eyebrow">{cp.t('copy.about_eyebrow')}</span>
               <h2 className="kf-heading">{c.about.title}</h2>
               <p className="kf-about-body">{c.about.body}</p>
               {c.about.ctaHref && (
-                <a href={c.about.ctaHref} className="kf-about-cta">
-                  {c.about.ctaText ?? 'Pelajari lebih lanjut'} →
+                <a href={c.about.ctaHref} className="kf-about-cta" data-edit="copy.about_cta">
+                  {c.about.ctaText ?? cp.t('copy.about_cta')} →
                 </a>
               )}
             </div>
@@ -690,8 +705,8 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {testimonials.length > 0 && (
         <section className="kf-section kf-testimonials" id="ulasan">
           <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
-            <span className="kf-eyebrow">Cerita pasien</span>
-            <h2 className="kf-heading">Mereka kembali bergerak bebas</h2>
+            <span className="kf-eyebrow" data-edit="copy.ulasan_eyebrow">{cp.t('copy.ulasan_eyebrow')}</span>
+            <h2 className="kf-heading" data-edit="copy.ulasan_title">{cp.t('copy.ulasan_title')}</h2>
             <p className="kf-mocklabel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /></svg>
               Contoh untuk mockup — ganti dengan testimoni asli (izin pasien)
@@ -732,8 +747,8 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       {faqs.length > 0 && (
         <section className="kf-section kf-faq" id="faq">
           <div className="kf-sec-hdr kf-center kf-rv lx-reveal">
-            <span className="kf-eyebrow">FAQ</span>
-            <h2 className="kf-heading">Pertanyaan yang sering ditanyakan</h2>
+            <span className="kf-eyebrow" data-edit="copy.faq_eyebrow">{cp.t('copy.faq_eyebrow')}</span>
+            <h2 className="kf-heading" data-edit="copy.faq_title">{cp.t('copy.faq_title')}</h2>
           </div>
           <div className="kf-faq-wrap">
             {faqs.map((f, i) => (
@@ -764,10 +779,10 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
             {c.cta.subtitle && <p className="kf-cta-sub">{c.cta.subtitle}</p>}
             <div className="kf-cta-btns">
               {booking
-                ? <><a href="#booking" className="kf-btn-wa">Booking Online</a>
-                    <a href={waUrl} className="kf-btn-ghost"><IconWa />Konsultasi via WhatsApp</a></>
-                : <><a href={waUrl} className="kf-btn-wa"><IconWa />{c.cta.ctaText ?? 'Konsultasi via WhatsApp'}</a>
-                    <a href="#layanan" className="kf-btn-ghost">Lihat Layanan</a></>}
+                ? <><a href="#booking" className="kf-btn-wa" data-edit="copy.booking_cta">{cp.t('copy.booking_cta')}</a>
+                    <a href={waUrl} className="kf-btn-ghost" data-edit="copy.cta_wa"><IconWa />{cp.t('copy.cta_wa')}</a></>
+                : <><a href={waUrl} className="kf-btn-wa" data-edit="copy.cta_wa"><IconWa />{c.cta.ctaText ?? cp.t('copy.cta_wa')}</a>
+                    <a href="#layanan" className="kf-btn-ghost" data-edit="copy.hero_cta2">{cp.t('copy.hero_cta2')}</a></>}
             </div>
           </div>
         </section>
@@ -790,12 +805,12 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
         <div className="kf-footer-grid">
           <div>
             <p className="kf-footer-brand">{c.nama ?? 'Klinik Fisio'}</p>
-            <p className="kf-footer-tagline">
-              {hero.eyebrow ?? `${c.nama ?? 'Klinik'} — fisioterapi & sport rehabilitation.`} Siap gerak bebas tanpa khawatir.
+            <p className="kf-footer-tagline" data-edit="copy.footer_tagline">
+              {hero.eyebrow ?? `${c.nama ?? 'Klinik'} — ${cp.t('copy.footer_desc')}`} {cp.t('copy.footer_tagline')}
             </p>
           </div>
           <div>
-            <p className="kf-footer-h">Kontak</p>
+            <p className="kf-footer-h" data-edit="copy.footer_kontak_h">{cp.t('copy.footer_kontak_h')}</p>
             {wa && <a href={waUrl} className="kf-footer-link">WhatsApp</a>}
             {c.contact?.email && (
               <a href={`mailto:${c.contact.email}`} className="kf-footer-link">{c.contact.email}</a>
@@ -803,14 +818,14 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
             {c.contact?.alamat && <p className="kf-footer-link">{c.contact.alamat}</p>}
           </div>
           <div>
-            <p className="kf-footer-h">Jam Praktik</p>
+            <p className="kf-footer-h" data-edit="copy.footer_jam_h">{cp.t('copy.footer_jam_h')}</p>
             {jamRows.length
               ? jamRows.map((j, i) => <p key={i} className="kf-footer-link">{j.hari}: {j.jam}</p>)
-              : <p className="kf-footer-link">Senin–Sabtu: 09.00–18.00</p>}
+              : <p className="kf-footer-link" data-edit="copy.footer_jam_fallback">{cp.t('copy.footer_jam_fallback')}</p>}
           </div>
         </div>
-        <p className="kf-footer-copy">
-          © {new Date().getFullYear()} {c.nama ?? 'Klinik Fisio'}. Semua hak cipta dilindungi.
+        <p className="kf-footer-copy" data-edit="copy.footer_copyright">
+          © {new Date().getFullYear()} {c.nama ?? 'Klinik Fisio'}. {cp.t('copy.footer_copyright')}
         </p>
       </footer>
 
@@ -820,7 +835,7 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
       </a>
 
       {/* LIGHTBOX */}
-      <BespokeLightbox ctaText="Konsultasi via WhatsApp" />
+      <BespokeLightbox ctaText={cp.t('copy.cta_wa')} />
       <script dangerouslySetInnerHTML={{ __html: LUX_JS }} />
     </div>
   )

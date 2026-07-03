@@ -16,13 +16,15 @@ import type { CSSProperties } from 'react'
 import type { ShowcaseItem, TeamMember } from '@/lib/theme-system/manifest'
 import type { BespokeProps } from '../toko-bespoke/types'
 import { resolveCapabilities } from '@/lib/addons/capabilities'
+import { copyGetter } from '@/lib/theme-system/theme-copy'
+import { RESTAURANT_LUX_SLOTS } from '../toko-bespoke/slots/restaurant-lux.slots'
 
 // ── Palet peran semantik (warm-dark luxury) ──────────────────
 interface Pal {
   bg: string; bg2: string; surface: string; ink: string; inkDim: string
   muted: string; accent: string; line: string; line2: string
 }
-const PALETTES: Record<string, Pal> = {
+export const PALETTES: Record<string, Pal> = {
   // Aurum — near-black hangat + emas (default, = mockup)
   aurum: {
     bg: '#100C0A', bg2: '#15100D', surface: '#1C1714', ink: '#F3ECE1', inkDim: '#D9CDBC',
@@ -43,10 +45,16 @@ function getPal(variant?: string): Pal {
   return PALETTES[variant ?? 'aurum'] ?? PALETTES.aurum
 }
 
-const FONT_IMPORT =
-  "@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap');"
+const FONT_URL =
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap'
 const SERIF = "'Cormorant Garamond', Georgia, 'Times New Roman', serif"
 const SANS = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+
+// Font parametrik (style knobs Wave 3): default = konstanta bawaan (byte-identik
+// render lama; parity.test menjaga). Pairing alternatif datang dari kurasi
+// registry (BespokeEntry.design.fontPairings) via props.font.
+type RlFont = { importUrl: string; display: string; body: string }
+const DEFAULT_FONT: RlFont = { importUrl: FONT_URL, display: SERIF, body: SANS }
 
 function rupiah(n?: number): string {
   if (typeof n !== 'number' || !Number.isFinite(n)) return ''
@@ -77,15 +85,15 @@ function groupByKategori(items: ShowcaseItem[]): { kategori?: string; items: Sho
 }
 
 const EASE = 'cubic-bezier(.16,1,.3,1)'
-function rlCss(): string {
-  return `${FONT_IMPORT}
-.rl-root{background:var(--rl-bg);color:var(--rl-ink);font-family:${SANS};line-height:1.65;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-.rl-root h1,.rl-root h2,.rl-root h3{font-family:${SERIF};font-weight:600;letter-spacing:-.01em;line-height:1.05;margin:0}
+function rlCss(f: RlFont): string {
+  return `@import url('${f.importUrl}');
+.rl-root{background:var(--rl-bg);color:var(--rl-ink);font-family:${f.body};line-height:1.65;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.rl-root h1,.rl-root h2,.rl-root h3{font-family:${f.display};font-weight:600;letter-spacing:-.01em;line-height:1.05;margin:0}
 .rl-root p{margin:0;text-wrap:pretty}
 .rl-root a{color:inherit;text-decoration:none}
 .rl-root img{display:block;max-width:100%}
 .rl-wrap{max-width:1200px;margin:0 auto;padding:0 32px}
-.rl-eyebrow{font-family:${SANS};font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--rl-accent);display:inline-flex;align-items:center;gap:13px}
+.rl-eyebrow{font-family:${f.body};font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--rl-accent);display:inline-flex;align-items:center;gap:13px}
 .rl-eyebrow::before{content:"";width:32px;height:1px;background:var(--rl-accent);opacity:.65}
 .rl-btn{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:15px 30px;border-radius:2px;transition:transform .35s ${EASE},background-color .35s ease,color .35s ease}
 .rl-btn-gold{background:var(--rl-accent);color:#16120A}
@@ -101,8 +109,8 @@ function rlCss(): string {
 /* nav */
 .rl-nav{position:sticky;top:0;z-index:100;backdrop-filter:saturate(1.3) blur(14px);background:linear-gradient(to bottom,color-mix(in srgb,var(--rl-bg) 72%,transparent),color-mix(in srgb,var(--rl-bg) 34%,transparent));border-bottom:1px solid var(--rl-line2)}
 .rl-nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1200px;margin:0 auto;padding:18px 32px}
-.rl-brand{font-family:${SERIF};font-size:25px;font-weight:600;letter-spacing:.02em}
-.rl-brand small{display:block;font-family:${SANS};font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--rl-muted);margin-top:-2px}
+.rl-brand{font-family:${f.display};font-size:25px;font-weight:600;letter-spacing:.02em}
+.rl-brand small{display:block;font-family:${f.body};font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--rl-muted);margin-top:-2px}
 .rl-nav-links{display:flex;gap:32px}
 .rl-nav-link{font-size:13px;font-weight:500;color:var(--rl-inkDim);position:relative;padding:4px 0;transition:color .25s ease}
 .rl-nav-link::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--rl-accent);transition:width .3s ease}
@@ -125,9 +133,9 @@ function rlCss(): string {
 /* statement */
 .rl-statement{background:var(--rl-bg2);border-top:1px solid var(--rl-line2);border-bottom:1px solid var(--rl-line2)}
 .rl-statement .rl-wrap{display:grid;grid-template-columns:1fr 2.1fr;gap:48px;align-items:start}
-.rl-quote{font-family:${SERIF};font-style:italic;font-weight:500;font-size:clamp(26px,3.4vw,42px);line-height:1.22;position:relative}
+.rl-quote{font-family:${f.display};font-style:italic;font-weight:500;font-size:clamp(26px,3.4vw,42px);line-height:1.22;position:relative}
 .rl-quote::before{content:"\\201C";position:absolute;left:-.4em;top:-.35em;font-size:2.6em;color:var(--rl-accent);opacity:.16;font-style:normal}
-.rl-cite{display:block;margin-top:26px;font-family:${SANS};font-style:normal;font-size:13px;letter-spacing:.06em;color:var(--rl-muted)}
+.rl-cite{display:block;margin-top:26px;font-family:${f.body};font-style:normal;font-size:13px;letter-spacing:.06em;color:var(--rl-muted)}
 @media(max-width:780px){.rl-statement .rl-wrap{grid-template-columns:1fr;gap:24px}}
 /* signature dishes */
 .rl-dish{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,72px);align-items:center;margin-bottom:clamp(56px,8vw,110px)}
@@ -136,11 +144,11 @@ function rlCss(): string {
 .rl-dish-media{position:relative;overflow:hidden;border-radius:3px;aspect-ratio:4/5;background:linear-gradient(135deg,var(--rl-surface),var(--rl-bg2))}
 .rl-dish-media img{width:100%;height:100%;object-fit:cover;transition:transform .9s ${EASE}}
 .rl-dish:hover .rl-dish-media img{transform:scale(1.06)}
-.rl-dish-idx{font-family:${SERIF};font-size:clamp(46px,6vw,80px);color:var(--rl-accent);opacity:.4;line-height:1;font-variant-numeric:tabular-nums}
+.rl-dish-idx{font-family:${f.display};font-size:clamp(46px,6vw,80px);color:var(--rl-accent);opacity:.4;line-height:1;font-variant-numeric:tabular-nums}
 .rl-dish h3{font-size:clamp(28px,3.4vw,42px);margin:12px 0 14px}
 .rl-dish .rl-lead{color:var(--rl-inkDim);font-size:16px;line-height:1.75;max-width:42ch}
 .rl-dish .rl-meta{margin-top:22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.rl-dish .rl-dprice{font-family:${SERIF};font-size:26px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff)}
+.rl-dish .rl-dprice{font-family:${f.display};font-size:26px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff)}
 .rl-tag{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rl-muted);border:1px solid var(--rl-line);padding:5px 12px;border-radius:999px}
 @media(max-width:780px){.rl-dish{grid-template-columns:1fr;gap:24px}.rl-dish:nth-child(even) .rl-dish-media{order:0}}
 /* menu */
@@ -152,9 +160,9 @@ function rlCss(): string {
 .rl-menu-cat>h3{font-size:24px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--rl-line)}
 .rl-menu-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--rl-line2)}
 .rl-menu-row:last-child{border-bottom:none}
-.rl-menu-row .rl-nm{font-family:${SERIF};font-size:20px;color:var(--rl-ink)}
+.rl-menu-row .rl-nm{font-family:${f.display};font-size:20px;color:var(--rl-ink)}
 .rl-menu-row .rl-ds{font-size:13px;color:var(--rl-muted);margin-top:2px;line-height:1.5}
-.rl-menu-row .rl-pr{font-family:${SERIF};font-size:19px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);white-space:nowrap}
+.rl-menu-row .rl-pr{font-family:${f.display};font-size:19px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);white-space:nowrap}
 .rl-root [id^="menu-"]{scroll-margin-top:96px}
 .rl-qr-note{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-size:13px;letter-spacing:.02em;color:var(--rl-muted);border:1px solid var(--rl-line);padding:9px 16px;border-radius:999px}
 .rl-qr-note svg{color:var(--rl-accent);flex-shrink:0}
@@ -168,18 +176,18 @@ function rlCss(): string {
 .rl-people .rl-chef{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(32px,5vw,72px);align-items:center;margin-bottom:60px}
 .rl-chef-media{position:relative;aspect-ratio:3/4;overflow:hidden;border-radius:3px;background:radial-gradient(circle at 30% 25%,var(--rl-surface),var(--rl-bg2));display:flex;align-items:center;justify-content:center}
 .rl-chef-media img{width:100%;height:100%;object-fit:cover}
-.rl-chef-ini{font-family:${SERIF};font-size:clamp(64px,9vw,120px);color:var(--rl-accent);opacity:.5}
+.rl-chef-ini{font-family:${f.display};font-size:clamp(64px,9vw,120px);color:var(--rl-accent);opacity:.5}
 .rl-chef-badge{position:absolute;left:18px;bottom:18px;background:color-mix(in srgb,var(--rl-bg) 72%,transparent);backdrop-filter:blur(6px);border:1px solid var(--rl-line);padding:10px 16px;border-radius:2px}
-.rl-chef-badge b{font-family:${SERIF};font-size:18px;display:block}
+.rl-chef-badge b{font-family:${f.display};font-size:18px;display:block}
 .rl-chef-badge span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--rl-accent)}
 .rl-chef h3{font-size:clamp(28px,3.4vw,44px);margin:14px 0 18px}
 .rl-chef p{color:var(--rl-inkDim);font-size:16px;line-height:1.8;max-width:50ch}
-.rl-chef .rl-sign{margin-top:22px;font-family:${SERIF};font-style:italic;font-size:24px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff)}
+.rl-chef .rl-sign{margin-top:22px;font-family:${f.display};font-style:italic;font-size:24px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff)}
 .rl-team-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
 .rl-tm{text-align:center}
-.rl-tm-av{width:78px;height:78px;border-radius:999px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:${SERIF};font-size:26px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);background:radial-gradient(circle at 30% 30%,var(--rl-surface),var(--rl-bg));border:1px solid var(--rl-line);overflow:hidden}
+.rl-tm-av{width:78px;height:78px;border-radius:999px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:${f.display};font-size:26px;color:color-mix(in srgb,var(--rl-accent) 72%,#fff);background:radial-gradient(circle at 30% 30%,var(--rl-surface),var(--rl-bg));border:1px solid var(--rl-line);overflow:hidden}
 .rl-tm-av img{width:100%;height:100%;object-fit:cover}
-.rl-tm b{font-family:${SERIF};font-size:19px;font-weight:600;display:block}
+.rl-tm b{font-family:${f.display};font-size:19px;font-weight:600;display:block}
 .rl-tm span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--rl-muted)}
 @media(max-width:780px){.rl-people .rl-chef{grid-template-columns:1fr;gap:24px}.rl-team-row{grid-template-columns:repeat(2,1fr);gap:32px}}
 /* gallery */
@@ -193,20 +201,20 @@ function rlCss(): string {
 @media(max-width:780px){.rl-gal{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px}}
 /* testimonial */
 .rl-testi{text-align:center}.rl-testi .rl-wrap{max-width:860px}
-.rl-testi blockquote{font-family:${SERIF};font-style:italic;font-size:clamp(24px,3.2vw,40px);line-height:1.3;margin:18px 0 0}
+.rl-testi blockquote{font-family:${f.display};font-style:italic;font-size:clamp(24px,3.2vw,40px);line-height:1.3;margin:18px 0 0}
 .rl-testi cite{display:block;margin-top:22px;font-style:normal;font-size:13px;letter-spacing:.06em;color:var(--rl-muted)}
 /* recognition */
 .rl-recog{background:var(--rl-bg2);border-top:1px solid var(--rl-line2);border-bottom:1px solid var(--rl-line2)}
 .rl-recog .rl-wrap{display:grid;grid-template-columns:repeat(4,1fr)}
 .rl-stat{padding:14px 26px;border-left:1px solid var(--rl-line)}
 .rl-stat:first-child{border-left:none;padding-left:0}
-.rl-stat b{font-family:${SERIF};font-size:clamp(38px,4.6vw,58px);color:color-mix(in srgb,var(--rl-accent) 72%,#fff);display:block;line-height:1;font-variant-numeric:tabular-nums}
+.rl-stat b{font-family:${f.display};font-size:clamp(38px,4.6vw,58px);color:color-mix(in srgb,var(--rl-accent) 72%,#fff);display:block;line-height:1;font-variant-numeric:tabular-nums}
 .rl-stat span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--rl-muted);margin-top:10px;display:block}
 @media(max-width:780px){.rl-recog .rl-wrap{grid-template-columns:1fr 1fr;gap:32px 0}.rl-stat:nth-child(odd){border-left:none;padding-left:0}}
 /* faq */
 .rl-faq-list{max-width:760px}
 .rl-faq details{border-bottom:1px solid var(--rl-line2)}
-.rl-faq summary{cursor:pointer;list-style:none;padding:22px 0;font-family:${SERIF};font-size:21px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.rl-faq summary{cursor:pointer;list-style:none;padding:22px 0;font-family:${f.display};font-size:21px;display:flex;justify-content:space-between;gap:16px;align-items:center}
 .rl-faq summary::-webkit-details-marker{display:none}
 .rl-faq summary::after{content:"+";color:var(--rl-accent);font-size:24px;transition:transform .3s ease}
 .rl-faq details[open] summary::after{transform:rotate(45deg)}
@@ -255,10 +263,14 @@ const QR_ICON = (
 )
 
 export default function RestaurantLuxRenderer({
-  content, variant, primary, slug, capabilities,
+  content, variant, primary, slug, capabilities, font,
 }: BespokeProps) {
   const pal = getPal(variant)
   const accent = (primary && primary.trim()) || pal.accent
+  const f = font ?? DEFAULT_FONT
+  // Copy khas-tema (slot manifest) — editan klien dari portal "Konten Tema";
+  // default = copy bawaan tema (byte-identik hardcode lama; parity.test menjaga).
+  const cp = copyGetter(content.themeCopy, RESTAURANT_LUX_SLOTS)
   const rootStyle = {
     '--rl-bg': pal.bg, '--rl-bg2': pal.bg2, '--rl-surface': pal.surface, '--rl-ink': pal.ink,
     '--rl-inkDim': pal.inkDim, '--rl-muted': pal.muted, '--rl-accent': accent,
@@ -281,20 +293,24 @@ export default function RestaurantLuxRenderer({
   // dipakai-ulang lintas renderer; resHref/resText tetap di sini (gabung konten + WA).
   const { bookingHref, hasDelivery, hasQrMenu } = resolveCapabilities(capabilities, slug)
   const resHref = bookingHref || content.info?.reservasiHref || waLink || '#kunjungi'
-  const resText = content.info?.reservasiText || (bookingHref ? 'Reservasi Meja' : 'Reservasi')
+  const resText = content.info?.reservasiText || (bookingHref ? cp.t('copy.reservasi_booking') : cp.t('copy.reservasi'))
+  const resEdit = bookingHref ? 'copy.reservasi_booking' : 'copy.reservasi'
   const deliveryHref = waLink || '#kunjungi'
   const gallery = content.gallery?.images ?? []
   const [chef, ...restTeam] = content.team ?? []
   const testi = content.testimonials?.[0]
 
-  // Nav links sadar-konten
-  const nav: { label: string; href: string }[] = []
-  if (items.length) nav.push({ label: navWord(content.showcase?.title) ?? 'Menu', href: '#menu' })
-  if (content.statement) nav.push({ label: 'Filosofi', href: '#filosofi' })
-  if (content.about) nav.push({ label: 'Cerita', href: '#cerita' })
-  if (content.team?.length) nav.push({ label: navWord(content.teamTitle) ?? 'Tim', href: '#tim' })
-  if (gallery.length) nav.push({ label: 'Galeri', href: '#galeri' })
-  if (content.info) nav.push({ label: 'Kunjungi', href: '#kunjungi' })
+  // Nav links sadar-konten. `edit` = key slot copy bila label datang dari slot
+  // (label turunan judul konten TIDAK diberi data-edit — pemiliknya konten).
+  const menuWord = navWord(content.showcase?.title)
+  const timWord = navWord(content.teamTitle)
+  const nav: { label: string; href: string; edit?: string }[] = []
+  if (items.length) nav.push({ label: menuWord ?? cp.t('copy.nav_menu'), href: '#menu', edit: menuWord ? undefined : 'copy.nav_menu' })
+  if (content.statement) nav.push({ label: cp.t('copy.nav_filosofi'), href: '#filosofi', edit: 'copy.nav_filosofi' })
+  if (content.about) nav.push({ label: cp.t('copy.nav_cerita'), href: '#cerita', edit: 'copy.nav_cerita' })
+  if (content.team?.length) nav.push({ label: timWord ?? cp.t('copy.nav_tim'), href: '#tim', edit: timWord ? undefined : 'copy.nav_tim' })
+  if (gallery.length) nav.push({ label: cp.t('copy.nav_galeri'), href: '#galeri', edit: 'copy.nav_galeri' })
+  if (content.info) nav.push({ label: cp.t('copy.nav_kunjungi'), href: '#kunjungi', edit: 'copy.nav_kunjungi' })
 
   // Titik fokus foto hero (foto_hero_focus dari tab Tampilan) — override
   // backgroundPosition default 'center' di .rl-hero-bg bila klien menyetelnya.
@@ -307,18 +323,18 @@ export default function RestaurantLuxRenderer({
 
   return (
     <div className="rl-root" style={rootStyle} data-variant={variant ?? 'aurum'}>
-      <style dangerouslySetInnerHTML={{ __html: rlCss() }} />
+      <style dangerouslySetInnerHTML={{ __html: rlCss(f) }} />
 
       {/* NAV */}
       <header className="rl-nav">
         <div className="rl-nav-in">
-          <span className="rl-brand">{content.nama}<small>Fine Dining</small></span>
+          <span className="rl-brand">{content.nama}<small data-edit="copy.brand_sub">{cp.t('copy.brand_sub')}</small></span>
           {nav.length > 0 && (
             <nav className="rl-nav-links" aria-label="Navigasi utama">
-              {nav.map((l) => <a key={l.href} className="rl-nav-link" href={l.href}>{l.label}</a>)}
+              {nav.map((l) => <a key={l.href} className="rl-nav-link" href={l.href} data-edit={l.edit}>{l.label}</a>)}
             </nav>
           )}
-          <a className="rl-nav-cta" href={resHref}>{resText}</a>
+          <a className="rl-nav-cta" href={resHref} data-edit={resEdit}>{resText}</a>
         </div>
       </header>
 
@@ -333,8 +349,8 @@ export default function RestaurantLuxRenderer({
             {content.hero.subtitle && <p>{content.hero.subtitle}</p>}
             <div className="rl-hero-actions">
               {content.hero.ctaText && <a className="rl-btn rl-btn-gold" href={content.hero.ctaHref ?? resHref}>{content.hero.ctaText}</a>}
-              <a className="rl-btn rl-btn-ghost" href={content.hero.ctaHref2 ?? '#menu'}>{content.hero.ctaText2 ?? 'Lihat Menu'}</a>
-              {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref}>{TRUCK}Pesan Antar</a>}
+              <a className="rl-btn rl-btn-ghost" href={content.hero.ctaHref2 ?? '#menu'} data-edit="copy.hero_cta2">{content.hero.ctaText2 ?? cp.t('copy.hero_cta2')}</a>
+              {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref} data-edit="copy.delivery_cta">{TRUCK}{cp.t('copy.delivery_cta')}</a>}
             </div>
           </div>
         </div>
@@ -345,7 +361,7 @@ export default function RestaurantLuxRenderer({
       {content.statement && (
         <section className="rl-statement rl-pad" id="filosofi">
           <div className="rl-wrap">
-            <span className="rl-eyebrow">{content.statement.eyebrow ?? 'Filosofi'}</span>
+            <span className="rl-eyebrow" data-edit="copy.statement_eyebrow">{content.statement.eyebrow ?? cp.t('copy.statement_eyebrow')}</span>
             <div>
               <p className="rl-quote">{content.statement.quote}</p>
               {content.statement.cite && <span className="rl-cite">{content.statement.cite}</span>}
@@ -359,8 +375,8 @@ export default function RestaurantLuxRenderer({
         <section className="rl-pad" id="signature">
           <div className="rl-wrap">
             <div className="rl-sec-head">
-              <span className="rl-eyebrow">Yang Kami Banggakan</span>
-              <h2>Hidangan yang menentukan kami</h2>
+              <span className="rl-eyebrow" data-edit="copy.signature_eyebrow">{cp.t('copy.signature_eyebrow')}</span>
+              <h2 data-edit="copy.signature_title">{cp.t('copy.signature_title')}</h2>
             </div>
             {featured.map((it, i) => (
               <article className="rl-dish" key={i}>
@@ -385,10 +401,10 @@ export default function RestaurantLuxRenderer({
         <section className="rl-menu rl-pad" id="menu">
           <div className="rl-wrap">
             <div className="rl-sec-head">
-              <span className="rl-eyebrow">Menu</span>
-              <h2>{content.showcase?.title ?? 'Daftar Pilihan'}</h2>
+              <span className="rl-eyebrow" data-edit="copy.menu_eyebrow">{cp.t('copy.menu_eyebrow')}</span>
+              <h2 data-edit="copy.menu_title">{content.showcase?.title ?? cp.t('copy.menu_title')}</h2>
               {content.showcase?.subtitle && <p>{content.showcase.subtitle}</p>}
-              {hasQrMenu && <p className="rl-qr-note">{QR_ICON} Pindai QR di meja untuk akses menu digital.</p>}
+              {hasQrMenu && <p className="rl-qr-note" data-edit="copy.qr_note">{QR_ICON} {cp.t('copy.qr_note')}</p>}
             </div>
             {showTabs && (
               <div className="rl-menu-tabs">
@@ -420,7 +436,7 @@ export default function RestaurantLuxRenderer({
         <section className="rl-story rl-pad" id="cerita">
           <div className="rl-wrap">
             <div>
-              <span className="rl-eyebrow">Cerita Kami</span>
+              <span className="rl-eyebrow" data-edit="copy.about_eyebrow">{cp.t('copy.about_eyebrow')}</span>
               <h2 style={{ marginTop: 16 }}>{content.about.title}</h2>
             </div>
             <p className="rl-body">{content.about.body}</p>
@@ -433,8 +449,8 @@ export default function RestaurantLuxRenderer({
         <section className="rl-people rl-pad" id="tim">
           <div className="rl-wrap">
             <div className="rl-sec-head">
-              <span className="rl-eyebrow">{content.teamEyebrow ?? 'Tim Kami'}</span>
-              <h2>{content.teamTitle ?? 'Di Balik Dapur'}</h2>
+              <span className="rl-eyebrow" data-edit="copy.team_eyebrow">{content.teamEyebrow ?? cp.t('copy.team_eyebrow')}</span>
+              <h2 data-edit="copy.team_title">{content.teamTitle ?? cp.t('copy.team_title')}</h2>
             </div>
             <div className="rl-chef">
               <div className="rl-chef-media">
@@ -466,8 +482,8 @@ export default function RestaurantLuxRenderer({
         <section className="rl-pad" id="galeri">
           <div className="rl-wrap">
             <div className="rl-sec-head">
-              <span className="rl-eyebrow">{content.gallery?.title ?? 'Suasana & Sajian'}</span>
-              <h2>{content.gallery?.subtitle ?? 'Ruang untuk perayaan'}</h2>
+              <span className="rl-eyebrow" data-edit="copy.gallery_eyebrow">{content.gallery?.title ?? cp.t('copy.gallery_eyebrow')}</span>
+              <h2 data-edit="copy.gallery_title">{content.gallery?.subtitle ?? cp.t('copy.gallery_title')}</h2>
             </div>
             <div className="rl-gal">
               {gallery.slice(0, 6).map((g, i) => (
@@ -485,7 +501,7 @@ export default function RestaurantLuxRenderer({
       {testi && (
         <section className="rl-testi rl-pad" style={{ background: pal.bg2 }}>
           <div className="rl-wrap">
-            <span className="rl-eyebrow" style={{ justifyContent: 'center' }}>Kata Tamu</span>
+            <span className="rl-eyebrow" style={{ justifyContent: 'center' }} data-edit="copy.testi_eyebrow">{cp.t('copy.testi_eyebrow')}</span>
             <blockquote>“{testi.quote}”</blockquote>
             <cite>— {testi.nama}{testi.peran ? ` · ${testi.peran}` : ''}</cite>
           </div>
@@ -507,7 +523,7 @@ export default function RestaurantLuxRenderer({
       {content.faq && content.faq.length > 0 && (
         <section className="rl-faq rl-pad">
           <div className="rl-wrap">
-            <div className="rl-sec-head"><span className="rl-eyebrow">Pertanyaan</span><h2>Sebelum Anda datang</h2></div>
+            <div className="rl-sec-head"><span className="rl-eyebrow" data-edit="copy.faq_eyebrow">{cp.t('copy.faq_eyebrow')}</span><h2 data-edit="copy.faq_title">{cp.t('copy.faq_title')}</h2></div>
             <div className="rl-faq-list">
               {content.faq.map((f, i) => (
                 <details key={i}><summary>{f.q}</summary><p>{f.a}</p></details>
@@ -522,18 +538,18 @@ export default function RestaurantLuxRenderer({
         <section className="rl-visit rl-pad" id="kunjungi">
           <div className="rl-wrap">
             <div>
-              <span className="rl-eyebrow">Kunjungi Kami</span>
-              <h2 style={{ marginTop: 16 }}>Amankan malam Anda</h2>
+              <span className="rl-eyebrow" data-edit="copy.visit_eyebrow">{cp.t('copy.visit_eyebrow')}</span>
+              <h2 style={{ marginTop: 16 }} data-edit="copy.visit_title">{cp.t('copy.visit_title')}</h2>
               <div className="rl-rows">
                 {content.info.jam && content.info.jam.length > 0 && (
-                  <div className="rl-r"><div className="rl-k">Jam Buka</div><div className="rl-v">{content.info.jam.map((j, i) => <div key={i}>{j.hari} · {j.jam}</div>)}</div></div>
+                  <div className="rl-r"><div className="rl-k" data-edit="copy.visit_jam_label">{cp.t('copy.visit_jam_label')}</div><div className="rl-v">{content.info.jam.map((j, i) => <div key={i}>{j.hari} · {j.jam}</div>)}</div></div>
                 )}
-                {content.info.alamat && <div className="rl-r"><div className="rl-k">Alamat</div><div className="rl-v">{content.info.alamat}</div></div>}
-                {content.info.telp && <div className="rl-r"><div className="rl-k">Reservasi</div><div className="rl-v">{content.info.telp}</div></div>}
+                {content.info.alamat && <div className="rl-r"><div className="rl-k" data-edit="copy.visit_alamat_label">{cp.t('copy.visit_alamat_label')}</div><div className="rl-v">{content.info.alamat}</div></div>}
+                {content.info.telp && <div className="rl-r"><div className="rl-k" data-edit="copy.visit_telp_label">{cp.t('copy.visit_telp_label')}</div><div className="rl-v">{content.info.telp}</div></div>}
               </div>
               <div className="rl-cta">
-                <a className="rl-btn rl-btn-gold" href={resHref}>{resText}</a>
-                {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref}>{TRUCK}Pesan Antar</a>}
+                <a className="rl-btn rl-btn-gold" href={resHref} data-edit={resEdit}>{resText}</a>
+                {hasDelivery && <a className="rl-btn rl-btn-ghost" href={deliveryHref} data-edit="copy.delivery_cta">{TRUCK}{cp.t('copy.delivery_cta')}</a>}
               </div>
             </div>
             <div className="rl-map">
@@ -569,7 +585,7 @@ export default function RestaurantLuxRenderer({
             {content.contact?.email && <a href={`mailto:${content.contact.email}`}>Email</a>}
             {content.contact?.alamat && <span>{content.contact.alamat}</span>}
           </div>
-          <div className="rl-cr">© {new Date().getUTCFullYear()} {content.nama}. Dibuat dengan Webzoka.</div>
+          <div className="rl-cr" data-edit="copy.footer_copyright">© {new Date().getUTCFullYear()} {content.nama}. {cp.t('copy.footer_copyright')}</div>
         </div>
       </footer>
 
