@@ -5,6 +5,8 @@ import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
 import { formatMoney, moneyFromConfig } from '@/lib/format-money'
 import PortalMenuSection from '@/app/components/order/PortalMenuSection'
+import { copyGetter } from '@/lib/theme-system/theme-copy'
+import { WARUNG_SLOTS } from './slots/restaurant-warung.slots'
 
 // ============================================================
 // HANGAT — Restaurant Warung / Kedai Bespoke Lux Renderer (Folk Warmth)
@@ -273,13 +275,16 @@ html,body{overflow-x:hidden;max-width:100%}
 `
 }
 
-// Kata pita = vibe warung (BUKAN klaim seperti halal/terenak); tampil di SEMUA
-// situs Hangat. Klaim spesifik milik klien → konten editabel.
-const RIBBON = ['Masakan Rumahan', 'Hangat', 'Dimasak Dadakan', 'Bersama', 'Sederhana']
-
 export default function WarungRenderer({ content: c, variant = 'hangat', primary, poUrl, localeConfig, portalCatalog }: BespokeProps) {
   const p = PALETTES[variant] ?? PALETTES.hangat
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+
+  // Copy khas-tema (slot manifest) — editan klien dari portal "Konten Tema";
+  // default = copy bawaan tema (byte-identik hardcode lama; parity.test menjaga).
+  // Kata pita = vibe warung (BUKAN klaim seperti halal/terenak); klaim spesifik
+  // milik klien → konten editabel.
+  const cp = copyGetter(c.themeCopy, WARUNG_SLOTS)
+  const ribbon = cp.list('copy.ribbon')
 
   // Cutover Portal (Bakso Fase 1): etalase jadi ber-keranjang in-page → CTA "Pesan"
   // mengarah ke #menu (bukan WA/PO). PortalCartProvider membungkus dari SiteRenderer.
@@ -288,8 +293,9 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#menu'
   // F&B Pre-Order: bila poUrl ada, CTA "Pesan" utama → form PO; WhatsApp jadi sekunder.
+  // Label mode portal/PO = fungsional (tak editabel); mode biasa = slot copy.
   const orderHref = portalMode ? '#menu' : (poUrl ?? waUrl)
-  const orderLabel = portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : 'Pesan')
+  const orderLabel = portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : cp.t('copy.nav_cta'))
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
   const features = c.features ?? []
@@ -316,22 +322,22 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {/* NAV */}
       <nav className="wr-nav" aria-label="Navigasi utama">
         <a href="#beranda" className="wr-nav-logo">{c.nama ?? 'Warung'}</a>
-        {!hideNavCta && <a href={orderHref} className="wr-nav-cta">{orderLabel}</a>}
+        {!hideNavCta && <a href={orderHref} className="wr-nav-cta" data-edit="copy.nav_cta">{orderLabel}</a>}
       </nav>
 
       {/* HERO */}
       <section className="wr-hero" id="beranda" aria-label="Hero">
         <span className="lx-sentinel" aria-hidden />
         <div className="wr-hero-text">
-          {hero.eyebrow && <p className="wr-hero-ew">{hero.eyebrow}</p>}
-          {hero.title && <h1 className="wr-hero-title">{hero.title}</h1>}
-          {hero.subtitle && <p className="wr-hero-sub">{hero.subtitle}</p>}
+          {hero.eyebrow && <p className="wr-hero-ew" data-edit="section:hero_banner.eyebrow">{hero.eyebrow}</p>}
+          {hero.title && <h1 className="wr-hero-title" data-edit="section:hero_banner.title">{hero.title}</h1>}
+          {hero.subtitle && <p className="wr-hero-sub" data-edit="section:hero_banner.subtitle">{hero.subtitle}</p>}
           <div className="wr-hero-btns">
-            <a href={hero.ctaHref ?? '#menu'} className="wr-btn-primary">{hero.ctaText ?? 'Lihat Menu'}</a>
-            <a href={portalMode ? '#menu' : (poUrl ?? hero.ctaHref2 ?? waUrl)} className="wr-btn-ghost">{portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : (hero.ctaText2 ?? 'Pesan Antar'))}</a>
+            <a href={hero.ctaHref ?? '#menu'} className="wr-btn-primary" data-edit="copy.hero_cta1">{hero.ctaText ?? cp.t('copy.hero_cta1')}</a>
+            <a href={portalMode ? '#menu' : (poUrl ?? hero.ctaHref2 ?? waUrl)} className="wr-btn-ghost" data-edit="copy.hero_cta2">{portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : (hero.ctaText2 ?? cp.t('copy.hero_cta2')))}</a>
           </div>
           {stats.length > 0 && (
-            <div className="wr-hero-meta">
+            <div className="wr-hero-meta" data-edit="konten:stats">
               {stats.slice(0, 3).map((s, i) => (
                 <div key={i} className="wr-meta-item">
                   <span className="wr-meta-num">{s.angka}</span>
@@ -348,14 +354,14 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
               : <span aria-hidden style={{ display: 'block', width: '100%', height: '100%' }} />}
           </div>
           {/* Stempel = seal dekoratif evergreen (tak menggemakan eyebrow di kiri-atas). */}
-          <div className="wr-hero-stamp"><span aria-hidden>♨</span> Selalu Hangat</div>
+          <div className="wr-hero-stamp" data-edit="copy.stamp"><span aria-hidden>♨</span> {cp.t('copy.stamp')}</div>
         </div>
       </section>
 
       {/* PITA */}
       <div className="wr-ribbon" aria-hidden="true">
-        <div className="wr-ribbon-row">
-          {RIBBON.map((m, i) => (
+        <div className="wr-ribbon-row" data-edit="copy.ribbon">
+          {ribbon.map((m, i) => (
             <span key={i} className="wr-ribbon-item">{m}</span>
           ))}
         </div>
@@ -365,8 +371,8 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {features.length > 0 && (
         <section className="wr-section" id="keunggulan">
           <div className="wr-sec-hdr wr-rv lx-reveal">
-            <p className="wr-eyebrow">{c.featuresEyebrow ?? 'Kenapa Kami'}</p>
-            {c.featuresTitle && <h2 className="wr-heading">{c.featuresTitle}</h2>}
+            <p className="wr-eyebrow" data-edit="copy.features_eyebrow">{c.featuresEyebrow ?? cp.t('copy.features_eyebrow')}</p>
+            {c.featuresTitle && <h2 className="wr-heading" data-edit="konten:featuresTitle">{c.featuresTitle}</h2>}
           </div>
           <div className="wr-feat-grid">
             {features.slice(0, 3).map((f, i) => (
@@ -396,7 +402,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {!portalMode && items.length > 0 && (
         <section className="wr-section wr-showcase" id="menu">
           <div className="wr-sec-hdr wr-rv lx-reveal" style={{ textAlign: 'center', margin: '0 auto 3.2rem' }}>
-            <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Menu</p>
+            <p className="wr-eyebrow" style={{ justifyContent: 'center' }} data-edit="copy.menu_eyebrow">{cp.t('copy.menu_eyebrow')}</p>
             {c.showcase?.title && <h2 className="wr-heading">{c.showcase.title}</h2>}
             {c.showcase?.subtitle && <p className="wr-subtext" style={{ marginLeft: 'auto', marginRight: 'auto' }}>{c.showcase.subtitle}</p>}
           </div>
@@ -419,13 +425,13 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
                 <div className="wr-card-frame">
                   {item.kategori && <span className="wr-card-cat">{item.kategori}</span>}
                   <span className="wr-card-tag">{priceText(item.harga)}</span>
-                  {item.soldOut && <span className="wr-card-soldout">Habis</span>}
+                  {item.soldOut && <span className="wr-card-soldout" data-edit="copy.soldout_badge">{cp.t('copy.soldout_badge')}</span>}
                   {item.gambar && <img src={item.gambar} alt={item.nama} loading="lazy" />}
                 </div>
                 <div className="wr-card-body">
                   <h3 className="wr-card-name">{item.nama}</h3>
                   {item.desc && <p className="wr-card-desc">{item.desc}</p>}
-                  <span className="wr-card-more">Lihat &amp; pesan →</span>
+                  <span className="wr-card-more" data-edit="copy.card_more">{cp.t('copy.card_more')}</span>
                 </div>
               </article>
             ))}
@@ -436,7 +442,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {/* STATEMENT */}
       {c.statement && (
         <div className="wr-statement">
-          <div className="wr-stmt-inner wr-rv lx-reveal">
+          <div className="wr-stmt-inner wr-rv lx-reveal" data-edit="konten:statement">
             {c.statement.eyebrow && <p className="wr-stmt-ew">{c.statement.eyebrow}</p>}
             <blockquote className="wr-stmt-quote">{c.statement.quote}</blockquote>
             {c.statement.cite && <cite className="wr-stmt-cite">— {c.statement.cite}</cite>}
@@ -449,9 +455,9 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
         <section className="wr-section wr-about" id="tentang">
           <div className={`wr-about-inner${c.about.image ? '' : ' wr-about-solo'}`}>
             <div className="wr-rv lx-reveal">
-              <p className="wr-eyebrow">Tentang Kami</p>
-              <h2 className="wr-heading">{c.about.title}</h2>
-              <p className="wr-about-body">{c.about.body}</p>
+              <p className="wr-eyebrow" data-edit="copy.about_eyebrow">{cp.t('copy.about_eyebrow')}</p>
+              <h2 className="wr-heading" data-edit="section:about.title">{c.about.title}</h2>
+              <p className="wr-about-body" data-edit="section:about.body">{c.about.body}</p>
               {c.about.ctaHref && (
                 <a href={c.about.ctaHref} className="wr-about-cta">
                   {c.about.ctaText ?? 'Pelajari lebih lanjut'} →
@@ -472,7 +478,7 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {/* STATS */}
       {stats.length > 0 && (
         <section className="wr-section wr-stats">
-          <div className="wr-stats-grid">
+          <div className="wr-stats-grid" data-edit="konten:stats">
             {stats.map((s, i) => (
               <div key={i} className={`wr-stat wr-rv lx-reveal wr-rv-d${i + 1}`}>
                 <div className="wr-stat-num" data-cu>{s.angka}</div>
@@ -487,8 +493,8 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {testimonials.length > 0 && (
         <section className="wr-section wr-testimonials" id="ulasan">
           <div className="wr-sec-hdr wr-rv lx-reveal" style={{ textAlign: 'center', margin: '0 auto 3rem' }}>
-            <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Ulasan</p>
-            <h2 className="wr-heading">Kata Pelanggan</h2>
+            <p className="wr-eyebrow" style={{ justifyContent: 'center' }} data-edit="copy.ulasan_eyebrow">{cp.t('copy.ulasan_eyebrow')}</p>
+            <h2 className="wr-heading" data-edit="copy.ulasan_title">{cp.t('copy.ulasan_title')}</h2>
           </div>
           <div className="wr-tcar lx-tcar">
             <div className="wr-tcar-track lx-tcar-track">
@@ -520,8 +526,8 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
       {faqs.length > 0 && (
         <section className="wr-section wr-faq" id="faq">
           <div className="wr-sec-hdr wr-rv lx-reveal" style={{ textAlign: 'center', margin: '0 auto 3rem' }}>
-            <p className="wr-eyebrow" style={{ justifyContent: 'center' }}>Pertanyaan</p>
-            <h2 className="wr-heading">Sering Ditanyakan</h2>
+            <p className="wr-eyebrow" style={{ justifyContent: 'center' }} data-edit="copy.faq_eyebrow">{cp.t('copy.faq_eyebrow')}</p>
+            <h2 className="wr-heading" data-edit="copy.faq_title">{cp.t('copy.faq_title')}</h2>
           </div>
           <div className="wr-faq-wrap">
             {faqs.map((f, i) => (
@@ -548,8 +554,8 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
             <h2 className="wr-cta-title">{c.cta.title}</h2>
             {c.cta.subtitle && <p className="wr-cta-sub">{c.cta.subtitle}</p>}
             <div className="wr-cta-btns">
-              <a href={orderHref} className="wr-btn-primary">{portalMode || poUrl ? 'Pesan Sekarang' : (c.cta.ctaText ?? 'Pesan via WhatsApp')}</a>
-              <a href="#menu" className="wr-btn-ghost">Lihat Menu</a>
+              <a href={orderHref} className="wr-btn-primary" data-edit="copy.cta_primary">{portalMode || poUrl ? 'Pesan Sekarang' : (c.cta.ctaText ?? cp.t('copy.cta_primary'))}</a>
+              <a href="#menu" className="wr-btn-ghost" data-edit="copy.cta_ghost">{cp.t('copy.cta_ghost')}</a>
             </div>
           </div>
         </section>
@@ -572,12 +578,12 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
         <div className="wr-footer-grid">
           <div>
             <p className="wr-footer-brand">{c.nama ?? 'Warung'}</p>
-            <p className="wr-footer-tagline">
-              {hero.eyebrow ?? `${c.nama ?? 'Warung'} — masakan rumahan yang bikin kangen.`}
+            <p className="wr-footer-tagline" data-edit="copy.footer_tagline">
+              {cp.t('copy.footer_tagline') || (hero.eyebrow ?? `${c.nama ?? 'Warung'} — masakan rumahan yang bikin kangen.`)}
             </p>
           </div>
           <div>
-            <p className="wr-footer-h">Kontak</p>
+            <p className="wr-footer-h" data-edit="copy.footer_kontak_h">{cp.t('copy.footer_kontak_h')}</p>
             {wa && <a href={waUrl} className="wr-footer-link">WhatsApp</a>}
             {c.contact?.email && (
               <a href={`mailto:${c.contact.email}`} className="wr-footer-link">{c.contact.email}</a>
@@ -585,23 +591,23 @@ export default function WarungRenderer({ content: c, variant = 'hangat', primary
             {c.contact?.alamat && <p className="wr-footer-link">{c.contact.alamat}</p>}
           </div>
           <div>
-            <p className="wr-footer-h">Jam Buka</p>
+            <p className="wr-footer-h" data-edit="copy.footer_jam_h">{cp.t('copy.footer_jam_h')}</p>
             {jamRows.length
               ? jamRows.map((j, i) => <p key={i} className="wr-footer-link">{j.hari}: {j.jam}</p>)
               : (
                 <>
-                  <p className="wr-footer-link">Setiap hari: 07.00–21.00</p>
+                  <p className="wr-footer-link" data-edit="copy.footer_jam_fallback">{cp.t('copy.footer_jam_fallback')}</p>
                 </>
               )}
           </div>
         </div>
-        <p className="wr-footer-copy">
-          © {new Date().getFullYear()} {c.nama ?? 'Warung'}. Semua hak cipta dilindungi.
+        <p className="wr-footer-copy" data-edit="copy.footer_copyright">
+          © {new Date().getFullYear()} {c.nama ?? 'Warung'}. {cp.t('copy.footer_copyright')}
         </p>
       </footer>
 
       {/* LIGHTBOX */}
-      <BespokeLightbox ctaText={portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : 'Pesan via WhatsApp')} />
+      <BespokeLightbox ctaText={portalMode ? 'Pesan' : (poUrl ? 'Pesan (PO)' : cp.t('copy.lightbox_cta'))} />
       <script dangerouslySetInnerHTML={{ __html: LUX_JS }} />
     </div>
   )
