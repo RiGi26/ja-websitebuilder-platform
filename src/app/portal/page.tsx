@@ -103,8 +103,11 @@ export default async function PortalPage() {
   // Kartu "Konten Tema" — copy khas-tema dari slot manifest (tema yang sudah
   // dimigrasi zero-hardcode saja; absen = kartu tak tampil). Kirim manifest
   // (plain data) + nilai editan tersimpan ke client.
+  // Tenant portal-cutover DIKECUALIKAN: situs mereka dirender skin order
+  // (CeriaOrderRenderer) yang tak membaca theme_copy — panel akan menyesatkan
+  // (edit tanpa efek). Buka lagi per-tenant saat skin cutover ikut membaca slot.
   const themeKey = typeof konfig.branding?.theme === 'string' ? konfig.branding.theme : undefined
-  const themeSlots = themeKey ? BESPOKE_RENDERERS[themeKey]?.slots ?? null : null
+  const themeSlots = !portalManaged && themeKey ? BESPOKE_RENDERERS[themeKey]?.slots ?? null : null
   const themeCopyValues = dataKonten.theme_copy && typeof dataKonten.theme_copy === 'object' && !Array.isArray(dataKonten.theme_copy)
     ? (dataKonten.theme_copy as Record<string, unknown>)
     : {}
