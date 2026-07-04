@@ -310,8 +310,8 @@ export default function PortalDashboard({ tenantId, namaTenant, page, initialPro
             </div>
           )}
 
-          {/* Tab nav */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          {/* Tab nav — scroll strip di mobile (jangan wrap 2–3 baris); whitespace-nowrap cegah shrink */}
+          <div className="flex gap-2 mb-6 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {hasContent && (
               <button onClick={() => setTab('konten')} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === 'konten' ? 'bg-apple-blue text-white' : 'bg-white text-gray-500 border border-black/10 hover:text-apple-blue'}`}>
                 <LayoutTemplate size={14} /> Konten
