@@ -21,6 +21,7 @@ import KlinikCleanRenderer from '@/app/components/themes/klinik/KlinikCleanRende
 import CompanyRenderer from '@/app/components/themes/company/CompanyRenderer'
 import SekolahRenderer from '@/app/components/themes/sekolah/SekolahRenderer'
 import RentalRenderer from '@/app/components/themes/rental/RentalRenderer'
+import RentalAsphaltRenderer from '@/app/components/themes/rental/asphalt/RentalAsphaltRenderer'
 import TokenDrivenRenderer from '@/app/components/themes/universal/TokenDrivenRenderer'
 import ComposableRenderer from '@/app/components/theme-engine/ComposableRenderer'
 import { getManifest } from '@/lib/theme-system/manifest'
@@ -277,6 +278,11 @@ export async function renderSite({
       fetchServicesByPage(client, page.id),
       fetchTenantProfile(client, page.id),
     ])
+    // Varian "asphalt" (Asphalt Editorial — SetirYuk): skin baru + booking realtime
+    // Portal Rental via konfigurasi.booking.slug. Varian lain = Warm Drive lama.
+    if (variant === 'asphalt') {
+      return <RentalAsphaltRenderer nama={page.nama_website} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} bookingSlug={konfig.booking?.slug} />
+    }
     return <RentalRenderer nama={page.nama_website} sections={sections} services={services} profile={profile} wa={profile?.wa ?? (page.data_konten as Record<string, any>)?.wa} slug={slug} primary={primary} konten={page.data_konten as any} features={konfig.features} designTokens={konfig.branding?.design_tokens} variant={variant} />
   }
 
