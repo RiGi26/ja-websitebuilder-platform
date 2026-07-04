@@ -208,11 +208,19 @@ function CarSilhouette() {
   )
 }
 
-/** Wordmark: kata terakhir nama di-italic-aksen (SetirYuk → Setir<em>Yuk</em>). */
+/** Wordmark: bagian terakhir nama di-italic-aksen. Multi-kata → kata terakhir
+ *  ("Nusantara Drive" → Nusantara <em>Drive</em>); satu kata CamelCase → segmen
+ *  Kapital terakhir ("SetirYuk" → Setir<em>Yuk</em>). */
 function BrandName({ nama }: { nama: string }) {
-  const m = /^(.*?)([A-Z][a-z0-9]*|[^\s]+)$/.exec(nama.trim())
-  if (!m || !m[1]) return <span className="ra-brand-nm">{nama}</span>
-  return <span className="ra-brand-nm">{m[1]}<em>{m[2]}</em></span>
+  const t = nama.trim()
+  const words = t.split(/\s+/)
+  if (words.length > 1) {
+    const last = words.pop()!
+    return <span className="ra-brand-nm">{words.join(' ')}{' '}<em>{last}</em></span>
+  }
+  const m = /^(.*[a-z0-9])([A-Z][a-z0-9]*)$/.exec(t)
+  if (m) return <span className="ra-brand-nm">{m[1]}<em>{m[2]}</em></span>
+  return <span className="ra-brand-nm">{t}</span>
 }
 
 export default function RentalAsphaltRenderer({
