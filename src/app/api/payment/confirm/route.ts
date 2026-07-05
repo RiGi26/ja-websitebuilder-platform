@@ -25,24 +25,44 @@ export async function POST(request: Request) {
     // legacy (null) → mode legacy. (Webhook tetap jalur settlement otoritatif.)
     const { data: orderRow } = await supabaseAdmin
       .from('orders')
-      .select('midtrans_mode')
+      .select('midtrans_mode, midtrans_order_id, dp_amount')
       .eq('id', order_id)
       .maybeSingle()
+
+    // Integritas pembayaran (audit 2026-07-05): JANGAN percaya midtrans_order_id dari
+    // body. Sebuah order hanya boleh ditandai lunas oleh transaksinya SENDIRI. Kita
+    // poll kolom tersimpan (bukan nilai dari client), wajibkan cocok dengan yang
+    // dikirim, dan verifikasi gross_amount == dp_amount sebelum menandai dp_paid.
+    // Tanpa ini, penyerang bisa mem-poll transaksi settle apa pun lalu mem-flip
+    // order lain jadi lunas tanpa membayar.
+    if (!orderRow?.midtrans_order_id) {
+      return NextResponse.json({ error: 'Order tidak ditemukan' }, { status: 404 })
+    }
+    if (orderRow.midtrans_order_id !== midtrans_order_id) {
+      return NextResponse.json({ error: 'Transaksi tidak cocok dengan order' }, { status: 400 })
+    }
+
     const { serverKey: SERVER_KEY, statusApiUrl: STATUS_API } = midtransConfigForMode(
       normalizeOrderMode(orderRow?.midtrans_mode),
     )
 
     // Verify transaction status directly from Midtrans
     const auth = Buffer.from(`${SERVER_KEY}:`).toString('base64')
-    const res = await fetch(`${STATUS_API}/${midtrans_order_id}/status`, {
+    const res = await fetch(`${STATUS_API}/${orderRow.midtrans_order_id}/status`, {
       headers: { Authorization: `Basic ${auth}` },
     })
 
     const tx = await res.json()
 
+    // gross_amount dari Midtrans harus sama dengan dp_amount tersimpan (defense-in-depth
+    // di atas binding order<->transaksi). Order legacy dengan dp_amount null → lewati
+    // cek nominal.
+    const amountMatches =
+      orderRow.dp_amount == null || Number(tx.gross_amount) === Number(orderRow.dp_amount)
     const isPaid =
-      (tx.transaction_status === 'capture' && tx.fraud_status === 'accept') ||
-      tx.transaction_status === 'settlement'
+      amountMatches &&
+      ((tx.transaction_status === 'capture' && tx.fraud_status === 'accept') ||
+        tx.transaction_status === 'settlement')
     const isPending = tx.transaction_status === 'pending'
 
     if (isPaid) {
