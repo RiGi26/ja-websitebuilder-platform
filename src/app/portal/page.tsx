@@ -9,6 +9,7 @@ import PortalDashboard, { type ShopOrderRow, type BookingRow } from './PortalDas
 import type { EditableSection } from './ContentPanel'
 import type { KontenBrandData } from './KontenBrandPanel'
 import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
+import { BLOG_SLOT_MANIFEST } from '@/app/[slug]/blog/blog.slots'
 
 export const dynamic = 'force-dynamic'
 
@@ -107,7 +108,12 @@ export default async function PortalPage() {
   // (CeriaOrderRenderer) yang tak membaca theme_copy — panel akan menyesatkan
   // (edit tanpa efek). Buka lagi per-tenant saat skin cutover ikut membaca slot.
   const themeKey = typeof konfig.branding?.theme === 'string' ? konfig.branding.theme : undefined
-  const themeSlots = !portalManaged && themeKey ? BESPOKE_RENDERERS[themeKey]?.slots ?? null : null
+  // Fallback slot BLOG: tenant ber-blog aktif tanpa slot bespoke tetap dapat
+  // kartu "Konten Tema" (edit chrome /{slug}/blog — judul, deskripsi, CTA).
+  const blogSlotEligible = page?.tipe_industri === 'blog' || !!konfig.features?.hasBlog
+  const themeSlots = !portalManaged
+    ? (themeKey ? BESPOKE_RENDERERS[themeKey]?.slots ?? null : null) ?? (blogSlotEligible ? BLOG_SLOT_MANIFEST : null)
+    : null
   const themeCopyValues = dataKonten.theme_copy && typeof dataKonten.theme_copy === 'object' && !Array.isArray(dataKonten.theme_copy)
     ? (dataKonten.theme_copy as Record<string, unknown>)
     : {}

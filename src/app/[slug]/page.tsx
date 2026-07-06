@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { cache } from 'react'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { fetchPageBySlug } from '@/lib/supabase/websitebuilder'
 import { renderSite } from '@/app/components/SiteRenderer'
 import EditBridge from '@/app/components/EditBridge'
 import type { LandingPageWithSections } from '@/types/websitebuilder'
 import { tenantFaviconDataUri } from '@/lib/tenant-favicon'
+import { tenantBasePath } from '@/lib/tenant-path'
 
 // Halaman publik klien. Render dinamis (data dari Supabase), dibaca via
 // anon client → RLS hanya mengizinkan status='published' + section visible.
@@ -61,6 +62,14 @@ export default async function PublicSitePage({
   const { slug } = await params
   const page = await getPage(slug)
   if (!page) notFound()
+
+  // Industri BLOG: beranda = daftar artikel (pola Ghost/Medium), bukan landing
+  // tema. Redirect ke /{base}/blog — di subdomain jadi {slug}.webzoka.com/blog.
+  // (Keputusan owner 2026-07-07; satu-satunya tenant blog = Japan Arena.)
+  if (page.tipe_industri === 'blog') {
+    const base = await tenantBasePath(slug)
+    redirect(`${base}/blog`)
+  }
 
   // Click-to-edit (Wave 2): LivePreview portal memuat iframe dgn ?portalEdit=1
   // → suntik bridge (aktif hanya di dalam iframe; publik tanpa param = nol byte).

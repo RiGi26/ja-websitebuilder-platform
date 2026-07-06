@@ -33,15 +33,24 @@ export function readingMinutes(konten?: string | null): number {
   return Math.max(1, Math.round(words / 200))
 }
 
-// konten plain text → blok paragraf. `\n\n` = paragraf baru, `\n` tunggal =
-// line break. TANPA HTML mentah/markdown (konten ditulis tenant → anti-XSS);
-// React meng-escape teks secara default.
-export function kontenBlocks(konten?: string | null): string[][] {
+// konten plain text → blok. `\n\n` = blok baru, `\n` tunggal = line break.
+// Blok yang SEMUA barisnya berawalan '> ' = callout (kotak sorot). TANPA HTML
+// mentah/markdown (konten ditulis tenant → anti-XSS); React meng-escape teks.
+export type KontenBlock = { type: 'p' | 'callout'; lines: string[] }
+export function kontenBlocks(konten?: string | null): KontenBlock[] {
   return (konten ?? '')
     .replace(/\r\n/g, '\n')
     .split(/\n{2,}/)
     .map((b) => b.split('\n').map((l) => l.trim()).filter(Boolean))
     .filter((b) => b.length > 0)
+    .map((lines) => {
+      const isCallout = lines.every((l) => l.startsWith('>'))
+      return {
+        type: isCallout ? 'callout' as const : 'p' as const,
+        lines: isCallout ? lines.map((l) => l.replace(/^>\s?/, '')).filter(Boolean) : lines,
+      }
+    })
+    .filter((b) => b.lines.length > 0)
 }
 
 // ── Kerangka halaman: topbar nama bisnis + konten + WA FAB ────
@@ -269,30 +278,56 @@ export function ArticleProse({ konten }: { konten: string | null }) {
   }
   return (
     <div className="space-y-6 text-[17px] leading-[1.75] text-[#28344A] md:text-[18px]" style={{ fontFamily: SERIF }}>
-      {blocks.map((lines, i) => (
-        <p key={i}>
-          {lines.map((line, j) => (
-            <span key={j}>
-              {j > 0 && <br />}
-              {line}
-            </span>
-          ))}
-        </p>
-      ))}
+      {blocks.map((b, i) =>
+        b.type === 'callout' ? (
+          <div key={i} className="rounded-xl border border-[color-mix(in_srgb,var(--blog-accent)_24%,#E4E9F2)] bg-[color-mix(in_srgb,var(--blog-accent)_8%,#fff)] px-5 py-4 text-[15px] leading-relaxed" style={{ fontFamily: 'inherit' }}>
+            {b.lines.map((line, j) => (
+              <span key={j}>
+                {j > 0 && <br />}
+                {line}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p key={i}>
+            {b.lines.map((line, j) => (
+              <span key={j}>
+                {j > 0 && <br />}
+                {line}
+              </span>
+            ))}
+          </p>
+        ),
+      )}
     </div>
   )
 }
 
-// ── Band CTA WA di akhir halaman (skip bila tenant tanpa WA) ──
-export function CtaBand({ nama, waHref, accent }: { nama: string; waHref: string | null; accent: string }) {
+// ── Band CTA di akhir halaman (slot copy menang; fallback WA;
+//    tanpa link sama sekali → band disembunyikan) ─────────────
+export function CtaBand({
+  nama,
+  waHref,
+  accent,
+  ctaTitle,
+  ctaSubtitle,
+  ctaLabel,
+}: {
+  nama: string
+  waHref: string | null
+  accent: string
+  ctaTitle?: string
+  ctaSubtitle?: string
+  ctaLabel?: string
+}) {
   if (!waHref) return null
   return (
     <section
       className="overflow-hidden rounded-3xl px-8 py-12 text-center text-white"
       style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 62%, #05122E))` }}
     >
-      <h2 className="text-2xl font-extrabold tracking-tight [text-wrap:balance]">Ada pertanyaan untuk {nama}?</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-white/85">Hubungi kami lewat WhatsApp — dibalas langsung oleh tim kami.</p>
+      <h2 className="text-2xl font-extrabold tracking-tight [text-wrap:balance]">{ctaTitle || `Ada pertanyaan untuk ${nama}?`}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-white/85">{ctaSubtitle || 'Hubungi kami lewat WhatsApp — dibalas langsung oleh tim kami.'}</p>
       <a
         href={waHref}
         target="_blank"
@@ -300,7 +335,7 @@ export function CtaBand({ nama, waHref, accent }: { nama: string; waHref: string
         className="mt-6 inline-flex min-h-[48px] items-center rounded-full bg-white px-8 text-[15px] font-bold transition-transform hover:-translate-y-0.5"
         style={{ color: accent }}
       >
-        Chat WhatsApp
+        {ctaLabel || 'Chat WhatsApp'}
       </a>
     </section>
   )
