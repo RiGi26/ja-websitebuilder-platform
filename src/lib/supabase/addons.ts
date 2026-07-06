@@ -89,6 +89,67 @@ export async function fetchTenantProfile(client: Client, pageId: string): Promis
   return (data ?? null) as TenantProfile | null
 }
 
+// Artikel published paged (index blog publik /{slug}/blog). Filter kategori
+// opsional; total utk pagination. perPage default 9 (grid 3×3 mockup).
+export async function fetchPublishedBlogPostsPaged(
+  client: Client,
+  pageId: string,
+  opts: { page?: number; perPage?: number; kategori?: string | null } = {},
+): Promise<{ posts: BlogPost[]; total: number }> {
+  const perPage = Math.min(Math.max(opts.perPage ?? 9, 1), 24)
+  const page = Math.max(opts.page ?? 1, 1)
+  const from = (page - 1) * perPage
+
+  let q = client
+    .from('blog_posts')
+    .select('*', { count: 'exact' })
+    .eq('page_id', pageId)
+    .eq('is_published', true)
+  if (opts.kategori) q = q.eq('kategori', opts.kategori)
+
+  const { data, count, error } = await q
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
+    .range(from, from + perPage - 1)
+
+  if (error) {
+    console.error('fetchPublishedBlogPostsPaged:', error.message)
+    return { posts: [], total: 0 }
+  }
+  return { posts: (data ?? []) as BlogPost[], total: count ?? 0 }
+}
+
+// Satu artikel published by slug (halaman baca /{slug}/blog/{postSlug}).
+// Draft/slug asing → null (route menjawab 404).
+export async function fetchBlogPostBySlug(client: Client, pageId: string, postSlug: string): Promise<BlogPost | null> {
+  const { data, error } = await client
+    .from('blog_posts')
+    .select('*')
+    .eq('page_id', pageId)
+    .eq('slug', postSlug)
+    .eq('is_published', true)
+    .maybeSingle()
+  if (error) { console.error('fetchBlogPostBySlug:', error.message); return null }
+  return (data ?? null) as BlogPost | null
+}
+
+// Daftar kategori distinct dari artikel published (chips filter index blog).
+export async function fetchBlogKategoris(client: Client, pageId: string): Promise<string[]> {
+  const { data, error } = await client
+    .from('blog_posts')
+    .select('kategori')
+    .eq('page_id', pageId)
+    .eq('is_published', true)
+    .not('kategori', 'is', null)
+  if (error) { console.error('fetchBlogKategoris:', error.message); return [] }
+  const set = new Set<string>()
+  for (const r of (data ?? []) as Array<{ kategori: string | null }>) {
+    const k = r.kategori?.trim()
+    if (k) set.add(k)
+  }
+  return [...set].sort((a, b) => a.localeCompare(b, 'id'))
+}
+
 // Artikel published untuk sebuah halaman, terbaru dulu.
 export async function fetchBlogPostsByPage(client: Client, pageId: string): Promise<BlogPost[]> {
   const { data, error } = await client

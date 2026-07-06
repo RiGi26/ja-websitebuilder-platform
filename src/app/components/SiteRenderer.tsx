@@ -28,6 +28,7 @@ import { getManifest } from '@/lib/theme-system/manifest'
 import { composableContentFromSections, articlesFromBlogPosts, type ShowcaseSourceItem } from '@/lib/theme-system/content-adapter'
 import { resolveTokenPack, isTokenDrivenTheme } from '@/lib/design-tokens/packs'
 import { sectionsToSiteContent } from '@/lib/design-tokens/section-adapter'
+import { tenantBasePath } from '@/lib/tenant-path'
 import LiveChatWidget from '@/app/components/LiveChatWidget'
 import type { KonfigurasiWebsite, LandingPageWithSections, Product } from '@/types/websitebuilder'
 
@@ -142,12 +143,14 @@ export async function renderSite({
 
     // Sumber etalase per industri (cermin cabang composable): menu_items / services
     // / blog_posts (dipetakan) / products (default + toko).
+    // href kartu artikel → halaman baca /{slug}/blog/{postSlug}; basis subdomain-aware.
+    const blogHrefBase = bespoke.source === 'blog' ? `${await tenantBasePath(slug)}/blog` : ''
     const fetchSource: Promise<ShowcaseSourceItem[]> =
       bespoke.source === 'menu' ? fetchMenuItemsByPage(client, page.id)
         : bespoke.source === 'services' ? fetchServicesByPage(client, page.id)
           : bespoke.source === 'blog'
             ? fetchBlogPostsByPage(client, page.id).then((posts) =>
-                posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at })))
+                posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at, href: p.slug ? `${blogHrefBase}/${p.slug}` : null })))
             : fetchProductsByPage(client, page.id)
     const [source, profile, galleryRows] = await Promise.all([
       fetchSource,
@@ -195,11 +198,16 @@ export async function renderSite({
     // ke {nama,deskripsi,harga,gambar_url}.
     const tipe = (page as { tipe_industri?: string }).tipe_industri ?? ''
     const SERVICE_INDUSTRI = ['klinik', 'sekolah', 'corporate', 'travel', 'personal']
+    // href kartu artikel → halaman baca /{slug}/blog/{postSlug}; basis subdomain-aware.
+    // Dihitung juga saat ada section blog_list (add-on lintas-industri, dipakai di bawah).
+    const blogHrefBase = tipe === 'blog' || sections.some((s) => s.tipe_komponen === 'blog_list')
+      ? `${await tenantBasePath(slug)}/blog`
+      : ''
     const fetchSource: Promise<ShowcaseSourceItem[]> =
       tipe === 'restaurant' ? fetchMenuItemsByPage(client, page.id)
         : tipe === 'blog'
           ? fetchBlogPostsByPage(client, page.id).then((posts) =>
-              posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at })))
+              posts.map((p) => ({ nama: p.judul, deskripsi: p.ringkasan, harga: null, gambar_url: p.cover_url, penulis: p.penulis, tanggal: p.published_at, href: p.slug ? `${blogHrefBase}/${p.slug}` : null })))
           : SERVICE_INDUSTRI.includes(tipe) ? fetchServicesByPage(client, page.id)
             : fetchProductsByPage(client, page.id)
     const showcaseTitle =
@@ -224,7 +232,7 @@ export async function renderSite({
     // (showcase utamanya sudah article-feed dari blog_posts).
     if (tipe !== 'blog' && sections.some((s) => s.tipe_komponen === 'blog_list')) {
       const posts = await fetchBlogPostsByPage(client, page.id)
-      content.articles = articlesFromBlogPosts(sections, posts)
+      content.articles = articlesFromBlogPosts(sections, posts, blogHrefBase)
     }
     const renderer = <ComposableRenderer manifest={manifest} content={content} />
     return hasCart ? <CartProvider slug={slug} primary={primary}>{renderer}</CartProvider> : renderer
@@ -339,6 +347,8 @@ export async function renderSite({
     needGallery ? fetchGalleryByPage(client, page.id) : Promise.resolve([]),
     needProfile ? fetchTenantProfile(client, page.id) : Promise.resolve(null),
   ])
+  // Basis link kartu blog_list → halaman baca artikel (subdomain-aware).
+  const genericBlogHrefBase = needPosts ? `${await tenantBasePath(slug)}/blog` : undefined
 
   const body = (
     <main className="min-h-screen bg-white">
@@ -365,7 +375,7 @@ export async function renderSite({
         </div>
       ) : (
         sections.map((s) => (
-          <SectionRenderer key={s.id} section={s} products={products} posts={posts} services={services} gallery={gallery} profile={profile} hasCart={hasCart} hasBooking={hasBooking} slug={slug} primary={primary} />
+          <SectionRenderer key={s.id} section={s} products={products} posts={posts} services={services} gallery={gallery} profile={profile} hasCart={hasCart} hasBooking={hasBooking} slug={slug} primary={primary} blogHrefBase={genericBlogHrefBase} />
         ))
       )}
     </main>

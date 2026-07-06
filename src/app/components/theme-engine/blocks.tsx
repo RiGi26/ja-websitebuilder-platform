@@ -776,8 +776,8 @@ export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<Compos
       <div className="ce-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
         {showcase.items.map((it, i) => {
           const tgl = formatTanggalID(it.tanggal)
-          return (
-            <article key={i} className="ce-art-card">
+          const card = (
+            <article className="ce-art-card">
               <div className="ce-art-imgwrap" style={{ background: MESH_FILL }}>
                 {it.gambar && <img className="ce-art-img" src={it.gambar} alt={it.nama} loading="lazy" />}
               </div>
@@ -794,6 +794,14 @@ export function ShowcaseArticleFeed({ showcase }: { showcase: NonNullable<Compos
                 <span className="ce-art-readmore" style={{ marginTop: 'auto' }}>Baca selengkapnya →</span>
               </div>
             </article>
+          )
+          // Kartu tanpa elemen interaktif lain → aman dibungkus <a> penuh.
+          // href dari halaman baca artikel ({base}/blog/{postSlug}); tanpa href =
+          // perilaku lama (kartu statis, nol regresi).
+          return it.href ? (
+            <a key={i} href={it.href} style={{ display: 'flex', color: 'inherit', textDecoration: 'none' }}>{card}</a>
+          ) : (
+            <div key={i} style={{ display: 'flex' }}>{card}</div>
           )
         })}
       </div>
