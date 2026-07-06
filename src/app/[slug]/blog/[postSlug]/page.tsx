@@ -11,6 +11,8 @@ import type { KonfigurasiWebsite, LandingPageWithSections } from '@/types/websit
 import {
   BlogShell, PostCard, ArticleProse, CtaBand, blogAccent, formatTanggalID, readingMinutes,
 } from '../blog-ui'
+import { resolveBlogCopy } from '../blog.slots'
+import { JaShell, JaReadHero, JaProse, JaRelated, JaCtaBand } from '../ja-panel'
 
 // ============================================================
 // /{slug}/blog/{postSlug} — halaman baca artikel (gap #1 blog engine:
@@ -82,6 +84,8 @@ export default async function BlogArticlePage({
 
   const konfig = (page.konfigurasi ?? {}) as KonfigurasiWebsite
   const accent = blogAccent(konfig.branding?.primary)
+  const skin = konfig.blog?.skin === 'ja-panel' ? 'ja-panel' : 'slate'
+  const copy = resolveBlogCopy(page.data_konten as Record<string, unknown> | null)
 
   const [allPosts, profile, base] = await Promise.all([
     fetchBlogPostsByPage(supabase, page.id),
@@ -100,6 +104,37 @@ export default async function BlogArticlePage({
   const waRaw = profile?.wa ?? (page.data_konten as Record<string, unknown> | null)?.wa
   const waHref0 = waLink(typeof waRaw === 'string' ? waRaw : null)
   const waHref = waHref0 !== '#' ? waHref0 : null
+  const ctaHref = copy.ctaLink || waHref
+
+  // ── Skin JA panel (mockup A) ────────────────────────────────
+  if (skin === 'ja-panel') {
+    return (
+      <JaShell nama={page.nama_website} base={base} accent={accent}>
+        <main className="mx-auto max-w-[1150px] px-5 pb-16 pt-8">
+          <JaReadHero post={post} hrefBase={hrefBase} kanji={copy.kanji} />
+          <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_290px]">
+            <article className="rounded-2xl border bg-white p-7 md:p-8" style={{ borderColor: '#e3e9f3' }}>
+              {post.cover_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={post.cover_url} alt={post.judul} className="mb-6 aspect-[16/9] w-full rounded-xl object-cover" />
+              )}
+              <JaProse konten={post.konten} />
+            </article>
+            <aside className="flex flex-col gap-4">
+              <JaRelated posts={related} hrefBase={hrefBase} />
+              <JaCtaBand
+                nama={page.nama_website}
+                ctaTitle={copy.ctaTitle}
+                ctaSubtitle={copy.ctaSubtitle}
+                ctaLabel={copy.ctaLabel}
+                ctaHref={ctaHref}
+              />
+            </aside>
+          </div>
+        </main>
+      </JaShell>
+    )
+  }
 
   const tgl = formatTanggalID(post.published_at)
 
@@ -179,7 +214,7 @@ export default async function BlogArticlePage({
         )}
 
         <div className="mx-auto mt-14 max-w-4xl">
-          <CtaBand nama={page.nama_website} waHref={waHref} accent={accent} />
+          <CtaBand nama={page.nama_website} waHref={ctaHref} accent={accent} ctaTitle={copy.ctaTitle} ctaSubtitle={copy.ctaSubtitle} ctaLabel={copy.ctaLabel} />
         </div>
       </main>
     </BlogShell>

@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { BESPOKE_RENDERERS } from '@/app/components/themes/toko-bespoke/registry'
 import { validateThemeCopyInput } from '@/lib/theme-system/slot-schema'
+import { BLOG_SLOT_MANIFEST } from '@/app/[slug]/blog/blog.slots'
 
 // Copy khas-tema editan klien (panel "Konten Tema" portal) — baca/tulis
 // data_konten.theme_copy milik tenant sendiri. Beda dari /api/portal/landing-page
@@ -23,7 +24,7 @@ async function getSessionTenantId(): Promise<string | null> {
 async function getTenantPage(tenantId: string) {
   const { data, error } = await supabaseAdmin
     .from('landing_pages')
-    .select('id, data_konten, konfigurasi')
+    .select('id, data_konten, konfigurasi, tipe_industri')
     .eq('tenant_id', tenantId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -33,13 +34,17 @@ async function getTenantPage(tenantId: string) {
 }
 
 // Manifest slot untuk tema halaman ini; null bila tema tak punya (belum
-// dimigrasi zero-hardcode / bukan bespoke).
-function manifestForPage(konfigurasi: unknown) {
+// dimigrasi zero-hardcode / bukan bespoke). Fallback: halaman ber-blog aktif
+// (tipe blog / add-on hasBlog) dapat manifest slot blog (chrome /{slug}/blog).
+function manifestForPage(konfigurasi: unknown, tipeIndustri?: string | null) {
   const konfig = (konfigurasi ?? {}) as Record<string, unknown>
   const branding = (konfig.branding ?? {}) as Record<string, unknown>
   const theme = typeof branding.theme === 'string' ? branding.theme : undefined
-  if (!theme) return null
-  return BESPOKE_RENDERERS[theme]?.slots ?? null
+  const bespoke = theme ? BESPOKE_RENDERERS[theme]?.slots ?? null : null
+  if (bespoke) return bespoke
+  const features = (konfig.features ?? {}) as Record<string, unknown>
+  const blogEnabled = tipeIndustri === 'blog' || features.hasBlog === true
+  return blogEnabled ? BLOG_SLOT_MANIFEST : null
 }
 
 export async function GET() {
@@ -72,7 +77,7 @@ export async function PATCH(request: Request) {
     const page = await getTenantPage(tenantId)
     if (!page) return NextResponse.json({ error: 'Halaman tidak ditemukan' }, { status: 404 })
 
-    const manifest = manifestForPage(page.konfigurasi)
+    const manifest = manifestForPage(page.konfigurasi, (page as { tipe_industri?: string | null }).tipe_industri)
     if (!manifest) {
       return NextResponse.json({ error: 'Tema ini belum mendukung edit copy tema' }, { status: 400 })
     }

@@ -133,6 +133,20 @@ export async function fetchBlogPostBySlug(client: Client, pageId: string, postSl
   return (data ?? null) as BlogPost | null
 }
 
+// Artikel pinned (kurasi "Paling Dibaca" di index blog), published saja.
+export async function fetchPinnedBlogPosts(client: Client, pageId: string, limit = 4): Promise<BlogPost[]> {
+  const { data, error } = await client
+    .from('blog_posts')
+    .select('*')
+    .eq('page_id', pageId)
+    .eq('is_published', true)
+    .eq('is_pinned', true)
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .limit(limit)
+  if (error) { console.error('fetchPinnedBlogPosts:', error.message); return [] }
+  return (data ?? []) as BlogPost[]
+}
+
 // Daftar kategori distinct dari artikel published (chips filter index blog).
 export async function fetchBlogKategoris(client: Client, pageId: string): Promise<string[]> {
   const { data, error } = await client
