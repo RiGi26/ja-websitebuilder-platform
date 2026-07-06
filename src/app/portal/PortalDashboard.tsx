@@ -1530,8 +1530,12 @@ function MenuPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
 }
 
 // ── Panel Blog (artikel) — customer kelola sendiri ──────────────
-type BlogDraft = { judul: string; ringkasan: string; konten: string; cover_url: string; penulis: string }
-const BLOG_EMPTY: BlogDraft = { judul: '', ringkasan: '', konten: '', cover_url: '', penulis: '' }
+type BlogDraft = { judul: string; ringkasan: string; konten: string; cover_url: string; penulis: string; kategori: string }
+const BLOG_EMPTY: BlogDraft = { judul: '', ringkasan: '', konten: '', cover_url: '', penulis: '', kategori: '' }
+
+// Pesan ramah utk pelanggaran unique (page_id, slug): slug diturunkan dari judul.
+const blogErrMsg = (e: { code?: string; message?: string }) =>
+  e?.code === '23505' ? 'Judul terlalu mirip artikel lain (slug sama) — ubah judulnya sedikit.' : `Gagal: ${e?.message ?? 'kesalahan tak dikenal'}`
 
 function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantId: string; initial: BlogPost[] }) {
   const supabase = createClient()
@@ -1547,7 +1551,12 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
     judul: d.judul, slug: slugify(d.judul) || null,
     ringkasan: d.ringkasan || null, konten: d.konten || null,
     cover_url: d.cover_url || null, penulis: d.penulis || null,
+    kategori: d.kategori.trim() || null,
   })
+  // URL publik artikel (subdomain tenant). Dipakai tombol "Lihat" baris published.
+  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'webzoka.com'
+  const publicPostUrl = (b: BlogPost) =>
+    page?.slug && b.slug ? `https://${page.slug}.${rootDomain}/blog/${b.slug}` : null
 
   const create = async () => {
     if (!page) return
@@ -1560,11 +1569,11 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
       if (error) throw error
       setItems((p) => [data as BlogPost, ...p])
       setAdd(BLOG_EMPTY)
-    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+    } catch (e: any) { alert(blogErrMsg(e)) } finally { setBusy(null) }
   }
   const startEdit = (b: BlogPost) => {
     setEditId(b.id)
-    setDraft({ judul: b.judul ?? '', ringkasan: b.ringkasan ?? '', konten: b.konten ?? '', cover_url: b.cover_url ?? '', penulis: b.penulis ?? '' })
+    setDraft({ judul: b.judul ?? '', ringkasan: b.ringkasan ?? '', konten: b.konten ?? '', cover_url: b.cover_url ?? '', penulis: b.penulis ?? '', kategori: b.kategori ?? '' })
   }
   const saveEdit = async (id: string) => {
     if (!draft.judul.trim()) return alert('Judul wajib')
@@ -1574,7 +1583,7 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
       if (error) throw error
       setItems((p) => p.map((x) => (x.id === id ? (data as BlogPost) : x)))
       setEditId(null)
-    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+    } catch (e: any) { alert(blogErrMsg(e)) } finally { setBusy(null) }
   }
   const togglePublish = async (b: BlogPost) => {
     setBusy(b.id)
@@ -1607,9 +1616,10 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
         <input value={add.judul} onChange={(e) => setAdd({ ...add, judul: e.target.value })} placeholder="Judul artikel *" className={inp} />
         <input value={add.ringkasan} onChange={(e) => setAdd({ ...add, ringkasan: e.target.value })} placeholder="Ringkasan singkat" className={inp} />
         <textarea value={add.konten} onChange={(e) => setAdd({ ...add, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <ImageUploadField compact value={add.cover_url} onChange={(url) => setAdd({ ...add, cover_url: url })} />
           <input value={add.penulis} onChange={(e) => setAdd({ ...add, penulis: e.target.value })} placeholder="Penulis (opsional)" className={inp} />
+          <input value={add.kategori} onChange={(e) => setAdd({ ...add, kategori: e.target.value })} placeholder="Kategori (opsional)" className={inp} />
         </div>
       </div>
       <div className="flex justify-end mb-6">
@@ -1627,9 +1637,10 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                 <input value={draft.judul} onChange={(e) => setDraft({ ...draft, judul: e.target.value })} placeholder="Judul *" className={inp} />
                 <input value={draft.ringkasan} onChange={(e) => setDraft({ ...draft, ringkasan: e.target.value })} placeholder="Ringkasan" className={inp} />
                 <textarea value={draft.konten} onChange={(e) => setDraft({ ...draft, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <ImageUploadField compact value={draft.cover_url} onChange={(url) => setDraft({ ...draft, cover_url: url })} />
                   <input value={draft.penulis} onChange={(e) => setDraft({ ...draft, penulis: e.target.value })} placeholder="Penulis" className={inp} />
+                  <input value={draft.kategori} onChange={(e) => setDraft({ ...draft, kategori: e.target.value })} placeholder="Kategori" className={inp} />
                 </div>
                 <div className="flex gap-2 justify-end">
                   <button onClick={() => setEditId(null)} className="px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-500 hover:bg-white">Batal</button>
@@ -1645,6 +1656,9 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                   {it.ringkasan && <p className="text-xs text-gray-500 truncate">{it.ringkasan}</p>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  {it.is_published && publicPostUrl(it) && (
+                    <a href={publicPostUrl(it)!} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Lihat artikel di website"><ExternalLink size={14} /></a>
+                  )}
                   <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
                   <button onClick={() => togglePublish(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_published ? 'Jadikan draft' : 'Terbitkan'}>
                     {it.is_published ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}
