@@ -8,7 +8,7 @@ async function requireAdmin() {
   return verifyAdminSessionToken(cookieStore.get(ADMIN_COOKIE_NAME)?.value)
 }
 
-const FIELDS = ['judul', 'slug', 'ringkasan', 'konten', 'cover_url', 'penulis', 'is_published', 'published_at'] as const
+const FIELDS = ['judul', 'slug', 'ringkasan', 'konten', 'cover_url', 'penulis', 'kategori', 'is_published', 'published_at'] as const
 
 // GET ?pageId= : semua artikel halaman (termasuk draft, utk admin)
 export async function GET(request: Request) {

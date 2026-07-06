@@ -359,7 +359,10 @@ function ServiceList({ isi, services, hasBooking, slug, primary }: { isi: Isi; s
 }
 
 // ── Add-on: Blog list (data dari tabel blog_posts) ───────────
-function BlogList({ isi, posts }: { isi: Isi; posts: BlogPost[] }) {
+// blogHrefBase (mis. `/{slug}/blog`, subdomain-aware dari SiteRenderer) →
+// kartu jadi link ke halaman baca + footer "Lihat semua artikel". Tanpa
+// basis = kartu statis (perilaku lama, nol regresi).
+function BlogList({ isi, posts, blogHrefBase }: { isi: Isi; posts: BlogPost[]; blogHrefBase?: string }) {
   return (
     <section className="px-6 py-20">
       <div className="max-w-5xl mx-auto">
@@ -368,19 +371,33 @@ function BlogList({ isi, posts }: { isi: Isi; posts: BlogPost[] }) {
           <p className="text-center text-gray-400 text-sm">Belum ada artikel.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {posts.map((b) => (
-              <article key={b.id} className="bg-white rounded-2xl border border-black/5 overflow-hidden">
-                {b.cover_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={b.cover_url} alt={b.judul} className="w-full aspect-video object-cover" />
-                )}
-                <div className="p-5">
-                  <h3 className="font-bold text-gray-900">{b.judul}</h3>
-                  {b.ringkasan && <p className="text-sm text-gray-500 mt-2 line-clamp-3">{b.ringkasan}</p>}
-                  {b.penulis && <p className="text-[11px] text-gray-400 mt-3">oleh {b.penulis}</p>}
-                </div>
-              </article>
-            ))}
+            {posts.map((b) => {
+              const card = (
+                <article className="h-full bg-white rounded-2xl border border-black/5 overflow-hidden transition-shadow hover:shadow-lg">
+                  {b.cover_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={b.cover_url} alt={b.judul} className="w-full aspect-video object-cover" />
+                  )}
+                  <div className="p-5">
+                    <h3 className="font-bold text-gray-900">{b.judul}</h3>
+                    {b.ringkasan && <p className="text-sm text-gray-500 mt-2 line-clamp-3">{b.ringkasan}</p>}
+                    {b.penulis && <p className="text-[11px] text-gray-400 mt-3">oleh {b.penulis}</p>}
+                  </div>
+                </article>
+              )
+              return blogHrefBase && b.slug ? (
+                <a key={b.id} href={`${blogHrefBase}/${b.slug}`} className="block h-full">{card}</a>
+              ) : (
+                <div key={b.id}>{card}</div>
+              )
+            })}
+          </div>
+        )}
+        {blogHrefBase && posts.length > 0 && (
+          <div className="mt-8 text-center">
+            <a href={blogHrefBase} className="inline-flex min-h-[44px] items-center rounded-full border border-black/10 bg-white px-5 text-sm font-bold text-gray-700 transition-colors hover:border-gray-400">
+              Lihat semua artikel →
+            </a>
           </div>
         )}
       </div>
@@ -427,6 +444,7 @@ export function SectionRenderer({
   hasBooking = false,
   slug,
   primary,
+  blogHrefBase,
 }: {
   section: PageSection
   products?: Product[]
@@ -438,13 +456,14 @@ export function SectionRenderer({
   hasBooking?: boolean
   slug?: string
   primary?: string
+  blogHrefBase?: string
 }) {
   const isi = (section.isi_komponen ?? {}) as Isi
 
   // Add-on dengan sumber data tabel bersama
   if (section.tipe_komponen === 'product_list') return <ProductList isi={isi} products={products} hasCart={hasCart} primary={primary} />
   if (section.tipe_komponen === 'service_list') return <ServiceList isi={isi} services={services} hasBooking={hasBooking} slug={slug} primary={primary} />
-  if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} />
+  if (section.tipe_komponen === 'blog_list') return <BlogList isi={isi} posts={posts} blogHrefBase={blogHrefBase} />
   if (section.tipe_komponen === 'gallery') return <Gallery isi={isi} gallery={gallery} />
   if (section.tipe_komponen === 'contact_form') return <ContactForm isi={isi} profile={profile} />
   if (section.tipe_komponen === 'social_feed') return <AddonPlaceholder label="Social Feed" />

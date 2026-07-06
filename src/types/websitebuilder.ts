@@ -347,6 +347,8 @@ export interface BlogPost {
   konten: string | null
   cover_url: string | null
   penulis: string | null
+  /** Kategori bebas (chips filter di index blog publik). */
+  kategori: string | null
   is_published: boolean
   published_at: string | null
   created_at: string

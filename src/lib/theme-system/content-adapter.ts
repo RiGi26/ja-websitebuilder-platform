@@ -26,6 +26,7 @@ export interface ShowcaseSourceItem {
   penulis?: string | null       // blog (dipetakan dari blog_posts.penulis)
   tanggal?: string | null       // blog (dipetakan dari blog_posts.published_at)
   is_sold_out?: boolean | null  // menu_items → badge "Habis" (F&B pre-order)
+  href?: string | null          // blog → link kartu ke halaman baca artikel
 }
 
 // Baris tabel gallery_images yang relevan untuk galeri (tab Galeri portal).
@@ -57,6 +58,7 @@ export function composableContentFromSections(
       penulis: p.penulis ?? undefined,
       tanggal: p.tanggal ?? undefined,
       soldOut: p.is_sold_out ?? undefined,
+      href: p.href ?? undefined,
     }))
 
   const showcase = items.length ? { title: showcaseTitle, items } : undefined
@@ -361,6 +363,7 @@ function parseSocial(v: unknown): SocialContent | undefined {
 // sendiri tidak lewat jalur ini (showcase utamanya sudah article-feed).
 export interface BlogPostRow {
   judul: string
+  slug?: string | null
   ringkasan?: string | null
   cover_url?: string | null
   penulis?: string | null
@@ -370,6 +373,9 @@ export interface BlogPostRow {
 export function articlesFromBlogPosts(
   sections: PageSection[],
   posts: BlogPostRow[],
+  // Basis link kartu → halaman baca (mis. `/{slug}/blog`); tanpa basis =
+  // kartu tanpa link (perilaku lama).
+  hrefBase?: string,
 ): ComposableContent['articles'] {
   const row = sections.find((s) => s.tipe_komponen === 'blog_list')
   if (!row) return undefined
@@ -382,6 +388,7 @@ export function articlesFromBlogPosts(
       gambar: p.cover_url ?? undefined,
       penulis: p.penulis ?? undefined,
       tanggal: p.published_at ?? undefined,
+      href: hrefBase && p.slug ? `${hrefBase}/${p.slug}` : undefined,
     }))
   if (!items.length) return undefined
   const isi = (row.isi_komponen ?? {}) as Record<string, unknown>
