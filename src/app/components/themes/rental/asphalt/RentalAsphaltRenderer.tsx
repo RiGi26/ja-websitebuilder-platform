@@ -92,7 +92,7 @@ const GLOBAL_CSS = `
 .ra-nav .ra-container{display:flex;align-items:center;gap:28px;min-height:68px}
 .ra-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:${PALETTE.onDark}}
 .ra-brand svg{color:var(--ra-accent)}
-.ra-brand-nm{font-family:var(--ra-display);font-size:24px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+.ra-brand-nm{font-family:var(--ra-display);font-size:24px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:${PALETTE.onDark}}
 .ra-brand-nm em{font-style:italic;color:var(--ra-accent)}
 .ra-nav-links{display:flex;gap:4px;margin-left:auto}
 .ra-nav-links a{color:${PALETTE.onDarkMuted};text-decoration:none;font-size:14.5px;font-weight:600;padding:10px 14px;border-radius:10px;transition:color .2s,background .2s}
