@@ -79,7 +79,10 @@ export default async function BlogIndexPage({
     tenantBasePath(slug),
   ])
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE))
-  if (pageNum > totalPages && total > 0) notFound()
+  // Halaman melewati rentang → 404. Berbasis hasil (bukan hanya total):
+  // range PostgREST di luar rentang balas 416 → helper mengembalikan
+  // {posts:[], total:0}, sehingga cek total saja lolos keliru.
+  if (pageNum > 1 && posts.length === 0) notFound()
 
   const hrefBase = `${base}/blog`
   const waRaw = profile?.wa ?? (page.data_konten as Record<string, unknown> | null)?.wa
