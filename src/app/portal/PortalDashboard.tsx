@@ -4,7 +4,7 @@ import { useState, useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
-  Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink,
+  Plus, Trash2, Loader2, Eye, EyeOff, Pencil, Check, LogOut, ExternalLink, Star,
   CreditCard, ShoppingBag, Receipt, CalendarClock, Briefcase, UtensilsCrossed,
   FileText, Image as ImageIcon, Store, LayoutTemplate, Monitor, Palette, Lock,
   ClipboardList, BarChart3, Settings, Bike, ChevronUp, ChevronDown, HelpCircle, Quote, MessageCircle,
@@ -1605,6 +1605,16 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
       setItems((p) => p.filter((x) => x.id !== id))
     } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
   }
+  // Pin → tampil di panel "Paling Dibaca" halaman blog (maks efektif 4, terbaru dulu).
+  const togglePin = async (b: BlogPost) => {
+    setBusy(b.id)
+    try {
+      const { data, error } = await supabase.from('blog_posts')
+        .update({ is_pinned: !b.is_pinned } as never).eq('id', b.id).select().single()
+      if (error) throw error
+      setItems((p) => p.map((x) => (x.id === b.id ? (data as BlogPost) : x)))
+    } catch (e: any) { alert(`Gagal: ${e.message}`) } finally { setBusy(null) }
+  }
 
   return (
     <div className="bg-white rounded-[32px] p-8 apple-shadow border border-black/[0.03]">
@@ -1616,6 +1626,7 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
         <input value={add.judul} onChange={(e) => setAdd({ ...add, judul: e.target.value })} placeholder="Judul artikel *" className={inp} />
         <input value={add.ringkasan} onChange={(e) => setAdd({ ...add, ringkasan: e.target.value })} placeholder="Ringkasan singkat" className={inp} />
         <textarea value={add.konten} onChange={(e) => setAdd({ ...add, konten: e.target.value })} placeholder="Isi artikel" rows={4} className={inp} />
+        <p className="text-[11px] text-gray-400">Baris kosong = paragraf baru. Awali baris dengan <code className="bg-gray-100 px-1 rounded">&gt;</code> untuk kotak sorot (callout).</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <ImageUploadField compact value={add.cover_url} onChange={(url) => setAdd({ ...add, cover_url: url })} />
           <input value={add.penulis} onChange={(e) => setAdd({ ...add, penulis: e.target.value })} placeholder="Penulis (opsional)" className={inp} />
@@ -1659,6 +1670,9 @@ function BlogPanel({ page, tenantId, initial }: { page: PageInfo | null; tenantI
                   {it.is_published && publicPostUrl(it) && (
                     <a href={publicPostUrl(it)!} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Lihat artikel di website"><ExternalLink size={14} /></a>
                   )}
+                  <button onClick={() => togglePin(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_pinned ? 'Lepas dari Paling Dibaca' : 'Pin ke Paling Dibaca'}>
+                    <Star size={14} className={it.is_pinned ? 'text-amber-400 fill-amber-400' : 'text-gray-400'} />
+                  </button>
                   <button onClick={() => startEdit(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white text-gray-500" title="Edit"><Pencil size={14} /></button>
                   <button onClick={() => togglePublish(it)} disabled={busy === it.id} className="p-1.5 rounded-lg hover:bg-white" title={it.is_published ? 'Jadikan draft' : 'Terbitkan'}>
                     {it.is_published ? <Eye size={14} /> : <EyeOff size={14} className="text-gray-400" />}

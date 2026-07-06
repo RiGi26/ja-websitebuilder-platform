@@ -122,6 +122,9 @@ export interface KonfigurasiWebsite {
    *  /api/portal/design lawan daftar registry; absen = bawaan tema (nol regresi).
    *  Nilai default TIDAK disalin ke sini (pilih bawaan = key dihapus). */
   design?: { palette?: string; fontPairing?: string; accent?: string }
+  /** Blog publik (/{slug}/blog): pilihan skin renderer. Absen = 'slate'
+   *  (layout universal netral). 'ja-panel' = skin panel-navy (klien Japan Arena). */
+  blog?: { skin?: 'slate' | 'ja-panel' }
 }
 
 export type TipeKomponen =
@@ -349,6 +352,8 @@ export interface BlogPost {
   penulis: string | null
   /** Kategori bebas (chips filter di index blog publik). */
   kategori: string | null
+  /** Pin manual → panel "Paling Dibaca" di index blog (kurasi tenant). */
+  is_pinned: boolean
   is_published: boolean
   published_at: string | null
   created_at: string
