@@ -35,6 +35,7 @@ describe('KlinikFisioRenderer parity (themeCopy kosong = byte-identik)', () => {
     // tertimpa hero.eyebrow sample.
     const CONDITIONAL = new Set([
       'copy.booking_cta', 'copy.booking_eyebrow', 'copy.booking_title', 'copy.booking_sub',
+      'copy.jadwal_eyebrow', 'copy.jadwal_title', 'copy.jadwal_sub', 'copy.jadwal_week_title', 'copy.jadwal_note',
       'copy.about_cta', 'copy.jam_fallback', 'copy.footer_desc', 'copy.footer_jam_fallback',
     ])
     for (const f of copyFields(KLINIK_FISIO_SLOTS)) {
