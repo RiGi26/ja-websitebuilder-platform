@@ -142,7 +142,7 @@ const CSS = `
 .kfj-btn:hover{background:var(--kf-popDeep);transform:translateY(-2px)}
 .kfj-btn.soft{background:rgba(234,243,248,.08);color:#AFC5D1;box-shadow:none;border:1px solid rgba(234,243,248,.1)}
 .kfj-btn.soft:hover{background:rgba(234,243,248,.14);transform:none}
-.kfj-week-h{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:1rem}
+.kf-root .kfj-week-h{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:1rem}
 .kfj-scroll{overflow-x:auto;border-radius:18px;border:1px solid rgba(234,243,248,.1);background:rgba(255,255,255,.035)}
 .kfj-table{width:100%;border-collapse:collapse;min-width:680px}
 .kfj-table th,.kfj-table td{padding:.9rem .85rem;text-align:left;font-size:.84rem;border-bottom:1px solid rgba(234,243,248,.1)}
