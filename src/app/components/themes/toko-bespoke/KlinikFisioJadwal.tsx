@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react'
 
 // ============================================================
 // JADWAL REALTIME (klinik-fisio) — papan "Tersedia Hari Ini" + jadwal praktik
-// mingguan per terapis + kartu cabang, semua dari Portal Klinik via proxy WB
-// (/api/booking-proxy/{slug}/schedule — read-only, tanpa data pasien).
-// Signature band GELAP satu-satunya di halaman (mockup 2026-07-11): papan skor.
-// Namespace kfj-; warna dari var --kf-* warisan .kf-root (dark/dark2/pop).
-// LiveCard (hero) & papan berbagi SATU fetch per slug via cache modul.
+// mingguan ber-tab cabang, plus seksi Terapis & Cabang, semua dari Portal
+// Klinik via proxy WB (/api/booking-proxy/{slug}/schedule — read-only, tanpa
+// data pasien). Papan = band GELAP satu-satunya di halaman (mockup 2026-07-11).
+// Namespace kfj- (papan gelap) & kfd-/kfc- (seksi terang); warna dari var
+// --kf-* warisan .kf-root. Semua komponen berbagi SATU fetch per slug (cache
+// modul).
 // ============================================================
 
 type WeeklyRow = { day_of_week: number; start: string; end: string }
@@ -22,7 +23,7 @@ type ScheduleData = { date: string; day_of_week: number; doctors: ScheduleDoctor
 
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 
-// Satu fetch per slug per pageview — LiveCard & papan memakai promise yang sama.
+// Satu fetch per slug per pageview — semua komponen memakai promise yang sama.
 const scheduleCache = new Map<string, Promise<ScheduleData | null>>()
 function fetchSchedule(slug: string): Promise<ScheduleData | null> {
   if (!scheduleCache.has(slug)) {
@@ -51,6 +52,10 @@ const AV_COLORS = ['#1B9CD8', '#F39C12', '#0B6E96']
 function initials(name: string): string {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'T'
 }
+// Panggilan pendek: buang gelar/prefiks profesi yang umum.
+function shortName(name: string): string {
+  return name.replace(/^(dr\.?|drg\.?|fisioterapis)\s+/i, '')
+}
 // Hari praktik berikutnya setelah hari ini (wrap ke minggu depan).
 function nextPracticeDay(weekly: WeeklyRow[], today: number): WeeklyRow | null {
   if (weekly.length === 0) return null
@@ -59,19 +64,20 @@ function nextPracticeDay(weekly: WeeklyRow[], today: number): WeeklyRow | null {
 }
 
 // ── Kartu LIVE di hero (menggantikan badge jam saat booking aktif) ──
+// Posisi mengikuti mockup: kanan-bawah kartu visual, sedikit menganjur.
 const LIVE_CSS = `
-.kfj-hero-live{position:absolute;right:-1rem;top:1.9rem;z-index:3;background:var(--kf-surface);border-radius:16px;padding:.85rem 1.05rem;box-shadow:0 16px 40px -18px var(--kf-shadowDeep);text-decoration:none;display:block;min-width:200px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
+.kfj-hero-live{position:absolute;right:-12px;bottom:-20px;z-index:3;background:var(--kf-surface);border-radius:20px;padding:1rem 1.15rem;box-shadow:0 2px 4px rgba(7,32,46,.06),0 20px 44px -14px var(--kf-shadowDeep);text-decoration:none;display:block;min-width:230px;max-width:min(320px,88%);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
 .kfj-hero-live:hover{transform:translateY(-3px)}
-.kfj-live-head{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem}
+.kfj-live-head{display:flex;align-items:center;gap:.45rem;margin-bottom:.4rem}
 .kfj-live-label{font-size:.66rem;font-weight:800;letter-spacing:.13em;color:#16A34A;text-transform:uppercase}
 .kfj-dot{width:8px;height:8px;border-radius:50%;background:#16A34A;position:relative;flex:none}
 .kfj-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(22,163,74,.4)}
 @media(prefers-reduced-motion:no-preference){.kfj-dot::after{animation:kfjPulse 1.8s cubic-bezier(.16,1,.3,1) infinite}}
 @keyframes kfjPulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.4);opacity:0}}
-.kfj-hero-live b{display:block;font-size:.9rem;color:var(--kf-ink);line-height:1.3}
-.kfj-hero-live small{font-size:.74rem;color:var(--kf-muted);display:block;margin-top:.1rem;font-variant-numeric:tabular-nums}
-.kfj-hero-live .kfj-go{display:inline-flex;align-items:center;gap:.3rem;font-size:.76rem;font-weight:700;color:var(--kf-accentDeep);margin-top:.4rem}
-@media(max-width:560px){.kfj-hero-live{right:0}}
+.kfj-hero-live b{display:block;font-size:.92rem;color:var(--kf-ink);line-height:1.3}
+.kfj-hero-live small{font-size:.76rem;color:var(--kf-muted);display:block;margin-top:.1rem;font-variant-numeric:tabular-nums}
+.kfj-hero-live .kfj-go{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;color:var(--kf-accentDeep);margin-top:.45rem}
+@media(max-width:560px){.kfj-hero-live{right:8px;bottom:-24px}}
 `
 
 export function KlinikFisioLiveCard({ slug }: { slug: string }) {
@@ -103,12 +109,12 @@ export function KlinikFisioLiveCard({ slug }: { slug: string }) {
       <span className="kfj-live-head"><span className="kfj-dot" aria-hidden /><span className="kfj-live-label">Live hari ini</span></span>
       <b>{title}</b>
       {sub && <small>{sub}</small>}
-      <span className="kfj-go">Lihat jadwal →</span>
+      <span className="kfj-go">Lihat jadwal lengkap →</span>
     </a>
   )
 }
 
-// ── Papan jadwal (seksi #jadwal) ──
+// ── Papan jadwal (seksi #jadwal, band gelap) ──
 const CSS = `
 .kf-board{position:relative;background:radial-gradient(ellipse 60% 40% at 90% 0%,rgba(27,156,216,.22),transparent 60%),radial-gradient(ellipse 50% 40% at 0% 100%,rgba(243,156,18,.10),transparent 55%),linear-gradient(180deg,var(--kf-dark),var(--kf-dark2))}
 .kf-board::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--kf-accent),var(--kf-pop))}
@@ -127,7 +133,7 @@ const CSS = `
 .kfj-tcard:hover{transform:translateY(-4px);background:rgba(255,255,255,.075);border-color:rgba(234,243,248,.2)}
 .kfj-tcard-top{display:flex;gap:.85rem;align-items:center;margin-bottom:.95rem}
 .kfj-av{width:48px;height:48px;border-radius:15px;flex:none;display:grid;place-items:center;font-weight:800;font-size:1.02rem;color:#fff}
-.kfj-tcard h3{font-size:1rem;font-weight:700;color:#fff;line-height:1.25}
+.kf-root .kfj-tcard h3{font-size:1rem;font-weight:700;color:#fff;line-height:1.25}
 .kfj-spec{font-size:.76rem;color:#7E99A8;font-weight:600}
 .kfj-chips{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin-bottom:.95rem}
 .kfj-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:700;padding:.28rem .7rem;border-radius:999px;background:rgba(14,124,176,.22);color:#8FD4F5;border:1px solid rgba(14,124,176,.4)}
@@ -142,7 +148,13 @@ const CSS = `
 .kfj-btn:hover{background:var(--kf-popDeep);transform:translateY(-2px)}
 .kfj-btn.soft{background:rgba(234,243,248,.08);color:#AFC5D1;box-shadow:none;border:1px solid rgba(234,243,248,.1)}
 .kfj-btn.soft:hover{background:rgba(234,243,248,.14);transform:none}
-.kf-root .kfj-week-h{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:1rem}
+.kfj-week-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.kf-root .kfj-week-h{font-size:1.2rem;font-weight:800;color:#fff;margin:0}
+.kfj-tabs{display:flex;gap:.45rem;flex-wrap:wrap}
+.kfj-tab{min-height:44px;padding:.55rem 1.15rem;border-radius:999px;background:rgba(234,243,248,.06);color:#AFC5D1;border:1px solid rgba(234,243,248,.1);font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:background .25s,color .25s,border-color .25s}
+.kfj-tab:hover{background:rgba(234,243,248,.12);color:#fff}
+.kfj-tab[aria-selected="true"]{background:var(--kf-pop);color:var(--kf-ink);border-color:var(--kf-pop)}
+.kfj-tab:focus-visible{outline:3px solid var(--kf-accentLight);outline-offset:2px}
 .kfj-scroll{overflow-x:auto;border-radius:18px;border:1px solid rgba(234,243,248,.1);background:rgba(255,255,255,.035)}
 .kfj-table{width:100%;border-collapse:collapse;min-width:680px}
 .kfj-table th,.kfj-table td{padding:.9rem .85rem;text-align:left;font-size:.84rem;border-bottom:1px solid rgba(234,243,248,.1)}
@@ -154,25 +166,24 @@ const CSS = `
 .kfj-table .kfj-off{color:rgba(234,243,248,.28)}
 .kfj-table .kfj-now{background:rgba(243,156,18,.09);box-shadow:inset 0 0 0 1px rgba(243,156,18,.25)}
 .kfj-table thead .kfj-now{color:var(--kf-pop)}
-.kfj-cabang{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-top:2.6rem}
-.kfj-branch{background:rgba(255,255,255,.05);border:1px solid rgba(234,243,248,.1);border-radius:16px;padding:1.05rem 1.15rem}
-.kfj-branch b{display:block;font-size:.9rem;color:#fff;margin-bottom:.25rem}
-.kfj-branch p{font-size:.78rem;color:#AFC5D1;line-height:1.55}
 .kfj-note{margin-top:1.4rem;font-size:.8rem;color:#7E99A8}
 .kfj-note b{color:#AFC5D1}
 .kfj-load{display:flex;align-items:center;justify-content:center;gap:.6rem;color:#AFC5D1;padding:2.5rem 0;font-size:.9rem}
 .kfj-spin{width:20px;height:20px;border:2px solid rgba(234,243,248,.25);border-top-color:var(--kf-pop);border-radius:50%;animation:kfjspin .7s linear infinite}
 @keyframes kfjspin{to{transform:rotate(360deg)}}
-@media(max-width:940px){.kfj-today{grid-template-columns:1fr}.kfj-cabang{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.kfj-cabang{grid-template-columns:1fr}}
+@media(max-width:940px){.kfj-today{grid-template-columns:1fr}}
 `
 
-type JadwalCopy = { eyebrow: string; title: string; sub: string; weekTitle: string; note: string }
+type SectionCopy = { eyebrow: string; title: string; sub: string }
+type JadwalCopy = SectionCopy & { weekTitle: string; note: string }
 
 export default function KlinikFisioJadwal({ slug, copy }: { slug: string; copy: JadwalCopy }) {
   const data = useSchedule(slug)
   // Detik sejak data tiba — bukti "live" di badge, tanpa polling ulang.
   const [secs, setSecs] = useState(0)
+  // Tab cabang aktif utk tabel mingguan; '' = belum dipilih (default cabang
+  // pertama yang punya terapis).
+  const [branch, setBranch] = useState('')
   useEffect(() => {
     if (!data) return
     setSecs(0)
@@ -182,6 +193,11 @@ export default function KlinikFisioJadwal({ slug, copy }: { slug: string; copy: 
 
   const days = [1, 2, 3, 4, 5, 6]
   const today = data?.day_of_week ?? -1
+  const activeBranch = branch
+    || data?.locations.find((l) => data.doctors.some((d) => d.location_id === l.id))?.id
+    || data?.locations[0]?.id
+    || ''
+  const docsHere = data?.doctors.filter((d) => d.location_id === activeBranch) ?? []
 
   return (
     <>
@@ -243,13 +259,30 @@ export default function KlinikFisioJadwal({ slug, copy }: { slug: string; copy: 
                   </div>
                   {off || full
                     ? <a className="kfj-btn soft" href="#booking">Lihat hari lain</a>
-                    : <a className="kfj-btn" href="#booking">Booking {doc.full_name.replace(/^Fisioterapis\s+|^Dr\.?\s+/i, '')} →</a>}
+                    : <a className="kfj-btn" href="#booking">Booking {shortName(doc.full_name)} →</a>}
                 </article>
               )
             })}
           </div>
 
-          <h3 className="kfj-week-h" data-edit="copy.jadwal_week_title">{copy.weekTitle}</h3>
+          <div className="kfj-week-head">
+            <h3 className="kfj-week-h" data-edit="copy.jadwal_week_title">{copy.weekTitle}</h3>
+            {data.locations.length > 1 && (
+              <div className="kfj-tabs" role="tablist" aria-label="Pilih cabang">
+                {data.locations.map((l) => (
+                  <button
+                    key={l.id}
+                    role="tab"
+                    className="kfj-tab"
+                    aria-selected={l.id === activeBranch}
+                    onClick={() => setBranch(l.id)}
+                  >
+                    {l.name.replace(/^KAMY Physio\s+/i, '').replace(/^Cabang\s+/i, '') || l.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="kfj-scroll">
             <table className="kfj-table">
               <thead>
@@ -263,11 +296,14 @@ export default function KlinikFisioJadwal({ slug, copy }: { slug: string; copy: 
                 </tr>
               </thead>
               <tbody>
-                {data.doctors.map((doc) => (
+                {docsHere.length === 0 && (
+                  <tr><td colSpan={7} style={{ color: '#7E99A8', padding: '1.75rem' }}>Belum ada jadwal rutin di cabang ini — pilih cabang lain.</td></tr>
+                )}
+                {docsHere.map((doc) => (
                   <tr key={doc.id}>
                     <td className="kfj-nm">
                       {doc.full_name}
-                      <small>{doc.location_name ?? doc.specialty}</small>
+                      <small>{doc.specialty}</small>
                     </td>
                     {days.map((d) => {
                       const row = doc.weekly.find((w) => w.day_of_week === d)
@@ -283,19 +319,114 @@ export default function KlinikFisioJadwal({ slug, copy }: { slug: string; copy: 
             </table>
           </div>
 
-          {data.locations.length > 1 && (
-            <div className="kfj-cabang" aria-label="Daftar cabang">
-              {data.locations.map((loc) => (
-                <div key={loc.id} className="kfj-branch">
-                  <b>{loc.name}</b>
-                  {loc.address && <p>{loc.address}</p>}
-                </div>
-              ))}
-            </div>
-          )}
-
           <p className="kfj-note" data-edit="copy.jadwal_note">{copy.note}</p>
         </>
+      )}
+    </>
+  )
+}
+
+// ── Seksi TERAPIS (terang) — profil dari data schedule ──
+// Bio default per fokus keahlian (kata kunci specialty); di luar itu tanpa bio.
+const BIO_BY_SPECIALTY: [RegExp, string][] = [
+  [/sport/i, 'Spesialis cedera olahraga & return-to-sport. Menangani atlet lari, bola, dan raket.'],
+  [/musculo|muskulo/i, 'Fokus nyeri punggung, leher, dan sendi menahun — terapi manual & koreksi postur.'],
+  [/neuro/i, 'Pendamping pemulihan stroke & gangguan saraf, berorientasi kemandirian pasien.'],
+]
+function bioFor(specialty: string): string {
+  return BIO_BY_SPECIALTY.find(([re]) => re.test(specialty))?.[1] ?? ''
+}
+
+const TERAPIS_CSS = `
+.kfd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.kfd-card{border-radius:28px;overflow:hidden;border:1px solid var(--kf-line);background:var(--kf-surface);box-shadow:0 1px 2px rgba(7,32,46,.04),0 8px 24px -8px rgba(7,32,46,.1);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
+.kfd-card:hover{transform:translateY(-5px);box-shadow:0 2px 4px rgba(7,32,46,.06),0 16px 40px -12px rgba(7,32,46,.22)}
+.kfd-hero{height:150px;display:grid;place-items:center}
+.kfd-av{width:76px;height:76px;border-radius:26px;display:grid;place-items:center;font-family:inherit;font-weight:800;font-size:1.6rem;color:#fff;box-shadow:0 10px 24px -8px rgba(7,32,46,.4)}
+.kfd-body{padding:1.35rem 1.5rem 1.6rem}
+.kf-root .kfd-body h3{font-size:1.1rem;font-weight:700}
+.kfd-spec{color:var(--kf-accent);font-weight:700;font-size:.84rem;margin:.15rem 0 .6rem;display:block}
+.kfd-bio{font-size:.88rem;color:var(--kf-inkDim);margin-bottom:1rem;line-height:1.6}
+.kfd-where{font-size:.78rem;color:var(--kf-muted);font-weight:600;margin-bottom:.5rem}
+.kfd-link{font-weight:700;font-size:.88rem;color:var(--kf-accentDeep);text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;min-height:44px}
+.kfd-link:hover{text-decoration:underline}
+.kfd-note{color:var(--kf-muted);font-size:.9rem}
+@media(max-width:940px){.kfd-grid{grid-template-columns:1fr}}
+`
+
+export function KlinikFisioTerapis({ slug, copy }: { slug: string; copy: SectionCopy }) {
+  const data = useSchedule(slug)
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: TERAPIS_CSS }} />
+      <div className="kf-sec-hdr kf-rv lx-reveal">
+        <span className="kf-eyebrow" data-edit="copy.terapis_eyebrow">{copy.eyebrow}</span>
+        <h2 className="kf-heading" data-edit="copy.terapis_title">{copy.title}</h2>
+        <p className="kf-subtext" data-edit="copy.terapis_sub">{copy.sub}</p>
+      </div>
+      {!data && <p className="kfd-note">{data === undefined ? 'Memuat profil terapis…' : 'Profil terapis sedang tidak bisa dimuat.'}</p>}
+      {data && (
+        <div className="kfd-grid">
+          {data.doctors.map((doc, i) => {
+            const bio = bioFor(doc.specialty)
+            return (
+              <article key={doc.id} className={`kfd-card kf-rv lx-reveal${i ? ` kf-rv-d${i}` : ''}`}>
+                <div className="kfd-hero" style={{ background: `linear-gradient(140deg,${AV_COLORS[i % AV_COLORS.length]}22,${AV_COLORS[i % AV_COLORS.length]}0d)` }}>
+                  <span className="kfd-av" style={{ background: AV_COLORS[i % AV_COLORS.length] }} aria-hidden>{initials(doc.full_name)}</span>
+                </div>
+                <div className="kfd-body">
+                  <h3>{doc.full_name}</h3>
+                  <span className="kfd-spec">{doc.specialty}</span>
+                  {bio && <p className="kfd-bio">{bio}</p>}
+                  {doc.location_name && <p className="kfd-where">Praktik di: {doc.location_name}</p>}
+                  <a className="kfd-link" href="#jadwal">Lihat jadwal &amp; booking →</a>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )}
+    </>
+  )
+}
+
+// ── Seksi CABANG (terang) — lokasi dari data schedule ──
+const CABANG_CSS = `
+.kfc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.kfc-card{background:var(--kf-surface);border:1px solid var(--kf-line);border-radius:22px;padding:1.5rem;box-shadow:0 1px 2px rgba(7,32,46,.04),0 8px 24px -8px rgba(7,32,46,.1);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
+.kfc-card:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(7,32,46,.06),0 16px 40px -12px rgba(7,32,46,.22)}
+.kfc-pin{width:40px;height:40px;border-radius:14px;background:rgba(14,124,176,.1);color:var(--kf-accent);display:grid;place-items:center;margin-bottom:.85rem}
+.kfc-pin svg{width:20px;height:20px}
+.kf-root .kfc-card h3{font-size:1rem;font-weight:700;margin-bottom:.35rem}
+.kfc-card p{font-size:.84rem;color:var(--kf-inkDim);line-height:1.6}
+.kfc-note{color:var(--kf-muted);font-size:.9rem}
+@media(max-width:940px){.kfc-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.kfc-grid{grid-template-columns:1fr}}
+`
+
+export function KlinikFisioCabang({ slug, copy }: { slug: string; copy: SectionCopy }) {
+  const data = useSchedule(slug)
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: CABANG_CSS }} />
+      <div className="kf-sec-hdr kf-rv lx-reveal">
+        <span className="kf-eyebrow" data-edit="copy.cabang_eyebrow">{copy.eyebrow}</span>
+        <h2 className="kf-heading" data-edit="copy.cabang_title">{copy.title}</h2>
+        <p className="kf-subtext" data-edit="copy.cabang_sub">{copy.sub}</p>
+      </div>
+      {!data && <p className="kfc-note">{data === undefined ? 'Memuat daftar cabang…' : 'Daftar cabang sedang tidak bisa dimuat.'}</p>}
+      {data && (
+        <div className="kfc-grid">
+          {data.locations.map((loc, i) => (
+            <article key={loc.id} className={`kfc-card kf-rv lx-reveal${i ? ` kf-rv-d${Math.min(i, 4)}` : ''}`}>
+              <span className="kfc-pin" aria-hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z" /><circle cx="12" cy="10" r="2.6" /></svg>
+              </span>
+              <h3>{loc.name}</h3>
+              {loc.address && <p>{loc.address}</p>}
+            </article>
+          ))}
+        </div>
       )}
     </>
   )
