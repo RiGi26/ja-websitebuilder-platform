@@ -36,6 +36,9 @@ describe('KlinikFisioRenderer parity (themeCopy kosong = byte-identik)', () => {
     const CONDITIONAL = new Set([
       'copy.booking_cta', 'copy.booking_eyebrow', 'copy.booking_title', 'copy.booking_sub',
       'copy.jadwal_eyebrow', 'copy.jadwal_title', 'copy.jadwal_sub', 'copy.jadwal_week_title', 'copy.jadwal_note',
+      'copy.hero_booking_cta', 'copy.hero_em',
+      'copy.terapis_eyebrow', 'copy.terapis_title', 'copy.terapis_sub',
+      'copy.cabang_eyebrow', 'copy.cabang_title', 'copy.cabang_sub',
       'copy.about_cta', 'copy.jam_fallback', 'copy.footer_desc', 'copy.footer_jam_fallback',
     ])
     for (const f of copyFields(KLINIK_FISIO_SLOTS)) {
