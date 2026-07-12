@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 
 // Host Portal Klinik yang diizinkan (tambah di sini bila portal pindah domain).
 const ALLOWED_PORTAL = 'https://ja-clinic-platform.vercel.app'
-const GET_ACTIONS = new Set(['info', 'slots', 'check-patient'])
+const GET_ACTIONS = new Set(['info', 'slots', 'check-patient', 'schedule'])
 const POST_ACTIONS = new Set(['submit'])
 
 function targetUrl(slug: string, action: string, search: string): string {
