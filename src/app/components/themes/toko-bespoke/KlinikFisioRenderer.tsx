@@ -4,6 +4,7 @@ import type { BespokeProps } from './types'
 import { LUX_JS } from './lux-script'
 import BespokeLightbox from './BespokeLightbox'
 import KlinikFisioBooking from './KlinikFisioBooking'
+import KlinikFisioJadwal, { KlinikFisioLiveCard } from './KlinikFisioJadwal'
 import { copyGetter } from '@/lib/theme-system/theme-copy'
 import { KLINIK_FISIO_SLOTS } from './slots/klinik-fisio.slots'
 
@@ -421,10 +422,11 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
 
   const wa = c.contact?.wa
   const waUrl = wa ? `https://wa.me/${wa}` : '#konsultasi'
-  // B5: bila booking online aktif, CTA utama arahkan ke seksi #booking (flow native);
-  // WhatsApp tetap tersedia (floating + footer). Absen → perilaku lama (WA).
+  // B5: bila booking online aktif, CTA utama arahkan ke #jadwal (papan ketersediaan
+  // live, tepat di bawah hero; berisi CTA lanjut ke #booking). WhatsApp tetap
+  // tersedia (floating + footer). Absen → perilaku lama (WA).
   const booking = !!bookingSlug
-  const primaryHref = booking ? '#booking' : (c.hero?.ctaHref ?? waUrl)
+  const primaryHref = booking ? '#jadwal' : (c.hero?.ctaHref ?? waUrl)
   const primaryLabel = booking ? cp.t('copy.booking_cta') : undefined
   const hero = c.hero ?? {}
   const items = c.showcase?.items ?? []
@@ -523,10 +525,29 @@ export default function KlinikFisioRenderer({ content: c, variant = 'gerak', boo
               <div className="kf-float-ring"><i>{ratingStat}</i></div>
               <div><b data-edit="copy.float_rating_prefix">{cp.t('copy.float_rating_prefix')} {ratingStat} {cp.t('copy.float_rating_suffix')}</b><small data-edit="copy.float_rating_sub">{cp.t('copy.float_rating_sub')}</small></div>
             </div>
-            <div className="kf-float-badge" data-edit="copy.badge_open"><span className="kf-dot" aria-hidden /> {cp.t('copy.badge_open')} · {jamSingkat}</div>
+            {booking
+              ? <KlinikFisioLiveCard slug={bookingSlug!} />
+              : <div className="kf-float-badge" data-edit="copy.badge_open"><span className="kf-dot" aria-hidden /> {cp.t('copy.badge_open')} · {jamSingkat}</div>}
           </div>
         </div>
       </section>
+
+      {/* JADWAL REALTIME (B6, hanya bila booking aktif) — papan gelap signature:
+          ketersediaan hari ini + jadwal mingguan + cabang, live dari Portal Klinik */}
+      {booking && (
+        <section className="kf-section kf-board" id="jadwal" aria-label="Jadwal dan ketersediaan terapis">
+          <KlinikFisioJadwal
+            slug={bookingSlug!}
+            copy={{
+              eyebrow: cp.t('copy.jadwal_eyebrow'),
+              title: cp.t('copy.jadwal_title'),
+              sub: cp.t('copy.jadwal_sub'),
+              weekTitle: cp.t('copy.jadwal_week_title'),
+              note: cp.t('copy.jadwal_note'),
+            }}
+          />
+        </section>
+      )}
 
       {/* KELUHAN — yang kami tangani (pill grid; dipetakan dari showcase items) */}
       {items.length > 0 && (
