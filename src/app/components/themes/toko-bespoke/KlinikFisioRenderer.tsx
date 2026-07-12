@@ -391,10 +391,22 @@ function BrandName({ nama }: { nama: string }) {
   return <>{words.join(' ')} <b>{last}</b></>
 }
 
-// Judul hero: substring `em` (slot copy.hero_em) dibungkus <em> ber-underline
-// oranye. Tak ketemu → judul apa adanya.
+// Judul hero: potongan `em` (slot copy.hero_em) dibungkus <em> ber-underline
+// oranye. Hanya match di BATAS KATA (hindari "ber[gerak bebas]" ter-sorot
+// separuh kata); tak ketemu → judul apa adanya.
 function HeroTitle({ title, em }: { title: string; em: string }) {
-  const i = em ? title.indexOf(em) : -1
+  let i = -1
+  if (em) {
+    let from = 0
+    while (from <= title.length - em.length) {
+      const j = title.indexOf(em, from)
+      if (j < 0) break
+      const before = j === 0 ? '' : title[j - 1]
+      const after = title[j + em.length] ?? ''
+      if (!/[a-zA-Z]/.test(before) && !/[a-zA-Z]/.test(after)) { i = j; break }
+      from = j + 1
+    }
+  }
   if (i < 0) return <h1 className="kf-hero-title">{title}</h1>
   return (
     <h1 className="kf-hero-title">
