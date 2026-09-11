@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S1 registry and capability-taxonomy checkpoint complete. S2+ work remains gated.
+Status: S2 Warm Commerce consolidation complete and approved for review. S3+ work remains gated.
 
-Date: 2026-09-11
+Date: 2026-09-12
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 now includes only the static typed registry, normalized capability taxonomy, focused validation, and this checkpoint update. No Warm Commerce migration, route refactor, Store redesign, redirect, merge, or deploy was performed.
+Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 now migrates Warm Commerce into canonical Store ownership and stops before browse standardization, route refactor, redirects, merge, or production deploy.
 
 ## 1. Approved S0 decisions
 
@@ -182,9 +182,9 @@ Registry rules:
 - Capability labels live in `CAPABILITY_TAXONOMY`, so future browse/filter/recommendation code can consume one vocabulary.
 - `detailRoute` and `previewRoute` use the canonical route convention and remain explicit until dynamic route wrappers pass parity.
 - `previewAssets` and `configurableFields` remain optional. S1 adds neither because current runtimes use CSS-built visuals and Customize is deferred.
-- All five local runtimes are `preview` and `visible`; Warm Commerce is `coming-soon`, `pending-migration`, owned by Public Webzoka, and `hidden-until-runtime`.
+- S1 baseline: all five local runtimes were `preview` and `visible`; Warm Commerce was `coming-soon`, `pending-migration`, owned by Public Webzoka, and `hidden-until-runtime`. S2 replaces that Warm state with the migrated canonical state recorded below.
 - `pricePresentation` uses the approved V1 model. It contains one honest Website starting price and consultation-only Portal/Bundle presentation. It does not copy legacy prices, ratings, reviews, or sold-count data.
-- Warm Commerce is marked `featured: true` for post-parity merchandising, but its index visibility guard prevents a broken canonical link before S2.
+- Warm Commerce remains marked `featured: true`; S1's index visibility guard was removed from registry truth after S2 parity, while `/store` merchandising remains deferred to S3.
 
 ### S1 decisions and deviations from planning shape
 
@@ -193,13 +193,13 @@ Registry rules:
 - `runtimeStatus`, `runtimeOwner`, and `storeIndexVisibility` make Warm Commerce's external runtime explicit. Its target canonical routes are metadata only until S2.
 - `public.whatsapp-contact`, `public.lead-form`, and `public.order-request` are separate IDs because channel, lead capture, and order intent are different buyer needs.
 - `ops.internal-users` represents internal access; Portal remains an operational/admin concept, not an account/member capability.
-- Chat's approved Warm Commerce featured decision supersedes the earlier Modern Catalog merchandising default. Warm remains hidden from the index until migration/parity.
+- Chat's approved Warm Commerce featured decision supersedes the earlier Modern Catalog merchandising default. At S1 it remained hidden from the index until migration/parity; S2 parity is now complete.
 
 Initial registry coverage:
 
 | Slug | Category | Base | Upgrade | Runtime/index state | Initial public capabilities |
 |---|---|---|---|---|---|
-| `warm-commerce` | Kuliner | Website | Website + Portal | pending migration, hidden until S2 | catalog, detail, price, WhatsApp, order request, location |
+| `warm-commerce` | Kuliner | Website | Website + Portal | S1 baseline: pending migration, hidden until S2 | catalog, detail, price, WhatsApp, order request, location |
 | `modern-catalog` | Retail | Website | Website + Portal | local preview, visible | catalog, detail, search/filter, price, inquiry |
 | `trust-profile` | Jasa Profesional | Website | Website + Portal | local preview, visible | profile, services, lead form, consultation, WhatsApp |
 | `care-booking` | Klinik & Wellness | Website | Website + Portal | local preview, visible | services, detail, schedule info, location, booking request |
@@ -277,7 +277,7 @@ Descriptions for every ID live in `CAPABILITY_TAXONOMY` in `src/lib/store/capabi
 
 ## 7. Store browsing architecture
 
-S1 integration status: `/store` remains unchanged. Existing five cards, visual composition, explicit links, and Warm Commerce exclusion remain hard-coded until S3 browse standardization. Registry consumers may use `storeIndexVisibility` to avoid exposing Warm Commerce before S2.
+S2 integration status: Warm Commerce runtime is canonical and registry-visible, but `/store` remains unchanged. Existing five cards, visual composition, explicit links, and Warm Commerce exclusion remain hard-coded until S3 browse standardization; merchandising activation is intentionally deferred.
 
 ### `/store` information hierarchy
 
@@ -622,7 +622,7 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 |---|---|---|---|---|---|---|
 | S0 | Approve ownership, boundary, registry shape, route target, redirect policy, WhatsApp env, and V1 scope. Docs only. | This plan document | Source inspection complete | Approved Chat decisions recorded in `0c9a765` | Keep both repos unchanged; reject plan without code rollback | Completed; S1 authorized |
 | S1 | Add typed registry, capability taxonomy, labels, six entries, completeness tests. No route/UI refactor. | `src/lib/store/types.ts`, `capabilities.ts`, `templates.ts`, `templates.test.ts` | S0 approval | `npm run typecheck`; focused Vitest 7/7; `npm run build`; `git diff --check`; 11-route HTTP smoke | Remove registry modules; existing five prototypes remain unchanged | Pending S1 Review Packet approval |
-| S2 | Consolidate Warm Commerce data/assets/runtime into canonical repo; adapt shared primitives; keep public implementation and routes intact. | Canonical `src/app/store/template-runtimes/warm-commerce`, `src/public/images/store/warm-commerce`, review doc; migration adapters | S1 registry | Warm parity matrix, typecheck/build, exact viewport browser checks | Keep public Warm as source; hide/revert canonical Warm adapter | Approve parity and migration ownership |
+| S2 | Consolidate Warm Commerce data/assets/runtime into canonical repo; adapt shared primitives; keep public implementation and routes intact. | Canonical `src/app/store/template/warm-commerce`, `public/images/store/warm-commerce`, `docs/webzoka-store-v2-s2-warm-commerce-review.md`, Store-local migration adapters | S1 registry | Warm parity matrix, typecheck/build, exact viewport browser checks | Keep public Warm as source; hide/revert canonical Warm adapter | Approve parity and migration ownership |
 | S3 | Standardize `/store`, detail, preview shell, statuses, cards, filters, and dynamic route wrappers across six templates. | `src/app/store/page.tsx`, `src/app/store/components/*`, `[slug]` route wrappers, `store.css` split/tokens | S2 parity; route/host decision | Route matrix, filter semantics, responsive/a11y/browser checks | Restore explicit routes and old Store index; no public redirects | Approve shared foundation and dynamic routes |
 | S4 | Add four-step customize wizard, client-only draft state, validation, mobile action bar, and `Belum yakin`. | `customize/[slug]`, `CustomizeStepper`, `src/lib/store/summary.ts` | S3 shared contract | State transition tests, keyboard/mobile UAT, missing-session recovery | Keep detail/preview CTA at consultation placeholder; remove wizard route | Approve question set and persistence boundary |
 | S5 | Add pure recommendation rules and explainable reasons. No pricing, AI, DB, or provisioning. | `src/lib/store/recommendation.ts`, tests, capability mapping | S4 draft model | Truth-table tests and six-template baseline tests | Disable recommendation result and fall back to `Perlu konsultasi` | Approve precedence and Website/Portal/Bundle meaning |
@@ -637,6 +637,22 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - `git diff --check` — exit 0.
 - `npm run lint` — existing script unavailable under current Next.js version: `Invalid project directory provided, no such directory: ...\\lint`. No lint configuration was added or changed.
 - Fresh local HTTP smoke — `/store` and Modern Catalog, Trust Profile, Care Booking, Course Enrollment, and Easy Booking detail/preview routes all returned `200`; each response contained exactly one `<h1>`.
+
+### S2 actual outcome and validation evidence
+
+- Warm Commerce now owns explicit canonical routes: `/store/template/warm-commerce` and `/store/template/warm-commerce/preview`.
+- Runtime/data/CSS moved under `src/app/store/template/warm-commerce`; temporary Store-local `StoreShell` and `PreviewToolbar` primitives were added under `src/app/store/components`.
+- Four required WebP assets moved under `public/images/store/warm-commerce`; no unrelated Public Webzoka assets were copied.
+- Warm registry transition: `coming-soon`/`pending-migration`/`public-webzoka`/`hidden-until-runtime` → `preview`/`local`/`canonical-store`/`visible`; `featured: true` preserved.
+- `/store` browse composition stayed unchanged. Warm merchandising remains deferred to S3.
+- `npm run typecheck` — exit 0.
+- `npx vitest run src/lib/store/templates.test.ts` — 1 file passed, 7 tests passed, exit 0.
+- `npm run build` — exit 0; both canonical Warm routes generated.
+- `git diff --check` — pass.
+- Fresh local and Vercel Preview HTTP matrices — `/store` plus all six detail/preview pairs returned `200`; each response contained exactly one `<h1>`.
+- Browser UAT — 1440×900, 768×900, and 390×844; mobile menu/Escape and Camilan filter verified; mobile DOM width stayed below viewport width.
+- New Preview deployment: `dpl_HUq3GxzmwBHXvt8x4KgnVjgATRbv`, status Ready, target `preview`.
+- Full bounded S2 packet: `docs/webzoka-store-v2-s2-warm-commerce-review.md`.
 
 ## 17. V1 deferred scope
 
@@ -659,24 +675,25 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0 decisions above are approved and recorded. S1 Review asks Chat to approve the concrete registry content, capability IDs/labels, runtime-status treatment for Warm Commerce, and validation evidence before S2 migration begins. No decision is requested for S2 implementation in this packet.
+S0 and S1 decisions above are approved and recorded. S2 Review asks Chat to approve the Warm Commerce migration, parity evidence, registry state transition, and Preview deployment before S3 Store browse standardization begins. No S3 implementation is included in this packet.
 
 ## GIT STATUS
 
-- Canonical worktree: S0/S1 changes committed; no uncommitted files after final docs checkpoint.
+- Canonical worktree: S2 implementation and docs committed on `codex/webzoka-v7-prototype`; final status is recorded in the S2 review packet.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0/S1 checkpoint file. S1 implementation adds only the scoped Store registry, taxonomy, tests, and validation notes in the canonical worktree.
+S0–S2 architecture checkpoint file. S2 implementation adds only the scoped Warm Commerce runtime/assets, Store-local migration primitives, registry transition, and validation notes in the canonical worktree.
 
 Commits:
 
 - S0 architecture checkpoint: `0c9a765`.
 - S1 registry and taxonomy: `5db6523`.
+- S2 runtime migration: `6097eb7`.
 
 ## 20. Verdict
 
-S1 registry and taxonomy checkpoint is complete. Recommended boundary remains clear: canonical Store V2 and template runtimes in `ja-websitebuilder-platform`; Public Webzoka remains marketing/public-web owner with temporary redirects. Warm Commerce migration, route standardization, customize, recommendation, summary, WhatsApp handoff, and launch QA remain approval-gated later phases. Stop here pending Chat approval of S1; do not start S2.
+S2 Warm Commerce consolidation is complete and parity evidence is recorded. Boundary remains clear: canonical Store V2 and template runtimes in `ja-websitebuilder-platform`; Public Webzoka remains marketing/public-web owner with old Warm routes temporarily intact. Store browse standardization, dynamic routes, Customize, Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, merge, and production launch remain approval-gated later phases. Stop here pending Chat approval of S2; do not start S3.
