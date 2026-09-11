@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowUpRight, BookOpenCheck, CalendarDays, Layers3, Search, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight, BookOpenCheck, CalendarDays, CarFront, Layers3, Search, ShieldCheck } from 'lucide-react'
 
 export default function StorePage() {
   return (
@@ -16,9 +16,9 @@ export default function StorePage() {
         <p className="mc-eyebrow"><Layers3 size={14} aria-hidden="true" /> Template directions</p>
         <h1>Choose a point of view,<br />then make it yours.</h1>
         <p>
-          Each direction starts with a different customer decision. Choose a product-led catalog
-          catalog, a credibility-led service site, a care request path, or a structured learning
-          journey, then make the direction your own.
+          Each direction starts with a different customer decision. Choose a product-led catalog,
+          a credibility-led service site, a care request path, a structured learning journey, or a
+          rental inquiry path, then make the direction your own.
         </p>
       </section>
 
@@ -104,15 +104,35 @@ export default function StorePage() {
           </div>
         </article>
 
+        <article className="mc-store-card mc-store-card-booking">
+          <div className="mc-store-card-art mc-art-booking" aria-hidden="true">
+            <span className="mc-art-label">NEW / 06</span>
+            <div className="mc-booking-map-lines" />
+            <div className="mc-booking-mini-car"><i /><b /><em /><strong /></div>
+            <div className="mc-booking-card-copy"><span>EASY BOOKING</span><strong>CHOOSE<br />YOUR<br />ROUTE.</strong></div>
+            <div className="mc-booking-sticker"><CarFront size={14} aria-hidden="true" /><span>REQUEST / CONFIRM</span></div>
+          </div>
+          <div className="mc-store-card-copy">
+            <div>
+              <p className="mc-eyebrow"><CarFront size={14} aria-hidden="true" /> Template #6</p>
+              <h2>Easy Booking</h2>
+              <p>For rental businesses that need clear unit discovery, useful specs, and an honest booking inquiry path.</p>
+            </div>
+            <Link className="mc-arrow-link" href="/store/template/easy-booking">
+              Explore direction <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+          </div>
+        </article>
+
         <aside className="mc-store-note">
           <Search size={21} aria-hidden="true" />
           <p className="mc-eyebrow">This round</p>
           <h2>One route, one job.</h2>
           <p>
             Search, category discovery, product context, and a direct enquiry path live in the
-            Modern Catalog preview. Care Booking adds an appointment request path with admin
-            confirmation. Course Enrollment adds program discovery and enrollment interest.
-            Purchase, payment, and accounts are intentionally absent.
+            Modern Catalog preview. Care Booking adds an appointment request path, Course
+            Enrollment adds program discovery, and Easy Booking adds rental unit comparison with
+            admin confirmation. Purchase, payment, live availability, and accounts are intentionally absent.
           </p>
           <p className="mc-store-note-foot">Warm Commerce remains outside this prototype round.</p>
         </aside>
