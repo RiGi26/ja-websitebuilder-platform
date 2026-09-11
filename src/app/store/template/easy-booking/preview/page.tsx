@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { EasyBookingExperience } from '../easy-booking-experience'
+import StoreTemplatePreviewPage from '@/app/store/components/StoreTemplatePreviewPage'
+import { getStoreTemplate } from '@/lib/store/templates'
 
-export const metadata: Metadata = {
-  title: 'Easy Booking Preview',
-  description: 'Interactive preview for the Easy Booking Webzoka template direction.',
-}
+export const metadata: Metadata = { title: 'Easy Booking Preview — Webzoka Store', description: 'Interactive preview for the Easy Booking Webzoka template direction.', robots: { index: false, follow: false } }
 
 export default function EasyBookingPreviewPage() {
-  return <EasyBookingExperience mode="preview" />
+  return <StoreTemplatePreviewPage template={getStoreTemplate('easy-booking')} />
 }

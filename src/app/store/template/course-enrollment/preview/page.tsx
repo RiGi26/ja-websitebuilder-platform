@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { CourseEnrollmentExperience } from '../course-enrollment-experience'
+import StoreTemplatePreviewPage from '@/app/store/components/StoreTemplatePreviewPage'
+import { getStoreTemplate } from '@/lib/store/templates'
 
-export const metadata: Metadata = {
-  title: 'Course Enrollment Preview',
-  description: 'Interactive preview for the Course Enrollment Webzoka template direction.',
-}
+export const metadata: Metadata = { title: 'Course Enrollment Preview — Webzoka Store', description: 'Interactive preview for the Course Enrollment Webzoka template direction.', robots: { index: false, follow: false } }
 
 export default function CourseEnrollmentPreviewPage() {
-  return <CourseEnrollmentExperience mode="preview" />
+  return <StoreTemplatePreviewPage template={getStoreTemplate('course-enrollment')} />
 }

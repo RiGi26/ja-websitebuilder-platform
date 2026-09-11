@@ -130,7 +130,7 @@ const initialForm = {
 
 const whatsappHref = 'https://wa.me/?text=Halo%20Ruang%20Pulih%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20dan%20jadwal.'
 
-export function CareBookingExperience({ mode }: { mode: Mode }) {
+export function CareBookingExperience({ mode, showPreviewStrip = true }: { mode: Mode; showPreviewStrip?: boolean }) {
   const [form, setForm] = useState(initialForm)
   const [submitted, setSubmitted] = useState(false)
 
@@ -151,7 +151,7 @@ export function CareBookingExperience({ mode }: { mode: Mode }) {
   return (
     <main className={`cb-shell ${careDisplay.variable} ${careBody.variable}`}>
       <a className="cb-skip-link" href="#care-main">Lewati ke konten</a>
-      {mode === 'preview' && (
+      {mode === 'preview' && showPreviewStrip && (
         <div className="cb-preview-strip">
           <span>Webzoka Store V2 · Care Booking preview</span>
           <Link href="/store/template/care-booking">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>

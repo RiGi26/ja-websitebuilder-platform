@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { ModernCatalogExperience } from '../modern-catalog-experience'
+import StoreTemplatePreviewPage from '@/app/store/components/StoreTemplatePreviewPage'
+import { getStoreTemplate } from '@/lib/store/templates'
 
-export const metadata: Metadata = {
-  title: 'Modern Catalog Preview',
-  description: 'Interactive preview for the Modern Catalog Webzoka template direction.',
-}
+export const metadata: Metadata = { title: 'Modern Catalog Preview — Webzoka Store', description: 'Interactive preview for the Modern Catalog Webzoka template direction.', robots: { index: false, follow: false } }
 
 export default function ModernCatalogPreviewPage() {
-  return <ModernCatalogExperience mode="preview" />
+  return <StoreTemplatePreviewPage template={getStoreTemplate('modern-catalog')} />
 }

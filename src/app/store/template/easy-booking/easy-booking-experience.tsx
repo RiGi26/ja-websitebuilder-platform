@@ -199,7 +199,7 @@ function VehicleIllustration({ vehicle, compact = false }: { vehicle: Vehicle; c
   )
 }
 
-export function EasyBookingExperience({ mode }: { mode: Mode }) {
+export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode: Mode; showPreviewStrip?: boolean }) {
   const [activeCategory, setActiveCategory] = useState<Category>('Semua')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(vehicles[0].id)
@@ -242,7 +242,7 @@ export function EasyBookingExperience({ mode }: { mode: Mode }) {
   return (
     <main className={`eb-shell ${bookingDisplay.variable} ${bookingBody.variable}`}>
       <a className="eb-skip-link" href="#easy-booking-main">Lewati ke konten</a>
-      {mode === 'preview' && (
+      {mode === 'preview' && showPreviewStrip && (
         <div className="eb-preview-strip">
           <span>Webzoka Store V2 · Easy Booking preview</span>
           <Link href="/store/template/easy-booking">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>

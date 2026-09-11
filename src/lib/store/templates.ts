@@ -11,6 +11,38 @@ export const STORE_CATEGORY_LABELS = {
   rental: 'Rental',
 } as const satisfies Record<StoreCategoryId, string>
 
+export const STORE_STATUS_LABELS = {
+  preview: 'Preview tersedia',
+  live: 'Live',
+  'coming-soon': 'Segera hadir',
+} as const
+
+export const BUSINESS_TYPE_LABELS = {
+  restaurant: 'Restoran',
+  cafe: 'Kafe',
+  bakery: 'Toko roti',
+  'food-service': 'Bisnis makanan',
+  'retail-brand': 'Brand retail',
+  'fashion-brand': 'Brand fashion',
+  'home-living': 'Home & living',
+  'lifestyle-brand': 'Brand lifestyle',
+  consultant: 'Konsultan',
+  agency: 'Agensi',
+  'professional-practice': 'Praktik profesional',
+  'creative-studio': 'Studio kreatif',
+  clinic: 'Klinik',
+  practitioner: 'Praktisi',
+  'wellness-practice': 'Wellness',
+  'course-provider': 'Penyelenggara kursus',
+  tutoring: 'Bimbingan belajar',
+  'training-center': 'Pusat pelatihan',
+  academy: 'Akademi',
+  'car-rental': 'Rental mobil',
+  'motorcycle-rental': 'Rental motor',
+  'equipment-rental': 'Rental peralatan',
+  'property-rental': 'Rental properti',
+} as const
+
 export const STORE_TEMPLATES_BY_SLUG = {
   'warm-commerce': {
     slug: 'warm-commerce',
@@ -378,6 +410,14 @@ export const STORE_TEMPLATES_BY_SLUG = {
 export const STORE_TEMPLATE_REGISTRY: readonly StoreTemplate[] = TEMPLATE_SLUGS.map(
   (slug) => STORE_TEMPLATES_BY_SLUG[slug],
 )
+
+export function isTemplateSlug(value: string): value is TemplateSlug {
+  return (TEMPLATE_SLUGS as readonly string[]).includes(value)
+}
+
+export function getStoreTemplateBySlug(slug: string): StoreTemplate | undefined {
+  return isTemplateSlug(slug) ? STORE_TEMPLATES_BY_SLUG[slug] : undefined
+}
 
 export function getStoreTemplate(slug: TemplateSlug): StoreTemplate {
   return STORE_TEMPLATES_BY_SLUG[slug]

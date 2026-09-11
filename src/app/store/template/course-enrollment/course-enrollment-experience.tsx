@@ -132,7 +132,7 @@ const initialForm = {
   note: '',
 }
 
-export function CourseEnrollmentExperience({ mode }: { mode: Mode }) {
+export function CourseEnrollmentExperience({ mode, showPreviewStrip = true }: { mode: Mode; showPreviewStrip?: boolean }) {
   const [selectedId, setSelectedId] = useState(programs[0].number)
   const [form, setForm] = useState(initialForm)
   const [submitted, setSubmitted] = useState(false)
@@ -164,7 +164,7 @@ export function CourseEnrollmentExperience({ mode }: { mode: Mode }) {
   return (
     <main className={`ce-shell ${courseDisplay.variable} ${courseBody.variable}`}>
       <a className="ce-skip-link" href="#course-main">Lewati ke konten</a>
-      {mode === 'preview' && (
+      {mode === 'preview' && showPreviewStrip && (
         <div className="ce-preview-strip">
           <span>Webzoka Store V2 · Course Enrollment preview</span>
           <Link href="/store/template/course-enrollment">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>

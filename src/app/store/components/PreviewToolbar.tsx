@@ -1,18 +1,22 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import type { StoreTemplate } from '@/lib/store/types'
+import { STORE_CATEGORY_LABELS } from '@/lib/store/templates'
+import TemplateStatusBadge from './TemplateStatusBadge'
 import styles from './PreviewToolbar.module.css'
 
-export default function PreviewToolbar() {
+export default function PreviewToolbar({ template }: { template: StoreTemplate }) {
   return (
-    <div className={styles.toolbar} role="toolbar" aria-label="Toolbar preview Warm Commerce">
-      <Link href="/store/template/warm-commerce" className={styles.back} aria-label="Kembali ke detail Warm Commerce">
+    <div className={styles.toolbar} role="toolbar" aria-label={`Toolbar preview ${template.name}`}>
+      <Link href={template.detailRoute} className={styles.back} aria-label={`Kembali ke detail ${template.name}`}>
         <ArrowLeft size={18} aria-hidden="true" /><span>Kembali</span>
       </Link>
       <div className={styles.identity}>
-        <strong>Warm Commerce</strong>
-        <span><i aria-hidden="true" />Preview responsif</span>
+        <strong>{template.name}</strong>
+        <span>{STORE_CATEGORY_LABELS[template.category]}</span>
       </div>
-      <Link href="/store/template/warm-commerce#gunakan-template" className={styles.action}>
+      <div className={styles.status}><TemplateStatusBadge status={template.previewStatus} /></div>
+      <Link href={`${template.detailRoute}#gunakan-template`} className={styles.action}>
         Gunakan Template Ini <ArrowRight size={15} aria-hidden="true" />
       </Link>
     </div>

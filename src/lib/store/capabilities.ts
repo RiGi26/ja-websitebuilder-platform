@@ -6,6 +6,18 @@ import type {
   RecommendationTierDefinition,
 } from './types'
 
+export const STORE_INTENT_FILTERS = [
+  { id: 'public.catalog', label: 'Menampilkan produk, menu, atau layanan' },
+  { id: 'public.order-request', label: 'Menerima permintaan order' },
+  { id: 'public.booking-request', label: 'Menerima permintaan booking' },
+  { id: 'public.enrollment-request', label: 'Menerima minat pendaftaran' },
+  { id: 'public.price-display', label: 'Menampilkan harga' },
+  { id: 'public.whatsapp-contact', label: 'Membuka percakapan WhatsApp' },
+  { id: 'ops.booking-management', label: 'Mengelola booking di belakang layar' },
+  { id: 'ops.inventory', label: 'Mengelola stok atau inventaris' },
+  { id: 'account.member-login', label: 'Menyediakan login member atau siswa' },
+] as const satisfies ReadonlyArray<{ id: CapabilityDefinition['id']; label: string }>
+
 export const CAPABILITY_GROUP_LABELS = {
   public: 'Public-facing',
   operational: 'Operasional / admin',

@@ -80,7 +80,7 @@ function formatWhatsAppMessage(product: Product, variant: string) {
   return encodeURIComponent(`Hello, I would like to ask about ${product.name} in ${variant}. Please share current availability and delivery options.`)
 }
 
-export function ModernCatalogExperience({ mode }: { mode: 'detail' | 'preview' }) {
+export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mode: 'detail' | 'preview'; showPreviewStrip?: boolean }) {
   const [activeCategory, setActiveCategory] = useState<Category>('All')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(products[0].id)
@@ -102,7 +102,7 @@ export function ModernCatalogExperience({ mode }: { mode: 'detail' | 'preview' }
 
   return (
     <main className="mc-shell">
-      {mode === 'preview' && (
+      {mode === 'preview' && showPreviewStrip && (
         <div className="mc-preview-strip">
           <span>Webzoka Store V2 · interactive template preview</span>
           <Link href="/store/template/modern-catalog">View detail <ArrowUpRight size={14} aria-hidden="true" /></Link>
