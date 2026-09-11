@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   CAPABILITY_TAXONOMY,
   RECOMMENDATION_TIERS,
+  STORE_INTENT_FILTERS,
   V1_PRICE_PRESENTATION,
 } from './capabilities'
-import { STORE_TEMPLATE_REGISTRY } from './templates'
+import { BUSINESS_TYPE_LABELS, STORE_TEMPLATE_REGISTRY } from './templates'
+import { getTemplateSearchText, matchesStoreFilters } from './store-filters'
 import { TEMPLATE_SLUGS } from './types'
 
 describe('Store V2 template registry', () => {
@@ -76,5 +78,39 @@ describe('Store V2 template registry', () => {
       displayMode: 'consultation',
       display: 'Harga menyesuaikan scope',
     })
+  })
+
+  it('keeps browse labels and intent filters registry-resolvable', () => {
+    for (const template of STORE_TEMPLATE_REGISTRY) {
+      for (const businessType of template.businessTypes) {
+        expect(BUSINESS_TYPE_LABELS[businessType]).toBeTruthy()
+      }
+      expect(getTemplateSearchText(template)).toContain(template.name.toLocaleLowerCase('id-ID'))
+    }
+
+    for (const intent of STORE_INTENT_FILTERS) {
+      expect(CAPABILITY_TAXONOMY[intent.id]).toBeDefined()
+    }
+  })
+
+  it('uses AND semantics for query, category, and buyer intent filters', () => {
+    const warmCommerce = STORE_TEMPLATE_REGISTRY.find((template) => template.slug === 'warm-commerce')!
+    const careBooking = STORE_TEMPLATE_REGISTRY.find((template) => template.slug === 'care-booking')!
+
+    expect(matchesStoreFilters(warmCommerce, {
+      query: 'WhatsApp',
+      category: 'kuliner',
+      intent: 'public.order-request',
+    })).toBe(true)
+    expect(matchesStoreFilters(warmCommerce, {
+      query: 'WhatsApp',
+      category: 'edukasi',
+      intent: 'public.order-request',
+    })).toBe(false)
+    expect(matchesStoreFilters(careBooking, {
+      query: '',
+      category: '',
+      intent: 'ops.booking-management',
+    })).toBe(true)
   })
 })

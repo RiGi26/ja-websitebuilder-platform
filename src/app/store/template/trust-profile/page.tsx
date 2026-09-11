@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { TrustProfileExperience } from './trust-profile-experience'
+import StoreTemplateDetailPage from '@/app/store/components/StoreTemplateDetailPage'
+import { getStoreTemplate } from '@/lib/store/templates'
 
-export const metadata: Metadata = {
-  title: 'Trust Profile',
-  description: 'A credibility-led Webzoka template direction for professional services.',
-}
+export const metadata: Metadata = { title: 'Trust Profile — Webzoka Store', description: 'A credibility-led Webzoka template direction for professional services.', robots: { index: false, follow: false } }
 
 export default function TrustProfilePage() {
-  return <TrustProfileExperience mode="detail" />
+  return <StoreTemplateDetailPage template={getStoreTemplate('trust-profile')} />
 }

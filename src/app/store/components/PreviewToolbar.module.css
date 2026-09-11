@@ -1,7 +1,7 @@
 .toolbar {
   min-height: 64px;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(120px, 1fr) auto auto minmax(160px, 1fr);
   align-items: center;
   gap: 24px;
   padding: 8px 24px;
@@ -17,15 +17,15 @@
 .back:hover { color: #2457d6; }
 .identity { display: grid; justify-items: center; gap: 2px; }
 .identity strong { font-size: 13px; }
-.identity span { display: inline-flex; align-items: center; gap: 6px; color: #76500c; font-size: 10px; font-weight: 700; }
-.identity i { width: 6px; height: 6px; border-radius: 50%; background: #c9821b; }
+.identity span { color: #56636a; font-size: 10px; font-weight: 700; }
+.status { justify-self: end; }
 .action { width: max-content; justify-self: end; justify-content: center; padding: 9px 16px; border-radius: 999px; color: #fff !important; background: #2457d6; transition: transform 200ms cubic-bezier(.16,1,.3,1), background-color 200ms ease; }
 .action:hover { transform: translateY(-1px); background: #163c9d; }
 
 @media (max-width: 599px) {
   .toolbar { min-height: 64px; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; padding: 8px 12px; }
   .back { width: 44px; justify-content: center; }
-  .back span, .identity span { display: none; }
+  .back span, .identity span, .status { display: none; }
   .identity { justify-items: start; }
   .identity strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
   .action { padding-inline: 12px; font-size: 11px; }
