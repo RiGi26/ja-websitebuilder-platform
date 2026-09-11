@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowUpRight, Layers3, Search } from 'lucide-react'
+import { ArrowUpRight, Layers3, Search, ShieldCheck } from 'lucide-react'
 
 export default function StorePage() {
   return (
@@ -16,8 +16,8 @@ export default function StorePage() {
         <p className="mc-eyebrow"><Layers3 size={14} aria-hidden="true" /> Template directions</p>
         <h1>Choose a point of view,<br />then make it yours.</h1>
         <p>
-          Each direction starts with a different customer decision. This round adds a crisp,
-          product-led catalog for brands that need their collection to lead the conversation.
+          Each direction starts with a different customer decision. Choose a product-led catalog
+          or a credibility-led professional-services site, then make the direction your own.
         </p>
       </section>
 
@@ -35,6 +35,25 @@ export default function StorePage() {
               <p>For considered objects, tight collections, and enquiries that need context.</p>
             </div>
             <Link className="mc-arrow-link" href="/store/template/modern-catalog">
+              Explore direction <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+          </div>
+        </article>
+
+        <article className="mc-store-card mc-store-card-trust">
+          <div className="mc-store-card-art mc-art-trust" aria-hidden="true">
+            <span className="mc-art-label">NEW / 03</span>
+            <div className="mc-trust-card-index">ARTA<br />STUDIO</div>
+            <div className="mc-trust-card-line" />
+            <div className="mc-trust-card-copy"><span>CLARITY</span><strong>MAKES<br />TRUST.</strong></div>
+          </div>
+          <div className="mc-store-card-copy">
+            <div>
+              <p className="mc-eyebrow"><ShieldCheck size={14} aria-hidden="true" /> Template #3</p>
+              <h2>Trust Profile</h2>
+              <p>For professional services that earn a conversation through clarity, process, and considered work.</p>
+            </div>
+            <Link className="mc-arrow-link" href="/store/template/trust-profile">
               Explore direction <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
           </div>
