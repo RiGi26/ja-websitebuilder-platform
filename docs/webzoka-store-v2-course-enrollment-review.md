@@ -75,8 +75,8 @@ The prototype models program discovery and an enrollment-interest request. It is
 
 ## Preview Evidence
 
-- Preview URL: <https://ja-websitebuilder-platform-m8e2irg0y-rigi26s-projects.vercel.app/store/template/course-enrollment/preview>
-- Deployment ID: `dpl_E3Wka7qwzU1Gnw7Z3CX7CSCpF5Vx`
+- Preview URL: <https://ja-websitebuilder-platform-kqniac6im-rigi26s-projects.vercel.app/store/template/course-enrollment/preview>
+- Deployment ID: `dpl_5xDe2xwCpGZXtRAQTeRQzRSdmBEx`
 - Vercel target/status: `preview` / `Ready`
 - Hosted route checks returned `200` for Store, all prior detail/preview routes, and both Course Enrollment routes.
 
