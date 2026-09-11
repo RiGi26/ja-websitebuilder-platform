@@ -98,6 +98,7 @@ Fresh validation on 2026-09-12:
 - Local HTTP matrix — `/store`, all six detail routes, all six preview routes returned `200`; unknown dynamic detail and preview slugs returned `404`.
 - Vercel Preview HTTP matrix — `/store`, all six detail routes, and all six preview routes returned `200`; unknown dynamic detail and preview slugs returned `404`.
 - Browser UAT — exact `1440×900`, `768×900`, and `390×844` checks covered Store browse, combined filters, reset/no-results, mobile menu/Escape/focus restoration, all six details, and all six previews. Every hydrated route had one H1, no horizontal overflow, and no captured console errors. Five client-only preview runtimes do not emit their runtime H1 in raw SSR HTML; browser hydration restored the approved one-H1 result.
+- Deployed Store search checks — `q=Restoran` returned Warm Commerce; `q=Permintaan booking` matched Care Booking and Easy Booking; combined URL filters, reset, and no-results recovery were also exercised.
 - New Vercel Preview — target `preview`, status `Ready`, deployment ID `dpl_GbJDF6EZHtkn6MF1hUaQVpTkBSq8`, URL [ja-websitebuilder-platform-o8dp8r7po-rigi26s-projects.vercel.app](https://ja-websitebuilder-platform-o8dp8r7po-rigi26s-projects.vercel.app), source commit `323860d`.
 - No production deployment was performed.
 
