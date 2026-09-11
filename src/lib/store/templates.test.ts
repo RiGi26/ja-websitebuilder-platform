@@ -49,14 +49,14 @@ describe('Store V2 template registry', () => {
     }
   })
 
-  it('marks Warm Commerce as pending migration and hidden from the live index', () => {
+  it('marks Warm Commerce as migrated and ready for later index merchandising', () => {
     const warmCommerce = STORE_TEMPLATE_REGISTRY.find((template) => template.slug === 'warm-commerce')
 
     expect(warmCommerce).toMatchObject({
-      previewStatus: 'coming-soon',
-      runtimeStatus: 'pending-migration',
-      runtimeOwner: 'public-webzoka',
-      storeIndexVisibility: 'hidden-until-runtime',
+      previewStatus: 'preview',
+      runtimeStatus: 'local',
+      runtimeOwner: 'canonical-store',
+      storeIndexVisibility: 'visible',
       detailRoute: '/store/template/warm-commerce',
       previewRoute: '/store/template/warm-commerce/preview',
     })
