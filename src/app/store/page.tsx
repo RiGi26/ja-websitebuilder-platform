@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowUpRight, Layers3, Search, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, Layers3, Search, ShieldCheck } from 'lucide-react'
 
 export default function StorePage() {
   return (
@@ -59,13 +59,34 @@ export default function StorePage() {
           </div>
         </article>
 
+        <article className="mc-store-card mc-store-card-care">
+          <div className="mc-store-card-art mc-art-care" aria-hidden="true">
+            <span className="mc-art-label">NEW / 04</span>
+            <div className="mc-care-card-orbit mc-care-card-orbit-one" />
+            <div className="mc-care-card-orbit mc-care-card-orbit-two" />
+            <div className="mc-care-card-note"><CalendarDays size={18} aria-hidden="true" /><span>REQUEST PATH</span><strong>Choose a time.<br />Confirm together.</strong></div>
+            <div className="mc-care-card-copy"><span>CARE BOOKING</span><strong>CLARITY<br />BEFORE<br />ARRIVAL.</strong></div>
+          </div>
+          <div className="mc-store-card-copy">
+            <div>
+              <p className="mc-eyebrow"><CalendarDays size={14} aria-hidden="true" /> Template #4</p>
+              <h2>Care Booking</h2>
+              <p>For clinics, practitioners, wellness, and care services that need a clear appointment request path.</p>
+            </div>
+            <Link className="mc-arrow-link" href="/store/template/care-booking">
+              Explore direction <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+          </div>
+        </article>
+
         <aside className="mc-store-note">
           <Search size={21} aria-hidden="true" />
           <p className="mc-eyebrow">This round</p>
           <h2>One route, one job.</h2>
           <p>
             Search, category discovery, product context, and a direct enquiry path live in the
-            Modern Catalog preview. Purchase, payment, and accounts are intentionally absent.
+            Modern Catalog preview. Care Booking adds an appointment request path with admin
+            confirmation. Purchase, payment, and accounts are intentionally absent.
           </p>
           <p className="mc-store-note-foot">Warm Commerce remains outside this prototype round.</p>
         </aside>
