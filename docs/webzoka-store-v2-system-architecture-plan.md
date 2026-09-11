@@ -419,7 +419,7 @@ recommendTemplatePath(draft: CustomizeDraft, entry: TemplateRegistryEntry): Reco
 4. Public-only needs → template `baseRecommendation`, initially `Website` for all six.
 5. Empty optional selections with a valid template → the template base recommendation, with a reason that the website is the starting point.
 
-`ops.payment` alone does not produce a payment product in V1. It produces `Perlu konsultasi` because payment is explicitly out of V1. A combination that mixes unsupported real-time, regulated, or custom operational expectations also produces `Perlu konsultasi`.
+`ops.payment-management` alone does not produce a payment product in V1. It produces `Perlu konsultasi` because payment is explicitly out of V1. A combination that mixes unsupported real-time, regulated, or custom operational expectations also produces `Perlu konsultasi`.
 
 `upgradeRecommendation` participates as the next-step explanation, not as an unconditional override. For example, Course Enrollment can explain that student login or enrollment management moves the recommendation to Bundle; Easy Booking can explain that availability/inventory moves it to Website + Portal.
 
