@@ -1,6 +1,6 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S2 Warm Commerce consolidation complete and approved for review. S3+ work remains gated.
+Status: S3 Store browse/detail/preview standardization complete and stopped at the requested review gate. S4+ work remains gated.
 
 Date: 2026-09-12
 
@@ -654,6 +654,21 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - New Preview deployment: `dpl_HUq3GxzmwBHXvt8x4KgnVjgATRbv`, status Ready, target `preview`.
 - Full bounded S2 packet: `docs/webzoka-store-v2-s2-warm-commerce-review.md`.
 
+### S3 actual outcome and validation evidence
+
+- `/store` is now registry-driven and rendered through the shared `StoreShell`.
+- Warm Commerce is the initial featured template. All six visible templates are reachable in the catalog grid.
+- Search matches template name, short name, category label, business-type label, positioning, short description, and baseline/optional capability labels.
+- Category and buyer-intent filters use URL query parameters (`q`, `category`, `intent`) with AND semantics. Reset clears all three; empty results explain recovery.
+- `StoreCard`, `TemplateStatusBadge`, `StoreTemplateDetailPage`, `StorePreviewFrame`, and `PreviewToolbar` are shared Store primitives.
+- Detail pages use one registry-backed contract: breadcrumb, name/category/status, positioning, business fit, customer capabilities, included/optional scope, Website → Website + Portal → Bundle education, Preview CTA, and honest S4 Customize boundary.
+- Preview pages use one shared outer toolbar. Template-specific navigation, content, palette, type, and interactions remain inside each runtime; old duplicated preview strips are disabled only when the shared toolbar is present.
+- Typed dynamic resolvers now own `/store/template/[slug]` and `/store/template/[slug]/preview`, enumerate the six frozen slugs with `generateStaticParams`, and return 404 for unknown slugs. Explicit page wrappers remain as thin compatibility checkpoints that delegate to the same shared renderers.
+- No Customize, Recommendation Engine, Summary, centralized WhatsApp handoff, redirect, Hub integration, checkout, account, pricing calculator, new template, merge, or production deployment was added.
+- Fresh browser UAT passed at 1440×900, 768×900, and 390×844: Store browse, filters, reset/no-results, mobile menu/Escape/focus restoration, six detail routes, six preview routes, one H1 per route, no horizontal overflow, and no captured console errors.
+- Fresh evidence: `npm run typecheck` exit 0; focused Store Vitest 9/9 passed; `npm run build` exit 0; `git diff --check` exit 0. Local and Vercel Preview HTTP matrices returned 200 for Store plus all six detail/preview pairs, and 404 for unknown dynamic slugs.
+- New Vercel Preview: `dpl_GbJDF6EZHtkn6MF1hUaQVpTkBSq8`, `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-o8dp8r7po-rigi26s-projects.vercel.app`, source commit `323860d`. No production deployment.
+
 ## 17. V1 deferred scope
 
 Cart, checkout, payment, customer account, AI recommendation, automatic provisioning, real-time availability, full Hub/Portal/LMS/clinic/rental backends, reviews/ratings, persistent lead database, CRM automation, CMS-driven registry, public self-serve pricing engine, live inventory, live scheduling, enrollment confirmation, customer/member portals, and production notification automation remain out of V1 unless separately approved.
@@ -675,25 +690,26 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0 and S1 decisions above are approved and recorded. S2 Review asks Chat to approve the Warm Commerce migration, parity evidence, registry state transition, and Preview deployment before S3 Store browse standardization begins. No S3 implementation is included in this packet.
+S0–S2 decisions are approved and recorded. S3 is implemented and stopped at the requested review gate. Chat must decide whether to approve the shared Store foundation and dynamic route resolution for S4 planning. This packet does not authorize S4 work.
 
 ## GIT STATUS
 
-- Canonical worktree: S2 implementation and docs committed on `codex/webzoka-v7-prototype`; final status is recorded in the S2 review packet.
+- Canonical worktree: S3 implementation and docs committed on `codex/webzoka-v7-prototype`; final status is recorded in the S3 review packet.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0–S2 architecture checkpoint file. S2 implementation adds only the scoped Warm Commerce runtime/assets, Store-local migration primitives, registry transition, and validation notes in the canonical worktree.
+S0–S3 architecture checkpoint file. S3 adds registry-driven Store browse, shared Store primitives, standardized detail/preview wrappers, dynamic resolvers, and validation notes in the canonical worktree.
 
 Commits:
 
 - S0 architecture checkpoint: `0c9a765`.
 - S1 registry and taxonomy: `5db6523`.
 - S2 runtime migration: `6097eb7`.
+- S3 Store standardization implementation: `323860d`.
 
 ## 20. Verdict
 
-S2 Warm Commerce consolidation is complete and parity evidence is recorded. Boundary remains clear: canonical Store V2 and template runtimes in `ja-websitebuilder-platform`; Public Webzoka remains marketing/public-web owner with old Warm routes temporarily intact. Store browse standardization, dynamic routes, Customize, Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, merge, and production launch remain approval-gated later phases. Stop here pending Chat approval of S2; do not start S3.
+S3 Store browse/detail/preview standardization is complete within scope. Registry truth, six-template browse, shared detail/preview contracts, dynamic resolvers, and 404 behavior are validated. Boundary remains clear: Customize, Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending Chat approval of S3; do not start S4.
