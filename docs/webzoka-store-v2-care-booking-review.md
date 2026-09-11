@@ -60,6 +60,14 @@ The prototype models an appointment request / booking inquiry. It does not model
 - Form success and FAQ disclosure use local browser state. Reduced-motion styling and visible keyboard focus states are included.
 - Store detail/preview page metadata identifies Care Booking and keeps the existing Store V2 catalog structure.
 
+## Preview Evidence
+
+- Preview URL: <https://ja-websitebuilder-platform-jw3sff88v-rigi26s-projects.vercel.app>
+- Deployment ID: `dpl_DEsx4uSNmhG8EmGiZqTQhV5Qaj4s`
+- Vercel target/status: `preview` / `Ready`
+- Fresh deployed HTTP checks returned `200` for all seven Store and template routes listed above.
+- Deployed browser smoke pass confirmed the preview strip, complete navigation, service/practitioner/schedule content, FAQ expansion, appointment form submission, and confirmation state.
+
 ## Verification Evidence
 
 - Fresh local HTTP checks returned `200` for Store, Modern Catalog detail/preview, Trust Profile detail/preview, and Care Booking detail/preview.
@@ -80,4 +88,4 @@ The prototype models an appointment request / booking inquiry. It does not model
 ## Commits
 
 - Code/prototype: `f5e8607` (`feat(store): add Care Booking template prototype`)
-- Review note: pending
+- Initial review note: `0981922` (`docs(store): add Care Booking review note`)
