@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S0 approved. S1 registry and capability-taxonomy implementation is authorized; S2+ work remains gated.
+Status: S1 registry and capability-taxonomy checkpoint complete. S2+ work remains gated.
 
 Date: 2026-09-11
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 is limited to the static typed registry, normalized capability taxonomy, focused validation, and this checkpoint update. No Warm Commerce migration, route refactor, Store redesign, redirect, merge, or deploy is part of S1.
+Architecture planning complete and approved in Chat. S1 now includes only the static typed registry, normalized capability taxonomy, focused validation, and this checkpoint update. No Warm Commerce migration, route refactor, Store redesign, redirect, merge, or deploy was performed.
 
 ## 1. Approved S0 decisions
 
@@ -167,106 +167,75 @@ Do not delete the public routes before the canonical host, redirect target, and 
 
 Use a static typed registry. Six frozen templates do not justify a database or CMS. Keep demo content inside each runtime until a later content-management decision.
 
-Suggested types in `src/lib/store/types.ts` and registry in `src/lib/store/registry.ts`:
+S1 implementation uses these files:
 
-```ts
-type TemplateStatus = 'preview' | 'live' | 'coming-soon'
-type Recommendation = 'website' | 'website-portal' | 'bundle' | 'consultation'
-type PriceVisibility = 'public' | 'consultation' | 'hidden'
+- `src/lib/store/types.ts` — `TemplateSlug`, `TemplateStatus`, `TemplateRuntimeStatus`, `StoreCategoryId`, `BusinessTypeId`, `CapabilityId`, `RecommendationTier`, `StoreTemplate`, price, asset, and configurable-field types.
+- `src/lib/store/capabilities.ts` — `CAPABILITY_TAXONOMY`, group labels, `RECOMMENDATION_TIERS`, recommendation labels, and `V1_PRICE_PRESENTATION`.
+- `src/lib/store/templates.ts` — `STORE_TEMPLATES_BY_SLUG`, deterministic `STORE_TEMPLATE_REGISTRY`, category labels, and typed `getStoreTemplate` lookup.
+- `src/lib/store/templates.test.ts` — focused registry, taxonomy, tier, Warm runtime-state, and price-model validation.
 
-type PreviewAsset = {
-  src: string
-  alt: string
-  kind: 'card' | 'hero' | 'desktop' | 'mobile' | 'gallery'
-}
+Registry rules:
 
-type ConfigurableField = {
-  id: string
-  label: string
-  kind: 'brand' | 'media' | 'catalog' | 'pricing' | 'schedule' |
-    'location' | 'contact' | 'copy' | 'operations'
-  required: boolean
-}
+- `capabilities` contains baseline capabilities represented by each template direction.
+- `optionalCapabilities` contains future operational/account scope and never implies that the current preview already provides those features.
+- `customerCan` contains only visitor-facing baseline capabilities.
+- Capability labels live in `CAPABILITY_TAXONOMY`, so future browse/filter/recommendation code can consume one vocabulary.
+- `detailRoute` and `previewRoute` use the canonical route convention and remain explicit until dynamic route wrappers pass parity.
+- `previewAssets` and `configurableFields` remain optional. S1 adds neither because current runtimes use CSS-built visuals and Customize is deferred.
+- All five local runtimes are `preview` and `visible`; Warm Commerce is `coming-soon`, `pending-migration`, owned by Public Webzoka, and `hidden-until-runtime`.
+- `pricePresentation` uses the approved V1 model. It contains one honest Website starting price and consultation-only Portal/Bundle presentation. It does not copy legacy prices, ratings, reviews, or sold-count data.
+- Warm Commerce is marked `featured: true` for post-parity merchandising, but its index visibility guard prevents a broken canonical link before S2.
 
-type TemplateRegistryEntry = {
-  slug: string
-  name: string
-  shortName: string
-  category: string
-  businessTypes: string[]
-  intents: string[]
-  descriptions: {
-    short: string
-    positioning: string
-    audienceFit: string
-  }
-  customerCan: string[]
-  includedFeatures: string[]
-  optionalFeatures: string[]
-  previewStatus: TemplateStatus
-  routes: { detail: string; preview: string }
-  previewAssets?: PreviewAsset[]
-  startingPrice?: {
-    amount?: number
-    display?: string
-    visibility: PriceVisibility
-    note?: string
-  }
-  baseRecommendation: Recommendation
-  upgradeRecommendation: Recommendation
-  featured: boolean
-  sortOrder: number
-  configurableFields: ConfigurableField[]
-  runtimeKey: string
-}
-```
+### S1 decisions and deviations from planning shape
 
-Rules:
-
-- `intents` and `customerCan` use capability IDs, not free-form labels.
-- Display labels live in the capability catalog so search/filter/recommendation stay aligned.
-- `routes` are generated from the canonical route convention; retaining them in the registry makes links and tests explicit.
-- `previewAssets` is optional because several current prototypes use CSS-built visuals and local art rather than images.
-- Initial V1 starting-price visibility should be `consultation` with a truthful note until approved package prices exist. Do not copy old prices from `src/data/templates.ts`.
-- Initial `previewStatus` for all six is `preview`; no entry may say `live` until the runtime and lead path are approved.
-- Preserve the current Modern Catalog featured treatment as the initial merchandising default; make the final single-featured decision at S3.
+- Registry filename is `templates.ts`, matching the requested Store convention. Planning's provisional `registry.ts` name is not used.
+- `optionalCapabilities` separates future operational/account scope from baseline preview capabilities. This prevents an operational upsell from reading as an existing backend feature.
+- `runtimeStatus`, `runtimeOwner`, and `storeIndexVisibility` make Warm Commerce's external runtime explicit. Its target canonical routes are metadata only until S2.
+- `public.whatsapp-contact`, `public.lead-form`, and `public.order-request` are separate IDs because channel, lead capture, and order intent are different buyer needs.
+- `ops.internal-users` represents internal access; Portal remains an operational/admin concept, not an account/member capability.
+- Chat's approved Warm Commerce featured decision supersedes the earlier Modern Catalog merchandising default. Warm remains hidden from the index until migration/parity.
 
 Initial registry coverage:
 
-| Slug | Category | Base | Upgrade | Initial public capabilities | Preview assets |
+| Slug | Category | Base | Upgrade | Runtime/index state | Initial public capabilities |
 |---|---|---|---|---|---|
-| `warm-commerce` | Kuliner | Website | Website + Portal | catalog, detail, price, inquiry, location | Warm Commerce food images |
-| `modern-catalog` | Retail / Katalog | Website | Website + Portal | catalog, detail, search/filter, price, inquiry | none required; CSS object study |
-| `trust-profile` | Jasa Profesional | Website | Website + Portal | service/detail, process, consultation | none required; CSS editorial art |
-| `care-booking` | Klinik & Wellness | Website | Website + Portal | service/detail, schedule info, location, booking request, inquiry | none required; CSS/runtime art |
-| `course-enrollment` | Edukasi | Website | Bundle when member/enrollment management is needed | program/detail, schedule info, enrollment request | none required; CSS route-board art |
-| `easy-booking` | Rental | Website | Website + Portal | unit/detail, search/filter, price, booking request, location | none required; CSS vehicle study |
+| `warm-commerce` | Kuliner | Website | Website + Portal | pending migration, hidden until S2 | catalog, detail, price, WhatsApp, order request, location |
+| `modern-catalog` | Retail | Website | Website + Portal | local preview, visible | catalog, detail, search/filter, price, inquiry |
+| `trust-profile` | Jasa Profesional | Website | Website + Portal | local preview, visible | profile, services, lead form, consultation, WhatsApp |
+| `care-booking` | Klinik & Wellness | Website | Website + Portal | local preview, visible | services, detail, schedule info, location, booking request |
+| `course-enrollment` | Edukasi | Website | Bundle when member/enrollment scope is needed | local preview, visible | programs, detail, schedule info, enrollment request |
+| `easy-booking` | Rental | Website | Website + Portal | local preview, visible | units, detail, search/filter, price, booking request, location |
 
 ## 6. Capability and intent taxonomy
 
-IDs are stable; labels may be copy-edited without changing rules.
+IDs are stable; labels may be copy-edited without changing rules. S1 uses `public.*`, `ops.*`, and `account.*` prefixes to keep groups explicit and avoid duplicate semantics.
 
 ### Public-facing
 
 | ID | Buyer-facing label |
 |---|---|
+| `public.business-profile` | Profil bisnis |
 | `public.catalog` | Tampilkan produk, menu, layanan, program, atau unit |
 | `public.item-detail` | Jelaskan detail pilihan sebelum orang bertanya |
 | `public.search-filter` | Bantu pengunjung mencari dan membandingkan pilihan |
 | `public.price-display` | Tampilkan harga atau harga mulai yang informatif |
+| `public.whatsapp-contact` | Kontak WhatsApp |
+| `public.lead-form` | Form kontak awal |
 | `public.schedule-info` | Tampilkan jadwal atau pola waktu sebagai informasi |
 | `public.location` | Tampilkan lokasi, area layanan, atau cara datang |
 | `public.process` | Jelaskan cara pesan, booking, daftar, atau konsultasi |
 | `public.inquiry` | Terima pertanyaan dan tindak lanjut melalui admin |
+| `public.order-request` | Terima permintaan order tanpa checkout otomatis |
 | `public.booking-request` | Terima permintaan jadwal atau tanggal booking |
 | `public.enrollment-request` | Terima minat pendaftaran program |
 | `public.consultation` | Arahkan calon pelanggan ke percakapan konsultasi |
 
-### Operational
+### Operational / admin
 
 | ID | Buyer-facing label |
 |---|---|
 | `ops.content-management` | Kelola isi katalog, layanan, program, atau unit |
+| `ops.order-management` | Kelola order |
 | `ops.inquiry-follow-up` | Tindak lanjuti inquiry/pesanan secara teratur |
 | `ops.booking-management` | Kelola booking dan permintaan jadwal |
 | `ops.availability` | Kelola ketersediaan slot atau unit |
@@ -276,29 +245,39 @@ IDs are stable; labels may be copy-edited without changing rules.
 | `ops.enrollment-management` | Kelola pendaftaran peserta |
 | `ops.class-management` | Kelola kelas dan peserta |
 | `ops.reminders` | Kirim pengingat operasional |
-| `ops.payment` | Kelola pembayaran atau transaksi |
+| `ops.payment-management` | Kelola pembayaran atau transaksi |
+| `ops.internal-users` | Atur akses tim internal |
 | `ops.admin-dashboard` | Pantau pekerjaan melalui dashboard admin |
 
-### Account/member
+### Account / member
 
 | ID | Buyer-facing label |
 |---|---|
 | `account.customer-login` | Pelanggan punya login sendiri |
-| `account.student-member-login` | Siswa/member punya area login |
-| `account.portal` | Tim internal membutuhkan Portal operasional |
+| `account.member-login` | Member punya area login sendiri |
+| `account.student-login` | Siswa punya area belajar sendiri |
+| `account.order-tracking` | Pelanggan dapat melacak status order |
+| `account.booking-history` | Pelanggan dapat melihat riwayat booking |
+| `account.learning-materials` | Siswa/member dapat mengakses materi belajar |
+| `account.attendance` | Siswa/member dapat melihat atau mengisi kehadiran |
+| `account.membership` | Kelola status dan manfaat keanggotaan |
+
+Descriptions for every ID live in `CAPABILITY_TAXONOMY` in `src/lib/store/capabilities.ts`.
 
 ### Mapping six templates
 
-| Template | Public-facing intents | Operational needs | Account/member needs |
+| Template | Baseline capabilities | Optional operational/account scope | `customerCan` baseline |
 |---|---|---|---|
-| Warm Commerce | `public.catalog`, `public.item-detail`, `public.price-display`, `public.inquiry`, `public.location`, `public.process` | `ops.content-management`, `ops.inquiry-follow-up`, optionally `ops.inventory`, `ops.customer-records`, `ops.payment` | optionally `account.customer-login`, `account.portal` |
-| Modern Catalog | `public.catalog`, `public.item-detail`, `public.search-filter`, `public.price-display`, `public.inquiry` | `ops.content-management`, `ops.inquiry-follow-up`, optionally `ops.payment` | optionally `account.portal` |
-| Trust Profile | `public.item-detail`, `public.process`, `public.consultation`, `public.inquiry`, `public.location` | `ops.content-management`, optionally `ops.inquiry-follow-up`, `ops.customer-records`, `ops.admin-dashboard` | optionally `account.portal` |
-| Care Booking | `public.catalog`, `public.item-detail`, `public.schedule-info`, `public.location`, `public.process`, `public.booking-request`, `public.inquiry` | `ops.content-management`, `ops.booking-management`, `ops.practitioner-management`, `ops.customer-records`, `ops.reminders`, optionally `ops.payment` | optionally `account.customer-login`, `account.portal` |
-| Course Enrollment | `public.catalog`, `public.item-detail`, `public.schedule-info`, `public.process`, `public.enrollment-request`, `public.inquiry` | `ops.content-management`, `ops.enrollment-management`, `ops.class-management`, optionally `ops.reminders`, `ops.payment` | `account.student-member-login`, `account.portal` |
-| Easy Booking | `public.catalog`, `public.item-detail`, `public.search-filter`, `public.price-display`, `public.location`, `public.process`, `public.booking-request`, `public.inquiry` | `ops.content-management`, `ops.booking-management`, `ops.availability`, `ops.inventory`, `ops.customer-records`, optionally `ops.payment` | optionally `account.customer-login`, `account.portal` |
+| Warm Commerce | `public.catalog`, `public.item-detail`, `public.price-display`, `public.whatsapp-contact`, `public.order-request`, `public.location`, `public.process` | `ops.content-management`, `ops.order-management`, `ops.inquiry-follow-up`, `ops.inventory`, `ops.customer-records`, `ops.internal-users`, `ops.admin-dashboard`, optional customer login/order tracking | catalog, detail, price, WhatsApp, order request |
+| Modern Catalog | `public.catalog`, `public.item-detail`, `public.search-filter`, `public.price-display`, `public.inquiry`, `public.whatsapp-contact`, `public.process` | `ops.content-management`, `ops.order-management`, `ops.inventory`, `ops.customer-records`, `ops.internal-users`, `ops.admin-dashboard`, optional customer login/order tracking | catalog, detail, search/filter, price, inquiry, WhatsApp |
+| Trust Profile | `public.business-profile`, `public.catalog`, `public.item-detail`, `public.process`, `public.lead-form`, `public.consultation`, `public.whatsapp-contact` | `ops.inquiry-follow-up`, `ops.customer-records`, `ops.internal-users`, `ops.admin-dashboard`, optional member login. No full CRM claim. | profile, services, lead form, consultation, WhatsApp |
+| Care Booking | `public.catalog`, `public.item-detail`, `public.schedule-info`, `public.location`, `public.booking-request`, `public.whatsapp-contact`, `public.process` | `ops.content-management`, `ops.booking-management`, `ops.availability`, `ops.customer-records`, `ops.practitioner-management`, `ops.reminders`, `ops.internal-users`, `ops.admin-dashboard`, optional customer login/booking history | services, detail, schedule, location, booking request, WhatsApp |
+| Course Enrollment | `public.catalog`, `public.item-detail`, `public.schedule-info`, `public.enrollment-request`, `public.process`, `public.whatsapp-contact` | `ops.content-management`, `ops.enrollment-management`, `ops.class-management`, `ops.customer-records`, `ops.reminders`, `ops.payment-management`, `ops.internal-users`, `ops.admin-dashboard`, student/member login, materials, attendance, membership | programs, detail, schedule, enrollment request, WhatsApp |
+| Easy Booking | `public.catalog`, `public.item-detail`, `public.search-filter`, `public.price-display`, `public.location`, `public.booking-request`, `public.whatsapp-contact`, `public.process` | `ops.content-management`, `ops.booking-management`, `ops.availability`, `ops.inventory`, `ops.customer-records`, `ops.payment-management`, `ops.internal-users`, `ops.admin-dashboard`, optional customer login, booking history, order tracking | units, detail, search/filter, price, location, booking request, WhatsApp |
 
 ## 7. Store browsing architecture
+
+S1 integration status: `/store` remains unchanged. Existing five cards, visual composition, explicit links, and Warm Commerce exclusion remain hard-coded until S3 browse standardization. Registry consumers may use `storeIndexVisibility` to avoid exposing Warm Commerce before S2.
 
 ### `/store` information hierarchy
 
@@ -531,8 +510,28 @@ Keep the message readable and short. Use labels, not full descriptions. Cap each
 src/
   lib/store/
     types.ts
-    registry.ts
     capabilities.ts
+    templates.ts
+    templates.test.ts
+    recommendation.ts
+    whatsapp.ts
+    summary.ts
+  app/store/
+    ...existing explicit routes...
+```
+
+S1 adds only the four `src/lib/store` files listed above. Shared UI primitives, runtime moves, recommendation rules, summary state, WhatsApp handoff, and dynamic route wrappers remain later-phase work.
+
+The registry lives in `templates.ts`, not the legacy `src/data/templates.ts`. The legacy catalog remains outside Store V2 because it contains unrelated slugs, ratings, reviews, sold counts, remote demo URLs, and old prices.
+
+### Planned post-S1 structure
+
+```text
+src/
+  lib/store/
+    types.ts
+    capabilities.ts
+    templates.ts
     recommendation.ts
     whatsapp.ts
     summary.ts
@@ -600,7 +599,7 @@ Use dynamic route wrappers backed by static registry entries:
 5. Add customize/summary routes.
 6. Redirect/remove old public Warm Commerce routes only after canonical host and parity approval.
 
-No route refactor is part of this planning task.
+No route refactor is part of S1. Dynamic wrappers remain gated by explicit-route parity.
 
 ## 15. Cross-template QA matrix
 
@@ -615,20 +614,29 @@ No route refactor is part of this planning task.
 
 Every route must check: overflow, one H1, meaningful/decorative alt behavior, console/network errors, keyboard order/focus-visible, reduced motion, touch targets >=44px, form labels/input size, responsive image sizing, CTA/status honesty, and interaction confirmation states.
 
-Run browser UAT only after implementation phases create a changed UI. This task is plan-only, so no browser UAT claim is made here.
+S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing detail/preview pairs: all 11 routes returned `200` and rendered exactly one `<h1>`. Visual browser UAT remains deferred because S1 did not alter route or UI code.
 
 ## 16. Approval-gated implementation phases S0–S7
 
 | Phase | Goal and exact scope | Likely files/modules | Prerequisites | Validation | Rollback/checkpoint | Chat approval gate |
 |---|---|---|---|---|---|---|
-| S0 | Approve ownership, boundary, registry shape, route target, redirect policy, WhatsApp env, and V1 scope. Docs only. | This plan document; decision notes if separately approved | Source inspection complete | Line-by-line review against product decision | Keep both repos unchanged; reject plan without code rollback | Approve architecture packet and open decisions |
-| S1 | Add typed registry, capability taxonomy, labels, six entries, completeness tests. No route/UI refactor. | `src/lib/store/types.ts`, `registry.ts`, `capabilities.ts`, tests | S0 approval | Typecheck, registry validation, taxonomy mapping tests | Remove registry modules; existing five prototypes remain unchanged | Approve registry content and taxonomy |
+| S0 | Approve ownership, boundary, registry shape, route target, redirect policy, WhatsApp env, and V1 scope. Docs only. | This plan document | Source inspection complete | Approved Chat decisions recorded in `0c9a765` | Keep both repos unchanged; reject plan without code rollback | Completed; S1 authorized |
+| S1 | Add typed registry, capability taxonomy, labels, six entries, completeness tests. No route/UI refactor. | `src/lib/store/types.ts`, `capabilities.ts`, `templates.ts`, `templates.test.ts` | S0 approval | `npm run typecheck`; focused Vitest 7/7; `npm run build`; `git diff --check`; 11-route HTTP smoke | Remove registry modules; existing five prototypes remain unchanged | Pending S1 Review Packet approval |
 | S2 | Consolidate Warm Commerce data/assets/runtime into canonical repo; adapt shared primitives; keep public implementation and routes intact. | Canonical `src/app/store/template-runtimes/warm-commerce`, `src/public/images/store/warm-commerce`, review doc; migration adapters | S1 registry | Warm parity matrix, typecheck/build, exact viewport browser checks | Keep public Warm as source; hide/revert canonical Warm adapter | Approve parity and migration ownership |
 | S3 | Standardize `/store`, detail, preview shell, statuses, cards, filters, and dynamic route wrappers across six templates. | `src/app/store/page.tsx`, `src/app/store/components/*`, `[slug]` route wrappers, `store.css` split/tokens | S2 parity; route/host decision | Route matrix, filter semantics, responsive/a11y/browser checks | Restore explicit routes and old Store index; no public redirects | Approve shared foundation and dynamic routes |
 | S4 | Add four-step customize wizard, client-only draft state, validation, mobile action bar, and `Belum yakin`. | `customize/[slug]`, `CustomizeStepper`, `src/lib/store/summary.ts` | S3 shared contract | State transition tests, keyboard/mobile UAT, missing-session recovery | Keep detail/preview CTA at consultation placeholder; remove wizard route | Approve question set and persistence boundary |
 | S5 | Add pure recommendation rules and explainable reasons. No pricing, AI, DB, or provisioning. | `src/lib/store/recommendation.ts`, tests, capability mapping | S4 draft model | Truth-table tests and six-template baseline tests | Disable recommendation result and fall back to `Perlu konsultasi` | Approve precedence and Website/Portal/Bundle meaning |
 | S6 | Add normalized summary, edit/back behavior, central WhatsApp generator/config, URL length/fallback handling. | `summary/page.tsx`, `src/lib/store/whatsapp.ts`, `.env.example`, deployment config | S5 rules; real number and fallback decision | Message snapshot/length tests, config-present/absent tests, browser handoff checks | Revert CTA to manual consultation; no outgoing message is sent automatically | Approve real contact and final message |
 | S7 | Full six-template QA, Warm parity, regression, SEO/redirect readiness, launch checklist. | QA docs/scripts, route metadata, public redirect files after approval | S6 complete; canonical host approved | Exact viewport browser UAT, HTTP checks, build/typecheck, console/network audit | Do not redirect/remove public routes; keep Store in preview | Approve launch and public-route cutover |
+
+### S1 validation evidence
+
+- `npm run typecheck` — exit 0.
+- `npx vitest run src/lib/store/templates.test.ts` — 1 file passed, 7 tests passed.
+- `npm run build` — exit 0; Next.js generated existing Store routes and no Warm Commerce canonical route.
+- `git diff --check` — exit 0.
+- `npm run lint` — existing script unavailable under current Next.js version: `Invalid project directory provided, no such directory: ...\\lint`. No lint configuration was added or changed.
+- Fresh local HTTP smoke — `/store` and Modern Catalog, Trust Profile, Care Booking, Course Enrollment, and Easy Booking detail/preview routes all returned `200`; each response contained exactly one `<h1>`.
 
 ## 17. V1 deferred scope
 
@@ -651,19 +659,24 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0 decisions above are approved and recorded. S1 Review asks Chat to approve the concrete registry content, capability IDs/labels, runtime-status treatment for Warm Commerce, and validation evidence before S2 migration begins.
+S0 decisions above are approved and recorded. S1 Review asks Chat to approve the concrete registry content, capability IDs/labels, runtime-status treatment for Warm Commerce, and validation evidence before S2 migration begins. No decision is requested for S2 implementation in this packet.
 
 ## GIT STATUS
 
-- Canonical worktree: S0 checkpoint document is the only intended change before S1 implementation.
+- Canonical worktree: S0/S1 changes committed; no uncommitted files after final docs checkpoint.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0 checkpoint file. S1 implementation will add only the scoped Store registry, taxonomy, tests, and validation notes in the canonical worktree.
+S0/S1 checkpoint file. S1 implementation adds only the scoped Store registry, taxonomy, tests, and validation notes in the canonical worktree.
+
+Commits:
+
+- S0 architecture checkpoint: `0c9a765`.
+- S1 registry and taxonomy: `5db6523`.
 
 ## 20. Verdict
 
-S0 architecture checkpoint is approved. Recommended boundary remains clear: canonical Store V2 and template runtimes in `ja-websitebuilder-platform`; Public Webzoka remains marketing/public-web owner with temporary redirects. S1 registry work is scoped below; Warm Commerce migration, route standardization, customize, recommendation, summary, WhatsApp handoff, and launch QA remain approval-gated later phases.
+S1 registry and taxonomy checkpoint is complete. Recommended boundary remains clear: canonical Store V2 and template runtimes in `ja-websitebuilder-platform`; Public Webzoka remains marketing/public-web owner with temporary redirects. Warm Commerce migration, route standardization, customize, recommendation, summary, WhatsApp handoff, and launch QA remain approval-gated later phases. Stop here pending Chat approval of S1; do not start S2.
