@@ -46,6 +46,23 @@ describe('Store S5 recommendation engine', () => {
     expect(result.reasons[0]).toContain('kebutuhan pengelolaan order')
   })
 
+  it('recommends Website + Portal for operational-only needs', () => {
+    const easyBooking = resultFor('easy-booking', {
+      customerNeeds: [],
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.booking-management', 'ops.inventory'],
+    })
+    const warmCommerce = resultFor('warm-commerce', {
+      customerNeeds: [],
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.order-management'],
+    })
+
+    expect(easyBooking).toMatchObject({ tier: 'website-portal', requiresConsultation: false })
+    expect(easyBooking.evidence.publicCapabilities).toEqual([])
+    expect(warmCommerce).toMatchObject({ tier: 'website-portal', requiresConsultation: false })
+  })
+
   it('recommends Bundle for account needs combined with operations', () => {
     const result = resultFor('warm-commerce', {
       customerNeeds: ['public.catalog', 'account.customer-login'],
@@ -58,9 +75,9 @@ describe('Store S5 recommendation engine', () => {
     expect(result.reasons[0]).toContain('website dan portal')
   })
 
-  it('sends generic login without a connected workflow to consultation', () => {
+  it('sends generic login only without a connected workflow to consultation', () => {
     const result = resultFor('trust-profile', {
-      customerNeeds: ['public.business-profile', 'account.member-login'],
+      customerNeeds: ['account.member-login'],
     })
 
     expect(result).toMatchObject({
@@ -82,6 +99,14 @@ describe('Store S5 recommendation engine', () => {
       operationalMode: 'selected',
       operationalNeeds: ['ops.order-management'],
       uncertainties: ['operational-needs'],
+      needsConsultation: true,
+    })).toMatchObject({ tier: 'website-portal' })
+
+    expect(resultFor('easy-booking', {
+      customerNeeds: [],
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.booking-management', 'ops.inventory'],
+      uncertainties: ['customer-needs'],
       needsConsultation: true,
     })).toMatchObject({ tier: 'website-portal' })
   })
@@ -160,6 +185,12 @@ describe('Store S5 recommendation engine', () => {
       customerNeeds: [],
       operationalMode: 'selected',
       operationalNeeds: ['ops.inventory'],
+    })).toMatchObject({ tier: 'website-portal', requiresConsultation: false })
+
+    expect(resultFor('course-enrollment', {
+      customerNeeds: [],
+      operationalMode: 'none',
+      operationalNeeds: [],
     })).toMatchObject({ tier: 'consultation', consultationCode: 'empty-needs' })
   })
 
