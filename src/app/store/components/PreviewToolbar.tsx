@@ -16,7 +16,7 @@ export default function PreviewToolbar({ template }: { template: StoreTemplate }
         <span>{STORE_CATEGORY_LABELS[template.category]}</span>
       </div>
       <div className={styles.status}><TemplateStatusBadge status={template.previewStatus} /></div>
-      <Link href={`${template.detailRoute}#gunakan-template`} className={styles.action}>
+      <Link href={template.customizeRoute} className={styles.action}>
         Gunakan Template Ini <ArrowRight size={15} aria-hidden="true" />
       </Link>
     </div>

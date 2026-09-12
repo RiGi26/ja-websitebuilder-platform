@@ -13,7 +13,7 @@
 .positioning { max-width: 620px; margin: 24px 0 0; color: var(--store-ink); font-size: clamp(1.15rem, 2.1vw, 1.55rem); line-height: 1.45; text-wrap: pretty; }
 .lede { max-width: 560px; margin: 16px 0 0; color: var(--store-soft); font-size: 15px; line-height: 1.7; }
 .actions, .finalActions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-.actions a, .secondaryAction, .unavailableAction { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 17px; border-radius: 14px; font-size: 13px; font-weight: 800; touch-action: manipulation; }
+.actions a, .finalActions a, .secondaryAction, .unavailableAction { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 17px; border-radius: 14px; font-size: 13px; font-weight: 800; touch-action: manipulation; }
 .primaryAction { color: #fff !important; background: var(--store-blue); box-shadow: 0 10px 24px rgba(36,87,214,.2); }
 .primaryAction:hover { background: #163c9d; }
 .secondaryAction { color: var(--store-ink) !important; border: 1px solid var(--store-line); background: #fff; }
@@ -76,7 +76,7 @@
   .audienceGrid, .scopeGrid, .priceGrid { grid-template-columns: 1fr; gap: 16px; margin-top: 28px; }
   .businessList { grid-template-columns: 1fr; }
   .finalCta { padding: 52px 0; }
-  .actions a, .secondaryAction, .unavailableAction { width: 100%; }
+  .actions a, .finalActions a, .secondaryAction, .unavailableAction { width: 100%; }
   .finalActions { align-items: stretch; flex-direction: column; }
   .comingSoon, .secondaryActionLight { width: 100%; justify-content: center; }
 }
