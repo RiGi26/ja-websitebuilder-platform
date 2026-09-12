@@ -106,7 +106,7 @@ The existing `webzoka.store.customize.v1:{templateSlug}` session payload remains
 | 27 | Easy Booking inventory | Pass |
 | 28 | Warm Commerce order management | Pass |
 
-Fresh focused Vitest covered this matrix with 34 assertions:
+Fresh focused Vitest covered this matrix with 34 tests:
 
 ```text
 npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts
