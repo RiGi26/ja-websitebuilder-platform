@@ -38,6 +38,7 @@ import {
   TIMELINE_OPTIONS,
   writeCustomizeDraft,
 } from '@/lib/store/customize'
+import { recommendStoreSolution } from '@/lib/store/recommendation'
 import { STORE_CATEGORY_LABELS } from '@/lib/store/templates'
 import type {
   CapabilityId,
@@ -276,6 +277,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
   const selectedCustomerLabels = draft.customerNeeds.map((id) => CAPABILITY_TAXONOMY[id].label)
   const selectedOperationalLabels = draft.operationalNeeds.map((id) => CAPABILITY_TAXONOMY[id].label)
   const completedAssetCount = Object.values(draft.assets).filter((state) => state !== 'unknown').length
+  const recommendation = draft.status === 'complete' ? recommendStoreSolution(draft, template) : null
 
   return (
     <StoreShell>
@@ -334,7 +336,22 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                 <div className={styles.completeIcon} aria-hidden="true"><Check size={28} /></div>
                 <p className={styles.kicker}>Customize selesai</p>
                 <h2 id="complete-title">Kebutuhanmu sudah tersimpan.</h2>
-                <p>Tahap berikutnya akan menyusun rekomendasi Website, Website + Portal, Bundle, atau konsultasi. Belum ada rekomendasi yang dihitung di tahap ini.</p>
+                <p>Berikut rekomendasi awal berdasarkan jawabanmu. Ini belum menjadi harga final, order, booking, atau proses pembuatan otomatis.</p>
+                {recommendation ? (
+                  <aside className={styles.recommendationPanel} data-recommendation-template={recommendation.templateSlug} data-recommendation-tier={recommendation.tier} aria-labelledby="recommendation-title">
+                    <div className={styles.recommendationHeading}>
+                      <div>
+                        <p className={styles.kicker}>Rekomendasi awal</p>
+                        <h3 id="recommendation-title">{recommendation.label}</h3>
+                      </div>
+                      <span className={styles.recommendationBadge}>{recommendation.tier === 'consultation' ? 'Perlu dibahas' : 'Cocok untuk mulai'}</span>
+                    </div>
+                    <p className={styles.recommendationSummary}>{recommendation.summary}</p>
+                    <ul className={styles.recommendationReasons}>
+                      {recommendation.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                    </ul>
+                  </aside>
+                ) : null}
                 <div className={styles.summaryGrid}>
                   <div><span>Bisnis</span><strong>{draft.businessType}</strong><small>{STORE_CATEGORY_LABELS[draft.businessCategory]}</small></div>
                   <div><span>Customer</span><strong>{selectedCountLabel(draft.customerNeeds.length, 'kebutuhan dipilih', 'kebutuhan dipilih')}</strong><small>{selectedCustomerLabels.slice(0, 2).join(', ') || 'Belum ditentukan'}</small></div>
