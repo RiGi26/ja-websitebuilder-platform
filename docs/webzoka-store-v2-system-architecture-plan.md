@@ -693,7 +693,7 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Fresh focused Vitest: `npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts` — 3 files, 28 tests passed.
 - Fresh `npm run typecheck` — exit 0.
 - `git diff --check` — pass before commit.
-- Browser UAT and HTTP regression run after the final build; no Preview deployment is claimed yet.
+- Fresh local HTTP regression and browser UAT passed; new Vercel Preview is Ready at `https://ja-websitebuilder-platform-8qnu1b533-rigi26s-projects.vercel.app`, deployment `dpl_3RtKFdcnKN7EydHtZhJBfW9B2HUb`, target `preview`, source commit `16687f1`. Deployed-browser spot check completed Warm Commerce public-only → Website. Exact 1440×900, 768×900, and 390×844 viewport controls were unavailable in the active in-app browser surface; prior S4 exact-viewport regression remains valid, while S5-specific completion states were verified in the active browser and route/build matrices.
 
 ## 17. V1 deferred scope
 
@@ -737,6 +737,10 @@ Commits:
 - S3 Store standardization implementation: `323860d`.
 - S4 Customize implementation: `d08a4dc`.
 - S4 docs/evidence: `f92e251`.
+- S5 recommendation engine: `aabbe6f`.
+- S5 recommendation matrix tests: `1a15407`.
+- S5 Customize completion integration: `06e62a5`.
+- S5 docs/evidence: `16687f1`.
 
 ## 20. Verdict
 
