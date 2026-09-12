@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S3 Store browse/detail/preview standardization complete and stopped at the requested review gate. S4+ work remains gated.
+Status: S4 Customize flow complete and stopped before S5 Recommendation Engine at the requested review gate.
 
 Date: 2026-09-12
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 now migrates Warm Commerce into canonical Store ownership and stops before browse standardization, route refactor, redirects, merge, or production deploy.
+Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, and S4 now captures a normalized client-only Customize draft. S5+ remains gated.
 
 ## 1. Approved S0 decisions
 
@@ -366,32 +366,34 @@ Do not ask users about APIs, databases, frameworks, hosting, schemas, or other t
 
 ```ts
 type CustomizeDraft = {
-  templateSlug: string
+  schemaVersion: 1
+  templateSlug: TemplateSlug
+  status: 'draft' | 'complete'
   currentStep: 1 | 2 | 3 | 4
-  business: {
-    categoryId?: string
-    businessType?: string
-    businessName?: string
-    location?: string
-    description?: string
+  businessCategory: StoreCategoryId
+  businessType: string
+  businessArea: string
+  currentWebsiteStatus: 'none' | 'existing' | 'refresh' | 'unsure'
+  currentContactChannels: ContactChannelId[]
+  customerNeeds: CapabilityId[] // public + account/member IDs
+  operationalNeeds: CapabilityId[] // operational IDs
+  operationalMode: 'none' | 'selected' | 'unsure'
+  assets: {
+    logo: 'ready' | 'missing' | 'help' | 'unknown'
+    domain: 'ready' | 'missing' | 'help' | 'unknown'
+    photos: 'ready' | 'missing' | 'help' | 'unknown'
+    catalog: 'ready' | 'missing' | 'help' | 'unknown'
+    'business-copy': 'ready' | 'missing' | 'help' | 'unknown'
   }
-  customerFacingNeeds: string[]
-  operationalNeeds: string[]
-  readiness: {
-    hasLogo: 'yes' | 'no' | 'help'
-    hasImages: 'yes' | 'no' | 'help'
-    hasContent: 'yes' | 'no' | 'help'
-    hasPriceOrScheduleInfo: 'yes' | 'no' | 'help'
-    hasWhatsappContact: 'yes' | 'no' | 'help'
-    targetTiming?: 'asap' | 'this-month' | 'exploring'
-  }
+  timeline: 'asap' | 'one-two-weeks' | 'two-four-weeks' | 'undecided'
+  uncertainties: Array<'customer-needs' | 'operational-needs'>
   needsConsultation: boolean
 }
 ```
 
-V1 persistence is client-only `sessionStorage`, keyed by template slug. Do not persist sensitive personal data or submit to a backend. The summary route reads the draft and shows an explicit empty-state recovery path if the session is missing.
+S4 persistence is client-only `sessionStorage`, namespaced as `webzoka.store.customize.v1:{templateSlug}`. Drafts are restored only for the current template; corrupt, unavailable, or cross-template payloads are ignored safely. Do not persist sensitive personal data or submit to a backend. The future summary route remains deferred.
 
-`Belum yakin` is a valid action. It marks `needsConsultation`, allows the user to continue, and produces an explainable `Perlu konsultasi` result rather than forcing a guess.
+`Belum yakin` is a valid action. It records an uncertainty marker, allows the user to continue, and leaves recommendation calculation to S5 rather than forcing a guess. `Tidak perlu dashboard khusus` clears operational selections and is mutually exclusive with `selected` and `unsure` operational modes.
 
 ### Navigation/mobile behavior
 
@@ -402,6 +404,7 @@ V1 persistence is client-only `sessionStorage`, keyed by template slug. Do not p
 - sticky bottom action bar with safe-area padding and enough content padding so it never covers fields;
 - all choices use fieldsets/legends, visible labels, 16px inputs, and 44px targets;
 - summary provides Edit step actions that return to the same draft.
+- completion state confirms the draft is saved locally and explicitly stops before recommendation calculation.
 
 ## 10. Rule-based recommendation engine V1
 
@@ -624,7 +627,7 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 | S1 | Add typed registry, capability taxonomy, labels, six entries, completeness tests. No route/UI refactor. | `src/lib/store/types.ts`, `capabilities.ts`, `templates.ts`, `templates.test.ts` | S0 approval | `npm run typecheck`; focused Vitest 7/7; `npm run build`; `git diff --check`; 11-route HTTP smoke | Remove registry modules; existing five prototypes remain unchanged | Pending S1 Review Packet approval |
 | S2 | Consolidate Warm Commerce data/assets/runtime into canonical repo; adapt shared primitives; keep public implementation and routes intact. | Canonical `src/app/store/template/warm-commerce`, `public/images/store/warm-commerce`, `docs/webzoka-store-v2-s2-warm-commerce-review.md`, Store-local migration adapters | S1 registry | Warm parity matrix, typecheck/build, exact viewport browser checks | Keep public Warm as source; hide/revert canonical Warm adapter | Approve parity and migration ownership |
 | S3 | Standardize `/store`, detail, preview shell, statuses, cards, filters, and dynamic route wrappers across six templates. | `src/app/store/page.tsx`, `src/app/store/components/*`, `[slug]` route wrappers, `store.css` split/tokens | S2 parity; route/host decision | Route matrix, filter semantics, responsive/a11y/browser checks | Restore explicit routes and old Store index; no public redirects | Approve shared foundation and dynamic routes |
-| S4 | Add four-step customize wizard, client-only draft state, validation, mobile action bar, and `Belum yakin`. | `customize/[slug]`, `CustomizeStepper`, `src/lib/store/summary.ts` | S3 shared contract | State transition tests, keyboard/mobile UAT, missing-session recovery | Keep detail/preview CTA at consultation placeholder; remove wizard route | Approve question set and persistence boundary |
+| S4 | Add four-step Customize wizard, client-only normalized draft state, validation, mobile action bar, and `Belum yakin`. | `customize/[slug]`, `CustomizeWizard`, `src/lib/store/customize.ts`, `src/lib/store/types.ts` | S3 shared contract | State transition tests, keyboard/mobile UAT, session restoration/reset, route matrix | Keep S5 recommendation boundary explicit; remove wizard only if S4 is rejected | Approve question set and persistence boundary |
 | S5 | Add pure recommendation rules and explainable reasons. No pricing, AI, DB, or provisioning. | `src/lib/store/recommendation.ts`, tests, capability mapping | S4 draft model | Truth-table tests and six-template baseline tests | Disable recommendation result and fall back to `Perlu konsultasi` | Approve precedence and Website/Portal/Bundle meaning |
 | S6 | Add normalized summary, edit/back behavior, central WhatsApp generator/config, URL length/fallback handling. | `summary/page.tsx`, `src/lib/store/whatsapp.ts`, `.env.example`, deployment config | S5 rules; real number and fallback decision | Message snapshot/length tests, config-present/absent tests, browser handoff checks | Revert CTA to manual consultation; no outgoing message is sent automatically | Approve real contact and final message |
 | S7 | Full six-template QA, Warm parity, regression, SEO/redirect readiness, launch checklist. | QA docs/scripts, route metadata, public redirect files after approval | S6 complete; canonical host approved | Exact viewport browser UAT, HTTP checks, build/typecheck, console/network audit | Do not redirect/remove public routes; keep Store in preview | Approve launch and public-route cutover |
@@ -669,6 +672,19 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Fresh evidence: `npm run typecheck` exit 0; focused Store Vitest 9/9 passed; `npm run build` exit 0; `git diff --check` exit 0. Local and Vercel Preview HTTP matrices returned 200 for Store plus all six detail/preview pairs, and 404 for unknown dynamic slugs.
 - New Vercel Preview: `dpl_GbJDF6EZHtkn6MF1hUaQVpTkBSq8`, `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-o8dp8r7po-rigi26s-projects.vercel.app`, source commit `323860d`. No production deployment.
 
+### S4 actual outcome and validation evidence
+
+- Canonical Customize route is `/store/customize/[slug]`; `generateStaticParams` enumerates all six frozen template slugs and unknown slugs return 404.
+- Detail-page `Gunakan Template Ini`, detail final CTA, and shared preview toolbar now navigate directly to the selected template's `customizeRoute`.
+- One shared `CustomizeWizard` drives all six templates. Template-aware customer and operational options are derived from `customerCan`/`optionalCapabilities` and `CAPABILITY_TAXONOMY`; no duplicate capability IDs were introduced.
+- Step 1 captures category, free buyer-facing business type, service area, current website status, and current contact channels. Step 2 captures relevant public/account needs plus `Belum yakin`. Step 3 captures relevant operational needs plus mutually exclusive `Tidak perlu dashboard khusus` and `Belum yakin`. Step 4 captures logo, domain, visual, catalog/menu/program/unit data, business copy, and timeline readiness.
+- Normalized draft model lives in `src/lib/store/types.ts`; serialization, safe restoration, per-template namespacing, reset, validation, and uncertainty transitions live in `src/lib/store/customize.ts`.
+- Persistence is client-only session storage under `webzoka.store.customize.v1:{templateSlug}`. No name, phone, email, backend write, account, payment, checkout, or CRM data is collected.
+- Completion shows the captured-answer review and the explicit boundary that recommendation calculation is next. No Recommendation Engine, Summary route, WhatsApp handoff, provisioning, or pricing result was added.
+- Focused Store/Customize Vitest: 15/15 passed. Fresh browser UAT on production server: detail CTA navigation, four-step completion, Back/Next preservation, refresh restoration, reset, `Belum yakin`, no-dashboard exclusivity, template-aware options, recommendation-free completion, 1440×900, 768×900, and 390×844 responsive/no-overflow checks passed; no app page errors or failed app requests were captured. Local self-hosted runs emitted the existing `/_vercel/speed-insights/script.js` 404/MIME warning from the root `SpeedInsights` integration.
+- Fresh `npm run typecheck` exit 0, `npm run build` exit 0, and `git diff --check` pass. `npm run lint` remains non-functional under the existing Next.js setup (`Invalid project directory ...\\lint`); lint configuration was not changed.
+- New Vercel Preview is required after the S4 branch push. No production deployment.
+
 ## 17. V1 deferred scope
 
 Cart, checkout, payment, customer account, AI recommendation, automatic provisioning, real-time availability, full Hub/Portal/LMS/clinic/rental backends, reviews/ratings, persistent lead database, CRM automation, CMS-driven registry, public self-serve pricing engine, live inventory, live scheduling, enrollment confirmation, customer/member portals, and production notification automation remain out of V1 unless separately approved.
@@ -690,7 +706,7 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0–S2 decisions are approved and recorded. S3 is implemented and stopped at the requested review gate. Chat must decide whether to approve the shared Store foundation and dynamic route resolution for S4 planning. This packet does not authorize S4 work.
+S0–S3 decisions are approved and recorded. S4 is implemented and stopped at the requested review gate. Chat must decide whether to approve the four-step Customize question set, normalized draft boundary, and client-only persistence for S5 planning. This packet does not authorize S5 work.
 
 ## GIT STATUS
 
@@ -701,7 +717,7 @@ S0–S2 decisions are approved and recorded. S3 is implemented and stopped at th
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0–S3 architecture checkpoint file. S3 adds registry-driven Store browse, shared Store primitives, standardized detail/preview wrappers, dynamic resolvers, and validation notes in the canonical worktree.
+S0–S4 architecture checkpoint file. S4 adds the shared Customize wizard, normalized draft model, client-only session persistence, and validation notes in the canonical worktree.
 
 Commits:
 
@@ -709,7 +725,8 @@ Commits:
 - S1 registry and taxonomy: `5db6523`.
 - S2 runtime migration: `6097eb7`.
 - S3 Store standardization implementation: `323860d`.
+- S4 Customize implementation: `d08a4dc`.
 
 ## 20. Verdict
 
-S3 Store browse/detail/preview standardization is complete within scope. Registry truth, six-template browse, shared detail/preview contracts, dynamic resolvers, and 404 behavior are validated. Boundary remains clear: Customize, Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending Chat approval of S3; do not start S4.
+S4 Customize flow is complete within scope. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, safe restoration/reset, and responsive/a11y behavior are validated. Boundary remains clear: Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S4 review; do not start S5.
