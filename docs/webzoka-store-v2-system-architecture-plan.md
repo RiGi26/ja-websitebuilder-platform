@@ -726,7 +726,7 @@ Commits:
 - S2 runtime migration: `6097eb7`.
 - S3 Store standardization implementation: `323860d`.
 - S4 Customize implementation: `d08a4dc`.
-- S4 docs/evidence: pending final Preview evidence commit.
+- S4 docs/evidence: `f92e251`.
 
 ## 20. Verdict
 
