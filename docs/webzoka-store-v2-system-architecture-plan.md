@@ -1,6 +1,6 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S5 Recommendation Engine complete and stopped before S6 Consultation Summary at the requested review gate.
+Status: S5 bounded revision complete and stopped before S6 Consultation Summary at the requested final review gate.
 
 Date: 2026-09-12
 
@@ -422,21 +422,20 @@ It reads only normalized S4 selections and template metadata. It has no browser-
 
 ### Precedence
 
-1. Runtime integrity and template support guards → `Perlu konsultasi` for malformed/incomplete completed drafts, unknown or unsupported capability IDs, cross-template drafts, or a business category that does not match the selected template.
-2. Explicit `needsConsultation` or any unresolved S4 `Belum yakin` marker → `Perlu konsultasi`.
-3. Contradictory operational state → `Perlu konsultasi`, including `Tidak perlu dashboard khusus` with operational selections, or selected operational mode with no operational capability.
-4. Missing customer context → `Perlu konsultasi`; a completed draft must contain at least one public or account need.
-5. Payment-management scope → `Perlu konsultasi`; S5 does not imply checkout or payment implementation.
-6. Account/member need plus any operational need, or a clearly connected customer workflow → `Bundle`.
-7. Account state capabilities such as order tracking, booking history, learning materials, attendance, or membership → `Bundle` even without an operational selection because they imply connected state. Generic login alone without a connected workflow → `Perlu konsultasi`.
-8. Any supported operational need without account/member needs → `Website + Portal`.
-9. Public-only needs, including explicit `Tidak perlu dashboard khusus`, → `Website`.
+1. Runtime integrity and template support guards → `Perlu konsultasi` for malformed/incomplete completed drafts, unknown or unsupported capability IDs, or cross-template drafts. Business-category mismatch is advisory context only and never a consultation trigger by itself.
+2. Contradictory operational state → `Perlu konsultasi`, including `Tidak perlu dashboard khusus` with operational selections, selected operational mode with no operational capability, or `Belum yakin` operational mode with operational selections.
+3. Both core uncertainty markers (`customer-needs` and `operational-needs`) with no public, operational, or account signal → `Perlu konsultasi`. One `Belum yakin` marker, and all readiness fields (logo, domain, photos, catalog/copy, timeline), never override a stronger signal. The retained S4 `needsConsultation` flag is compatibility state, not an unconditional tier override.
+4. Missing customer/account context → `Perlu konsultasi`; a completed draft must contain at least one public or account need.
+5. Persistent account/member state such as order tracking, booking history, learning materials, attendance, or membership → `Bundle` even without separate operations.
+6. Account/member need plus any operational need, or generic login plus a connected public workflow (`order-request`, `booking-request`, or `enrollment-request`) → `Bundle`. `schedule-info` alone does not establish a connected workflow; generic login without one → `Perlu konsultasi`.
+7. Any supported operational need, including `ops.payment-management`, without account/member needs → `Website + Portal`. Payment is classified only; no payment implementation is added.
+8. Public-only needs, including explicit `Tidak perlu dashboard khusus`, → `Website`.
 
 `baseRecommendation` and `upgradeRecommendation` remain registry context only. They never override stronger actual needs or change the public/operational/account rules above.
 
 ### Template-aware behavior
 
-The engine uses the same taxonomy and support checks for all six templates. `customerCan` defines supported public selections; `optionalCapabilities` defines supported operational and account scope. Connected public workflows are the canonical order, booking, enrollment, and schedule capabilities. This preserves Warm Commerce order management, Modern Catalog inventory, Care Booking booking management, Course Enrollment enrollment/student flow, and Easy Booking availability/inventory behavior without six separate engines. Trust Profile generic member login remains consultation until a service workflow is clear.
+The engine uses the same taxonomy and support checks for all six templates. `customerCan` defines supported public selections; `optionalCapabilities` defines supported operational and account scope. Connected public workflows are only order, booking, and enrollment requests; generic schedule information is intentionally excluded. This preserves Warm Commerce order management, Modern Catalog inventory, Care Booking booking management, Course Enrollment enrollment/student flow, Easy Booking availability/inventory behavior, and payment-management classification without six separate engines. Trust Profile generic member login remains consultation until a service workflow is clear.
 
 ### Explainable reasons
 
@@ -444,7 +443,7 @@ Every result has at least one Indonesian buyer-facing reason. Website explains t
 
 ### Tests
 
-`src/lib/store/recommendation.test.ts` covers public-only baselines across all six templates, operational and account precedence, generic login ambiguity, explicit no-dashboard, contradictions, uncertainty, empty/missing needs, template defaults not overriding actual needs, Course Enrollment's three tiers, Care Booking, Easy Booking inventory, Warm Commerce order management, unknown/unsupported runtime capabilities, deterministic output, buyer-facing Indonesian reasons, and payment-scope consultation.
+`src/lib/store/recommendation.test.ts` covers the final 28-case matrix and 34 focused assertions: public-only baselines across all six templates, operational and account precedence, bounded uncertainty, readiness uncertainty, category mismatch, generic login ambiguity, schedule-info exclusion, order/booking/enrollment connected workflows, persistent account state, payment-management classification, explicit no-dashboard, contradictions, empty/missing needs, template defaults not overriding actual needs, Course Enrollment's three tiers, Care Booking, Easy Booking inventory, Warm Commerce order management, unknown/unsupported runtime capabilities, deterministic output, and buyer-facing Indonesian reasons.
 
 ## 11. Consultation Summary model
 
@@ -689,11 +688,15 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - `src/lib/store/types.ts` adds `RecommendationEvidence`, `RecommendationConsultationCode`, and `RecommendationResult` without adding pricing or persistence fields to `CustomizeDraft`.
 - The Customize completion boundary derives the result from the current complete draft and selected template. It displays only tier, summary, and reasons; no Summary page or WhatsApp handoff was added.
 - Recommendation results are not stored as authoritative session data. The existing versioned per-template draft remains the only persisted payload; refresh recomputes from the restored draft, and editing answers returns to draft mode so completion recomputes from current answers.
-- Consultation triggers are bounded to runtime/input integrity, cross-template or category mismatch, unsupported capabilities, unresolved uncertainty, contradictions, missing customer context, ambiguous generic login, and payment-management scope.
-- Fresh focused Vitest: `npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts` — 3 files, 28 tests passed.
+- Consultation triggers are bounded to runtime/input integrity, cross-template mismatch, unsupported capabilities, both core need areas unresolved without a stronger signal, contradictions, missing customer context, ambiguous generic login, and unsupported account/workflow combinations. Category mismatch alone is advisory context; payment-management is operational scope; `schedule-info` is excluded from connected workflows.
+- Fresh focused Vitest: `npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts` — 3 files, 34 tests passed covering the 28-case S5 matrix.
 - Fresh `npm run typecheck` — exit 0.
-- `git diff --check` — pass before commit.
-- Fresh local HTTP regression and browser UAT passed; new Vercel Preview is Ready at `https://ja-websitebuilder-platform-8qnu1b533-rigi26s-projects.vercel.app`, deployment `dpl_3RtKFdcnKN7EydHtZhJBfW9B2HUb`, target `preview`, source commit `16687f1`. Deployed-browser spot check completed Warm Commerce public-only → Website. Exact 1440×900, 768×900, and 390×844 viewport controls were unavailable in the active in-app browser surface; prior S4 exact-viewport regression remains valid, while S5-specific completion states were verified in the active browser and route/build matrices.
+- Fresh `npm run build` — exit 0; six Customize, six detail, and six preview SSG route families generated.
+- `git diff --check` — exit 0.
+- `npm run lint` — exit 1 because the existing script invokes `next lint` as a directory; lint configuration was not changed.
+- Local and Preview HTTP regression passed: `/store`, all six detail routes, all six preview routes, all six Customize routes returned `200` with one `<h1>` each; unknown Customize slug returned `404`; 0 failures.
+- Exact browser UAT passed at `1440×900`, `768×900`, and `390×844`. All four result classes were directly observed; edit/recompute, refresh restore, category mismatch, payment-management, schedule-info exclusion, connected booking/order/enrollment, persistent account state, no-overflow, long-reason wrapping, and touch-size checks passed. Local and Preview CUA console captures returned no errors or warnings. Existing root SpeedInsights local warning remains unrelated and outside S5.
+- New Vercel Preview is Ready: `https://ja-websitebuilder-platform-c9anlhhsn-rigi26s-projects.vercel.app`, deployment `dpl_DFN12PeSk8MWbepEpse6objq2th2`, target `preview`. No production deployment.
 
 ## 17. V1 deferred scope
 
@@ -720,7 +723,7 @@ S0–S4 decisions are approved and recorded. Chat must decide whether to approve
 
 ## GIT STATUS
 
-- Canonical worktree: S5 implementation is in progress on `codex/webzoka-v7-prototype`; final commit and validation status belong in the S5 review packet.
+- Canonical worktree: S5 bounded revision is committed on `codex/webzoka-v7-prototype`; docs commit and push evidence belong in the S5 review packet.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
@@ -741,7 +744,9 @@ Commits:
 - S5 recommendation matrix tests: `1a15407`.
 - S5 Customize completion integration: `06e62a5`.
 - S5 docs/evidence: `16687f1`.
+- S5 bounded precedence revision: `3c37f64`.
+- S5 final edge-case matrix: `9f676b9`.
 
 ## 20. Verdict
 
-S5 Recommendation Engine is implemented within scope, subject to the final build, HTTP regression, browser UAT, commit, and branch-push evidence recorded in the S5 Review Packet. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, deterministic tier precedence, safe consultation guards, explainable reasons, and compact completion integration are covered. Boundary remains clear: Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S5 review; do not start S6.
+S5 bounded revision is implemented and verified within scope. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, deterministic tier precedence, bounded consultation guards, explainable reasons, and compact completion integration are covered. Boundary remains clear: Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S5 approval; do not start S6.
