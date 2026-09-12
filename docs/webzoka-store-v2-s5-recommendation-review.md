@@ -48,7 +48,7 @@ Result shape:
 1. Runtime integrity and template support guards return consultation for malformed or incomplete completed drafts, unknown/unsupported capabilities, or cross-template drafts. Business-category mismatch is advisory context only and never a consultation trigger by itself.
 2. Contradictory operational state returns consultation, including no-dashboard plus selected operations, selected operations with no capability, or unsure mode with selected operations.
 3. Both core uncertainty markers with no public, operational, or account signal return consultation. One `Belum yakin` marker and readiness uncertainty (logo, domain, photos, catalog/copy, timeline) do not override a stronger signal. The retained S4 `needsConsultation` flag is compatibility state, not an unconditional tier override.
-4. Missing customer/account context returns consultation. A completed draft must contain at least one public or account need.
+4. No public, operational, or account signal returns consultation. A valid operational signal does not require a public selection.
 5. Persistent account state such as order tracking, booking history, learning materials, attendance, or membership returns Bundle without operations.
 6. Account/member needs combined with operations, or generic login plus `order-request`, `booking-request`, or `enrollment-request`, returns Bundle. `schedule-info` is excluded; generic login without a connected workflow returns consultation.
 7. Supported operational needs, including `ops.payment-management`, without account/member needs return Website + Portal. Payment is classified only; no payment implementation is implied.
@@ -106,7 +106,9 @@ The existing `webzoka.store.customize.v1:{templateSlug}` session payload remains
 | 27 | Easy Booking inventory | Pass |
 | 28 | Warm Commerce order management | Pass |
 
-Fresh focused Vitest covered this matrix with 34 tests:
+The final bounded revision also explicitly covers: Easy Booking ops-only booking + inventory → Website + Portal; Warm Commerce ops-only order management → Website + Portal; customer-needs uncertainty with clear operations → Website + Portal; no public + no operations + no account → Consultation; and generic login only → Consultation.
+
+Fresh focused Vitest covered this matrix with 35 tests:
 
 ```text
 npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts
@@ -122,9 +124,18 @@ npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test
 - Local production HTTP matrix: `/store`, all six detail routes, all six preview routes, all six Customize routes, and unknown Customize slug returned `200/404` as expected; every successful response contained one `<h1>`; 0 failures.
 - Preview HTTP matrix: same 20-route coverage returned `200/404` as expected; 0 failures.
 
-## Exact viewport UAT
+## Exact viewport evidence
 
-Fresh local and deployed-preview browser checks used explicit viewport overrides:
+The recorded browser evidence is a sampled tier/viewport matrix, not every tier at every viewport. Verified examples:
+
+- Website @ `1440×900`.
+- Website + Portal @ `768×900`.
+- Bundle @ `390×844`.
+- Consultation @ `390×844`.
+
+This bounded revision changed only the recommendation engine, focused tests, and S5 docs; no UI source changed, so no full viewport rerun was required.
+
+Fresh local and deployed-preview browser checks used explicit viewport overrides for those samples:
 
 - `1440×900`: Website visible. Local Modern Catalog category mismatch still returned Website; deployed Warm Commerce public-only returned Website. `scrollWidth === clientWidth` (1425 after scrollbar subtraction).
 - `768×900`: Local edit flow recomputed Website → Website + Portal after changing the previous answer to order management. Deployed Easy Booking operations returned Website + Portal. `scrollWidth === clientWidth` (753).
@@ -139,7 +150,9 @@ Fresh local and deployed-preview browser checks used explicit viewport overrides
 
 - Local CUA browser console capture: `[]` error/warning entries across the S5 flows.
 - Deployed preview CUA browser console capture: `[]` error/warning entries.
-- S5 engine is client-only and makes no recommendation API request. Local and preview HTTP matrices showed no failed Store/Customize route request. The existing root `SpeedInsights` integration remains a known unrelated local warning from earlier S4 runs; it is outside S5 and did not appear in the fresh CUA console capture.
+- HTTP regression was verified for `/store`, all six detail routes, all six preview routes, all six Customize routes, and an unknown Customize slug returning 404.
+- S5 engine is client-only and makes no recommendation API request. Comprehensive browser failed-request capture was unavailable, so this packet does not claim universal `no failed network requests`.
+- `NoFallbackError` observed during local server shutdown is a P2 investigation note only, not a proven user-facing defect. The existing root `SpeedInsights` integration remains a known unrelated local warning from earlier S4 runs; it is outside S5 and did not appear in the inspected CUA console captures.
 
 ## Deployment
 
@@ -157,7 +170,7 @@ No production deployment was made.
 
 - P0: none identified.
 - P1: none identified.
-- P2: existing lint-command issue; existing local SpeedInsights warning; Vercel install reported 13 dependency audit findings; client-only session durability remains the approved V1 boundary.
+- P2: `NoFallbackError` during local server shutdown is investigation-only, not a proven user-facing defect; existing lint-command issue; existing local SpeedInsights warning; Vercel install reported 13 dependency audit findings; client-only session durability remains the approved V1 boundary.
 
 ## Deferred to S6
 

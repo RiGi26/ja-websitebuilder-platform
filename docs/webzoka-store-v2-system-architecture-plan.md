@@ -145,7 +145,7 @@ The public `StoreShell` desktop sidebar/mobile drawer is a useful interaction re
 
 1. Canonical Warm detail and preview routes return 200 and preserve metadata/robots behavior.
 2. All five image assets load from the canonical public directory with zero missing alt text.
-3. Exact 1440x900 and 390x844 checks show one H1, no horizontal overflow, no console errors, and no failed image/network requests.
+3. Viewport evidence is a sampled tier/viewport matrix, not every tier at every viewport. The S5 examples include Website at 1440x900, Website + Portal at 768x900, Bundle at 390x844, and Consultation at 390x844; inspected checks showed one H1 and no horizontal overflow.
 4. Category filtering, mobile navigation, Escape, focus restoration, product inquiry links, and location links behave as before.
 5. Preview status remains truthful: inquiry only, no live availability, no checkout, no payment, no account, no external form submission from the demo.
 6. Store index card, detail CTA, preview toolbar, and customize CTA all resolve to the canonical route family.
@@ -425,7 +425,7 @@ It reads only normalized S4 selections and template metadata. It has no browser-
 1. Runtime integrity and template support guards → `Perlu konsultasi` for malformed/incomplete completed drafts, unknown or unsupported capability IDs, or cross-template drafts. Business-category mismatch is advisory context only and never a consultation trigger by itself.
 2. Contradictory operational state → `Perlu konsultasi`, including `Tidak perlu dashboard khusus` with operational selections, selected operational mode with no operational capability, or `Belum yakin` operational mode with operational selections.
 3. Both core uncertainty markers (`customer-needs` and `operational-needs`) with no public, operational, or account signal → `Perlu konsultasi`. One `Belum yakin` marker, and all readiness fields (logo, domain, photos, catalog/copy, timeline), never override a stronger signal. The retained S4 `needsConsultation` flag is compatibility state, not an unconditional tier override.
-4. Missing customer/account context → `Perlu konsultasi`; a completed draft must contain at least one public or account need.
+4. No public, operational, or account signal → `Perlu konsultasi`; a valid operational signal does not require a public selection.
 5. Persistent account/member state such as order tracking, booking history, learning materials, attendance, or membership → `Bundle` even without separate operations.
 6. Account/member need plus any operational need, or generic login plus a connected public workflow (`order-request`, `booking-request`, or `enrollment-request`) → `Bundle`. `schedule-info` alone does not establish a connected workflow; generic login without one → `Perlu konsultasi`.
 7. Any supported operational need, including `ops.payment-management`, without account/member needs → `Website + Portal`. Payment is classified only; no payment implementation is added.
@@ -443,7 +443,15 @@ Every result has at least one Indonesian buyer-facing reason. Website explains t
 
 ### Tests
 
-`src/lib/store/recommendation.test.ts` covers the final 28-case matrix and 34 focused assertions: public-only baselines across all six templates, operational and account precedence, bounded uncertainty, readiness uncertainty, category mismatch, generic login ambiguity, schedule-info exclusion, order/booking/enrollment connected workflows, persistent account state, payment-management classification, explicit no-dashboard, contradictions, empty/missing needs, template defaults not overriding actual needs, Course Enrollment's three tiers, Care Booking, Easy Booking inventory, Warm Commerce order management, unknown/unsupported runtime capabilities, deterministic output, and buyer-facing Indonesian reasons.
+`src/lib/store/recommendation.test.ts` covers the final matrix, including public-only baselines across all six templates, operational-only recommendations, customer-needs uncertainty with clear operations, no-signal consultation, operational and account precedence, bounded uncertainty, readiness uncertainty, category mismatch, generic-login ambiguity, schedule-info exclusion, order/booking/enrollment connected workflows, persistent account state, payment-management classification, explicit no-dashboard, contradictions, template defaults not overriding actual needs, Course Enrollment's three tiers, Care Booking, Easy Booking inventory, Warm Commerce order management, unknown/unsupported runtime capabilities, deterministic output, and buyer-facing Indonesian reasons. The focused Store suite passed 35 tests across recommendation, template, and Customize coverage.
+
+### S5 verification evidence
+
+- Exact viewport evidence is a sampled tier/viewport matrix, not evidence for every tier at every viewport. Verified examples: Website @ 1440x900; Website + Portal @ 768x900; Bundle @ 390x844; Consultation @ 390x844.
+- HTTP regression was verified for `/store`, all six detail routes, all six preview routes, all six Customize routes, and an unknown Customize slug returning 404.
+- Captured browser error and warning logs were empty in the inspected sessions.
+- Comprehensive browser failed-request capture was unavailable, so this plan does not claim universal `no failed network requests`.
+- `NoFallbackError` observed during local server shutdown is a P2 investigation note only, not a proven user-facing defect.
 
 ## 11. Consultation Summary model
 
