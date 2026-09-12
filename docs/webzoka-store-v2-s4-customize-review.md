@@ -53,7 +53,7 @@ One shared wizard derives options from `customerCan`, `optionalCapabilities`, an
 
 ## Deployment
 
-New Vercel Preview: `dpl_6u4UK3KEesKXMW3NHofGfYTsuevt`, status `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-8kpzzgymu-rigi26s-projects.vercel.app`. Remote browser smoke passed at 1440×900, 768×900, and 390×844 with zero console errors, page errors, or failed requests. No production deployment.
+New Vercel Preview: `dpl_4oUwycFGNzh3AXjQQXDwgh5EjVQy`, status `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-mogkbs0i4-rigi26s-projects.vercel.app`. Remote browser smoke passed at 1440×900, 768×900, and 390×844 with zero console errors, page errors, or failed requests; latest 390×844 smoke also completed the four-step flow with zero errors. No production deployment.
 
 ## Deferred
 
