@@ -683,7 +683,7 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Completion shows the captured-answer review and the explicit boundary that recommendation calculation is next. No Recommendation Engine, Summary route, WhatsApp handoff, provisioning, or pricing result was added.
 - Focused Store/Customize Vitest: 15/15 passed. Fresh browser UAT on production server: detail CTA navigation, four-step completion, Back/Next preservation, refresh restoration, reset, `Belum yakin`, no-dashboard exclusivity, template-aware options, recommendation-free completion, 1440×900, 768×900, and 390×844 responsive/no-overflow checks passed; no app page errors or failed app requests were captured. Local self-hosted runs emitted the existing `/_vercel/speed-insights/script.js` 404/MIME warning from the root `SpeedInsights` integration.
 - Fresh `npm run typecheck` exit 0, `npm run build` exit 0, and `git diff --check` pass. `npm run lint` remains non-functional under the existing Next.js setup (`Invalid project directory ...\\lint`); lint configuration was not changed.
-- New Vercel Preview is required after the S4 branch push. No production deployment.
+- New Vercel Preview: `dpl_6u4UK3KEesKXMW3NHofGfYTsuevt`, status `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-8kpzzgymu-rigi26s-projects.vercel.app`, source branch `codex/webzoka-v7-prototype`. No production deployment.
 
 ## 17. V1 deferred scope
 
@@ -726,6 +726,7 @@ Commits:
 - S2 runtime migration: `6097eb7`.
 - S3 Store standardization implementation: `323860d`.
 - S4 Customize implementation: `d08a4dc`.
+- S4 docs/evidence: pending final Preview evidence commit.
 
 ## 20. Verdict
 
