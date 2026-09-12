@@ -359,8 +359,9 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                   <div><span>Kesiapan</span><strong>{completedAssetCount} dari 5 area diisi</strong><small>{TIMELINE_OPTIONS.find((option) => option.id === draft.timeline)?.label}</small></div>
                 </div>
                 <div className={styles.completeActions}>
-                  <button className={styles.secondaryButton} type="button" onClick={() => updateDraft({ status: 'draft' })}>Ubah jawaban</button>
-                  <Link className={styles.primaryButton} href={template.detailRoute}><ArrowLeft size={17} aria-hidden="true" /> Kembali ke template</Link>
+                  <button className={styles.secondaryButton} type="button" onClick={() => updateDraft({ status: 'draft' })}>Edit jawaban</button>
+                  <Link className={styles.primaryButton} href="/store/summary"><ArrowRight size={17} aria-hidden="true" /> Lihat Ringkasan</Link>
+                  <Link className={styles.tertiaryButton} href={template.detailRoute}><ArrowLeft size={17} aria-hidden="true" /> Kembali ke template</Link>
                 </div>
               </section>
             ) : (

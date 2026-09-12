@@ -91,11 +91,13 @@
 .reviewRows span { color: var(--store-soft); font-size: 11px; font-weight: 750; }
 .reviewRows strong { min-width: 0; color: var(--store-ink); font-size: 12px; line-height: 1.5; }
 .actionBar { position: sticky; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px -32px -76px; padding: 14px 32px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(216,212,203,.9); background: rgba(246,243,238,.92); box-shadow: 0 -10px 25px rgba(23,35,42,.06); backdrop-filter: blur(12px); }
-.primaryButton, .secondaryButton { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 17px; border-radius: 14px; font-size: 13px; font-weight: 850; cursor: pointer; touch-action: manipulation; }
+.primaryButton, .secondaryButton, .tertiaryButton { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 17px; border-radius: 14px; font-size: 13px; font-weight: 850; cursor: pointer; touch-action: manipulation; }
 .primaryButton { border: 1px solid var(--store-blue); color: #fff !important; background: var(--store-blue); box-shadow: 0 10px 22px rgba(36,87,214,.18); }
 .primaryButton:hover { background: #163c9d; }
 .secondaryButton { border: 1px solid var(--store-line); color: var(--store-ink); background: #fff; }
 .secondaryButton:hover { border-color: var(--store-blue); color: #163c9d; }
+.tertiaryButton { border: 1px solid transparent; color: var(--store-soft) !important; background: transparent; }
+.tertiaryButton:hover { color: var(--store-blue) !important; }
 .completePanel { padding: 40px; border: 1px solid #b7c6f2; border-radius: 26px; background: linear-gradient(135deg, #fff, #f1f4ff); box-shadow: 0 16px 34px rgba(23,35,42,.06); }
 .completeIcon { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 24px; border-radius: 18px; color: #fff; background: var(--store-blue); box-shadow: 0 10px 24px rgba(36,87,214,.24); }
 .completePanel > p:not(.kicker) { max-width: 620px; margin: 18px 0 0; color: var(--store-soft); font-size: 15px; line-height: 1.7; }
@@ -134,7 +136,7 @@
   .readinessChoices .choice { min-height: 52px; }
   .reviewRows div { grid-template-columns: 90px minmax(0, 1fr); gap: 10px; }
   .actionBar { align-items: stretch; margin: 20px -16px -54px; padding-inline: 16px; }
-  .primaryButton, .secondaryButton { flex: 1; }
+  .primaryButton, .secondaryButton, .tertiaryButton { flex: 1; }
   .completePanel h2 { font-size: clamp(2.4rem, 12vw, 4.2rem); }
   .recommendationPanel { margin-top: 24px; padding: 18px 16px; }
   .recommendationHeading { flex-direction: column; gap: 12px; }

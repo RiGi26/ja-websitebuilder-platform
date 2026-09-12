@@ -20,6 +20,7 @@ import {
 
 export const CUSTOMIZE_DRAFT_SCHEMA_VERSION = 1 as const
 export const CUSTOMIZE_STORAGE_KEY = 'webzoka.store.customize.v1'
+export const CUSTOMIZE_ACTIVE_TEMPLATE_KEY = `${CUSTOMIZE_STORAGE_KEY}:active`
 
 export const CUSTOMIZE_STEP_LABELS = [
   { step: 1, label: 'Tentang bisnis' },
@@ -178,6 +179,17 @@ export function serializeCustomizeDraft(draft: CustomizeDraft): string {
   return JSON.stringify(draft)
 }
 
+/** Return the last template touched by the client-only Customize flow. */
+export function readActiveCustomizeTemplate(storage: CustomizeStorage | null | undefined): string | null {
+  if (!storage) return null
+  try {
+    const value = storage.getItem(CUSTOMIZE_ACTIVE_TEMPLATE_KEY)
+    return value?.trim() || null
+  } catch {
+    return null
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
@@ -252,16 +264,25 @@ export function writeCustomizeDraft(storage: CustomizeStorage | null | undefined
   if (!storage) return false
   try {
     storage.setItem(customizeStorageKey(draft.templateSlug), serializeCustomizeDraft(draft))
+    storage.setItem(CUSTOMIZE_ACTIVE_TEMPLATE_KEY, draft.templateSlug)
     return true
   } catch {
     return false
   }
 }
 
+export function resumeCustomizeDraft(storage: CustomizeStorage | null | undefined, templateSlug: TemplateSlug): boolean {
+  const draft = readCustomizeDraft(storage, templateSlug)
+  return draft ? writeCustomizeDraft(storage, { ...draft, status: 'draft' }) : false
+}
+
 export function resetCustomizeDraft(storage: CustomizeStorage | null | undefined, templateSlug: TemplateSlug): boolean {
   if (!storage) return false
   try {
     storage.removeItem(customizeStorageKey(templateSlug))
+    if (storage.getItem(CUSTOMIZE_ACTIVE_TEMPLATE_KEY) === templateSlug) {
+      storage.removeItem(CUSTOMIZE_ACTIVE_TEMPLATE_KEY)
+    }
     return true
   } catch {
     return false
