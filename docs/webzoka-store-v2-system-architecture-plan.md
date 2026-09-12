@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S5 bounded revision complete and stopped before S6 Consultation Summary at the requested final review gate.
+Status: S6 implementation complete and stopped at the requested S6 Review Packet gate. S7 QA / launch readiness remains deferred.
 
 Date: 2026-09-12
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, S4 captures a normalized client-only Customize draft, and S5 now derives a deterministic recommendation with explainable reasons. S6+ remains gated.
+Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, S4 captures a normalized client-only Customize draft, S5 derives a deterministic recommendation with explainable reasons, and S6 now presents a client-only consultation summary with centralized WhatsApp handoff. S7+ remains gated.
 
 ## 1. Approved S0 decisions
 
@@ -456,59 +456,69 @@ Every result has at least one Indonesian buyer-facing reason. Website explains t
 ## 11. Consultation Summary model
 
 ```ts
-type ConsultationSummary = {
-  template: { slug: string; name: string; category: string }
-  business: {
-    categoryId?: string
-    categoryLabel?: string
-    businessType?: string
-    businessName?: string
-    location?: string
-    description?: string
-  }
-  customerFacingNeeds: Array<{ id: string; label: string }>
-  operationalNeeds: Array<{ id: string; label: string }>
-  readiness: {
-    assets: Array<{ id: string; label: string; state: 'yes' | 'no' | 'help' }>
-    targetTiming?: string
-  }
+type SummaryViewModel = {
+  template: { name: string; category: string; description: string; detailRoute: string; customizeRoute: string }
+  business: { type: string; category: string; area: string | null; websiteStatus: string; contactChannels: string[] }
+  customerNeeds: string[]
+  operationalNeeds: string[]
+  accountNeeds: string[]
+  readiness: Array<{ label: string; state: string }>
+  timeline: string
   recommendation: {
-    kind: Recommendation
+    tier: 'website' | 'website-portal' | 'bundle' | 'consultation'
     label: string
+    summary: string
     reasons: string[]
+    price: { display: string; note: string }
+    requiresConsultation: boolean
   }
 }
 ```
 
-The summary is generated from the draft, not independently edited. Users can edit any step, return to the wizard, and regenerate without losing prior answers. The summary page should show the selected template, needs, readiness gaps, recommendation, reasons, and next action. It must not imply an order, payment, account, provisioning job, or confirmed project.
+S6 implements this model in `src/lib/store/summary.ts`. `buildSummaryViewModel` derives buyer-facing labels from the registry, taxonomy, and Customize options; no raw capability IDs are exposed in the UI or handoff message. `resolveSummary` reads only the active per-template client draft from session storage, validates the template and completed state, recomputes S5, and returns an honest recovery state for missing, corrupt, stale, or incomplete data. The canonical route is `/store/summary`.
+
+The summary is generated from the draft, not independently edited. Users can edit answers through `/store/customize/[slug]`; the existing draft is resumed in draft mode, and the next completion recomputes the recommendation. The page shows the selected template, business context, customer needs, operational needs, account/member needs when present, readiness, timeline, recommendation, reasons, approved price presentation, and the next action. It does not imply an order, payment, account, provisioning job, or confirmed project.
 
 ## 12. WhatsApp lead handoff
 
-Centralize this in `src/lib/store/whatsapp.ts` or a similarly scoped Store utility. Do not duplicate message templates in six runtimes.
+Centralize this in `src/lib/store/whatsapp.ts` and `src/lib/store/summary.ts`. Do not duplicate message templates in six runtimes.
 
 ### Configuration
 
 - Use a real Webzoka number from environment/config, preferably `NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER` to distinguish Store contact from tenant-level `src/lib/wa.ts` behavior.
-- Add the variable to `.env.example` and deployment configuration during the implementation phase.
+- The variable is documented in `.env.example`; preview/dev may leave it empty so the CTA stays unavailable.
 - Do not hard-code the real number in source, tests, or preview content.
-- Missing configuration must not generate a fake `wa.me` URL. Render a clear fallback action such as copy-summary/contact instructions, with the exact fallback destination decided before S6.
+- `normalizeStoreWhatsAppNumber` accepts formatted international input, returns E.164 digits only, and rejects local, malformed, too-short, and overlong values.
+- Missing or invalid configuration must not generate a fake `wa.me` URL. The summary keeps its content usable and renders a disabled CTA with honest status copy.
 
 ### Message shape
 
 ```text
-Halo Webzoka, saya ingin konsultasi template website.
+Halo Webzoka, saya ingin konsultasi.
 
-Template: {name}
-Kategori bisnis: {category/business type}
-Nama bisnis: {business name, if provided}
-Kebutuhan customer: {selected labels}
-Kebutuhan operasional: {selected labels}
-Kesiapan: {short readiness summary}
+Template: {template name}
+Bisnis: {business type} ({category})
+
+Kebutuhan customer:
+- {canonical labels}
+
+Kebutuhan operasional:
+- {canonical labels}
+
+Kebutuhan akun/member:
+- {canonical labels, when present}
+
+Kesiapan:
+- {non-empty readiness fields only}
+
+Timeline: {canonical label}
 Rekomendasi awal: {Website | Website + Portal | Bundle | Perlu konsultasi}
-Alasan: {short reason list}
+Alasan: {up to two shortened reasons}
+
+Saya ingin diskusi scope dan langkah berikutnya.
 ```
 
-Keep the message readable and short. Use labels, not full descriptions. Cap each list and append `+N lainnya` when needed; enforce a total length budget and test encoded URLs. Include no passwords, identity documents, payment details, or sensitive customer data. If the number is absent or URL creation fails, keep the consultation summary usable and offer copy-to-clipboard/manual contact fallback.
+`buildSummaryWhatsAppMessage` trims empty sections, caps each long line and the reason count, enforces an 1,800-character total budget, and uses deterministic section ordering. `buildStoreWhatsAppLink` URL-encodes the message and returns no URL for missing/invalid configuration. The message includes consultation context only; it excludes session keys, internal IDs, contact data, payment data, and sensitive fields.
 
 ## 13. Shared template-engine boundary
 
@@ -634,7 +644,7 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 | S3 | Standardize `/store`, detail, preview shell, statuses, cards, filters, and dynamic route wrappers across six templates. | `src/app/store/page.tsx`, `src/app/store/components/*`, `[slug]` route wrappers, `store.css` split/tokens | S2 parity; route/host decision | Route matrix, filter semantics, responsive/a11y/browser checks | Restore explicit routes and old Store index; no public redirects | Approve shared foundation and dynamic routes |
 | S4 | Add four-step Customize wizard, client-only normalized draft state, validation, mobile action bar, and `Belum yakin`. | `customize/[slug]`, `CustomizeWizard`, `src/lib/store/customize.ts`, `src/lib/store/types.ts` | S3 shared contract | State transition tests, keyboard/mobile UAT, session restoration/reset, route matrix | Keep S5 recommendation boundary explicit; remove wizard only if S4 is rejected | Approve question set and persistence boundary |
 | S5 | Add pure recommendation rules and explainable reasons. No pricing, AI, DB, or provisioning. | `src/lib/store/recommendation.ts`, tests, capability mapping | S4 draft model | Truth-table tests and six-template baseline tests | Disable recommendation result and fall back to `Perlu konsultasi` | Approve precedence and Website/Portal/Bundle meaning |
-| S6 | Add normalized summary, edit/back behavior, central WhatsApp generator/config, URL length/fallback handling. | `summary/page.tsx`, `src/lib/store/whatsapp.ts`, `.env.example`, deployment config | S5 rules; real number and fallback decision | Message snapshot/length tests, config-present/absent tests, browser handoff checks | Revert CTA to manual consultation; no outgoing message is sent automatically | Approve real contact and final message |
+| S6 | Add normalized summary, edit/back behavior, central WhatsApp generator/config, URL length/fallback handling. | `summary/page.tsx`, `SummaryView`, `src/lib/store/summary.ts`, `src/lib/store/whatsapp.ts`, `customize.ts`, `.env.example` | S5 rules; real number and fallback decision | Summary/message/config tests, route matrix, exact viewport browser handoff checks | Revert CTA to manual consultation; no outgoing message is sent automatically | Approve real contact and final message |
 | S7 | Full six-template QA, Warm parity, regression, SEO/redirect readiness, launch checklist. | QA docs/scripts, route metadata, public redirect files after approval | S6 complete; canonical host approved | Exact viewport browser UAT, HTTP checks, build/typecheck, console/network audit | Do not redirect/remove public routes; keep Store in preview | Approve launch and public-route cutover |
 
 ### S1 validation evidence
@@ -706,6 +716,21 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Exact browser UAT passed at `1440×900`, `768×900`, and `390×844`. All four result classes were directly observed; edit/recompute, refresh restore, category mismatch, payment-management, schedule-info exclusion, connected booking/order/enrollment, persistent account state, no-overflow, long-reason wrapping, and touch-size checks passed. Local and Preview CUA console captures returned no errors or warnings. Existing root SpeedInsights local warning remains unrelated and outside S5.
 - New Vercel Preview is Ready: `https://ja-websitebuilder-platform-c9anlhhsn-rigi26s-projects.vercel.app`, deployment `dpl_DFN12PeSk8MWbepEpse6objq2th2`, target `preview`. No production deployment.
 
+### S6 actual outcome and validation evidence
+
+- Canonical consultation summary route is `/store/summary`; it reads the active client-only Customize draft from session storage and never dumps state into a query string.
+- `src/lib/store/summary.ts` owns the normalized `SummaryViewModel`, safe resolver, buyer-facing label mapping, approved tier price presentation, and deterministic WhatsApp message format. It separates customer-facing, operational, and account/member needs without exposing internal capability IDs.
+- Customize storage now records `webzoka.store.customize.v1:active` alongside the existing per-template draft. Summary edit actions resume the same draft in draft mode; no duplicate draft is created. Invalid or stale active template data does not fall back to another template.
+- `src/lib/store/whatsapp.ts` is the single Store-scoped URL/configuration helper. It validates international numbers into E.164 digits, URL-encodes the generated message, and returns an unavailable state instead of a fake URL when configuration is absent or invalid. Warm Commerce already uses this shared helper and remains behavior-compatible.
+- `.env.example` documents `NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER`; no real production number was added to source or preview.
+- Summary recovery covers missing, corrupt, stale-template, and incomplete drafts. Recommendation exceptions fail safe to `Perlu konsultasi`; consultation results are presented as an expected scope-discussion outcome, not an error.
+- Summary primary action opens a prefilled WhatsApp consultation message when configuration is valid. Missing/invalid number or message-generation failure disables the CTA and keeps the summary available.
+- S6 focused tests cover valid view-model labels, Website / Website + Portal / Bundle / Perlu konsultasi presentation, readiness omission, deterministic ordering, no sensitive/internal fields, URL encoding, number validation, missing-number fallback, active-draft recovery, stale template handling, and Customize storage parity.
+- Fresh focused Vitest: 4 files / 35 tests passed. `npm run typecheck`, `npm run build`, and `git diff --check` exited 0. Existing `npm run lint` remains nonfunctional because `next lint` treats `lint` as a project directory.
+- Fresh Preview HTTP matrix: 21 requests, 20 expected 200s, 1 expected unknown-slug 404, 0 other failures. Preview is `https://ja-websitebuilder-platform-nzkzq7xes-rigi26s-projects.vercel.app`, deployment `dpl_4gU1KX3VUKTqMaRx8gBWsmrNLKVW`, target `preview`, status `READY`.
+- Exact browser checks at `1440×900`, `768×900`, and `390×844` found one `h1` and no horizontal overflow in local ready Summary and Preview recovery states. Website, Website + Portal, Bundle, Perlu konsultasi, edit/recompute, refresh restore, missing-number fallback, valid safe-number URL generation, and long-reason wrapping were observed.
+- Fresh validation evidence and browser/preview results are recorded in `docs/webzoka-store-v2-s6-summary-whatsapp-review.md`.
+
 ## 17. V1 deferred scope
 
 Cart, checkout, payment, customer account, AI recommendation, automatic provisioning, real-time availability, full Hub/Portal/LMS/clinic/rental backends, reviews/ratings, persistent lead database, CRM automation, CMS-driven registry, public self-serve pricing engine, live inventory, live scheduling, enrollment confirmation, customer/member portals, and production notification automation remain out of V1 unless separately approved.
@@ -727,18 +752,18 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0–S4 decisions are approved and recorded. Chat must decide whether to approve the S5 precedence, generic-login consultation boundary, payment-scope consultation boundary, and compact completion-state recommendation display before S6 planning. This packet does not authorize S6 work.
+S0–S5 decisions are approved and recorded. Chat must decide whether to approve the S6 summary presentation, active-draft recovery behavior, and centralized WhatsApp handoff/message before any S7 QA or launch-readiness work. This packet does not authorize S7 work.
 
 ## GIT STATUS
 
-- Canonical worktree: S5 bounded revision is committed on `codex/webzoka-v7-prototype`; docs commit and push evidence belong in the S5 review packet.
+- Canonical worktree: S6 implementation is committed on `codex/webzoka-v7-prototype`; no merge to master/main and no production deployment.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0–S5 architecture checkpoint file. S5 adds deterministic recommendation rules, result types, completion-state derivation, and validation notes in the canonical worktree.
+S0–S6 architecture checkpoint file. S6 adds the normalized consultation summary, active-draft recovery, centralized WhatsApp handoff, and validation notes in the canonical worktree.
 
 Commits:
 
@@ -757,4 +782,4 @@ Commits:
 
 ## 20. Verdict
 
-S5 bounded revision is implemented and verified within scope. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, deterministic tier precedence, bounded consultation guards, explainable reasons, and compact completion integration are covered. Boundary remains clear: Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S5 approval; do not start S6.
+S6 is implemented within scope and stops at the S6 Review Packet gate. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, deterministic tier precedence, explainable reasons, consultation summary, active-draft edit/back flow, safe recovery, and centralized WhatsApp handoff are covered. Boundary remains clear: redirects, Hub integration, checkout, accounts, pricing calculator, new templates, S7 QA / launch readiness, merge, and production launch remain deferred.
