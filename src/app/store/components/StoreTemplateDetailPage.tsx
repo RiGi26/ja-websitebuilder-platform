@@ -49,7 +49,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                   ) : (
                     <span className={styles.unavailableAction} role="status">Preview {template.previewStatus === 'coming-soon' ? 'segera hadir' : 'tersedia di live site'}</span>
                   )}
-                  <Link className={styles.secondaryAction} href="#gunakan-template">Gunakan Template Ini <ArrowRight size={16} aria-hidden="true" /></Link>
+                  <Link className={styles.secondaryAction} href={template.customizeRoute}>Gunakan Template Ini <ArrowRight size={16} aria-hidden="true" /></Link>
                 </div>
               </div>
 
@@ -142,9 +142,9 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
           <div className={styles.container}>
             <p className={styles.eyebrow}>Langkah berikutnya</p>
             <h2 id="use-title">Gunakan {template.name} sebagai titik mulai.</h2>
-            <p>Customize mandiri belum tersedia di S3. Simpan arah ini, lalu bahas isi, warna, dan scope yang perlu disesuaikan bersama Webzoka.</p>
+            <p>Jawab beberapa pertanyaan singkat supaya kebutuhan bisnis dan arah template ini bisa disiapkan untuk tahap berikutnya.</p>
             <div className={styles.finalActions}>
-              <span className={styles.comingSoon} role="status">Customize segera hadir di tahap berikutnya.</span>
+              <Link className={styles.primaryAction} href={template.customizeRoute}>Mulai Customize <ArrowRight size={16} aria-hidden="true" /></Link>
               <Link className={styles.secondaryActionLight} href="/store">Kembali ke koleksi <ArrowLeft size={16} aria-hidden="true" /></Link>
             </div>
           </div>
