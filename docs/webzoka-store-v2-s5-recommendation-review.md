@@ -82,12 +82,20 @@ The existing `webzoka.store.customize.v1:{templateSlug}` session payload remains
 - `git diff --check`: pass.
 - `npm run lint`: not run; the existing script is known non-functional under the current Next.js setup (`Invalid project directory ...\\lint`), and no lint configuration changed.
 - HTTP smoke on local production server: `/store`, all six detail routes, all six preview routes, all six Customize routes, and unknown Customize slug. Expected 200/404 statuses and one H1 per successful page; 0 failures.
-- Browser UAT on local production server: Warm Commerce public-only → Website; edit prior answer to order management → Website + Portal; refresh restoration; Course Enrollment student login + learning materials → Bundle; Trust Profile generic member login → Perlu konsultasi. Current browser smoke showed no visible app error and no horizontal overflow at the available responsive browser viewport.
+- Browser UAT on local production server: Warm Commerce public-only → Website; edit prior answer to order management → Website + Portal; refresh restoration; Course Enrollment student login + learning materials → Bundle; Trust Profile generic member login → Perlu konsultasi. Deployed-browser spot check also completed Warm Commerce public-only → Website with the expected reason. Current browser smoke showed no visible app error and no horizontal overflow at the available responsive browser viewport.
 - Exact 1440×900, 768×900, and 390×844 viewport controls were unavailable in the active in-app browser surface; prior S4 exact-viewport regression remains covered, while S5-specific completion behavior was verified in the active browser surface and through the route/build matrix.
 
 ## Deployment
 
-S5 changes the visible Customize completion state, so a new Vercel Preview is required after the validated branch push. Record the Ready URL, deployment ID, source commit, and preview smoke result here before closing the packet. No production deployment is allowed.
+New Vercel Preview is Ready:
+
+- URL: `https://ja-websitebuilder-platform-8qnu1b533-rigi26s-projects.vercel.app`
+- Deployment ID: `dpl_3RtKFdcnKN7EydHtZhJBfW9B2HUb`
+- Target/status: `preview` / `Ready`
+- Source commit: `16687f1`
+- Deployed-browser spot check: Warm Commerce public-only flow completed and displayed `Website` with the expected Indonesian reason.
+
+No production deployment was made.
 
 ## P0/P1/P2
 
