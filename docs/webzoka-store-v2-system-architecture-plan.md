@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S4 Customize flow complete and stopped before S5 Recommendation Engine at the requested review gate.
+Status: S5 Recommendation Engine complete and stopped before S6 Consultation Summary at the requested review gate.
 
 Date: 2026-09-12
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, and S4 now captures a normalized client-only Customize draft. S5+ remains gated.
+Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, S4 captures a normalized client-only Customize draft, and S5 now derives a deterministic recommendation with explainable reasons. S6+ remains gated.
 
 ## 1. Approved S0 decisions
 
@@ -404,49 +404,47 @@ S4 persistence is client-only `sessionStorage`, namespaced as `webzoka.store.cus
 - sticky bottom action bar with safe-area padding and enough content padding so it never covers fields;
 - all choices use fieldsets/legends, visible labels, 16px inputs, and 44px targets;
 - summary provides Edit step actions that return to the same draft.
-- completion state confirms the draft is saved locally and explicitly stops before recommendation calculation.
+- completion state confirms the draft is saved locally and shows only the compact S5 recommendation result; Summary and WhatsApp remain deferred.
 
 ## 10. Rule-based recommendation engine V1
 
-Pure function, no pricing engine and no AI:
+Implemented as the pure function `recommendStoreSolution` in `src/lib/store/recommendation.ts`:
 
 ```ts
-recommendTemplatePath(draft: CustomizeDraft, entry: TemplateRegistryEntry): RecommendationResult
+recommendStoreSolution(draft: CustomizeDraft, template: StoreTemplate): RecommendationResult
 ```
+
+It reads only normalized S4 selections and template metadata. It has no browser-state dependency, pricing calculation, AI/LLM inference, backend call, account, payment, or provisioning behavior.
+
+### Result shape
+
+`RecommendationResult` in `src/lib/store/types.ts` returns `tier`, buyer-facing `label`, `summary`, ordered `reasons`, `evidence`, `templateSlug`, `requiresConsultation`, and an optional `consultationCode`. Evidence is grouped into `publicCapabilities`, `operationalCapabilities`, and `accountCapabilities` using canonical `CapabilityId` values.
 
 ### Precedence
 
-1. Explicit `needsConsultation` or unresolved/contradictory answers → `Perlu konsultasi`.
-2. Account/member needs (`account.customer-login` or `account.student-member-login`) → `Bundle`.
-3. Operational needs that require a Portal (`ops.booking-management`, `ops.availability`, `ops.inventory`, `ops.customer-records`, `ops.practitioner-management`, `ops.enrollment-management`, `ops.class-management`, `ops.reminders`, `ops.admin-dashboard`) → `Website + Portal`.
-4. Public-only needs → template `baseRecommendation`, initially `Website` for all six.
-5. Empty optional selections with a valid template → the template base recommendation, with a reason that the website is the starting point.
+1. Runtime integrity and template support guards → `Perlu konsultasi` for malformed/incomplete completed drafts, unknown or unsupported capability IDs, cross-template drafts, or a business category that does not match the selected template.
+2. Explicit `needsConsultation` or any unresolved S4 `Belum yakin` marker → `Perlu konsultasi`.
+3. Contradictory operational state → `Perlu konsultasi`, including `Tidak perlu dashboard khusus` with operational selections, or selected operational mode with no operational capability.
+4. Missing customer context → `Perlu konsultasi`; a completed draft must contain at least one public or account need.
+5. Payment-management scope → `Perlu konsultasi`; S5 does not imply checkout or payment implementation.
+6. Account/member need plus any operational need, or a clearly connected customer workflow → `Bundle`.
+7. Account state capabilities such as order tracking, booking history, learning materials, attendance, or membership → `Bundle` even without an operational selection because they imply connected state. Generic login alone without a connected workflow → `Perlu konsultasi`.
+8. Any supported operational need without account/member needs → `Website + Portal`.
+9. Public-only needs, including explicit `Tidak perlu dashboard khusus`, → `Website`.
 
-`ops.payment-management` alone does not produce a payment product in V1. It produces `Perlu konsultasi` because payment is explicitly out of V1. A combination that mixes unsupported real-time, regulated, or custom operational expectations also produces `Perlu konsultasi`.
+`baseRecommendation` and `upgradeRecommendation` remain registry context only. They never override stronger actual needs or change the public/operational/account rules above.
 
-`upgradeRecommendation` participates as the next-step explanation, not as an unconditional override. For example, Course Enrollment can explain that student login or enrollment management moves the recommendation to Bundle; Easy Booking can explain that availability/inventory moves it to Website + Portal.
+### Template-aware behavior
+
+The engine uses the same taxonomy and support checks for all six templates. `customerCan` defines supported public selections; `optionalCapabilities` defines supported operational and account scope. Connected public workflows are the canonical order, booking, enrollment, and schedule capabilities. This preserves Warm Commerce order management, Modern Catalog inventory, Care Booking booking management, Course Enrollment enrollment/student flow, and Easy Booking availability/inventory behavior without six separate engines. Trust Profile generic member login remains consultation until a service workflow is clear.
 
 ### Explainable reasons
 
-Every result returns reason IDs and readable labels, for example:
-
-- `base-template`: “Template ini cocok untuk mulai dari website publik.”
-- `portal-operations`: “Kamu memilih kebutuhan yang perlu dikelola tim.”
-- `member-account`: “Login member/siswa membutuhkan pengalaman di luar website publik.”
-- `needs-consultation`: “Ada kebutuhan yang perlu dibahas agar scope dan alurnya tepat.”
-- `template-upgrade`: template-specific next-step explanation from registry.
+Every result has at least one Indonesian buyer-facing reason. Website explains the public-facing focus; Website + Portal names selected operational areas; Bundle explains the connected customer/member flow; Consultation explains the uncertainty, contradiction, unsupported scope, or missing context. No reason mentions implementation stacks.
 
 ### Tests
 
-- six templates × empty/public-only baseline;
-- each operational capability;
-- each account/member capability;
-- precedence when account + operations are both selected;
-- explicit `Belum yakin`;
-- unsupported payment/real-time combinations;
-- unknown capability IDs fail safely to consultation;
-- stable reason ordering and serialization;
-- no price calculation and no dependency on browser state.
+`src/lib/store/recommendation.test.ts` covers public-only baselines across all six templates, operational and account precedence, generic login ambiguity, explicit no-dashboard, contradictions, uncertainty, empty/missing needs, template defaults not overriding actual needs, Course Enrollment's three tiers, Care Booking, Easy Booking inventory, Warm Commerce order management, unknown/unsupported runtime capabilities, deterministic output, buyer-facing Indonesian reasons, and payment-scope consultation.
 
 ## 11. Consultation Summary model
 
@@ -680,10 +678,22 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Step 1 captures category, free buyer-facing business type, service area, current website status, and current contact channels. Step 2 captures relevant public/account needs plus `Belum yakin`. Step 3 captures relevant operational needs plus mutually exclusive `Tidak perlu dashboard khusus` and `Belum yakin`. Step 4 captures logo, domain, visual, catalog/menu/program/unit data, business copy, and timeline readiness.
 - Normalized draft model lives in `src/lib/store/types.ts`; serialization, safe restoration, per-template namespacing, reset, validation, and uncertainty transitions live in `src/lib/store/customize.ts`.
 - Persistence is client-only session storage under `webzoka.store.customize.v1:{templateSlug}`. No name, phone, email, backend write, account, payment, checkout, or CRM data is collected.
-- Completion shows the captured-answer review and the explicit boundary that recommendation calculation is next. No Recommendation Engine, Summary route, WhatsApp handoff, provisioning, or pricing result was added.
-- Focused Store/Customize Vitest: 15/15 passed. Fresh browser UAT on production server: detail CTA navigation, four-step completion, Back/Next preservation, refresh restoration, reset, `Belum yakin`, no-dashboard exclusivity, template-aware options, recommendation-free completion, 1440×900, 768×900, and 390×844 responsive/no-overflow checks passed; no app page errors or failed app requests were captured. Local self-hosted runs emitted the existing `/_vercel/speed-insights/script.js` 404/MIME warning from the root `SpeedInsights` integration.
+- Completion shows the captured-answer review and the explicit S5 boundary that recommendation calculation is next. No Recommendation Engine, Summary route, WhatsApp handoff, provisioning, or pricing result was added during S4.
+- Focused Store/Customize Vitest: 15/15 passed. Fresh browser UAT on production server: detail CTA navigation, four-step completion, Back/Next preservation, refresh restoration, reset, `Belum yakin`, no-dashboard exclusivity, template-aware options, recommendation-free completion at the S4 checkpoint, 1440×900, 768×900, and 390×844 responsive/no-overflow checks passed; no app page errors or failed app requests were captured. Local self-hosted runs emitted the existing `/_vercel/speed-insights/script.js` 404/MIME warning from the root `SpeedInsights` integration.
 - Fresh `npm run typecheck` exit 0, `npm run build` exit 0, and `git diff --check` pass. `npm run lint` remains non-functional under the existing Next.js setup (`Invalid project directory ...\\lint`); lint configuration was not changed.
 - New Vercel Preview: `dpl_4oUwycFGNzh3AXjQQXDwgh5EjVQy`, status `Ready`, target `preview`, URL `https://ja-websitebuilder-platform-mogkbs0i4-rigi26s-projects.vercel.app`, source branch `codex/webzoka-v7-prototype`. No production deployment.
+
+### S5 actual outcome and validation evidence
+
+- `src/lib/store/recommendation.ts` implements one deterministic, taxonomy-driven engine with explicit consultation guards, public/operational/account evidence, and buyer-facing Indonesian reasons.
+- `src/lib/store/types.ts` adds `RecommendationEvidence`, `RecommendationConsultationCode`, and `RecommendationResult` without adding pricing or persistence fields to `CustomizeDraft`.
+- The Customize completion boundary derives the result from the current complete draft and selected template. It displays only tier, summary, and reasons; no Summary page or WhatsApp handoff was added.
+- Recommendation results are not stored as authoritative session data. The existing versioned per-template draft remains the only persisted payload; refresh recomputes from the restored draft, and editing answers returns to draft mode so completion recomputes from current answers.
+- Consultation triggers are bounded to runtime/input integrity, cross-template or category mismatch, unsupported capabilities, unresolved uncertainty, contradictions, missing customer context, ambiguous generic login, and payment-management scope.
+- Fresh focused Vitest: `npx vitest run src/lib/store/recommendation.test.ts src/lib/store/templates.test.ts src/lib/store/customize.test.ts` — 3 files, 28 tests passed.
+- Fresh `npm run typecheck` — exit 0.
+- `git diff --check` — pass before commit.
+- Browser UAT and HTTP regression run after the final build; no Preview deployment is claimed yet.
 
 ## 17. V1 deferred scope
 
@@ -706,18 +716,18 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0–S3 decisions are approved and recorded. S4 is implemented and stopped at the requested review gate. Chat must decide whether to approve the four-step Customize question set, normalized draft boundary, and client-only persistence for S5 planning. This packet does not authorize S5 work.
+S0–S4 decisions are approved and recorded. Chat must decide whether to approve the S5 precedence, generic-login consultation boundary, payment-scope consultation boundary, and compact completion-state recommendation display before S6 planning. This packet does not authorize S6 work.
 
 ## GIT STATUS
 
-- Canonical worktree: S3 implementation and docs committed on `codex/webzoka-v7-prototype`; final status is recorded in the S3 review packet.
+- Canonical worktree: S5 implementation is in progress on `codex/webzoka-v7-prototype`; final commit and validation status belong in the S5 review packet.
 - Public Webzoka worktree: clean; no files changed.
 
 ## PLAN DOC PATH
 
 `D:\Project\Website JapanArena\JapanArena SaaS\.wt-webzoka-v7-prototype\docs\webzoka-store-v2-system-architecture-plan.md`
 
-S0–S4 architecture checkpoint file. S4 adds the shared Customize wizard, normalized draft model, client-only session persistence, and validation notes in the canonical worktree.
+S0–S5 architecture checkpoint file. S5 adds deterministic recommendation rules, result types, completion-state derivation, and validation notes in the canonical worktree.
 
 Commits:
 
@@ -730,4 +740,4 @@ Commits:
 
 ## 20. Verdict
 
-S4 Customize flow is complete within scope. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, safe restoration/reset, and responsive/a11y behavior are validated. Boundary remains clear: Recommendation Engine, Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S4 review; do not start S5.
+S5 Recommendation Engine is implemented within scope, subject to the final build, HTTP regression, browser UAT, commit, and branch-push evidence recorded in the S5 Review Packet. Registry truth, six-template browse/detail/preview foundation, direct Customize entry, normalized client-only draft, four-step capture, deterministic tier precedence, safe consultation guards, explainable reasons, and compact completion integration are covered. Boundary remains clear: Summary, centralized WhatsApp handoff, redirects, Hub integration, checkout, accounts, pricing calculator, new templates, merge, and production launch remain deferred. Stop here pending S5 review; do not start S6.
