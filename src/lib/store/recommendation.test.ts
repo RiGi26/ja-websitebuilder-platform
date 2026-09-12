@@ -70,6 +70,53 @@ describe('Store S5 recommendation engine', () => {
     })
   })
 
+  it('does not let one core uncertainty override a clear solution signal', () => {
+    expect(resultFor('warm-commerce', {
+      customerNeeds: ['public.catalog'],
+      uncertainties: ['customer-needs'],
+      needsConsultation: true,
+    })).toMatchObject({ tier: 'website' })
+
+    expect(resultFor('warm-commerce', {
+      customerNeeds: ['public.catalog'],
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.order-management'],
+      uncertainties: ['operational-needs'],
+      needsConsultation: true,
+    })).toMatchObject({ tier: 'website-portal' })
+  })
+
+  it('consults when both core need areas are unclear and no stronger signal exists', () => {
+    expect(resultFor('warm-commerce', {
+      customerNeeds: [],
+      operationalMode: 'unsure',
+      operationalNeeds: [],
+      uncertainties: ['customer-needs', 'operational-needs'],
+      needsConsultation: true,
+    })).toMatchObject({ tier: 'consultation', consultationCode: 'uncertain-needs' })
+  })
+
+  it('ignores readiness uncertainty for tiering', () => {
+    const publicOnly = resultFor('modern-catalog', {
+      assets: {
+        logo: 'missing',
+        domain: 'help',
+        photos: 'missing',
+        catalog: 'help',
+        'business-copy': 'unknown',
+      },
+      timeline: 'undecided',
+    })
+    expect(publicOnly.tier).toBe('website')
+
+    const operational = resultFor('warm-commerce', {
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.order-management'],
+      timeline: 'undecided',
+    })
+    expect(operational.tier).toBe('website-portal')
+  })
+
   it('keeps explicit no-dashboard plus public needs at Website', () => {
     const result = resultFor('modern-catalog', {
       operationalMode: 'none',
@@ -77,6 +124,19 @@ describe('Store S5 recommendation engine', () => {
     })
 
     expect(result.tier).toBe('website')
+  })
+
+  it('treats category mismatch as advisory context, not a consultation trigger', () => {
+    expect(resultFor('modern-catalog', {
+      businessCategory: 'kuliner',
+      customerNeeds: ['public.catalog', 'public.price-display', 'public.inquiry'],
+    }).tier).toBe('website')
+
+    expect(resultFor('modern-catalog', {
+      businessCategory: 'kuliner',
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.inventory'],
+    }).tier).toBe('website-portal')
   })
 
   it('guards contradictions, uncertainty, and empty completed drafts', () => {
@@ -88,7 +148,7 @@ describe('Store S5 recommendation engine', () => {
     expect(resultFor('care-booking', {
       uncertainties: ['customer-needs'],
       needsConsultation: true,
-    })).toMatchObject({ tier: 'consultation', consultationCode: 'uncertain-needs' })
+    })).toMatchObject({ tier: 'website' })
 
     expect(resultFor('course-enrollment', {
       customerNeeds: [],
@@ -146,6 +206,55 @@ describe('Store S5 recommendation engine', () => {
     }).tier).toBe('website-portal')
   })
 
+  it('treats payment management as operational scope unless account workflow is present', () => {
+    expect(resultFor('easy-booking', {
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.payment-management'],
+    }).tier).toBe('website-portal')
+
+    expect(resultFor('course-enrollment', {
+      customerNeeds: ['public.catalog', 'account.student-login'],
+      operationalMode: 'selected',
+      operationalNeeds: ['ops.payment-management'],
+    }).tier).toBe('bundle')
+  })
+
+  it('requires a connected workflow for generic login', () => {
+    expect(resultFor('care-booking', {
+      customerNeeds: ['public.catalog', 'public.schedule-info', 'account.customer-login'],
+    })).toMatchObject({ tier: 'consultation', consultationCode: 'ambiguous-account' })
+
+    expect(resultFor('care-booking', {
+      customerNeeds: ['public.catalog', 'public.schedule-info', 'public.booking-request', 'account.customer-login'],
+    }).tier).toBe('bundle')
+
+    expect(resultFor('warm-commerce', {
+      customerNeeds: ['public.catalog', 'public.order-request', 'account.customer-login'],
+    }).tier).toBe('bundle')
+
+    expect(resultFor('course-enrollment', {
+      customerNeeds: ['public.catalog', 'public.enrollment-request', 'account.student-login'],
+    }).tier).toBe('bundle')
+  })
+
+  it('treats persistent account state as Bundle without a separate operations selection', () => {
+    expect(resultFor('warm-commerce', {
+      customerNeeds: ['public.catalog', 'account.order-tracking'],
+    }).tier).toBe('bundle')
+    expect(resultFor('care-booking', {
+      customerNeeds: ['public.catalog', 'account.booking-history'],
+    }).tier).toBe('bundle')
+    expect(resultFor('course-enrollment', {
+      customerNeeds: ['public.catalog', 'account.learning-materials'],
+    }).tier).toBe('bundle')
+    expect(resultFor('course-enrollment', {
+      customerNeeds: ['public.catalog', 'account.attendance'],
+    }).tier).toBe('bundle')
+    expect(resultFor('course-enrollment', {
+      customerNeeds: ['public.catalog', 'account.membership'],
+    }).tier).toBe('bundle')
+  })
+
   it('fails safely for unknown and unsupported runtime capabilities', () => {
     const unknownCapabilityDraft = completeDraft(getStoreTemplate('warm-commerce'), {
       customerNeeds: ['public.catalog', 'public.not-real' as CapabilityId],
@@ -184,12 +293,4 @@ describe('Store S5 recommendation engine', () => {
     }
   })
 
-  it('routes payment-management scope to consultation without implying checkout', () => {
-    const result = resultFor('easy-booking', {
-      operationalMode: 'selected',
-      operationalNeeds: ['ops.payment-management'],
-    })
-
-    expect(result).toMatchObject({ tier: 'consultation', consultationCode: 'unsupported-scope' })
-  })
 })
