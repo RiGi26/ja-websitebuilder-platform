@@ -105,13 +105,11 @@ export interface RecommendationEvidence {
 export type RecommendationConsultationCode =
   | 'invalid-draft'
   | 'template-mismatch'
-  | 'business-category-mismatch'
   | 'uncertain-needs'
   | 'contradictory-selections'
   | 'empty-needs'
   | 'ambiguous-account'
   | 'unsupported-capability'
-  | 'unsupported-scope'
 
 export interface RecommendationResult {
   readonly tier: RecommendationTier

@@ -29,33 +29,26 @@ const CONNECTED_CUSTOMER_FLOWS: ReadonlySet<CapabilityId> = new Set([
   'public.order-request',
   'public.booking-request',
   'public.enrollment-request',
-  'public.schedule-info',
 ])
-
-const PAYMENT_CAPABILITY: CapabilityId = 'ops.payment-management'
 
 const CONSULTATION_SUMMARIES: Record<RecommendationConsultationCode, string> = {
   'invalid-draft': 'Jawaban inti belum lengkap atau perlu diperiksa lagi sebelum scope ditentukan.',
   'template-mismatch': 'Pilihan template dan jawaban kebutuhanmu belum berada dalam satu arah yang jelas.',
-  'business-category-mismatch': 'Kategori bisnis yang dipilih belum selaras dengan arah template ini.',
-  'uncertain-needs': 'Beberapa kebutuhan utama masih belum pasti.',
+  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, portal operasional, atau alur customer yang terhubung.',
   'contradictory-selections': 'Beberapa pilihan kebutuhanmu belum konsisten.',
   'empty-needs': 'Belum ada kebutuhan utama yang cukup jelas untuk menentukan solusi.',
   'ambiguous-account': 'Kebutuhan login belum menunjukkan alur customer, member, atau siswa yang jelas.',
   'unsupported-capability': 'Ada kebutuhan yang belum cocok dengan pilihan template ini.',
-  'unsupported-scope': 'Ada kebutuhan operasional yang perlu dibahas lebih khusus.',
 }
 
 const CONSULTATION_REASONS: Record<RecommendationConsultationCode, string> = {
   'invalid-draft': 'Jawaban inti belum lengkap, jadi rekomendasi belum bisa ditentukan dengan aman.',
   'template-mismatch': 'Pilihan template dan kebutuhanmu belum berada dalam satu arah yang jelas. Konsultasi akan membantu memastikan pilihan yang paling tepat.',
-  'business-category-mismatch': 'Kategori bisnis yang dipilih belum selaras dengan arah template ini. Konsultasi akan membantu memastikan struktur yang paling tepat.',
-  'uncertain-needs': 'Beberapa kebutuhanmu masih belum pasti atau belum cocok dengan alur standar template ini. Konsultasi akan membantu menentukan scope yang tepat.',
+  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, portal operasional, atau alur customer yang terhubung.',
   'contradictory-selections': 'Pilihan kebutuhan publik dan operasionalmu belum konsisten, jadi scope perlu diklarifikasi sebelum solusi ditentukan.',
   'empty-needs': 'Belum ada kebutuhan utama yang cukup jelas untuk menentukan solusi secara bertanggung jawab. Konsultasi akan membantu memulai dari prioritas bisnis.',
   'ambiguous-account': 'Kebutuhan login yang dipilih belum menunjukkan alur customer, member, atau siswa yang jelas. Konsultasi akan membantu memastikan kebutuhan yang tepat.',
   'unsupported-capability': 'Ada kebutuhan yang belum cocok dengan pilihan template ini. Konsultasi akan membantu menentukan scope yang tepat.',
-  'unsupported-scope': 'Kebutuhan operasional ini perlu dibahas lebih lanjut agar alur kerja dan tanggung jawabnya tepat.',
 }
 
 function emptyEvidence(): RecommendationEvidence {
@@ -208,10 +201,6 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
     return consultationResult(template, evidence, 'unsupported-capability')
   }
 
-  if (rawDraft.businessCategory !== template.category) {
-    return consultationResult(template, evidence, 'business-category-mismatch')
-  }
-
   const uncertainties = rawDraft.uncertainties
   if (
     !Array.isArray(uncertainties)
@@ -221,11 +210,7 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
     return consultationResult(template, evidence, 'invalid-draft')
   }
 
-  if (rawDraft.needsConsultation || uncertainties.length > 0) {
-    return consultationResult(template, evidence, 'uncertain-needs')
-  }
-
-  if (rawDraft.operationalMode !== 'none' && rawDraft.operationalMode !== 'selected') {
+  if (rawDraft.operationalMode !== 'none' && rawDraft.operationalMode !== 'selected' && rawDraft.operationalMode !== 'unsure') {
     return consultationResult(template, evidence, 'contradictory-selections')
   }
   if (rawDraft.operationalMode === 'none' && evidence.operationalCapabilities.length > 0) {
@@ -234,13 +219,24 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
   if (rawDraft.operationalMode === 'selected' && evidence.operationalCapabilities.length === 0) {
     return consultationResult(template, evidence, 'contradictory-selections')
   }
+  if (rawDraft.operationalMode === 'unsure' && evidence.operationalCapabilities.length > 0) {
+    return consultationResult(template, evidence, 'contradictory-selections')
+  }
+
+  const hasStrongSolutionSignal = evidence.publicCapabilities.length > 0
+    || evidence.operationalCapabilities.length > 0
+    || evidence.accountCapabilities.length > 0
+  const hasBothCoreUncertainties = uncertainties.includes('customer-needs')
+    && uncertainties.includes('operational-needs')
+
+  // S4 keeps needsConsultation for compatibility, but one Belum yakin marker
+  // must not override a clear public, operational, or account signal.
+  if (hasBothCoreUncertainties && !hasStrongSolutionSignal) {
+    return consultationResult(template, evidence, 'uncertain-needs')
+  }
 
   if (evidence.publicCapabilities.length === 0 && evidence.accountCapabilities.length === 0) {
     return consultationResult(template, evidence, 'empty-needs')
-  }
-
-  if (evidence.operationalCapabilities.includes(PAYMENT_CAPABILITY)) {
-    return consultationResult(template, evidence, 'unsupported-scope')
   }
 
   if (evidence.accountCapabilities.length > 0) {
