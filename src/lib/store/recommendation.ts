@@ -235,7 +235,11 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
     return consultationResult(template, evidence, 'uncertain-needs')
   }
 
-  if (evidence.publicCapabilities.length === 0 && evidence.accountCapabilities.length === 0) {
+  if (
+    evidence.publicCapabilities.length === 0
+    && evidence.operationalCapabilities.length === 0
+    && evidence.accountCapabilities.length === 0
+  ) {
     return consultationResult(template, evidence, 'empty-needs')
   }
 
