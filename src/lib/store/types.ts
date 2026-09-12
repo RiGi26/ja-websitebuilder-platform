@@ -96,6 +96,34 @@ export type CapabilityId =
 
 export type RecommendationTier = 'website' | 'website-portal' | 'bundle' | 'consultation'
 
+export interface RecommendationEvidence {
+  readonly publicCapabilities: readonly CapabilityId[]
+  readonly operationalCapabilities: readonly CapabilityId[]
+  readonly accountCapabilities: readonly CapabilityId[]
+}
+
+export type RecommendationConsultationCode =
+  | 'invalid-draft'
+  | 'template-mismatch'
+  | 'business-category-mismatch'
+  | 'uncertain-needs'
+  | 'contradictory-selections'
+  | 'empty-needs'
+  | 'ambiguous-account'
+  | 'unsupported-capability'
+  | 'unsupported-scope'
+
+export interface RecommendationResult {
+  readonly tier: RecommendationTier
+  readonly label: string
+  readonly summary: string
+  readonly reasons: readonly string[]
+  readonly evidence: RecommendationEvidence
+  readonly templateSlug: TemplateSlug
+  readonly requiresConsultation: boolean
+  readonly consultationCode?: RecommendationConsultationCode
+}
+
 export interface CapabilityDefinition {
   readonly id: CapabilityId
   readonly label: string
