@@ -26,6 +26,7 @@ import { createServerClient } from '@supabase/ssr'
 //   bakso-tini.webzoka.com/invoice/<token> → /bakso-tini/invoice/<token>
 // yang tak punya route → 404.
 const TENANT_PASSTHROUGH = new Set(['lacak', 'invoice'])
+const STORE_HOST = 'store.webzoka.com'
 
 // Subdomain di bawah ROOT_DOMAIN yang BUKAN tenant: portal sistem + host
 // fungsional platform. `wb` = host builder (admin/order/portal/dst).
@@ -92,6 +93,13 @@ async function refreshPortalSession(req: NextRequest): Promise<NextResponse> {
 
 export async function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? ''
+  const hostname = host.split(':')[0].toLowerCase()
+
+  if (hostname === STORE_HOST && req.nextUrl.pathname === '/') {
+    const destination = new URL('/store', req.url)
+    destination.search = req.nextUrl.search
+    return NextResponse.redirect(destination, 308)
+  }
 
   // Area portal customer: jaga sesi auth tetap segar.
   if (req.nextUrl.pathname.startsWith('/portal')) {
