@@ -1,12 +1,12 @@
 # Webzoka Store V2 — System Architecture Consolidation Plan
 
-Status: S6 implementation complete and stopped at the requested S6 Review Packet gate. S7 QA / launch readiness remains deferred.
+Status: S7 QA / launch-readiness review completed. Canonical Store changes are preview-only; merge, production deployment, DNS, and Public Webzoka redirects remain gated by external launch decisions.
 
 Date: 2026-09-12
 
 ## TASK STATUS
 
-Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, S4 captures a normalized client-only Customize draft, S5 derives a deterministic recommendation with explainable reasons, and S6 now presents a client-only consultation summary with centralized WhatsApp handoff. S7+ remains gated.
+Architecture planning complete and approved in Chat. S1 established the static typed registry and normalized capability taxonomy. S2 migrated Warm Commerce, S3 standardized Store browse/detail/preview, S4 captures a normalized client-only Customize draft, S5 derives a deterministic recommendation with explainable reasons, and S6 now presents a client-only consultation summary with centralized WhatsApp handoff. S7 completed final QA and recorded launch conditions; production cutover remains gated.
 
 ## 1. Approved S0 decisions
 
@@ -731,6 +731,20 @@ S1 changed no UI. Fresh local HTTP smoke covered `/store` plus all five existing
 - Exact browser checks at `1440×900`, `768×900`, and `390×844` found one `h1` and no horizontal overflow in local ready Summary and Preview recovery states. Website, Website + Portal, Bundle, Perlu konsultasi, edit/recompute, refresh restore, missing-number fallback, valid safe-number URL generation, and long-reason wrapping were observed.
 - Fresh validation evidence and browser/preview results are recorded in `docs/webzoka-store-v2-s6-summary-whatsapp-review.md`.
 
+### S7 actual outcome and validation evidence
+
+- S7 stayed within the approved V1 boundary: no merge to `master`/`main`, production deployment, DNS/domain mutation, Public Webzoka redirect activation, new template, checkout, payment, account, backend, CRM, or provisioning feature.
+- Canonical route validation covered 23 HTTP cases: `/store`, six detail routes, six preview routes, six Customize routes, `/store/summary`, and three unknown dynamic slugs. The expected 20 responses returned `200`, the three unknown slugs returned `404`, and every expected `200` response contained exactly one server-rendered `<h1>`.
+- Exact browser coverage used `1440x900`, `768x900`, and `390x844` across `/store`, all six previews, all six Customize routes, and `/store/summary` (42 viewport-route checks). Final checks found no horizontal overflow, missing image alt text, or undersized controls after the responsive fix. Store search/filter, mobile menu, Escape handling, and focus restoration passed.
+- End-to-end browser coverage exercised Warm Commerce → Website, Modern Catalog → Website + Portal, Course Enrollment → Bundle, Trust Profile → Perlu konsultasi, Care Booking, and Easy Booking. Summary edit, recompute, refresh/session restoration, template namespacing, missing WhatsApp configuration, and a temporary local-only valid-number handoff were observed. No production number was committed.
+- Metadata now uses the approved `https://store.webzoka.com` base: browse and detail routes are indexable with canonical URLs; Preview, Customize, and Summary are `noindex, nofollow` and do not expose session data. Unknown Store slugs remain 404. Root `robots.txt` and `sitemap.xml` are not emitted by this app and remain a host/SEO follow-up, not an invented global fix.
+- Bounded launch-readiness fixes include centralized WhatsApp CTA fallback for remaining preview runtimes, Store metadata/canonical/Open Graph/Twitter helpers, the current Next ESLint CLI migration, explicit Turbopack root and Sentry logger configuration, a 44px Care FAQ target, disabled-state styling, and production dependency updates that reduce the production audit to zero findings.
+- Fresh automated evidence: `npm run typecheck` exited 0; focused Store Vitest passed 5 files / 44 tests; `npm run build` exited 0 and generated the Store route families; `git diff --check` passed. `npm run lint` now runs ESLint but exits 1 with 49 errors and 95 warnings across the existing repository; Store-only lint reports three intentional client hydration/session-effect findings in `CustomizeWizard` and `SummaryView`. These remain P2/tooling debt and are not suppressed.
+- Fresh `npm audit --omit=dev --json` reports 0 production vulnerabilities. Full development audit still reports six dev-tool findings, including the existing Vitest/Vite chain; no blind major dependency upgrade was applied.
+- Public Webzoka was inspected only. Its static-export routing remains unchanged; exact future 308 mappings, CTA updates, old-runtime retirement, and sitemap/analytics cutover steps are documented in the S7 review packet but were not activated.
+- S7 verdict is `GO WITH CONDITIONS`: no observed P0/P1 Store runtime blocker remains in Preview/local evidence, but production launch still requires the approved WhatsApp number, `store.webzoka.com` domain/SSL/canonical configuration, a redirect mechanism compatible with the Public Webzoka static export, an explicit lint-debt/CI decision, and post-deploy smoke/rollback approval.
+- Full evidence and the final external-action checklist are recorded in `docs/webzoka-store-v2-s7-launch-readiness-review.md`.
+
 ## 17. V1 deferred scope
 
 Cart, checkout, payment, customer account, AI recommendation, automatic provisioning, real-time availability, full Hub/Portal/LMS/clinic/rental backends, reviews/ratings, persistent lead database, CRM automation, CMS-driven registry, public self-serve pricing engine, live inventory, live scheduling, enrollment confirmation, customer/member portals, and production notification automation remain out of V1 unless separately approved.
@@ -752,7 +766,7 @@ The V1 summary is a client-side consultation brief. It is not an order, booking,
 
 ## EXACT DECISIONS NEEDED FROM CHAT
 
-S0–S5 decisions are approved and recorded. Chat must decide whether to approve the S6 summary presentation, active-draft recovery behavior, and centralized WhatsApp handoff/message before any S7 QA or launch-readiness work. This packet does not authorize S7 work.
+S0–S6 decisions are approved and recorded. Chat must decide whether to accept this S7 `GO WITH CONDITIONS` packet, provide/approve the production WhatsApp number, approve the `store.webzoka.com` domain/canonical plan, choose the Public Webzoka 308 mechanism, and decide whether the existing full-repository lint debt blocks merge. This packet does not authorize merge, production deployment, DNS changes, or redirect activation.
 
 ## GIT STATUS
 
