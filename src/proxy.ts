@@ -32,6 +32,7 @@ const TENANT_PASSTHROUGH = new Set(['lacak', 'invoice'])
 const RESERVED_SUBDOMAINS = new Set([
   'www',
   'wb',
+  'store',
   'stock',
   'lms',
   'clinic',
