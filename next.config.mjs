@@ -31,6 +31,11 @@ const noFrameHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // Keep this worktree's dependency graph as the Turbopack workspace root.
+  // The parent folder also has a lockfile because this repository uses worktrees.
+  turbopack: {
+    root: process.cwd(),
+  },
   // Optimasi gambar (next/image). Host di-whitelist KETAT (bukan '**') supaya
   // optimizer tak jadi proxy terbuka: storage Supabase ekosistem + Unsplash
   // (dipakai aset template default). Host lain → renderer fallback ke <img>
@@ -86,5 +91,9 @@ export default withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  disableLogger: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 })
