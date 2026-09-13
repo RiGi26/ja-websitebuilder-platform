@@ -14,6 +14,15 @@ function rewrittenPath(response: Response) {
 }
 
 describe('proxy host routing', () => {
+  it('redirects the Store host root to the canonical Store path', async () => {
+    const response = await proxy(makeRequest('store.webzoka.com', '/?utm_source=cutover-test&foo=bar'))
+
+    expect(response.status).toBe(308)
+    expect(response.headers.get('location')).toBe(
+      'https://store.webzoka.com/store?utm_source=cutover-test&foo=bar',
+    )
+  })
+
   it.each(['/store', '/store/template/warm-commerce'])('keeps Store paths unchanged on the Store host: %s', async (pathname) => {
     const response = await proxy(makeRequest('store.webzoka.com', pathname))
 
