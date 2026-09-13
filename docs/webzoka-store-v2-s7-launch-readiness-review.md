@@ -1,6 +1,6 @@
 # Webzoka Store V2 — S7 Final QA / Launch Readiness Review
 
-Date: 2026-09-13  
+Date: 2026-09-13
 Scope: canonical Store V2 QA only; Preview/local evidence; no production cutover
 
 ## TASK STATUS
