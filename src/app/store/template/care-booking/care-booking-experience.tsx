@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Manrope, Newsreader } from 'next/font/google'
 import { FormEvent, useState } from 'react'
+import { storeWhatsAppUrl } from '@/lib/store/whatsapp'
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -128,11 +129,12 @@ const initialForm = {
   note: '',
 }
 
-const whatsappHref = 'https://wa.me/?text=Halo%20Ruang%20Pulih%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20dan%20jadwal.'
+const whatsappMessage = 'Halo Ruang Pulih, saya ingin bertanya tentang layanan dan jadwal.'
 
 export function CareBookingExperience({ mode, showPreviewStrip = true }: { mode: Mode; showPreviewStrip?: boolean }) {
   const [form, setForm] = useState(initialForm)
   const [submitted, setSubmitted] = useState(false)
+  const whatsappHref = storeWhatsAppUrl(whatsappMessage)
 
   const updateField = (field: keyof typeof initialForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -294,7 +296,7 @@ export function CareBookingExperience({ mode, showPreviewStrip = true }: { mode:
 
         <section className="cb-final" aria-labelledby="final-title">
           <div><p className="cb-eyebrow">Mulai dengan pertanyaanmu</p><h2 id="final-title">Belum yakin harus mulai dari layanan yang mana?</h2><p>Tanyakan ke admin atau kirim permintaan jadwal. Kamu tidak perlu menebak semuanya sendiri.</p></div>
-          <div className="cb-final-actions"><a className="cb-button cb-button-light" target="_blank" rel="noreferrer" href={whatsappHref}>Hubungi Admin <MessageCircle size={18} aria-hidden="true" /></a><a className="cb-button cb-button-outline" href="#appointment">Ajukan Jadwal <ArrowUpRight size={17} aria-hidden="true" /></a><span>Preview demo: WhatsApp terbuka tanpa nomor tujuan. Pilih kontak sebelum mengirim.</span></div>
+          <div className="cb-final-actions">{whatsappHref ? <a className="cb-button cb-button-light" target="_blank" rel="noreferrer" href={whatsappHref}>Hubungi Admin <MessageCircle size={18} aria-hidden="true" /></a> : <button className="cb-button cb-button-light" type="button" disabled>Hubungi Admin <MessageCircle size={18} aria-hidden="true" /></button>}<a className="cb-button cb-button-outline" href="#appointment">Ajukan Jadwal <ArrowUpRight size={17} aria-hidden="true" /></a><span>{whatsappHref ? 'WhatsApp membuka pesan inquiry yang sudah disiapkan. Periksa kembali isinya sebelum mengirim.' : 'WhatsApp belum dikonfigurasi untuk preview ini. CTA akan aktif setelah NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER tersedia.'}</span></div>
         </section>
       </div>
 

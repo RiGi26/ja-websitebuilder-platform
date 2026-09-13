@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Barlow_Condensed, IBM_Plex_Sans } from 'next/font/google'
 import { type FormEvent, useState } from 'react'
+import { storeWhatsAppUrl } from '@/lib/store/whatsapp'
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -208,6 +209,7 @@ export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode:
   const [menuOpen, setMenuOpen] = useState(false)
 
   const selected = vehicles.find((vehicle) => vehicle.id === selectedId) ?? vehicles[0]
+  const whatsappHref = storeWhatsAppUrl('Halo Ruang Jalan Rental, saya ingin bertanya tentang unit dan tanggal rental.')
   const normalizedQuery = query.trim().toLowerCase()
   const visibleVehicles = vehicles.filter((vehicle) => {
     const categoryMatches = activeCategory === 'Semua' || vehicle.category === activeCategory
@@ -409,7 +411,7 @@ export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode:
           <div className="eb-faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>
         </section>
 
-        <section className="eb-final" aria-labelledby="final-title"><div><p className="eb-eyebrow">Sudah menemukan unit yang cocok?</p><h2 id="final-title">Ajukan tanggal yang kamu inginkan.</h2><p>Admin Ruang Jalan akan membantu mengonfirmasi ketersediaan dan detail rental sebelum ada kesepakatan.</p></div><div className="eb-final-actions"><a className="eb-button eb-button-light" href="#booking">Ajukan Booking <ArrowUpRight size={17} aria-hidden="true" /></a><a className="eb-button eb-button-outline" href="https://wa.me/?text=Halo%20Ruang%20Jalan%20Rental%2C%20saya%20ingin%20bertanya%20tentang%20unit%20dan%20tanggal%20rental." target="_blank" rel="noreferrer">Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></a><span>Kontak WhatsApp di preview perlu diganti dengan nomor bisnis sebelum production.</span></div></section>
+        <section className="eb-final" aria-labelledby="final-title"><div><p className="eb-eyebrow">Sudah menemukan unit yang cocok?</p><h2 id="final-title">Ajukan tanggal yang kamu inginkan.</h2><p>Admin Ruang Jalan akan membantu mengonfirmasi ketersediaan dan detail rental sebelum ada kesepakatan.</p></div><div className="eb-final-actions"><a className="eb-button eb-button-light" href="#booking">Ajukan Booking <ArrowUpRight size={17} aria-hidden="true" /></a>{whatsappHref ? <a className="eb-button eb-button-outline" href={whatsappHref} target="_blank" rel="noreferrer">Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></a> : <button className="eb-button eb-button-outline" type="button" disabled>Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></button>}<span>{whatsappHref ? 'WhatsApp membuka pesan inquiry yang sudah disiapkan. Periksa kembali isinya sebelum mengirim.' : 'WhatsApp belum dikonfigurasi untuk preview ini. CTA akan aktif setelah NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER tersedia.'}</span></div></section>
       </div>
 
       <footer className="eb-footer"><span>Ruang Jalan Rental · Easy Booking prototype</span><Link href="/store"><ArrowLeft size={15} aria-hidden="true" /> Kembali ke Webzoka Store</Link></footer>

@@ -1,11 +1,12 @@
-import type { Metadata } from 'next'
 import SummaryView from '@/app/store/components/SummaryView'
+import { createStoreMetadata } from '@/lib/store/metadata'
 
-export const metadata: Metadata = {
+export const metadata = createStoreMetadata({
   title: 'Ringkasan kebutuhan — Webzoka Store',
   description: 'Tinjau kebutuhan bisnis dan rekomendasi awal sebelum konsultasi dengan Webzoka.',
-  robots: { index: false, follow: false },
-}
+  pathname: '/store/summary',
+  noIndex: true,
+})
 
 export default function StoreSummaryRoute() {
   return <SummaryView />

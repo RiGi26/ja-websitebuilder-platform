@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import StoreTemplateDetailPage from '@/app/store/components/StoreTemplateDetailPage'
+import { createStoreMetadata } from '@/lib/store/metadata'
 import { getStoreTemplateBySlug } from '@/lib/store/templates'
 import { TEMPLATE_SLUGS } from '@/lib/store/types'
 
@@ -14,7 +15,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const template = getStoreTemplateBySlug(slug)
   return template
-    ? { title: `${template.name} — Webzoka Store`, description: template.shortDescription }
+    ? createStoreMetadata({
+        title: `${template.name} — Webzoka Store`,
+        description: template.shortDescription,
+        pathname: template.detailRoute,
+      })
     : {}
 }
 

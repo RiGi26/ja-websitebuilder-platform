@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import CustomizeWizard from '@/app/store/components/CustomizeWizard'
+import { createStoreMetadata } from '@/lib/store/metadata'
 import { getStoreTemplateBySlug } from '@/lib/store/templates'
 import { TEMPLATE_SLUGS } from '@/lib/store/types'
 
@@ -14,10 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const template = getStoreTemplateBySlug(slug)
   return template
-    ? {
+    ? createStoreMetadata({
         title: `Customize ${template.name} — Webzoka Store`,
         description: `Ceritakan kebutuhan bisnismu untuk ${template.name} dalam empat langkah singkat.`,
-      }
+        pathname: template.customizeRoute,
+        noIndex: true,
+      })
     : {}
 }
 
