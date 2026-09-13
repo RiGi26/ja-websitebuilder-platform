@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { useState } from 'react'
+import { storeWhatsAppUrl } from '@/lib/store/whatsapp'
 
 type Category = 'All' | 'Seating' | 'Lighting' | 'Tables' | 'Objects'
 type ProductKind = 'lamp' | 'chair' | 'table' | 'vessel' | 'shelf' | 'stool'
@@ -77,7 +78,7 @@ function ProductObject({ product, compact = false }: { product: Product; compact
 }
 
 function formatWhatsAppMessage(product: Product, variant: string) {
-  return encodeURIComponent(`Hello, I would like to ask about ${product.name} in ${variant}. Please share current availability and delivery options.`)
+  return `Hello, I would like to ask about ${product.name} in ${variant}. Please share current availability and delivery options.`
 }
 
 export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mode: 'detail' | 'preview'; showPreviewStrip?: boolean }) {
@@ -87,6 +88,7 @@ export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mod
   const [selectedVariant, setSelectedVariant] = useState(products[0].variants[0])
 
   const selected = products.find((product) => product.id === selectedId) ?? products[0]
+  const whatsappHref = storeWhatsAppUrl(formatWhatsAppMessage(selected, selectedVariant))
   const normalizedQuery = query.trim().toLowerCase()
   const visibleProducts = products.filter((product) => {
     const categoryMatches = activeCategory === 'All' || product.category === activeCategory
@@ -215,10 +217,16 @@ export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mod
             <legend>Choose a finish</legend>
             <div>{selected.variants.map((variant) => <button className={selectedVariant === variant ? 'is-active' : ''} type="button" key={variant} aria-pressed={selectedVariant === variant} onClick={() => setSelectedVariant(variant)}>{variant}</button>)}</div>
           </fieldset>
-          <a className="mc-primary-action" target="_blank" rel="noreferrer" href={`https://wa.me/?text=${formatWhatsAppMessage(selected, selectedVariant)}`}>
-            Ask via WhatsApp <MessageCircle size={18} aria-hidden="true" />
-          </a>
-          <p className="mc-detail-disclaimer">WhatsApp opens with this item prefilled. Choose the contact before sending; this prototype does not collect or transmit an order.</p>
+          {whatsappHref ? (
+            <a className="mc-primary-action" target="_blank" rel="noreferrer" href={whatsappHref}>
+              Ask via WhatsApp <MessageCircle size={18} aria-hidden="true" />
+            </a>
+          ) : (
+            <button className="mc-primary-action" type="button" disabled>
+              Ask via WhatsApp <MessageCircle size={18} aria-hidden="true" />
+            </button>
+          )}
+          <p className="mc-detail-disclaimer">{whatsappHref ? 'WhatsApp opens with this item prefilled. Check the message before sending; this prototype does not collect or transmit an order.' : 'WhatsApp is not configured for this preview. The inquiry CTA activates after NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER is available.'}</p>
         </div>
       </section>
 
@@ -235,7 +243,7 @@ export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mod
 
       <section className="mc-contact-band" id="contact" aria-labelledby="contact-title">
         <div><p className="mc-eyebrow"><Check size={14} aria-hidden="true" /> Clear before committed</p><h2 id="contact-title">Need dimensions,<br />lead time, or a second look?</h2></div>
-        <div><p>We confirm current availability, finish options, delivery coverage, and final pricing in the conversation. Nothing is reserved by this preview.</p><a className="mc-secondary-action" target="_blank" rel="noreferrer" href={`https://wa.me/?text=${formatWhatsAppMessage(selected, selectedVariant)}`}>Start a WhatsApp inquiry <ArrowUpRight size={18} aria-hidden="true" /></a></div>
+        <div><p>We confirm current availability, finish options, delivery coverage, and final pricing in the conversation. Nothing is reserved by this preview.</p>{whatsappHref ? <a className="mc-secondary-action" target="_blank" rel="noreferrer" href={whatsappHref}>Start a WhatsApp inquiry <ArrowUpRight size={18} aria-hidden="true" /></a> : <button className="mc-secondary-action" type="button" disabled>Start a WhatsApp inquiry <ArrowUpRight size={18} aria-hidden="true" /></button>}</div>
       </section>
 
       <footer className="mc-footer"><span>Obliq Objects · Modern Catalog prototype</span><Link href="/store"><ArrowLeft size={15} aria-hidden="true" /> Back to Webzoka Store</Link></footer>

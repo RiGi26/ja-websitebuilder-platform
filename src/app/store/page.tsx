@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import StoreShell from './components/StoreShell'
 import StoreIndex from './components/StoreIndex'
+import { createStoreMetadata } from '@/lib/store/metadata'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createStoreMetadata({
   title: 'Template Store — Webzoka',
   description: 'Bandingkan enam arah template website Webzoka berdasarkan kategori bisnis dan kebutuhanmu.',
-}
+  pathname: '/store',
+})
 
 function StoreIndexFallback() {
   return (

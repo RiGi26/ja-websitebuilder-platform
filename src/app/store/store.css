@@ -16,6 +16,8 @@
 .wz-store a { color: inherit; text-decoration: none; }
 .wz-store button, .wz-store input { font: inherit; }
 .wz-store button { cursor: pointer; }
+.wz-store button:disabled { cursor: not-allowed; opacity: .58; }
+.wz-store button:disabled:hover { transform: none; }
 .mc-shell { width: min(100%, 1440px); margin: 0 auto; overflow: clip; background: var(--mc-paper); }
 .mc-topbar { min-height: 72px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--mc-line); background: rgba(246,247,251,.94); backdrop-filter: blur(16px); }
 .mc-brand { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; letter-spacing: -.04em; }
@@ -30,7 +32,7 @@
 .mc-hero h1 { max-width: 700px; font-size: clamp(3.5rem, 11vw, 8.3rem); }
 .mc-hero h1 em { color: var(--mc-cobalt); font-weight: inherit; }
 .mc-hero-description { max-width: 430px; margin: 24px 0; color: #3f4554; font-size: 16px; line-height: 1.7; }
-.mc-primary-action, .mc-secondary-action { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 18px; border-radius: 7px; font-size: 14px; font-weight: 760; transition: transform 180ms var(--mc-ease), box-shadow 180ms var(--mc-ease), background 180ms var(--mc-ease); }
+.mc-primary-action, .mc-secondary-action { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 18px; border: 0; border-radius: 7px; font-size: 14px; font-weight: 760; transition: transform 180ms var(--mc-ease), box-shadow 180ms var(--mc-ease), background 180ms var(--mc-ease); }
 .mc-primary-action { background: var(--mc-cobalt); color: white; box-shadow: 0 10px 25px rgba(36,68,216,.25); }
 .mc-primary-action:hover { background: var(--mc-cobalt-deep); box-shadow: 0 14px 32px rgba(36,68,216,.32); transform: translateY(-2px); }
 .mc-primary-action:active, .mc-secondary-action:active { transform: scale(.97); }
@@ -138,7 +140,7 @@
 .cb-brand-mark { width: 32px; height: 32px; display: grid; flex: none; place-items: center; border-radius: 12px 12px 12px 4px; background: var(--cb-ink); color: var(--cb-soft-sage); font-family: var(--font-care-display), Georgia, serif; font-size: 21px; }
 .cb-nav { display: flex; order: 3; width: calc(100% + 8px); min-width: 0; gap: 4px; margin: 0 -4px -4px; overflow-x: auto; padding: 4px; scrollbar-width: none; }
 .cb-nav::-webkit-scrollbar { display: none; }
-.cb-nav a { min-height: 44px; display: inline-flex; flex: none; align-items: center; padding: 8px 12px; border-radius: 999px; color: var(--cb-ink-soft); font-size: 12px; font-weight: 750; white-space: nowrap; }
+.cb-nav a { min-width: 44px; min-height: 44px; display: inline-flex; flex: none; align-items: center; justify-content: center; padding: 8px 12px; border-radius: 999px; color: var(--cb-ink-soft); font-size: 12px; font-weight: 750; white-space: nowrap; }
 .cb-nav a:hover { background: var(--cb-soft-sage); color: var(--cb-ink); }
 .cb-topbar-action { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: var(--cb-sage); font-size: 12px; font-weight: 800; }
 .cb-eyebrow { margin: 0 0 16px; display: flex; align-items: center; gap: 7px; color: var(--cb-sage); font-size: 11px; font-weight: 800; letter-spacing: .14em; line-height: 1.45; text-transform: uppercase; }
