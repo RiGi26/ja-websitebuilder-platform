@@ -35,11 +35,11 @@ export default function StoreCard({ template, featured = false }: { template: St
         </div>
         <div className={styles.actions}>
           <Link className={styles.primaryAction} href={template.detailRoute}>
-            Lihat Template <ArrowUpRight size={16} aria-hidden="true" />
+            Lihat detail <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
           {template.previewStatus === 'preview' && (
             <Link className={styles.previewAction} href={template.previewRoute}>
-              <Eye size={16} aria-hidden="true" /> Preview
+              <Eye size={16} aria-hidden="true" /> Lihat preview
             </Link>
           )}
         </div>

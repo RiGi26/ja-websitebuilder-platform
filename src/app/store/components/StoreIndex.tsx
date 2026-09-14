@@ -48,22 +48,22 @@ export default function StoreIndex() {
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}><Layers3 size={15} aria-hidden="true" /> Webzoka Store</p>
-          <h1>Pilih fondasi website yang sesuai cara bisnismu bekerja.</h1>
+          <h1>Pilih contoh website yang paling cocok untuk usahamu.</h1>
           <p className={styles.heroLede}>
-            Enam arah template untuk menjelaskan produk, layanan, jadwal, program, atau unit rental dengan lebih jelas.
+            Enam contoh website untuk menjelaskan produk, layanan, jadwal, program, atau unit rental dengan lebih jelas.
           </p>
-          <Link className={styles.heroLink} href="#templates">Lihat semua template <ArrowRight size={16} aria-hidden="true" /></Link>
+          <Link className={styles.heroLink} href="#templates">Lihat semua contoh website <ArrowRight size={16} aria-hidden="true" /></Link>
         </div>
         <div className={styles.heroAside} aria-label="Ringkasan Store">
           <span>06</span>
-          <p>arah template</p>
-          <small>Preview tersedia untuk setiap arah. Isi dan alur internal dapat dibahas sesuai scope.</small>
+          <p>contoh website</p>
+          <small>Preview tersedia untuk setiap contoh. Isi dan alur kerja tim dapat dibahas sesuai kebutuhan.</small>
         </div>
       </header>
 
       <section className={styles.discovery} aria-labelledby="discovery-title">
         <div className={styles.sectionHeading}>
-          <p className={styles.eyebrow}><Search size={15} aria-hidden="true" /> Cari arah yang tepat</p>
+          <p className={styles.eyebrow}><Search size={15} aria-hidden="true" /> Pilih yang paling cocok</p>
           <h2 id="discovery-title">Mulai dari kebutuhan yang ingin kamu jelaskan.</h2>
         </div>
 
@@ -100,7 +100,7 @@ export default function StoreIndex() {
         </div>
 
         <div className={styles.filterNote}>
-          <p><SlidersHorizontal size={15} aria-hidden="true" /> Filter kemampuan mencakup kemampuan dasar dan opsi pengembangan yang dicatat di registry.</p>
+          <p><SlidersHorizontal size={15} aria-hidden="true" /> Filter kemampuan mencakup pilihan dasar dan opsi tambahan yang tersedia.</p>
           {hasFilters && <button type="button" onClick={resetFilters}><X size={15} aria-hidden="true" /> Reset filter</button>}
         </div>
       </section>
@@ -112,7 +112,7 @@ export default function StoreIndex() {
               <p className={styles.eyebrow}>Pilihan unggulan</p>
               <h2 id="featured-title">Warm Commerce</h2>
             </div>
-            <p>Direction pilihan untuk bisnis kuliner yang ingin membuat menu dan jalur pesan terasa dekat.</p>
+            <p>Contoh tampilan pilihan untuk bisnis kuliner yang ingin membuat menu dan jalur pesan terasa dekat.</p>
           </div>
           <StoreCard template={featuredTemplate} featured />
         </section>
@@ -121,8 +121,8 @@ export default function StoreIndex() {
       <section className={styles.catalog} id="templates" aria-labelledby="templates-title">
         <div className={styles.sectionHeadingRow}>
           <div>
-            <p className={styles.eyebrow}>Koleksi template</p>
-            <h2 id="templates-title">Enam arah, satu tempat untuk membandingkan.</h2>
+            <p className={styles.eyebrow}>Koleksi contoh website</p>
+            <h2 id="templates-title">Enam contoh website untuk dibandingkan.</h2>
           </div>
           <p id="template-results" role="status" aria-live="polite">
             {filteredTemplates.length} dari {visibleTemplates.length} template tampil
@@ -137,15 +137,15 @@ export default function StoreIndex() {
           <div className={styles.emptyState} role="status" aria-live="polite">
             <Search size={24} aria-hidden="true" />
             <h3>Belum ada template yang cocok.</h3>
-            <p>Coba kata kunci atau filter lain. Reset untuk melihat keenam template lagi.</p>
+            <p>Coba kata kunci atau filter lain. Reset untuk melihat enam contoh website lagi.</p>
             <button type="button" onClick={resetFilters}>Reset pencarian</button>
           </div>
         )}
       </section>
 
       <footer className={styles.footer}>
-        <span>Webzoka Store · Koleksi template</span>
-        <span>Preview demo, bukan checkout atau ketersediaan live.</span>
+        <span>Webzoka Store · Koleksi contoh website</span>
+        <span>Preview demo, bukan halaman pembelian atau jaminan situs live.</span>
       </footer>
     </div>
   )

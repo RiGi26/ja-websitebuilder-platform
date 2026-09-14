@@ -57,7 +57,7 @@ describe('Store S6 summary model and handoff', () => {
       template: { name: 'Warm Commerce', category: 'Kuliner' },
       business: { type: 'Kedai makan rumahan', category: 'Kuliner' },
       customerNeeds: ['Katalog pilihan', 'Permintaan order'],
-      operationalNeeds: ['Tidak perlu dashboard khusus'],
+      operationalNeeds: ['Belum perlu halaman kerja untuk tim'],
       timeline: '1–2 minggu',
       recommendation: { tier: 'website', label: 'Website', price: { display: 'Mulai Rp600.000' } },
     })
@@ -69,17 +69,17 @@ describe('Store S6 summary model and handoff', () => {
       customerNeeds: [],
       operationalMode: 'selected',
       operationalNeeds: ['ops.booking-management', 'ops.inventory'],
-    }).recommendation).toMatchObject({ tier: 'website-portal', label: 'Website + Portal', price: { display: 'Harga menyesuaikan kebutuhan' } })
+    }).recommendation).toMatchObject({ tier: 'website-portal', label: 'Website untuk pelanggan + halaman kerja untuk tim', price: { display: 'Harga menyesuaikan kebutuhan' } })
 
     expect(viewModelFor('course-enrollment', {
       customerNeeds: ['public.catalog', 'account.student-login', 'account.learning-materials'],
-    }).recommendation).toMatchObject({ tier: 'bundle', label: 'Bundle', price: { display: 'Harga menyesuaikan scope' } })
+    }).recommendation).toMatchObject({ tier: 'bundle', label: 'Website + sistem lengkap untuk pelanggan dan tim', price: { display: 'Harga menyesuaikan kebutuhan' } })
 
     expect(viewModelFor('course-enrollment', {
       customerNeeds: [],
       operationalMode: 'unsure',
       uncertainties: ['customer-needs', 'operational-needs'],
-    }).recommendation).toMatchObject({ tier: 'consultation', label: 'Perlu konsultasi', price: { display: 'Scope dibahas saat konsultasi' } })
+    }).recommendation).toMatchObject({ tier: 'consultation', label: 'Perlu konsultasi', price: { display: 'Kebutuhan dibahas saat konsultasi' } })
   })
 
   it('separates account needs and omits unknown readiness fields', () => {
@@ -95,6 +95,20 @@ describe('Store S6 summary model and handoff', () => {
     ])
   })
 
+  it('keeps template-specific readiness labels in the summary', () => {
+    const viewModel = viewModelFor('warm-commerce', {
+      assets: {
+        logo: 'unknown',
+        domain: 'unknown',
+        photos: 'unknown',
+        catalog: 'ready',
+        'business-copy': 'unknown',
+      },
+    })
+
+    expect(viewModel.readiness).toEqual([{ label: 'Menu, daftar harga, atau katalog produk', state: 'Sudah ada' }])
+  })
+
   it('generates concise deterministic WhatsApp content without internal or sensitive fields', () => {
     const viewModel = viewModelFor('warm-commerce', {
       businessArea: 'Bandung dan sekitarnya',
@@ -104,13 +118,13 @@ describe('Store S6 summary model and handoff', () => {
 
     expect(message).toContain('Template: Warm Commerce')
     expect(message).toContain('Bisnis: Kedai makan rumahan (Kuliner)')
-    expect(message).toContain('Kebutuhan customer:')
+    expect(message).toContain('Kebutuhan pelanggan:')
     expect(message).toContain('- Katalog pilihan')
     expect(message).toContain('Timeline: 1–2 minggu')
     expect(message).toContain('Rekomendasi awal: Website')
     expect(message).not.toMatch(/public\.|ops\.|account\.|sessionStorage|@|08\d/)
-    expect(message.indexOf('Template:')).toBeLessThan(message.indexOf('Kebutuhan customer:'))
-    expect(message.indexOf('Kebutuhan customer:')).toBeLessThan(message.indexOf('Timeline:'))
+    expect(message.indexOf('Template:')).toBeLessThan(message.indexOf('Kebutuhan pelanggan:'))
+    expect(message.indexOf('Kebutuhan pelanggan:')).toBeLessThan(message.indexOf('Timeline:'))
     expect(message.indexOf('Timeline:')).toBeLessThan(message.indexOf('Rekomendasi awal:'))
     expect(message).toBe(buildSummaryWhatsAppMessage(viewModel))
   })

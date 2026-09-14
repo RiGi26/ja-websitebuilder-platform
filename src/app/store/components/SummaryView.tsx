@@ -73,12 +73,12 @@ function recoveryCopy(reason: Exclude<SummaryResolution, { status: 'ready' }>['r
   if (reason === 'incomplete-draft') {
     return {
       title: 'Ringkasan belum siap.',
-      body: 'Selesaikan empat langkah Customize dulu agar kebutuhan dan rekomendasi bisa dirangkum dengan benar.',
+      body: 'Selesaikan empat langkah pertanyaan dulu agar kebutuhan dan rekomendasi bisa dirangkum dengan benar.',
     }
   }
   return {
     title: 'Belum ada draft Customize.',
-    body: 'Mulai dari satu template, lalu ceritakan kebutuhan bisnismu. Jawaban tidak perlu dikirim atau disimpan ke akun.',
+    body: 'Ringkasan hanya tersedia setelah kamu menyelesaikan pertanyaan di sesi browser ini. Mulai dari satu contoh website, lalu ceritakan kebutuhan bisnismu.',
   }
 }
 
@@ -135,10 +135,10 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
   }
 
   const unavailableReason = handoff.messageError
-    ? 'Pesan konsultasi belum dapat dibuat. Coba kembali ke Customize atau mulai lagi.'
+    ? 'Pesan konsultasi belum dapat dibuat. Coba kembali ke pertanyaan atau mulai lagi.'
     : handoff.link.status === 'invalid-number'
-      ? 'Nomor tujuan WhatsApp di preview belum valid. CTA akan aktif setelah konfigurasi diperbaiki.'
-      : 'WhatsApp belum dikonfigurasi untuk preview ini. CTA akan aktif setelah nomor tujuan tersedia.'
+      ? 'Nomor tujuan WhatsApp di Preview belum tersedia. Tombol akan aktif setelah tujuan konsultasi tersedia.'
+      : 'WhatsApp belum tersedia di Preview. Tombol akan aktif setelah tujuan konsultasi tersedia.'
 
   return (
     <div className={styles.page} data-summary-status="ready" data-recommendation-tier={viewModel.recommendation.tier}>
@@ -155,7 +155,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
         <header className={styles.intro}>
           <p className={styles.eyebrow}>Ringkasan kebutuhan</p>
           <h1>Kebutuhanmu sudah siap dibawa ke konsultasi.</h1>
-          <p>Ini adalah rangkuman dari jawaban Customize dan rekomendasi awal. Scope, harga final, dan langkah pengerjaan dibahas bersama tim Webzoka.</p>
+          <p>Ini adalah rangkuman dari jawabanmu dan rekomendasi awal. Cakupan pekerjaan, harga final, dan langkah pengerjaan dibahas bersama tim Webzoka.</p>
         </header>
 
         <section className={styles.templateCard} aria-labelledby="selected-template-title">
@@ -167,7 +167,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
             <p>{viewModel.template.description}</p>
           </div>
           <Link className={styles.templateLink} href={viewModel.template.detailRoute}>
-            Lihat template <ArrowUpRight size={15} aria-hidden="true" />
+            Lihat contoh website <ArrowUpRight size={15} aria-hidden="true" />
           </Link>
         </section>
 
@@ -187,7 +187,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
             <p>{viewModel.recommendation.price.note}</p>
           </div>
           {viewModel.recommendation.requiresConsultation ? (
-            <p className={styles.consultationNote}><CircleHelp size={17} aria-hidden="true" /> Perlu konsultasi adalah hasil yang diharapkan ketika scope belum cukup jelas. Tim akan membantu memeriksa kebutuhanmu.</p>
+            <p className={styles.consultationNote}><CircleHelp size={17} aria-hidden="true" /> Perlu konsultasi muncul saat beberapa kebutuhan belum cukup jelas. Tim Webzoka akan membahasnya bersamamu sebelum pekerjaan dimulai.</p>
           ) : null}
         </section>
 
@@ -202,7 +202,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
             </div>
           </DetailSection>
 
-          <DetailSection id="customer-needs-title" title="Kebutuhan customer">
+          <DetailSection id="customer-needs-title" title="Kebutuhan pelanggan">
             <SectionList items={viewModel.customerNeeds} />
           </DetailSection>
 
@@ -216,7 +216,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
             </DetailSection>
           ) : null}
 
-          <DetailSection id="readiness-title" title="Kesiapan project">
+          <DetailSection id="readiness-title" title="Kesiapan bisnis">
             <ReadinessList items={viewModel.readiness} />
             <div className={styles.timelineRow}><Clock3 size={18} aria-hidden="true" /><div><span>Timeline pilihan</span><strong>{viewModel.timeline}</strong></div></div>
           </DetailSection>
@@ -227,7 +227,7 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
           <div className={styles.handoffCopy}>
             <p className={styles.eyebrow}>Langkah berikutnya</p>
             <h2 id="handoff-title">Bawa ringkasan ini ke percakapan yang tepat.</h2>
-            <p>Pesan WhatsApp hanya berisi konteks konsultasi di atas. Store tidak meminta nama, nomor telepon, email, atau data pribadi lain.</p>
+            <p>Rekomendasi ini masih awal. Kirim ringkasan ke WhatsApp untuk membahas kebutuhan dan langkah berikutnya. Mengklik tombol tidak berarti kamu membeli atau membayar apa pun.</p>
             {handoff.link.available && handoff.link.href ? (
               <a className={styles.primaryAction} href={handoff.link.href} target="_blank" rel="noopener noreferrer">
                 Konsultasikan via WhatsApp <ArrowUpRight size={17} aria-hidden="true" />
@@ -265,7 +265,7 @@ function SummaryRecovery({ resolution }: { resolution: Extract<SummaryResolution
           <p>{copy.body}</p>
           <div className={styles.recoveryActions}>
             <Link className={styles.primaryAction} href="/store#templates">Mulai lagi <ArrowRight size={17} aria-hidden="true" /></Link>
-            {resolution.customizeRoute ? <Link className={styles.secondaryAction} href={resolution.customizeRoute}>Lanjutkan Customize <ArrowRight size={16} aria-hidden="true" /></Link> : null}
+            {resolution.customizeRoute ? <Link className={styles.secondaryAction} href={resolution.customizeRoute}>Lanjutkan pertanyaan <ArrowRight size={16} aria-hidden="true" /></Link> : null}
           </div>
         </section>
       </div>

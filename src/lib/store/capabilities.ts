@@ -19,8 +19,8 @@ export const STORE_INTENT_FILTERS = [
 ] as const satisfies ReadonlyArray<{ id: CapabilityDefinition['id']; label: string }>
 
 export const CAPABILITY_GROUP_LABELS = {
-  public: 'Public-facing',
-  operational: 'Operasional / admin',
+  public: 'Untuk pelanggan',
+  operational: 'Untuk tim',
   account: 'Akun / member',
 } as const satisfies Record<CapabilityGroup, string>
 
@@ -153,9 +153,9 @@ export const CAPABILITY_TAXONOMY = {
   },
   'ops.inquiry-follow-up': {
     id: 'ops.inquiry-follow-up',
-    label: 'Tindak lanjuti inquiry',
+    label: 'Kelola dan tindak lanjuti permintaan pelanggan',
     group: 'operational',
-    description: 'Atur tindak lanjut pertanyaan, lead, atau permintaan masuk.',
+    description: 'Kelola pertanyaan, calon pelanggan, atau permintaan yang masuk.',
   },
   'ops.practitioner-management': {
     id: 'ops.practitioner-management',
@@ -185,19 +185,19 @@ export const CAPABILITY_TAXONOMY = {
     id: 'ops.payment-management',
     label: 'Kelola pembayaran',
     group: 'operational',
-    description: 'Kelola pembayaran dan status transaksi sesuai scope.',
+    description: 'Kelola pembayaran dan status transaksi sesuai kebutuhan yang disepakati.',
   },
   'ops.internal-users': {
     id: 'ops.internal-users',
-    label: 'Akses pengguna internal',
+    label: 'Akses khusus untuk tim atau karyawan',
     group: 'operational',
-    description: 'Atur akses tim internal ke area operasional.',
+    description: 'Atur siapa di tim yang dapat membuka halaman kerja.',
   },
   'ops.admin-dashboard': {
     id: 'ops.admin-dashboard',
-    label: 'Dashboard admin',
+    label: 'Halaman untuk mengelola operasional',
     group: 'operational',
-    description: 'Pantau pekerjaan operasional melalui dashboard admin.',
+    description: 'Pantau pekerjaan tim dari satu halaman kerja.',
   },
   'account.customer-login': {
     id: 'account.customer-login',
@@ -253,17 +253,17 @@ export const RECOMMENDATION_TIERS = {
   website: {
     id: 'website',
     label: 'Website',
-    definition: 'Kebutuhan public-facing saja.',
+    definition: 'Kebutuhan untuk pelanggan saja.',
   },
   'website-portal': {
     id: 'website-portal',
-    label: 'Website + Portal',
-    definition: 'Website ditambah sistem operasional internal atau admin.',
+    label: 'Website untuk pelanggan + halaman kerja untuk tim',
+    definition: 'Website untuk pelanggan ditambah halaman kerja untuk tim.',
   },
   bundle: {
     id: 'bundle',
-    label: 'Bundle',
-    definition: 'Website, portal internal, dan login atau alur customer/member.',
+    label: 'Website + sistem lengkap untuk pelanggan dan tim',
+    definition: 'Website, halaman kerja tim, dan alur akun atau member yang saling terhubung.',
   },
   consultation: {
     id: 'consultation',
@@ -274,8 +274,8 @@ export const RECOMMENDATION_TIERS = {
 
 export const RECOMMENDATION_TIER_LABELS = {
   website: 'Website',
-  'website-portal': 'Website + Portal',
-  bundle: 'Bundle',
+  'website-portal': 'Website untuk pelanggan + halaman kerja untuk tim',
+  bundle: 'Website + sistem lengkap untuk pelanggan dan tim',
   consultation: 'Perlu konsultasi',
 } as const satisfies Record<RecommendationTier, string>
 
@@ -289,11 +289,11 @@ export const V1_PRICE_PRESENTATION = {
   websitePortal: {
     displayMode: 'consultation',
     display: 'Harga menyesuaikan kebutuhan',
-    note: 'Portal operasional ditentukan dari alur kerja dan kebutuhan tim.',
+    note: 'Halaman kerja tim ditentukan dari alur kerja dan kebutuhan tim.',
   },
   bundle: {
     displayMode: 'consultation',
-    display: 'Harga menyesuaikan scope',
-    note: 'Bundle ditentukan dari portal internal dan alur akun atau member yang dibutuhkan.',
+    display: 'Harga menyesuaikan kebutuhan',
+    note: 'Sistem lengkap ditentukan dari alur kerja dan akun atau member yang dibutuhkan.',
   },
 } as const satisfies PricePresentation

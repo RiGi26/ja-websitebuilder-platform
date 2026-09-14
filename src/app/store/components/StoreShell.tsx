@@ -11,11 +11,11 @@ import styles from './StoreShell.module.css'
 
 const storeNav = [
   { label: 'Store', href: '/store' },
-  { label: 'Koleksi template', href: '/store#templates' },
+  { label: 'Koleksi contoh website', href: '/store#templates' },
 ]
 
 const consultationUrl = storeWhatsAppUrl(
-  'Halo Webzoka, saya ingin konsultasi memilih template dan fondasi website untuk bisnis saya.',
+  'Halo Webzoka, saya ingin konsultasi memilih contoh website dan kebutuhan sistem untuk bisnis saya.',
 )
 
 function StoreNavigation({ onNavigate }: { onNavigate?: () => void }) {
@@ -23,7 +23,7 @@ function StoreNavigation({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <nav className={styles.navigation} aria-label="Navigasi Webzoka Store">
-      <p className={styles.navLabel}>Belanja berdasarkan kebutuhan</p>
+      <p className={styles.navLabel}>Pilih berdasarkan kebutuhan</p>
       {storeNav.map((item) => {
         const active = item.href === '/store'
           ? pathname === '/store'
@@ -80,7 +80,7 @@ function StoreUtilities({ onNavigate }: { onNavigate?: () => void }) {
         </a>
       ) : (
         <span className={styles.unavailableUtility} role="status">
-          <MessageCircle size={15} aria-hidden="true" /> WhatsApp belum dikonfigurasi
+          <MessageCircle size={15} aria-hidden="true" /> WhatsApp belum tersedia di Preview
         </span>
       )}
     </div>
