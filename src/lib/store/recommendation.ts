@@ -32,23 +32,23 @@ const CONNECTED_CUSTOMER_FLOWS: ReadonlySet<CapabilityId> = new Set([
 ])
 
 const CONSULTATION_SUMMARIES: Record<RecommendationConsultationCode, string> = {
-  'invalid-draft': 'Jawaban inti belum lengkap atau perlu diperiksa lagi sebelum scope ditentukan.',
+  'invalid-draft': 'Jawaban inti belum lengkap atau perlu diperiksa lagi sebelum kebutuhan ditentukan.',
   'template-mismatch': 'Pilihan template dan jawaban kebutuhanmu belum berada dalam satu arah yang jelas.',
-  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, portal operasional, atau alur customer yang terhubung.',
+  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, halaman kerja untuk tim, atau alur pelanggan yang terhubung.',
   'contradictory-selections': 'Beberapa pilihan kebutuhanmu belum konsisten.',
   'empty-needs': 'Belum ada kebutuhan utama yang cukup jelas untuk menentukan solusi.',
-  'ambiguous-account': 'Kebutuhan login belum menunjukkan alur customer, member, atau siswa yang jelas.',
+  'ambiguous-account': 'Kebutuhan login belum menunjukkan alur pelanggan, member, atau siswa yang jelas.',
   'unsupported-capability': 'Ada kebutuhan yang belum cocok dengan pilihan template ini.',
 }
 
 const CONSULTATION_REASONS: Record<RecommendationConsultationCode, string> = {
   'invalid-draft': 'Jawaban inti belum lengkap, jadi rekomendasi belum bisa ditentukan dengan aman.',
   'template-mismatch': 'Pilihan template dan kebutuhanmu belum berada dalam satu arah yang jelas. Konsultasi akan membantu memastikan pilihan yang paling tepat.',
-  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, portal operasional, atau alur customer yang terhubung.',
-  'contradictory-selections': 'Pilihan kebutuhan publik dan operasionalmu belum konsisten, jadi scope perlu diklarifikasi sebelum solusi ditentukan.',
+  'uncertain-needs': 'Beberapa kebutuhan utama masih belum cukup jelas untuk menentukan apakah kamu membutuhkan website saja, halaman kerja untuk tim, atau alur pelanggan yang terhubung.',
+  'contradictory-selections': 'Pilihan kebutuhan untuk pelanggan dan tim belum konsisten, jadi kebutuhan perlu diklarifikasi sebelum solusi ditentukan.',
   'empty-needs': 'Belum ada kebutuhan utama yang cukup jelas untuk menentukan solusi secara bertanggung jawab. Konsultasi akan membantu memulai dari prioritas bisnis.',
-  'ambiguous-account': 'Kebutuhan login yang dipilih belum menunjukkan alur customer, member, atau siswa yang jelas. Konsultasi akan membantu memastikan kebutuhan yang tepat.',
-  'unsupported-capability': 'Ada kebutuhan yang belum cocok dengan pilihan template ini. Konsultasi akan membantu menentukan scope yang tepat.',
+  'ambiguous-account': 'Kebutuhan login yang dipilih belum menunjukkan alur pelanggan, member, atau siswa yang jelas. Konsultasi akan membantu memastikan kebutuhan yang tepat.',
+  'unsupported-capability': 'Ada kebutuhan yang belum cocok dengan pilihan template ini. Konsultasi akan membantu menentukan kebutuhan yang tepat.',
 }
 
 function emptyEvidence(): RecommendationEvidence {
@@ -72,10 +72,10 @@ function resultFor(
     summary: consultationCode
       ? CONSULTATION_SUMMARIES[consultationCode]
       : tier === 'website'
-        ? 'Website publik untuk memperkenalkan bisnis dan membantu customer mengambil langkah berikutnya.'
+        ? 'Website untuk pelanggan yang memperkenalkan bisnis dan membantu mereka mengambil langkah berikutnya.'
         : tier === 'website-portal'
-          ? 'Website dengan portal operasional untuk membantu tim mengelola pekerjaan di belakang layar.'
-          : 'Website, portal, dan alur customer atau member yang saling terhubung.',
+          ? 'Website untuk pelanggan dengan halaman kerja untuk membantu tim mengelola pekerjaan di belakang layar.'
+          : 'Website, sistem kerja tim, dan alur pelanggan atau member yang saling terhubung.',
     reasons,
     evidence,
     templateSlug: template.slug,
@@ -249,7 +249,7 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
         template,
         'bundle',
         evidence,
-        ['Kamu membutuhkan login customer, member, atau siswa yang terhubung dengan alur layanan, sehingga website dan portal perlu berjalan dalam satu alur.'],
+        ['Kamu membutuhkan login pelanggan, member, atau siswa yang terhubung dengan alur layanan, sehingga website dan sistem kerja tim perlu berjalan dalam satu alur.'],
       )
     }
 
@@ -262,7 +262,7 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
       template,
       'bundle',
       evidence,
-      ['Kamu membutuhkan area customer, member, atau siswa yang menyimpan alur dan statusnya, sehingga website dan portal perlu saling terhubung.'],
+      ['Kamu membutuhkan area pelanggan, member, atau siswa yang menyimpan alur dan statusnya, sehingga website dan sistem kerja tim perlu saling terhubung.'],
     )
   }
 
@@ -271,7 +271,7 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
       template,
       'website-portal',
       evidence,
-      [`Kamu memilih kebutuhan ${formatOperationalList(evidence.operationalCapabilities)}, sehingga dibutuhkan dashboard operasional selain website.`],
+      [`Kamu memilih kebutuhan ${formatOperationalList(evidence.operationalCapabilities)}, sehingga dibutuhkan halaman kerja tim selain website.`],
     )
   }
 
@@ -279,6 +279,6 @@ export function recommendStoreSolution(draft: CustomizeDraft, template: StoreTem
     template,
     'website',
     evidence,
-    [`Kebutuhanmu masih berfokus pada ${formatCapabilityList(evidence.publicCapabilities)}, tanpa dashboard operasional, sehingga website publik menjadi pilihan yang tepat.`],
+    [`Kebutuhanmu masih berfokus pada ${formatCapabilityList(evidence.publicCapabilities)}, tanpa kebutuhan halaman kerja tim, sehingga website untuk pelanggan menjadi pilihan yang tepat.`],
   )
 }

@@ -282,7 +282,7 @@ export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode:
               <a className="eb-button eb-button-primary" href="#unit">Lihat Unit <ChevronRight size={18} aria-hidden="true" /></a>
               <a className="eb-button eb-button-quiet" href="#cara-rental">Cara Rental <ArrowUpRight size={17} aria-hidden="true" /></a>
             </div>
-            <p className="eb-hero-note"><ShieldCheck size={16} aria-hidden="true" /> Preview ini membantu mengirim inquiry. Ketersediaan unit tidak ditampilkan secara live.</p>
+            <p className="eb-hero-note"><ShieldCheck size={16} aria-hidden="true" /> Preview ini membantu mengirim permintaan booking. Ketersediaan unit tidak ditampilkan secara live.</p>
           </div>
           <div className="eb-hero-visual-wrap">
             <div className="eb-hero-visual-top"><span>UNIT 01 / 06</span><span>RUTE HARIAN</span></div>
@@ -407,11 +407,11 @@ export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode:
         </section>
 
         <section className="eb-faq" id="faq" aria-labelledby="faq-title">
-          <div className="eb-section-heading"><div><p className="eb-eyebrow"><CircleHelp size={15} aria-hidden="true" /> Pertanyaan umum</p><h2 id="faq-title">Sebelum mengirim request.</h2></div><p>Jawaban singkat untuk membantu pengunjung memahami batas antara inquiry dan konfirmasi rental.</p></div>
+          <div className="eb-section-heading"><div><p className="eb-eyebrow"><CircleHelp size={15} aria-hidden="true" /> Pertanyaan umum</p><h2 id="faq-title">Sebelum mengirim permintaan.</h2></div><p>Jawaban singkat untuk membantu pengunjung memahami batas antara permintaan dan konfirmasi rental.</p></div>
           <div className="eb-faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>
         </section>
 
-        <section className="eb-final" aria-labelledby="final-title"><div><p className="eb-eyebrow">Sudah menemukan unit yang cocok?</p><h2 id="final-title">Ajukan tanggal yang kamu inginkan.</h2><p>Admin Ruang Jalan akan membantu mengonfirmasi ketersediaan dan detail rental sebelum ada kesepakatan.</p></div><div className="eb-final-actions"><a className="eb-button eb-button-light" href="#booking">Ajukan Booking <ArrowUpRight size={17} aria-hidden="true" /></a>{whatsappHref ? <a className="eb-button eb-button-outline" href={whatsappHref} target="_blank" rel="noreferrer">Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></a> : <button className="eb-button eb-button-outline" type="button" disabled>Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></button>}<span>{whatsappHref ? 'WhatsApp membuka pesan inquiry yang sudah disiapkan. Periksa kembali isinya sebelum mengirim.' : 'WhatsApp belum dikonfigurasi untuk preview ini. CTA akan aktif setelah NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER tersedia.'}</span></div></section>
+        <section className="eb-final" aria-labelledby="final-title"><div><p className="eb-eyebrow">Sudah menemukan unit yang cocok?</p><h2 id="final-title">Ajukan tanggal yang kamu inginkan.</h2><p>Admin Ruang Jalan akan membantu mengonfirmasi ketersediaan dan detail rental sebelum ada kesepakatan.</p></div><div className="eb-final-actions"><a className="eb-button eb-button-light" href="#booking">Ajukan Booking <ArrowUpRight size={17} aria-hidden="true" /></a>{whatsappHref ? <a className="eb-button eb-button-outline" href={whatsappHref} target="_blank" rel="noreferrer">Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></a> : <button className="eb-button eb-button-outline" type="button" disabled>Hubungi Admin <MessageCircle size={17} aria-hidden="true" /></button>}<span>{whatsappHref ? 'WhatsApp membuka pesan permintaan booking yang sudah disiapkan. Periksa kembali isinya sebelum mengirim.' : 'WhatsApp belum tersedia untuk preview ini. Tombol akan aktif setelah tujuan konsultasi tersedia.'}</span></div></section>
       </div>
 
       <footer className="eb-footer"><span>Ruang Jalan Rental · Easy Booking prototype</span><Link href="/store"><ArrowLeft size={15} aria-hidden="true" /> Kembali ke Webzoka Store</Link></footer>

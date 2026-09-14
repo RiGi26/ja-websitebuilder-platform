@@ -7,6 +7,7 @@ import {
   readActiveCustomizeTemplate,
   TIMELINE_OPTIONS,
   customizeStorageKey,
+  getCustomizeConfig,
   type CustomizeStorage,
 } from './customize'
 import { CAPABILITY_TAXONOMY, RECOMMENDATION_TIERS, V1_PRICE_PRESENTATION } from './capabilities'
@@ -95,8 +96,8 @@ const CATEGORY_LABELS = Object.fromEntries(
 ) as Record<CustomizeDraft['businessCategory'], string>
 
 const CONSULTATION_PRICE = {
-  display: 'Scope dibahas saat konsultasi',
-  note: 'Kebutuhan yang belum jelas dibahas bersama sebelum scope ditentukan.',
+  display: 'Kebutuhan dibahas saat konsultasi',
+  note: 'Kebutuhan yang belum jelas dibahas bersama sebelum pekerjaan ditentukan.',
 } as const
 
 function priceForTier(tier: RecommendationTier): PricePresentation['website'] | PricePresentation['websitePortal'] | PricePresentation['bundle'] | typeof CONSULTATION_PRICE {
@@ -117,7 +118,7 @@ function safeRecommendation(draft: CustomizeDraft, template: StoreTemplate): Rec
     return {
       tier: 'consultation',
       label: RECOMMENDATION_TIERS.consultation.label,
-      summary: 'Jawabanmu perlu dibahas bersama sebelum scope ditentukan.',
+      summary: 'Jawabanmu perlu dibahas bersama sebelum kebutuhan ditentukan.',
       reasons: ['Rekomendasi awal belum dapat dihitung dengan aman, jadi konsultasi menjadi langkah berikutnya.'],
       evidence: { publicCapabilities: [], operationalCapabilities: [], accountCapabilities: [] },
       templateSlug: template.slug,
@@ -136,10 +137,11 @@ export function buildSummaryViewModel(
   template: StoreTemplate,
   recommendation: RecommendationResult = safeRecommendation(draft, template),
 ): SummaryViewModel {
+  const customizeConfig = getCustomizeConfig(template)
   const publicNeeds = draft.customerNeeds.filter((id) => CAPABILITY_TAXONOMY[id].group === 'public')
   const accountNeeds = draft.customerNeeds.filter((id) => CAPABILITY_TAXONOMY[id].group === 'account')
   const operationalNeeds = draft.operationalMode === 'none'
-    ? ['Tidak perlu dashboard khusus']
+    ? ['Belum perlu halaman kerja untuk tim']
     : draft.operationalMode === 'unsure'
       ? ['Belum yakin']
       : normalizeList(capabilityLabels(draft.operationalNeeds), 'Belum dipilih')
@@ -154,7 +156,7 @@ export function buildSummaryViewModel(
           : asset === 'photos'
             ? 'Foto / visual'
             : asset === 'catalog'
-              ? 'Daftar isi bisnis'
+              ? customizeConfig.catalogAssetLabel
               : 'Teks profil dan cerita bisnis',
       state: READINESS_STATE_LABELS[state as Exclude<typeof state, 'unknown'>],
     }))
@@ -210,7 +212,7 @@ export function buildSummaryWhatsAppMessage(viewModel: SummaryViewModel): string
     `Bisnis: ${compactMessageText(viewModel.business.type, 120)} (${compactMessageText(viewModel.business.category, 60)})`,
   ]
 
-  appendSection(lines, 'Kebutuhan customer', viewModel.customerNeeds)
+  appendSection(lines, 'Kebutuhan pelanggan', viewModel.customerNeeds)
   appendSection(lines, 'Kebutuhan operasional', viewModel.operationalNeeds)
   appendSection(lines, 'Kebutuhan akun/member', viewModel.accountNeeds)
   appendSection(lines, 'Kesiapan', viewModel.readiness.map((item) => `${item.label}: ${item.state}`))
@@ -219,12 +221,12 @@ export function buildSummaryWhatsAppMessage(viewModel: SummaryViewModel): string
 
   const reasons = viewModel.recommendation.reasons.slice(0, 2).map((reason) => compactMessageText(reason, 240)).filter(Boolean)
   if (reasons.length > 0) lines.push(`Alasan: ${reasons.join(' ')}`)
-  lines.push('', 'Saya ingin diskusi scope dan langkah berikutnya.')
+  lines.push('', 'Saya ingin membahas kebutuhan dan langkah berikutnya.')
 
   let message = lines.join('\n')
   if (message.length <= MAX_WHATSAPP_MESSAGE_LENGTH) return message
 
-  const closing = '\n\nSaya ingin diskusi scope dan langkah berikutnya.'
+  const closing = '\n\nSaya ingin membahas kebutuhan dan langkah berikutnya.'
   const shortened = `${message.slice(0, MAX_WHATSAPP_MESSAGE_LENGTH - closing.length - 1).trimEnd()}…${closing}`
   return shortened
 }
