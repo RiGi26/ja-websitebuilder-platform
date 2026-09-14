@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, Menu, MessageCircle, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -47,8 +48,14 @@ function BrandBlock() {
   return (
     <div className={styles.brandBlock}>
       <Link href="/store" className={styles.brand} aria-label="Webzoka Store, kembali ke halaman Store">
-        <span className={styles.brandMark} aria-hidden="true">W</span>
-        <span className={styles.brandName}>Webzoka</span>
+        <Image
+          className={styles.brandLogo}
+          src="/images/logo-wide-clean.png"
+          alt="Webzoka"
+          width={170}
+          height={56}
+          priority
+        />
       </Link>
       <span>Store</span>
       <p>Pilih bentuk bisnisnya dulu. Kami bantu menerjemahkan kebutuhanmu setelahnya.</p>
@@ -140,8 +147,14 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
       <header className={styles.mobileHeader}>
         <div className={styles.mobileHeaderInner}>
           <Link href="/store" className={styles.mobileBrand} aria-label="Webzoka Store, kembali ke halaman Store">
-            <span className={styles.brandMark} aria-hidden="true">W</span>
-            <span className={styles.brandName}>Webzoka</span>
+            <Image
+              className={styles.mobileBrandLogo}
+              src="/images/logo-wide-clean.png"
+              alt="Webzoka"
+              width={142}
+              height={43}
+              priority
+            />
             <span>Store</span>
           </Link>
           {!open && (
@@ -150,7 +163,7 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
               type="button"
               className={styles.menuButton}
               aria-label="Buka menu Store"
-              aria-expanded="false"
+              aria-expanded={open}
               aria-controls="store-mobile-drawer"
               onClick={() => setOpen(true)}
             >

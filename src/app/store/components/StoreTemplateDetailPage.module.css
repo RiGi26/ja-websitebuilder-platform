@@ -1,6 +1,6 @@
 .page { min-width: 0; overflow: hidden; }
 .container { width: min(100%, 1120px); margin: 0 auto; padding-inline: 32px; }
-.hero { padding: 32px 0 72px; border-bottom: 1px solid var(--store-line); background: linear-gradient(135deg, rgba(255,255,255,.86), rgba(235,239,255,.64)); }
+.hero { padding: 32px 0 72px; border-bottom: 1px solid var(--store-line); background: linear-gradient(135deg, #fff, #f7f9ff); }
 .breadcrumb { min-height: 44px; display: flex; align-items: center; gap: 8px; color: var(--store-soft); font-size: 12px; }
 .breadcrumb a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--store-blue); font-weight: 800; }
 .breadcrumb a:hover { color: #163c9d; }
@@ -36,7 +36,7 @@
 .visualOverlay span { font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .visualOverlay strong { font-family: var(--font-warm-display), Georgia, serif; font-size: 22px; font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
 .section { padding: 72px 0; }
-.altSection { background: #eef1f8; }
+.altSection { background: #f7f9fc; }
 .sectionHeading { max-width: 780px; }
 .sectionHeading h2, .finalCta h2 { font-size: clamp(2.6rem, 6vw, 5.2rem); }
 .bodyCopy, .headingCopy { color: var(--store-soft); font-size: 14px; line-height: 1.65; }
@@ -68,7 +68,9 @@
   .container { padding-inline: 16px; }
   .hero { padding-top: 16px; padding-bottom: 48px; }
   .heroGrid { grid-template-columns: 1fr; gap: 32px; padding-top: 28px; }
-  .hero h1 { font-size: clamp(3rem, 16vw, 5.4rem); }
+  .hero h1 { font-size: clamp(2.85rem, 14vw, 5.4rem); }
+  .positioning { margin-top: 20px; font-size: 18px; }
+  .lede { font-size: 14px; }
   .heroVisual { min-height: 300px; border-radius: 22px; }
   .visualOverlay { right: 12px; bottom: 12px; left: 12px; }
   .visualOverlay strong { font-size: 18px; }

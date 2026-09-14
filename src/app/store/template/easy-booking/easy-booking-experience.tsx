@@ -246,7 +246,7 @@ export function EasyBookingExperience({ mode, showPreviewStrip = true }: { mode:
       <a className="eb-skip-link" href="#easy-booking-main">Lewati ke konten</a>
       {mode === 'preview' && showPreviewStrip && (
         <div className="eb-preview-strip">
-          <span>Webzoka Store V2 · Easy Booking preview</span>
+          <span>Webzoka Store · Easy Booking preview</span>
           <Link href="/store/template/easy-booking">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>
         </div>
       )}

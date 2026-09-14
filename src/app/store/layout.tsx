@@ -28,7 +28,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: STORE_METADATA_BASE,
   ...createStoreMetadata({
-    title: 'Webzoka Store V2',
+    title: 'Webzoka Store',
     description: 'A focused collection of website template directions from Webzoka.',
     pathname: '/store',
   }),

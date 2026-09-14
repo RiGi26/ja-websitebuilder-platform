@@ -1,11 +1,11 @@
 .page {
   --summary-ink: #17232a;
   --summary-soft: #56636a;
-  --summary-paper: #f6f3ee;
+  --summary-paper: #ffffff;
   --summary-surface: #fff;
-  --summary-line: #d8d4cb;
-  --summary-blue: #2457d6;
-  --summary-blue-soft: #e8eeff;
+  --summary-line: #dbe2ea;
+  --summary-blue: #0071e3;
+  --summary-blue-soft: #eaf3ff;
   min-height: 100dvh;
   overflow-x: hidden;
   color: var(--summary-ink);
@@ -52,7 +52,7 @@
 .sectionHeading .eyebrow { color: var(--summary-soft); font-size: 10px; }
 .detailSection h2 { margin: 8px 0 0; font-family: var(--font-warm-display), Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: -.045em; line-height: 1; }
 .contextGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
-.contextGrid > div, .readinessItem { min-width: 0; display: grid; gap: 6px; padding: 14px; border: 1px solid var(--summary-line); border-radius: 14px; background: rgba(246,243,238,.55); }
+.contextGrid > div, .readinessItem { min-width: 0; display: grid; gap: 6px; padding: 14px; border: 1px solid var(--summary-line); border-radius: 14px; background: #f7f9fc; }
 .contextGrid span, .readinessItem span, .timelineRow span { color: var(--summary-soft); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .contextGrid strong, .readinessItem strong, .timelineRow strong { overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; }
 .readinessGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
@@ -81,7 +81,7 @@
 .loadingState > p:last-child { margin: 16px 0 0; color: var(--summary-soft); font-size: 14px; line-height: 1.6; }
 
 @media (max-width: 767px) {
-  .container { width: min(100% - 32px, 960px); padding-top: 16px; }
+  .container { width: min(100% - 32px, 960px); padding-top: 16px; padding-bottom: 136px; }
   .intro { padding: 48px 0 28px; }
   .intro h1, .recovery h1 { font-size: clamp(2.7rem, 14vw, 4.5rem); }
   .intro > p:last-child, .recovery > p:not(.eyebrow) { font-size: 14px; }

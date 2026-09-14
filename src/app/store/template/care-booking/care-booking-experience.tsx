@@ -155,7 +155,7 @@ export function CareBookingExperience({ mode, showPreviewStrip = true }: { mode:
       <a className="cb-skip-link" href="#care-main">Lewati ke konten</a>
       {mode === 'preview' && showPreviewStrip && (
         <div className="cb-preview-strip">
-          <span>Webzoka Store V2 · Care Booking preview</span>
+          <span>Webzoka Store · Care Booking preview</span>
           <Link href="/store/template/care-booking">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>
         </div>
       )}
