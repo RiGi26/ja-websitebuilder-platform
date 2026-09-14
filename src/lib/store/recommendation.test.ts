@@ -72,7 +72,7 @@ describe('Store S5 recommendation engine', () => {
 
     expect(result.tier).toBe('bundle')
     expect(result.evidence.accountCapabilities).toEqual(['account.customer-login'])
-    expect(result.reasons[0]).toContain('website dan portal')
+    expect(result.reasons[0]).toContain('website dan sistem kerja tim')
   })
 
   it('sends generic login only without a connected workflow to consultation', () => {

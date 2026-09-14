@@ -161,7 +161,7 @@ export default function WarmCommerceSite() {
               </div>
               {!orderUrl && (
                 <p id="warm-commerce-whatsapp-unavailable" className={styles.whatsappNotice} role="status">
-                  WhatsApp belum dikonfigurasi untuk preview ini. CTA inquiry akan aktif setelah NEXT_PUBLIC_WEBZOKA_WHATSAPP_NUMBER tersedia.
+                  WhatsApp belum tersedia untuk preview ini. Tombol pertanyaan akan aktif setelah tujuan konsultasi tersedia.
                 </p>
               )}
             </div>

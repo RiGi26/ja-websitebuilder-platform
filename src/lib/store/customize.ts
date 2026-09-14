@@ -24,9 +24,9 @@ export const CUSTOMIZE_ACTIVE_TEMPLATE_KEY = `${CUSTOMIZE_STORAGE_KEY}:active`
 
 export const CUSTOMIZE_STEP_LABELS = [
   { step: 1, label: 'Tentang bisnis' },
-  { step: 2, label: 'Kebutuhan customer' },
+  { step: 2, label: 'Kebutuhan pelanggan' },
   { step: 3, label: 'Kebutuhan operasional' },
-  { step: 4, label: 'Kesiapan project' },
+  { step: 4, label: 'Kesiapan bisnis' },
 ] as const
 
 export const CURRENT_WEBSITE_STATUS_OPTIONS = [
@@ -60,8 +60,8 @@ export const TIMELINE_OPTIONS = [
 ] as const satisfies ReadonlyArray<{ id: TimelinePreference; label: string }>
 
 export const OPERATIONAL_MODE_OPTIONS = [
-  { id: 'selected', label: 'Ya, saya ingin memilih kebutuhannya', description: 'Pilih hal yang ingin dibantu atau dipantau tim.' },
-  { id: 'none', label: 'Tidak perlu dashboard khusus', description: 'Cukup website publik untuk saat ini.' },
+  { id: 'selected', label: 'Ya, saya ingin memilih kebutuhan tim', description: 'Pilih pekerjaan yang ingin dirapikan atau dipantau tim.' },
+  { id: 'none', label: 'Belum perlu halaman kerja untuk tim', description: 'Untuk saat ini cukup website yang dilihat pelanggan.' },
   { id: 'unsure', label: 'Belum yakin', description: 'Tandai untuk dibahas di tahap berikutnya.' },
 ] as const satisfies ReadonlyArray<{ id: OperationalSelectionMode; label: string; description: string }>
 
