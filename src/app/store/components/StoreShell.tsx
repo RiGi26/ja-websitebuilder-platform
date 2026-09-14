@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, Menu, MessageCircle, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { PUBLIC_WEBZOKA_URL } from '@/lib/store/metadata'
 import { storeWhatsAppUrl } from '@/lib/store/whatsapp'
 import styles from './StoreShell.module.css'
 
@@ -66,6 +67,9 @@ function BrandBlock() {
 function StoreUtilities({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className={styles.utilities}>
+      <a className={styles.publicLink} href={PUBLIC_WEBZOKA_URL} onClick={onNavigate}>
+        <ArrowLeft size={15} aria-hidden="true" /> Kembali ke Webzoka
+      </a>
       <Link href="/store" onClick={onNavigate}>
         <ArrowLeft size={15} aria-hidden="true" /> Kembali ke Store
       </Link>
