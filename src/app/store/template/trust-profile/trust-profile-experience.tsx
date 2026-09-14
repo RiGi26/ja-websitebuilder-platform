@@ -39,7 +39,7 @@ export function TrustProfileExperience({ mode, showPreviewStrip = true }: { mode
   return (
     <main className={`tp-shell ${dmSerif.variable}`}>
       <a className="tp-skip-link" href="#arta-main">Skip to content</a>
-      {mode === 'preview' && showPreviewStrip && <div className="tp-preview-strip"><span>Webzoka Store V2 · Trust Profile preview</span><Link href="/store/template/trust-profile">View the template direction <ArrowUpRight size={14} aria-hidden="true" /></Link></div>}
+      {mode === 'preview' && showPreviewStrip && <div className="tp-preview-strip"><span>Webzoka Store · Trust Profile preview</span><Link href="/store/template/trust-profile">View the template direction <ArrowUpRight size={14} aria-hidden="true" /></Link></div>}
 
       <header className="tp-topbar">
         <Link className="tp-brand" href="/store" aria-label="Back to Webzoka Store"><span className="tp-brand-mark" aria-hidden="true">A</span><span>Arta Studio</span></Link>
