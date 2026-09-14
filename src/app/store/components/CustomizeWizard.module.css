@@ -7,7 +7,7 @@
 }
 
 .container { width: min(100%, 1088px); margin: 0 auto; padding-inline: 32px; }
-.header { border-bottom: 1px solid var(--store-line); background: linear-gradient(135deg, #fffdf9, #eef2ff); }
+.header { border-bottom: 1px solid var(--store-line); background: linear-gradient(135deg, #fff, #f7f9ff); }
 .headerTopline { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; }
 .backLink, .resetButton { min-height: 44px; display: inline-flex; align-items: center; gap: 7px; color: var(--store-soft); font-size: 12px; font-weight: 750; }
 .backLink:hover, .resetButton:hover { color: var(--store-blue); }
@@ -35,7 +35,7 @@
 .errorSummary { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; padding: 14px 16px; border: 1px solid #c85b57; border-radius: 14px; color: #7a2522; background: #fff2f1; }
 .errorSummary svg { flex: none; margin-top: 1px; }
 .errorSummary p { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.5; }
-.formPanel { padding: 32px; border: 1px solid var(--store-line); border-radius: 24px; background: rgba(255,255,255,.8); box-shadow: 0 12px 30px rgba(23,35,42,.05); }
+.formPanel { padding: 32px; border: 1px solid var(--store-line); border-radius: 24px; background: #fff; box-shadow: 0 12px 30px rgba(23,35,42,.05); }
 .sectionHeading { max-width: 760px; }
 .sectionHeading h2, .completePanel h2 { font-size: clamp(2.25rem, 5vw, 4.2rem); }
 .sectionHeading > p:last-child { max-width: 600px; margin: 16px 0 0; color: var(--store-soft); font-size: 15px; line-height: 1.7; }
@@ -90,7 +90,7 @@
 .reviewRows div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; padding-top: 10px; border-top: 1px solid var(--store-line); }
 .reviewRows span { color: var(--store-soft); font-size: 11px; font-weight: 750; }
 .reviewRows strong { min-width: 0; color: var(--store-ink); font-size: 12px; line-height: 1.5; }
-.actionBar { position: sticky; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px -32px -76px; padding: 14px 32px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(216,212,203,.9); background: rgba(246,243,238,.92); box-shadow: 0 -10px 25px rgba(23,35,42,.06); backdrop-filter: blur(12px); }
+.actionBar { position: sticky; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px -32px -76px; padding: 14px 32px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(219,226,234,.9); background: rgba(255,255,255,.94); box-shadow: 0 -10px 25px rgba(23,35,42,.06); backdrop-filter: blur(12px); }
 .primaryButton, .secondaryButton, .tertiaryButton { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 17px; border-radius: 14px; font-size: 13px; font-weight: 850; cursor: pointer; touch-action: manipulation; }
 .primaryButton { border: 1px solid var(--store-blue); color: #fff !important; background: var(--store-blue); box-shadow: 0 10px 22px rgba(36,87,214,.18); }
 .primaryButton:hover { background: #163c9d; }
@@ -116,10 +116,15 @@
 
 @media (max-width: 767px) {
   .container { padding-inline: 16px; }
-  .headerTopline { padding-top: 12px; }
-  .backLink { max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .resetButton { font-size: 11px; }
+  .headerTopline { align-items: flex-start; padding-top: 12px; }
+  .backLink { max-width: calc(100% - 52px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .resetButton { width: 44px; justify-content: center; padding: 0; font-size: 0 !important; }
+  .resetButton svg { margin: 0; }
   .identity { margin-top: 24px; }
+  .identity { align-items: flex-start; flex-wrap: wrap; }
+  .identity > div { min-width: 0; }
+  .identityName { overflow-wrap: anywhere; }
+  .category { margin-left: 54px; }
   .headingBlock { padding: 26px 0 24px; }
   .headingBlock h1 { font-size: clamp(2.5rem, 13vw, 4.2rem); }
   .headingBlock > p:last-child { font-size: 14px; }
@@ -146,7 +151,7 @@
 }
 
 @media (max-width: 380px) {
-  .resetButton { font-size: 0; }
+  .resetButton { font-size: 0 !important; }
   .resetButton svg { margin: 0; }
   .choiceGridThree { grid-template-columns: 1fr; }
 }

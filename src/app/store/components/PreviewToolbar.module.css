@@ -5,9 +5,9 @@
   align-items: center;
   gap: 24px;
   padding: 8px 24px;
-  border-bottom: 1px solid #d8d4cb;
+  border-bottom: 1px solid #dbe2ea;
   color: #17232a;
-  background: #faf8f3;
+  background: #fff;
   font-family: var(--font-body), sans-serif;
 }
 .toolbar a { text-decoration: none; touch-action: manipulation; }
@@ -23,12 +23,12 @@
 .action:hover { transform: translateY(-1px); background: #163c9d; }
 
 @media (max-width: 599px) {
-  .toolbar { min-height: 64px; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; padding: 8px 12px; }
+  .toolbar { min-height: 64px; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) 12px 8px; }
   .back { width: 44px; justify-content: center; }
   .back span, .identity span, .status { display: none; }
   .identity { justify-items: start; }
   .identity strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-  .action { padding-inline: 12px; font-size: 11px; }
+  .action { min-width: 0; padding-inline: 12px; font-size: 11px; white-space: nowrap; }
 }
 @media (prefers-reduced-motion: reduce) {
   .toolbar *, .toolbar *::before, .toolbar *::after { transition-duration: .01ms !important; }

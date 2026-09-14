@@ -47,7 +47,7 @@ export default function StoreIndex() {
     <div className={styles.page}>
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}><Layers3 size={15} aria-hidden="true" /> Webzoka Store V2</p>
+          <p className={styles.eyebrow}><Layers3 size={15} aria-hidden="true" /> Webzoka Store</p>
           <h1>Pilih fondasi website yang sesuai cara bisnismu bekerja.</h1>
           <p className={styles.heroLede}>
             Enam arah template untuk menjelaskan produk, layanan, jadwal, program, atau unit rental dengan lebih jelas.
@@ -144,7 +144,7 @@ export default function StoreIndex() {
       </section>
 
       <footer className={styles.footer}>
-        <span>Webzoka Store · Template V2</span>
+        <span>Webzoka Store · Koleksi template</span>
         <span>Preview demo, bukan checkout atau ketersediaan live.</span>
       </footer>
     </div>
