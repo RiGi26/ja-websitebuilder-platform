@@ -2,9 +2,8 @@ import type { Metadata } from 'next'
 
 export const STORE_BASE_URL = 'https://store.webzoka.com'
 export const STORE_METADATA_BASE = new URL(STORE_BASE_URL)
-// Public Customer Hub route: the apex Webzoka URL redirects here, so Store
-// return navigation lands on the stable user-facing Public entry experience.
-export const PUBLIC_WEBZOKA_URL = 'https://www.webzoka.com/hub/store'
+// Canonical public entry used by Store return navigation.
+export const PUBLIC_WEBZOKA_URL = 'https://webzoka.com'
 
 type StoreMetadataInput = {
   title: string
