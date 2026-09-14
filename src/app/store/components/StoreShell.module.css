@@ -140,6 +140,8 @@
 }
 .utilities a:hover { color: var(--store-blue); }
 .utilities a svg:last-child { margin-left: auto; }
+.publicLink { color: var(--store-ink) !important; }
+.publicLink:hover { color: var(--store-blue) !important; }
 
 .main { min-width: 0; min-height: 100dvh; margin-left: 232px; }
 .mobileHeader { display: none; }
