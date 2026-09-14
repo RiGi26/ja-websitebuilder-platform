@@ -106,7 +106,7 @@ export function ModernCatalogExperience({ mode, showPreviewStrip = true }: { mod
     <main className="mc-shell">
       {mode === 'preview' && showPreviewStrip && (
         <div className="mc-preview-strip">
-          <span>Webzoka Store V2 · interactive template preview</span>
+          <span>Webzoka Store · interactive template preview</span>
           <Link href="/store/template/modern-catalog">View detail <ArrowUpRight size={14} aria-hidden="true" /></Link>
         </div>
       )}

@@ -13,7 +13,7 @@ export const metadata: Metadata = createStoreMetadata({
 function StoreIndexFallback() {
   return (
     <div style={{ minHeight: '100dvh', padding: '48px 32px' }} aria-busy="true">
-      <p>Webzoka Store V2</p>
+      <p>Webzoka Store</p>
       <h1>Pilih fondasi website yang sesuai cara bisnismu bekerja.</h1>
       <p>Memuat koleksi template…</p>
     </div>

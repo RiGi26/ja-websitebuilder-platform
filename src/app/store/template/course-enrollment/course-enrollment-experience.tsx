@@ -166,7 +166,7 @@ export function CourseEnrollmentExperience({ mode, showPreviewStrip = true }: { 
       <a className="ce-skip-link" href="#course-main">Lewati ke konten</a>
       {mode === 'preview' && showPreviewStrip && (
         <div className="ce-preview-strip">
-          <span>Webzoka Store V2 · Course Enrollment preview</span>
+          <span>Webzoka Store · Course Enrollment preview</span>
           <Link href="/store/template/course-enrollment">Lihat arah template <ArrowUpRight size={14} aria-hidden="true" /></Link>
         </div>
       )}

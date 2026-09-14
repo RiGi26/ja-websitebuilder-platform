@@ -2,7 +2,7 @@
   --mc-ink: #10121a;
   --mc-muted: #606675;
   --mc-line: #d9dce5;
-  --mc-paper: #f6f7fb;
+  --mc-paper: #ffffff;
   --mc-white: #ffffff;
   --mc-cobalt: #2444d8;
   --mc-cobalt-deep: #172e98;
@@ -19,7 +19,7 @@
 .wz-store button:disabled { cursor: not-allowed; opacity: .58; }
 .wz-store button:disabled:hover { transform: none; }
 .mc-shell { width: min(100%, 1440px); margin: 0 auto; overflow: clip; background: var(--mc-paper); }
-.mc-topbar { min-height: 72px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--mc-line); background: rgba(246,247,251,.94); backdrop-filter: blur(16px); }
+.mc-topbar { min-height: 72px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--mc-line); background: rgba(255,255,255,.94); backdrop-filter: blur(16px); }
 .mc-brand { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; letter-spacing: -.04em; }
 .mc-brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; background: var(--mc-ink); color: white; font-family: var(--font-fraunces), Georgia, serif; font-size: 18px; font-weight: 700; }
 .mc-topbar-note, .mc-nav, .mc-contact-link { display: none; }

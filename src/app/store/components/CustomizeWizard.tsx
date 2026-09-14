@@ -288,7 +288,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
               <Link className={styles.backLink} href={template.detailRoute}>
                 <ArrowLeft size={16} aria-hidden="true" /> Kembali ke {template.name}
               </Link>
-              <button className={styles.resetButton} type="button" onClick={handleReset}>
+              <button className={styles.resetButton} type="button" aria-label="Mulai dari awal" onClick={handleReset}>
                 <RotateCcw size={15} aria-hidden="true" /> Mulai dari awal
               </button>
             </div>
