@@ -34,7 +34,7 @@
 .recommendation { margin-top: 18px; padding: 28px; border-color: #b7c6f2; border-radius: 24px; background: linear-gradient(135deg, #fff, #f1f4ff); }
 .recommendationTopline { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .recommendationLabel { display: inline-flex; align-items: center; gap: 8px; color: var(--summary-blue); font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
-.tierBadge { min-height: 32px; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(36,87,214,.2); border-radius: 999px; color: #163c9d; background: var(--summary-blue-soft); font-size: 11px; font-weight: 850; }
+.tierBadge { min-height: 32px; max-width: 100%; display: inline-flex; align-items: center; padding: 7px 12px; border: 1px solid rgba(36,87,214,.2); border-radius: 999px; color: #163c9d; background: var(--summary-blue-soft); font-size: 11px; font-weight: 850; line-height: 1.35; overflow-wrap: anywhere; white-space: normal; }
 .recommendation h2 { margin: 18px 0 0; font-family: var(--font-warm-display), Georgia, serif; font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 600; letter-spacing: -.055em; line-height: .98; }
 .recommendationSummary { max-width: 680px; margin: 16px 0 0; color: var(--summary-ink); font-size: 15px; line-height: 1.7; }
 .recommendationReason { margin-top: 24px; padding-top: 20px; border-top: 1px solid #cbd5f2; }

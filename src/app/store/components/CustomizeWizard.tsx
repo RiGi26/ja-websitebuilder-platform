@@ -71,7 +71,7 @@ const ASSET_LABELS: Record<ReadinessAssetId, string> = {
   logo: 'Logo bisnis',
   domain: 'Nama domain',
   photos: 'Foto / visual',
-  catalog: 'Daftar isi bisnis',
+  catalog: 'Materi katalog atau layanan',
   'business-copy': 'Teks profil dan cerita bisnis',
 }
 
@@ -295,7 +295,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
             <div className={styles.identity}>
               <div className={styles.identityMark} aria-hidden="true"><Store size={20} /></div>
               <div>
-                <p className={styles.kicker}>Customize template</p>
+                <p className={styles.kicker}>Menyesuaikan contoh website</p>
                 <p className={styles.identityName}>{template.name}</p>
               </div>
               <span className={styles.category}>{STORE_CATEGORY_LABELS[template.category]}</span>
@@ -316,7 +316,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
               >
                 <span className={styles.progressFill} style={{ width: `${draft.currentStep * 25}%` }} />
               </div>
-              <ol className={styles.stepList} aria-label="Progress Customize">
+              <ol className={styles.stepList} aria-label="Progress pertanyaan">
                 {CUSTOMIZE_STEP_LABELS.map(({ step, label }) => (
                   <li key={step} aria-current={draft.currentStep === step ? 'step' : undefined} className={draft.currentStep >= step ? styles.stepActive : ''}>
                     <span>{step}</span>
@@ -334,7 +334,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
             {draft.status === 'complete' ? (
               <section className={styles.completePanel} aria-labelledby="complete-title">
                 <div className={styles.completeIcon} aria-hidden="true"><Check size={28} /></div>
-                <p className={styles.kicker}>Customize selesai</p>
+                <p className={styles.kicker}>Semua pertanyaan selesai</p>
                 <h2 id="complete-title">Kebutuhanmu sudah tersimpan.</h2>
                 <p>Berikut rekomendasi awal berdasarkan jawabanmu. Ini belum menjadi harga final, order, booking, atau proses pembuatan otomatis.</p>
                 {recommendation ? (
@@ -354,8 +354,8 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                 ) : null}
                 <div className={styles.summaryGrid}>
                   <div><span>Bisnis</span><strong>{draft.businessType}</strong><small>{STORE_CATEGORY_LABELS[draft.businessCategory]}</small></div>
-                  <div><span>Customer</span><strong>{selectedCountLabel(draft.customerNeeds.length, 'kebutuhan dipilih', 'kebutuhan dipilih')}</strong><small>{selectedCustomerLabels.slice(0, 2).join(', ') || 'Belum ditentukan'}</small></div>
-                  <div><span>Operasional</span><strong>{draft.operationalMode === 'none' ? 'Tidak perlu dashboard khusus' : draft.operationalMode === 'unsure' ? 'Belum yakin' : selectedCountLabel(draft.operationalNeeds.length, 'kebutuhan dipilih', 'kebutuhan dipilih')}</strong><small>{selectedOperationalLabels.slice(0, 2).join(', ') || 'Belum ditentukan'}</small></div>
+                  <div><span>Pelanggan</span><strong>{selectedCountLabel(draft.customerNeeds.length, 'kebutuhan dipilih', 'kebutuhan dipilih')}</strong><small>{selectedCustomerLabels.slice(0, 2).join(', ') || 'Belum ditentukan'}</small></div>
+                  <div><span>Operasional</span><strong>{draft.operationalMode === 'none' ? 'Belum perlu halaman kerja untuk tim' : draft.operationalMode === 'unsure' ? 'Belum yakin' : selectedCountLabel(draft.operationalNeeds.length, 'kebutuhan dipilih', 'kebutuhan dipilih')}</strong><small>{selectedOperationalLabels.slice(0, 2).join(', ') || 'Belum ditentukan'}</small></div>
                   <div><span>Kesiapan</span><strong>{completedAssetCount} dari 5 area diisi</strong><small>{TIMELINE_OPTIONS.find((option) => option.id === draft.timeline)?.label}</small></div>
                 </div>
                 <div className={styles.completeActions}>
@@ -370,9 +370,9 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                   <div className={styles.errorSummary} role="alert">
                     <CircleHelp size={18} aria-hidden="true" />
                     <p>
-                      {stepError === 'business-type' && 'Ceritakan dulu jenis atau bentuk bisnismu agar arah Customize bisa lebih relevan.'}
-                      {stepError === 'customer-needs' && 'Pilih minimal satu kebutuhan customer, atau pilih Belum yakin untuk lanjut.'}
-                      {stepError === 'operational-needs' && 'Pilih minimal satu kebutuhan operasional, atau pilih Tidak perlu dashboard khusus / Belum yakin.'}
+                      {stepError === 'business-type' && 'Ceritakan dulu jenis atau bentuk bisnismu agar jawaban berikutnya bisa lebih relevan.'}
+                      {stepError === 'customer-needs' && 'Pilih minimal satu kebutuhan pelanggan, atau pilih Belum yakin untuk lanjut.'}
+                      {stepError === 'operational-needs' && 'Pilih minimal satu kebutuhan operasional, atau pilih Belum perlu halaman kerja untuk tim / Belum yakin.'}
                     </p>
                   </div>
                 ) : null}
@@ -426,8 +426,8 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                   {draft.currentStep === 2 ? (
                     <>
                       <div className={styles.sectionHeading}>
-                        <p className={styles.kicker}>02 / Kebutuhan customer</p>
-                        <h2 id="step-title">Apa yang ingin customer lihat atau lakukan?</h2>
+                        <p className={styles.kicker}>02 / Kebutuhan pelanggan</p>
+                        <h2 id="step-title">Apa yang ingin pelanggan lihat atau lakukan?</h2>
                         <p>{config.customerIntro}</p>
                       </div>
                       <fieldset className={styles.fieldset}>
@@ -446,11 +446,11 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                     <>
                       <div className={styles.sectionHeading}>
                         <p className={styles.kicker}>03 / Kebutuhan operasional</p>
-                        <h2 id="step-title">Apa yang perlu dibantu di belakang layar?</h2>
-                        <p>Ini membantu kami memahami alur kerja tim. Pilihan di sini belum berarti dashboard langsung dibuat.</p>
+                        <h2 id="step-title">Apa yang ingin kamu rapikan di dalam bisnis?</h2>
+                        <p>Di sini kamu memilih pekerjaan yang ingin dibantu atau dipantau oleh tim. Ini belum berarti halaman kerja langsung dibuat.</p>
                       </div>
                       <fieldset className={styles.fieldset}>
-                        <legend>Seberapa jauh kamu butuh area pengelolaan?</legend>
+                        <legend>Apakah tim perlu halaman kerja khusus?</legend>
                         <div className={styles.choiceGrid}>
                           {OPERATIONAL_MODE_OPTIONS.map((option) => (
                             <ChoiceOption key={option.id} id={`operational-mode-${option.id}`} name="operational-mode" type="radio" checked={draft.operationalMode === option.id} label={option.label} description={option.description} onChange={() => chooseOperationalMode(option.id)} />
@@ -458,19 +458,19 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                         </div>
                       </fieldset>
                       <fieldset className={styles.fieldset} disabled={draft.operationalMode !== 'selected'}>
-                        <legend>Pilih area yang ingin dikelola</legend>
+                        <legend>Pilih pekerjaan yang ingin dibantu</legend>
                         <div className={styles.capabilityGrid}>
                           {config.operationalCapabilities.map((id) => <CapabilityOption key={id} id={id} checked={draft.operationalNeeds.includes(id)} disabled={draft.operationalMode !== 'selected'} onChange={() => toggleOperationalCapability(id)} />)}
                         </div>
                       </fieldset>
-                      <p className={styles.boundaryNote}><LayoutDashboard size={17} aria-hidden="true" /> Kami hanya mencatat kebutuhan ini. Rekomendasi dan pembahasan scope datang di tahap berikutnya.</p>
+                      <p className={styles.boundaryNote}><LayoutDashboard size={17} aria-hidden="true" /> Jawaban ini membantu kami memberi rekomendasi awal. Kebutuhan dan pekerjaan detail dibahas bersama setelahnya.</p>
                     </>
                   ) : null}
 
                   {draft.currentStep === 4 ? (
                     <>
                       <div className={styles.sectionHeading}>
-                        <p className={styles.kicker}>04 / Kesiapan project</p>
+                        <p className={styles.kicker}>04 / Kesiapan bisnis</p>
                         <h2 id="step-title">Apa yang sudah siap untuk memulai?</h2>
                         <p>Jawaban boleh belum lengkap. Pilih “Perlu dibantu” kalau kamu ingin area ini ikut dibahas.</p>
                       </div>
@@ -485,7 +485,7 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                         ))}
                       </div>
                       <fieldset className={styles.fieldset}>
-                        <legend>Kapan ingin mulai membahas project ini?</legend>
+                        <legend>Kapan ingin mulai membahas kebutuhan ini?</legend>
                         <div className={styles.choiceGridFour}>
                           {TIMELINE_OPTIONS.map((option) => <ChoiceOption key={option.id} id={`timeline-${option.id}`} name="timeline" type="radio" checked={draft.timeline === option.id} label={option.label} onChange={() => updateDraft({ timeline: option.id as TimelinePreference })} />)}
                         </div>
@@ -494,8 +494,8 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
                         <div className={styles.reviewHeading}><FileText size={18} aria-hidden="true" /><div><strong>Ringkasan jawabanmu</strong><span>Belum ada rekomendasi di tahap ini.</span></div></div>
                         <div className={styles.reviewRows}>
                           <div><span>Bisnis</span><strong>{draft.businessType || 'Belum diisi'} · {STORE_CATEGORY_LABELS[draft.businessCategory]}</strong></div>
-                          <div><span>Customer</span><strong>{selectedCustomerLabels.join(', ') || (draft.uncertainties.includes('customer-needs') ? 'Belum yakin' : 'Belum dipilih')}</strong></div>
-                          <div><span>Operasional</span><strong>{draft.operationalMode === 'none' ? 'Tidak perlu dashboard khusus' : draft.operationalMode === 'unsure' ? 'Belum yakin' : selectedOperationalLabels.join(', ') || 'Belum dipilih'}</strong></div>
+                          <div><span>Pelanggan</span><strong>{selectedCustomerLabels.join(', ') || (draft.uncertainties.includes('customer-needs') ? 'Belum yakin' : 'Belum dipilih')}</strong></div>
+                          <div><span>Operasional</span><strong>{draft.operationalMode === 'none' ? 'Belum perlu halaman kerja untuk tim' : draft.operationalMode === 'unsure' ? 'Belum yakin' : selectedOperationalLabels.join(', ') || 'Belum dipilih'}</strong></div>
                           <div><span>Kesiapan</span><strong>{completedAssetCount} dari 5 area diisi · {TIMELINE_OPTIONS.find((option) => option.id === draft.timeline)?.label}</strong></div>
                         </div>
                       </aside>

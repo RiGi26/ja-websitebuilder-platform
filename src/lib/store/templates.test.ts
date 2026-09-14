@@ -76,7 +76,7 @@ describe('Store V2 template registry', () => {
     })
     expect(V1_PRICE_PRESENTATION.bundle).toMatchObject({
       displayMode: 'consultation',
-      display: 'Harga menyesuaikan scope',
+      display: 'Harga menyesuaikan kebutuhan',
     })
   })
 

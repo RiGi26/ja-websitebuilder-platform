@@ -37,7 +37,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                   <TemplateStatusBadge status={template.previewStatus} />
                   <span>{STORE_CATEGORY_LABELS[template.category]}</span>
                 </div>
-                <p className={styles.eyebrow}><Layers3 size={15} aria-hidden="true" /> Template direction</p>
+                <p className={styles.eyebrow}><Layers3 size={15} aria-hidden="true" /> Contoh tampilan</p>
                 <h1>{template.name}</h1>
                 <p className={styles.positioning}>{template.positioning}</p>
                 <p className={styles.lede}>{template.shortDescription}</p>
@@ -53,7 +53,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                 </div>
               </div>
 
-              <div className={styles.heroVisual} aria-label={`Arah visual ${template.name}`}>
+              <div className={styles.heroVisual} aria-label={`Contoh tampilan ${template.name}`}>
                 {previewAsset ? (
                   <Image src={previewAsset.src} alt={previewAsset.alt} fill priority sizes="(max-width: 767px) 100vw, 48vw" />
                 ) : (
@@ -65,7 +65,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                 )}
                 <div className={styles.visualOverlay}>
                   <span>{template.name}</span>
-                  <strong>Direction untuk cara bisnis yang berbeda.</strong>
+                  <strong>Contoh tampilan untuk cara bisnis yang berbeda.</strong>
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
           <div className={styles.container}>
             <div className={styles.sectionHeading}>
               <p className={styles.eyebrow}>Cocok untuk siapa</p>
-              <h2 id="audience-title">Pilih arah yang sudah dekat dengan jenis bisnismu.</h2>
+            <h2 id="audience-title">Pilih contoh yang dekat dengan jenis bisnismu.</h2>
             </div>
             <div className={styles.audienceGrid}>
               <div>
@@ -86,7 +86,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                 </ul>
               </div>
               <div className={styles.customerCard}>
-                <p className={styles.eyebrow}>Customer bisa</p>
+                <p className={styles.eyebrow}>Pelanggan bisa</p>
                 <ul className={styles.checkList}>
                   {customerCan.map((capability) => <li key={capability}><Check size={16} aria-hidden="true" />{capability}</li>)}
                 </ul>
@@ -113,7 +113,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                 <ul className={styles.optionalList}>
                   {template.optionalFeatures.map((feature) => <li key={feature}>{feature}</li>)}
                 </ul>
-                <p>Fitur opsional tidak dianggap sudah aktif di preview. Scope dibahas terpisah.</p>
+              <p>Kebutuhan tambahan belum aktif di preview. Cakupan pekerjaan dibahas terpisah.</p>
               </div>
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
             <div className={styles.sectionHeading}>
               <p className={styles.eyebrow}>Pilih titik mulai</p>
               <h2 id="price-title">Website dulu, tambah sistem saat alurnya membutuhkan.</h2>
-              <p className={styles.headingCopy}>Harga awal hanya berlaku untuk kebutuhan website publik. Portal dan akun menyesuaikan scope.</p>
+              <p className={styles.headingCopy}>Harga awal hanya berlaku untuk kebutuhan website publik. Halaman kerja tim dan akun menyesuaikan kebutuhan.</p>
             </div>
             <div className={styles.priceGrid}>
               {priceTiers.map(([id, label, presentation]) => (
@@ -142,9 +142,9 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
           <div className={styles.container}>
             <p className={styles.eyebrow}>Langkah berikutnya</p>
             <h2 id="use-title">Gunakan {template.name} sebagai titik mulai.</h2>
-            <p>Jawab beberapa pertanyaan singkat supaya kebutuhan bisnis dan arah template ini bisa disiapkan untuk tahap berikutnya.</p>
+              <p>Jawab beberapa pertanyaan singkat supaya kebutuhan bisnis dan contoh website ini bisa disiapkan untuk tahap berikutnya.</p>
             <div className={styles.finalActions}>
-              <Link className={styles.primaryAction} href={template.customizeRoute}>Mulai Customize <ArrowRight size={16} aria-hidden="true" /></Link>
+              <Link className={styles.primaryAction} href={template.customizeRoute}>Mulai menjawab pertanyaan <ArrowRight size={16} aria-hidden="true" /></Link>
               <Link className={styles.secondaryActionLight} href="/store">Kembali ke koleksi <ArrowLeft size={16} aria-hidden="true" /></Link>
             </div>
           </div>
