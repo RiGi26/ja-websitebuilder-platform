@@ -124,7 +124,9 @@ export function loadAnalytics(measurementId: string | undefined): boolean {
   }
 
   window.dataLayer = window.dataLayer || []
-  window.gtag = window.gtag || ((...args: unknown[]) => window.dataLayer?.push(args))
+  window.gtag = window.gtag || function gtag(this: void) {
+    window.dataLayer?.push(arguments)
+  }
   window.gtag('js', new Date())
   window.gtag('config', measurementId)
 
