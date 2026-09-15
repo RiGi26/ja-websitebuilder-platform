@@ -52,6 +52,7 @@ const ALLOWED_PROPERTIES: Record<AnalyticsEventName, readonly string[]> = {
 const MAX_PROPERTY_LENGTH = 255
 export const ANALYTICS_CONSENT_KEY = 'webzoka_analytics_consent'
 const GA_SCRIPT_ID = 'webzoka-google-tag'
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
 const sentOnce = new Set<string>()
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>
@@ -170,7 +171,8 @@ export function trackEvent<TEvent extends AnalyticsEventName>(
   properties: AnalyticsEventProperties[TEvent],
 ): boolean {
   if (typeof window === 'undefined') return false
-  if (getAnalyticsConsent() !== 'granted' || !window.__webzokaAnalyticsLoaded) return false
+  if (getAnalyticsConsent() !== 'granted') return false
+  if (!window.__webzokaAnalyticsLoaded && !loadAnalytics(GA_MEASUREMENT_ID)) return false
 
   try {
     return queueEvent(eventName, sanitizeProperties(eventName, properties))
