@@ -39,6 +39,7 @@ import {
   writeCustomizeDraft,
 } from '@/lib/store/customize'
 import { recommendStoreSolution } from '@/lib/store/recommendation'
+import { ANALYTICS_EVENTS, trackEventOnce } from '@/lib/analytics'
 import { STORE_CATEGORY_LABELS } from '@/lib/store/templates'
 import type {
   CapabilityId,
@@ -169,6 +170,14 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
 
   useEffect(() => {
     if (!hydrated) return
+    trackEventOnce(ANALYTICS_EVENTS.customizeStarted, {
+      template_slug: template.slug,
+      step: String(draft.currentStep),
+    }, `customize-started:${template.slug}`)
+  }, [draft.currentStep, hydrated, template.slug])
+
+  useEffect(() => {
+    if (!hydrated) return
     if (skipNextPersist.current) {
       skipNextPersist.current = false
       return
@@ -216,6 +225,9 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
   const handleNext = () => {
     if (!validateCurrentStep()) return
     if (draft.currentStep === 4) {
+      trackEventOnce(ANALYTICS_EVENTS.customizeCompleted, {
+        template_slug: template.slug,
+      }, `customize-completed:${template.slug}`)
       setDraft((current) => ({ ...current, status: 'complete', currentStep: 4 }))
       setStorageMessage('Kebutuhanmu sudah tersimpan di sesi browser ini.')
       return
@@ -278,6 +290,15 @@ export default function CustomizeWizard({ template }: { template: StoreTemplate 
   const selectedOperationalLabels = draft.operationalNeeds.map((id) => CAPABILITY_TAXONOMY[id].label)
   const completedAssetCount = Object.values(draft.assets).filter((state) => state !== 'unknown').length
   const recommendation = draft.status === 'complete' ? recommendStoreSolution(draft, template) : null
+  const recommendationTier = recommendation?.tier
+
+  useEffect(() => {
+    if (draft.status !== 'complete' || !recommendationTier) return
+    trackEventOnce(ANALYTICS_EVENTS.recommendationViewed, {
+      template_slug: template.slug,
+      recommendation_tier: recommendationTier,
+    }, `recommendation:${template.slug}:${recommendationTier}`)
+  }, [draft.status, recommendationTier, template.slug])
 
   return (
     <StoreShell>
