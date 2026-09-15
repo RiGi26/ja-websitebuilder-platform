@@ -1,5 +1,3 @@
-import { track } from '@vercel/analytics'
-
 export const ANALYTICS_EVENTS = {
   storeTemplateView: 'store_template_view',
   storePreviewView: 'store_preview_view',
@@ -54,6 +52,30 @@ const ALLOWED_PROPERTIES: Record<AnalyticsEventName, readonly string[]> = {
 const MAX_PROPERTY_LENGTH = 255
 const sentOnce = new Set<string>()
 
+type AnalyticsProperties = Record<string, string | number | boolean | null>
+
+declare global {
+  interface Window {
+    dataLayer?: unknown[]
+    gtag?: (command: 'event', eventName: AnalyticsEventName, properties: AnalyticsProperties) => void
+  }
+}
+
+function queueEvent(eventName: AnalyticsEventName, properties: AnalyticsProperties): boolean {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', eventName, properties)
+    return true
+  }
+
+  if (!Array.isArray(window.dataLayer)) return false
+
+  const gtag = function (this: void, ...args: unknown[]) {
+    window.dataLayer?.push(args)
+  }
+  gtag('event', eventName, properties)
+  return true
+}
+
 function sanitizeProperties<TEvent extends AnalyticsEventName>(
   eventName: TEvent,
   properties: AnalyticsEventProperties[TEvent],
@@ -77,13 +99,14 @@ function sanitizeProperties<TEvent extends AnalyticsEventName>(
 export function trackEvent<TEvent extends AnalyticsEventName>(
   eventName: TEvent,
   properties: AnalyticsEventProperties[TEvent],
-): void {
-  if (typeof window === 'undefined') return
+): boolean {
+  if (typeof window === 'undefined') return false
 
   try {
-    track(eventName, sanitizeProperties(eventName, properties))
+    return queueEvent(eventName, sanitizeProperties(eventName, properties))
   } catch {
     // Analytics must remain non-critical to the Store experience.
+    return false
   }
 }
 
@@ -95,6 +118,5 @@ export function trackEventOnce<TEvent extends AnalyticsEventName>(
 ): void {
   const key = `${eventName}:${dedupeKey}`
   if (sentOnce.has(key)) return
-  sentOnce.add(key)
-  trackEvent(eventName, properties)
+  if (trackEvent(eventName, properties)) sentOnce.add(key)
 }
