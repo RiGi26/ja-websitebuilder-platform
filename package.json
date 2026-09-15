@@ -17,6 +17,7 @@
     "sync:corp-preview": "npm run build:theme-registry && node scripts/sync-corp-preview.mjs"
   },
   "dependencies": {
+    "@next/third-parties": "16.3.5",
     "@radix-ui/react-accordion": "1.2.3",
     "@radix-ui/react-alert-dialog": "1.1.6",
     "@radix-ui/react-aspect-ratio": "1.1.2",
@@ -47,7 +48,6 @@
     "@sentry/nextjs": "^10.59.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.0",
-    "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "canvas-confetti": "1.9.4",
     "class-variance-authority": "0.7.1",
