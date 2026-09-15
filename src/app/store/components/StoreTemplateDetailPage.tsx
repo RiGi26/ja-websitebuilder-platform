@@ -8,6 +8,7 @@ import {
 } from '@/lib/store/templates'
 import type { StoreTemplate } from '@/lib/store/types'
 import StoreShell from './StoreShell'
+import AnalyticsView from './AnalyticsView'
 import TemplateStatusBadge from './TemplateStatusBadge'
 import styles from './StoreTemplateDetailPage.module.css'
 
@@ -22,6 +23,11 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
 
   return (
     <StoreShell>
+      <AnalyticsView
+        eventName="store_template_view"
+        properties={{ template_slug: template.slug }}
+        dedupeKey={`template:${template.slug}`}
+      />
       <div className={styles.page} data-template={template.slug}>
         <header className={styles.hero}>
           <div className={styles.container}>

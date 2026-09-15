@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 // Font app-wide (admin/portal/landing/template) di-self-host via next/font →
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <Toaster position="top-center" richColors />
+        <Analytics mode={process.env.NODE_ENV === 'development' ? 'development' : 'production'} />
         <SpeedInsights />
       </body>
     </html>
