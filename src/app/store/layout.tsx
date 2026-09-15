@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Newsreader, Plus_Jakarta_Sans, Syne } from 'next/font/google'
-import { createStoreMetadata, STORE_METADATA_BASE } from '@/lib/store/metadata'
+import { STORE_METADATA_BASE } from '@/lib/store/metadata'
 import './store.css'
 
 const newsreader = Newsreader({
@@ -27,11 +27,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   metadataBase: STORE_METADATA_BASE,
-  ...createStoreMetadata({
-    title: 'Webzoka Store',
-    description: 'A focused collection of website template directions from Webzoka.',
-    pathname: '/store',
-  }),
+  title: 'Webzoka Store',
 }
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {

@@ -16,7 +16,7 @@ export function createStoreMetadata({ title, description, pathname, noIndex = fa
   return {
     title,
     description,
-    alternates: { canonical: pathname },
+    ...(noIndex ? {} : { alternates: { canonical: pathname } }),
     openGraph: {
       title,
       description,
@@ -30,6 +30,6 @@ export function createStoreMetadata({ title, description, pathname, noIndex = fa
       title,
       description,
     },
-    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: noIndex ? { index: false, follow: true } : { index: true, follow: true },
   }
 }
