@@ -1,5 +1,5 @@
-/* Inter + Fraunces kini di-self-host via next/font di app/layout.tsx (var
-   --font-inter / --font-fraunces) → tak ada lagi @import render-blocking. */
+/* Inter is self-hosted via next/font in app/layout.tsx. Display fonts are
+   loaded by the route trees that render them. */
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
