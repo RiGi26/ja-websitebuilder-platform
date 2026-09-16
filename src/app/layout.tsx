@@ -3,6 +3,7 @@ import { Inter, Fraunces } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import AnalyticsConsent from '@/app/components/AnalyticsConsent'
 
 // Font app-wide (admin/portal/landing/template) di-self-host via next/font →
 // zero render-block. Sebelumnya dimuat lewat CSS @import di globals.css (Inter +
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <Toaster position="top-center" richColors />
+        <AnalyticsConsent />
         <SpeedInsights />
       </body>
     </html>

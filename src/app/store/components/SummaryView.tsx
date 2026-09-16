@@ -17,6 +17,7 @@ import {
   WalletCards,
 } from 'lucide-react'
 import { resumeCustomizeDraft } from '@/lib/store/customize'
+import { ANALYTICS_EVENTS, trackEvent, trackEventOnce } from '@/lib/analytics'
 import { buildStoreWhatsAppLink, type StoreWhatsAppLink } from '@/lib/store/whatsapp'
 import {
   buildSummaryWhatsAppMessage,
@@ -129,6 +130,17 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
   const { viewModel } = resolution
   const handoff = createHandoff(viewModel)
 
+  useEffect(() => {
+    trackEventOnce(ANALYTICS_EVENTS.recommendationViewed, {
+      template_slug: resolution.templateSlug,
+      recommendation_tier: viewModel.recommendation.tier,
+    }, `recommendation:${resolution.templateSlug}:${viewModel.recommendation.tier}`)
+    trackEventOnce(ANALYTICS_EVENTS.summaryViewed, {
+      template_slug: resolution.templateSlug,
+      recommendation_tier: viewModel.recommendation.tier,
+    }, `summary:${resolution.templateSlug}:${viewModel.recommendation.tier}`)
+  }, [resolution.templateSlug, viewModel.recommendation.tier])
+
   const editAnswers = () => {
     resumeCustomizeDraft(getSessionStorage(), resolution.templateSlug)
     router.push(viewModel.template.customizeRoute)
@@ -229,7 +241,17 @@ function SummaryContent({ resolution }: { resolution: Extract<SummaryResolution,
             <h2 id="handoff-title">Bawa ringkasan ini ke percakapan yang tepat.</h2>
             <p>Rekomendasi ini masih awal. Kirim ringkasan ke WhatsApp untuk membahas kebutuhan dan langkah berikutnya. Mengklik tombol tidak berarti kamu membeli atau membayar apa pun.</p>
             {handoff.link.available && handoff.link.href ? (
-              <a className={styles.primaryAction} href={handoff.link.href} target="_blank" rel="noopener noreferrer">
+              <a
+                className={styles.primaryAction}
+                href={handoff.link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent(ANALYTICS_EVENTS.whatsappConsultationClick, {
+                  template_slug: resolution.templateSlug,
+                  recommendation_tier: viewModel.recommendation.tier,
+                  source_page: '/store/summary',
+                })}
+              >
                 Konsultasikan via WhatsApp <ArrowUpRight size={17} aria-hidden="true" />
               </a>
             ) : (
