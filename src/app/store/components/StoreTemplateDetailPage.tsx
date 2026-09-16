@@ -49,7 +49,7 @@ export default function StoreTemplateDetailPage({ template }: { template: StoreT
                 <p className={styles.lede}>{template.shortDescription}</p>
                 <div className={styles.actions}>
                   {template.previewStatus === 'preview' ? (
-                    <Link className={styles.primaryAction} href={template.previewRoute}>
+                    <Link className={styles.primaryAction} href={template.previewRoute} prefetch={false}>
                       Lihat Preview <Eye size={17} aria-hidden="true" />
                     </Link>
                   ) : (
