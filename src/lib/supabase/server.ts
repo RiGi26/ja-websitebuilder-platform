@@ -2,6 +2,8 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from './database.types'
+import { getPublicSupabaseKey } from './public-key'
+import { getSecretSupabaseKey } from './secret-key'
 
 // Client untuk Server Components & Route Handlers — respects RLS via JWT
 export async function createServerSupabaseClient() {
@@ -9,7 +11,7 @@ export async function createServerSupabaseClient() {
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getPublicSupabaseKey(),
     {
       cookies: {
         getAll() {
@@ -29,7 +31,7 @@ export async function createServerSupabaseClient() {
 export function createServiceSupabaseClient() {
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    getSecretSupabaseKey(),
     { auth: { persistSession: false, autoRefreshToken: false } }
   )
 }
