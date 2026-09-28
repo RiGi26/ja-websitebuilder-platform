@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react'
 
@@ -77,8 +78,11 @@ export default function PortalLoginPage() {
             </button>
           </form>
         </div>
-        <p className="text-center text-[11px] text-gray-400 mt-6">
-          Lupa password? Hubungi tim Webzoka Studio.
+        <p className="text-center text-sm text-gray-500 mt-6">
+          <Link href="/portal/forgot-password" className="inline-flex min-h-11 items-center justify-center px-3 font-semibold text-[#0071E3] hover:text-[#005BB5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071E3]">
+            Lupa kata sandi?
+          </Link>
+          <span className="block text-xs text-gray-400">Tidak punya akses ke email? Hubungi tim Webzoka Studio.</span>
         </p>
       </div>
     </div>
