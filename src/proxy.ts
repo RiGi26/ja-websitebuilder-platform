@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { getPublicSupabaseKey } from '@/lib/supabase/public-key'
 
 // ============================================================
 // Proxy (Next 16; menggantikan konvensi "middleware") — routing host tenant.
@@ -76,10 +77,10 @@ function isPrimaryHost(host: string): boolean {
 async function refreshPortalSession(req: NextRequest): Promise<NextResponse> {
   const res = NextResponse.next({ request: req })
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !anonKey) return res
+  if (!supabaseUrl) return res
+  const publishableKey = getPublicSupabaseKey()
 
-  const supabase = createServerClient(supabaseUrl, anonKey, {
+  const supabase = createServerClient(supabaseUrl, publishableKey, {
     cookies: {
       getAll() { return req.cookies.getAll() },
       setAll(cookiesToSet) {
@@ -130,8 +131,8 @@ export async function proxy(req: NextRequest) {
   if (req.nextUrl.pathname !== '/') return NextResponse.next()
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !anonKey) return NextResponse.next()
+  if (!supabaseUrl) return NextResponse.next()
+  const publishableKey = getPublicSupabaseKey()
 
   try {
     const cleanHost = host.split(':')[0].toLowerCase()
@@ -139,7 +140,7 @@ export async function proxy(req: NextRequest) {
       cleanHost
     )}&status=eq.published&select=slug&limit=1`
     const res = await fetch(url, {
-      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+      headers: { apikey: publishableKey },
       cache: 'no-store',
     })
     if (!res.ok) return NextResponse.next()

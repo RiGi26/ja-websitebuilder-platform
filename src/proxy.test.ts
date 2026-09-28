@@ -1,6 +1,11 @@
 import { NextRequest } from 'next/server'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { proxy } from './proxy'
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+  vi.unstubAllGlobals()
+})
 
 function makeRequest(host: string, pathname: string) {
   return new NextRequest(`https://${host}${pathname}`, {
@@ -39,5 +44,21 @@ describe('proxy host routing', () => {
     const response = await proxy(makeRequest('acme.webzoka.com', '/store'))
 
     expect(rewrittenPath(response)).toBe('/acme/store')
+  })
+
+  it('uses only the publishable key header for custom-domain lookup', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://chjgijlwhozeevrvhejt.supabase.co')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_test')
+    const fetchMock = vi.fn(async (_url: string, _options?: RequestInit) =>
+      new Response(JSON.stringify([{ slug: 'acme' }]), { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const response = await proxy(makeRequest('example.com', '/'))
+
+    expect(rewrittenPath(response)).toBe('/acme')
+    expect(fetchMock).toHaveBeenCalledOnce()
+    const options = fetchMock.mock.calls[0][1] as RequestInit
+    expect(options.headers).toEqual({ apikey: 'sb_publishable_test' })
   })
 })
