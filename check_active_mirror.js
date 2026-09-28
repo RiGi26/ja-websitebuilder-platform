@@ -2,19 +2,20 @@ const { createClient } = require('@supabase/supabase-js')
 const fs = require('fs')
 
 const envPath = '.env.local'
-const envContent = fs.readFileSync(envPath, 'utf8')
-
-const env = {}
-envContent.split('\n').forEach(line => {
-  const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/)
-  if (match) {
-    let value = match[2] || ''
-    if (value.startsWith('"') && value.endsWith('"')) {
-      value = value.substring(1, value.length - 1)
+const env = { ...process.env }
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf8')
+  envContent.split('\n').forEach(line => {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/)
+    if (match && !env[match[1]]) {
+      let value = match[2] || ''
+      if (value.startsWith('"') && value.endsWith('"')) {
+        value = value.substring(1, value.length - 1)
+      }
+      env[match[1]] = value
     }
-    env[match[1]] = value
-  }
-})
+  })
+}
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseSecretKey = env.SUPABASE_SECRET_KEY
@@ -26,7 +27,7 @@ if (!supabaseSecretKey?.startsWith('sb_secret_')) {
 const supabase = createClient(supabaseUrl, supabaseSecretKey)
 
 async function run() {
-  if (process.argv.includes('--probe')) {
+  if (process.argv.includes('probe') || process.argv.includes('--probe')) {
     const { error } = await supabase
       .from('catalog_mirror')
       .select('pack_id', { head: true, count: 'exact' })
