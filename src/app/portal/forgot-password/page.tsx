@@ -30,7 +30,11 @@ export default function ForgotPasswordPage() {
       })
 
       if (resetError) {
-        setError('Tautan pemulihan belum bisa diminta. Periksa koneksi, lalu coba lagi.')
+        setError(
+          resetError.code === 'over_email_send_rate_limit'
+            ? 'Batas pengiriman email pemulihan tercapai. Tunggu satu jam, lalu coba lagi.'
+            : 'Tautan pemulihan belum bisa diminta. Periksa koneksi, lalu coba lagi.'
+        )
         return
       }
 
